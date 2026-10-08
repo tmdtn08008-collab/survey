@@ -38,6 +38,8 @@ dependencies {
 	modImplementation "maven.modrinth:forge-config-api-port:${project.forge_config_api_port_version}"
 	//javax.annotation.Nullable and friends, which NeoForge puts on the classpath
 	compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+	//optional: camera view compatibility with Sodium's chunk tracking (Sodium's API is the same from 0.6 to 0.8 for this)
+	modCompileOnly 'maven.modrinth:sodium:mc1.21.1-0.6.13-fabric'
 	//Forge Config API Port ships NightConfig as nested jars, which Loom does not put on the development classpath
 	implementation 'com.electronwill.night-config:core:3.8.0'
 	implementation 'com.electronwill.night-config:toml:3.8.0'
