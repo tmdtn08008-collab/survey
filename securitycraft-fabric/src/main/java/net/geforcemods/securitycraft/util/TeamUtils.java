@@ -7,11 +7,9 @@ import java.util.function.Supplier;
 import net.geforcemods.securitycraft.ClientHandler;
 import net.geforcemods.securitycraft.ConfigHandler;
 import net.geforcemods.securitycraft.api.Owner;
-import net.geforcemods.securitycraft.compat.ftbteams.FTBTeamsCompat;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.scores.PlayerTeam;
-import net.neoforged.fml.ModList;
 import net.geforcemods.securitycraft.fabric.util.ServerLifecycleHooks;
 
 public class TeamUtils {
@@ -86,12 +84,8 @@ public class TeamUtils {
 	public record TeamRepresentation(String name, int color) {}
 
 	public enum TeamType {
-		FTB_TEAMS(() -> {
-			if (ModList.get().isLoaded("ftbteams"))
-				return new FTBTeamsCompat();
-			else
-				return null;
-		}),
+		// PORT-NOTE: FTB Teams compatibility is not part of the Fabric port yet; this entry is kept so existing configs stay valid
+		FTB_TEAMS(() -> null),
 		VANILLA(VanillaTeamHandler::new),
 		NO_OP(() -> null);
 
