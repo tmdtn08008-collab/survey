@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "securitycraft:reinforced_iron_bars"
+    },
+    "G": {
+      "tag": "c:ingots/gold"
+    },
+    "I": {
+      "item": "securitycraft:reinforced_iron_block"
+    },
+    "R": {
+      "tag": "c:dusts/redstone"
+    }
+  },
+  "pattern": [
+    "BBB",
+    "GRG",
+    "III"
+  ],
+  "result": {
+    "count": 1,
+    "id": "securitycraft:cage_trap"
+  }
+}

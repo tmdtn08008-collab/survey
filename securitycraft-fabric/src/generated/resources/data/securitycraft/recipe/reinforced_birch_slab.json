@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "securitycraft:wooden_slab",
+  "key": {
+    "B": {
+      "item": "securitycraft:reinforced_birch_planks"
+    }
+  },
+  "pattern": [
+    "BBB"
+  ],
+  "result": {
+    "count": 6,
+    "id": "securitycraft:reinforced_birch_slab"
+  }
+}

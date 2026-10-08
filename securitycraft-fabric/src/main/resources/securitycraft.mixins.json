@@ -1,0 +1,35 @@
+{
+	"required": true,
+	"package": "net.geforcemods.securitycraft.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"refmap": "securitycraft.refmap.json",
+	"client": [
+		"camera.ClientChunkCacheMixin",
+		"camera.GameRendererMixin",
+		"camera.LevelRendererMixin",
+		"camera.LocalPlayerMixin",
+		"camera.MinecraftMixin",
+		"camera.ViewAreaMixin",
+		"f3.BetterF3TargetModuleMixin",
+		"f3.DebugScreenOverlayMixin",
+		"sri.ModelManagerMixin",
+		"taser.ItemInHandRendererMixin"
+	],
+	"mixins": [
+		"boat.BoatMixin",
+		"camera.ChunkMapMixin",
+		"camera.PlayerListMixin",
+		"camera.ServerPlayerMixin",
+		"camera.TrackedEntityMixin",
+		"datafix.ItemStackComponentizationFixMixin",
+		"datafix.V1460Mixin",
+		"passcode.ServerGamePacketListenerImplMixin",
+		"passcode.StructureTemplateMixin",
+		"potion.BrewingStandMenuMixin",
+		"reinforced.PortalForcerMixin",
+		"reinforced.ShearsItemMixin",
+		"reinforced.SwordItemMixin",
+		"suspiciousmines.BrushItemMixin"
+	],
+	"minVersion": "0.8"
+}

@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "securitycraft:reinforced_terracotta",
+  "key": {
+    "D": {
+      "tag": "c:dyes/cyan"
+    },
+    "T": {
+      "item": "securitycraft:reinforced_hardened_clay"
+    }
+  },
+  "pattern": [
+    "TTT",
+    "TDT",
+    "TTT"
+  ],
+  "result": {
+    "count": 8,
+    "id": "securitycraft:reinforced_cyan_terracotta"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "group": "securitycraft:reinforced_wool",
+  "ingredients": [
+    {
+      "tag": "c:dyes/orange"
+    },
+    {
+      "tag": "securitycraft:reinforced/wool"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "securitycraft:reinforced_orange_wool"
+  }
+}

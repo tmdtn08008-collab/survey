@@ -1,0 +1,356 @@
+--------------------------Changelog for the next version of SecurityCraft--------------------------
+
+- New: Hungarian translation (Thanks morpheus133!)
+- Fix: Some UIs stay open, even though the player is no longer near the block or holding the item
+- Fix: Retinal Scanners, Scanner Doors, and Scanner Trapdoors send messages to players who are not the owner or allowlisted, even if they're configured to not send messages
+- Fix: Crashes
+
+--------------------------Changelog for v1.10.2.1 of SecurityCraft--------------------------
+
+- Fix: Some of SecurityCraft's UIs immediately close and/or cause other players to get kicked
+
+--------------------------Changelog for v1.10.2 of SecurityCraft--------------------------
+
+- New: Secure Trading Station
+- New: The Keycard Reader, Keypad, and Retinal Scanner can now be placed facing up or down (Thanks CYB3RCA4T!)
+- New: The "/sc owner" subcommand now has an optional "resetSettings" mode to force affected blocks to reset sensible data like passcodes
+- New: Configuration option to control whether to render the spinning disk of Secure Redstone Interfaces
+- New: Configuration option to control the breaking speed of owned blocks
+- New: Option for the Portable Radar to control whether it should send messages if players are in its radius
+- New: Block Pockets can now be disassembled automatically
+- New: The reinforced block tint can now be adjusted to only apply to owned or unowned blocks
+- New: The reinforced block tint mode and color can be modified ingame in the Universal Block Reinforcer screen
+- New: Inventory Scanners will now react to items in the inventories of various entities, including Donkeys, Minecarts with Chests, and Boats with Chests
+- New: Inventory Scanners will now react to items in the equipment slots of living entities
+- New: Inventory Scanners will now react to items equipped in the player's Curio inventory, if the mod Curios is installed
+- New: The Username Logger now supports the Smart Module, allowing it to update existing entries instead of creating new ones for the same player
+- New: Dutch translation
+- Change: Several entries within the SecurityCraft Manual have been updated to remove outdated descriptions
+- Change: Ownable blocks that are targeted by the "/sc owner" subcommand will now keep all of their non-owner-related data by default
+- Change: The visible chunks in Frame feeds are no longer expanded by Distant Horizons, to increase stability and performance 
+- Change: The Cage Trap now builds up gradually within roughly half a second when activated
+- Change: Un-/Reinforcing blocks is now done by taking them out of the Universal Block Reinforcer screen's output slot instead of closing the screen
+- Change: The Username Logger entry capacity has been increased from 100 to 128 for consistency with vanilla Vaults
+- API: New method Owner#isTreatedTheSameAs to check if everything owned by one owner is also owned by the other owner
+- API: New methods within LinkableBlockEntity for better control over how the list of linked blocks is modified and stored
+- Fix: Some Briefcase and Keycard interactions do not respect whether the player is wearing an Incognito Mask
+- Fix: The Block Change Detector cannot open Reinforced Doors/Trapdoors/etc. or interact with Secure Redstone Interfaces (Thanks CYB3RCA4T!)
+- Fix: Redstone Wire cannot be placed on top of Reinforced Hoppers
+- Fix: Lecterns and Chiseled Bookshelves display their content incorrectly when they are reinforced using /sc convert
+- Fix: Reinforced Lanterns and Reinforced Chains cannot be waterlogged by placing water into them using a Bucket
+- Fix: Some messages that are sent from a Keycard Lock mention a Keycard Reader as the source block
+- Fix: Triggered Bouncing Betties do not increase in size before exploding
+- Fix: Severe lag when joining a superflat world with a layer of Secure Redstone Interfaces
+- Fix: Placing a Secure Redstone Interface using /setblock places it in its waterlogged state
+- Fix: The two halves of Keypad Doors and Scanner Doors can sometimes become unlinked, making modules and options no longer synchronize between them
+- Fix: Players mounted to Security Cameras are not affected by gravity and cannot be moved by other players
+- Fix: Projected blocks are rendered even if they are outside the player's field of view
+- Fix: The value of the Projector's "Range" option changes unexpectedly when toggling the Horizontal mode
+- Fix: The experience level is visible while mounted to a Security Camera
+- Fix: Crash related to linking and unlinking Laser Blocks
+- Fix: Projected blocks stop rendering when standing too far away
+- Fix: The sub-screen that is used for choosing outline colors cannot be closed through the inventory key
+- Fix: Some buttons in the Block Pocket Manager and Block Change Detector screens cannot be interacted with using keyboard navigation
+- Fix: Players can smuggle items past Inventory Scanners by interacting with nearby containers 
+- Fix: A Projector placed on the ceiling has the wrong breaking particles
+- Fix: The Alarm sometimes interrupts its sound directly after being powered
+- Fix: Visual issues when viewing a Frame feed while a post effect is active, e.g. when spectating a Creeper
+- Fix: Reinforced Copper Bulbs have no crafting recipe
+- Fix: Reinforced Doors do not drop in item form when mining the bottom block
+- Fix: Some UIs stay open, even though the player is no longer near the block or holding the item
+- Fix: The Sonic Security System cannot lock Passcode-protected Chests and Barrels
+- Removed: Server configuration options "reinforcedBlockTint" and "forceReinforcedBlockTint"
+- Removed: Indicator in the camera select screen that shows when no Redstone Module is installed
+- Misc.: The textures for some items and the SecurityCraft Manual UI have been updated
+- Misc.: The Inventory Scanner has a new look
+
+--------------------------Changelog for v1.10.1 of SecurityCraft--------------------------
+
+- New: Reinforced Lightning Rod
+- New: Incognito Mask
+- New: In-game notification message that informs players that an error occurred while capturing a frame feed
+- New: Debug feature to help identify other mods preventing players from viewing a Security Camera
+- New: Configuration option for limiting the amount of chunks that may be forceloaded by frame feeds
+- Change: The model and texture of the Motion-Activated Light have been updated
+- Change: The Trophy System now shows its targeting laser even when disguised
+- Change: The signature of a Keycard Reader can now be changed through a text box
+- API: New IOwnable#isOwnedBy overload taking a Player and a boolean for checking ownership respecting the new Incognito Mask
+- API: New method Owner#isDefaultOwner to check if the Owner object has no player data associated with it
+- API: New method IPasscodeConvertible#getRequiredKeyPanels to control how many key panel items are consumed when converting this block
+- Fix: Several mod incompatibilities that caused Frame feeds to not show up correctly
+- Fix: Game performance does not improve when breaking frames with an active frame feed
+- Fix: Active camera feeds in multiple dimensions can interfere with each other's chunk loading
+- Fix: The Level 3 Keycard cannot be crafted
+- Fix: The powered Secure Redstone Interface model looks wrong when placed on the wall or ceiling
+- Fix: Briefcase and Keycard Holder exploits
+- Fix: Inventory scanner crash
+- Fix: Placing a Secure Redstone Interface as a receiver does not correctly update itself and surrounding blocks
+- Fix: Lenses placed inside a Claymore, Security Camera, or Trophy System sometimes disappear when the world is reloaded
+- Fix: Blocks projected by a Projector are reset to their default state when opening the Projector's screen
+- Fix: The owner of the topmost block of the cage spawned by a Cage Trap is not set correctly
+- Fix: Ownable blocks can be mined by drills or similar blocks from certain other mods
+- Fix: Blocks disguised as vanilla blocks can be mined by anyone
+- Fix: The rotation of a Security Camera can become desynced between client and server
+- Fix: Tricking Retinal Scanners, Scanner Doors and Scanner Trapdoors with player heads does not work
+- Fix: The Mine and Sentry Remote Access Tool appear to be able to interact with mines/sentries that are not owned by the player, even though they can't
+- Fix: Players viewing a Security Camera are invisible for players in spectator mode
+- Fix: The Rift Stabilizer does not keep its custom name as an item when the bottom half is mined
+- Fix: Crash when teleporting or respawning near Security Cameras
+- Fix: Crash when trying to change the owner of a Reinforced Button or Reinforced Lever
+- Fix: Bad client performance when looking at many reinforced blocks at once
+- Misc.: The minimum required NeoForge version is now 21.1.206
+
+--------------------------Changelog for v1.10 of SecurityCraft--------------------------
+
+- New: Cameras can now be viewed on Frames within the world (live camera feeds)[1]
+- New: Several server and client config settings to control chunk loading in camera feeds
+- New: All blocks can now be broken only by the owner with normal tools (axe, shovel, hoe, ...) and the Universal Block Remover has been disabled by default
+- New: Config to re-enable the Universal Block Remover and disable normal block breaking
+- New: Config to define tool requirement behavior (e.g. does Reinforced Stone always drop, or just when breaking it using a pickaxe?)
+- New: Config to allow other players to break anyone's blocks (disallowed by default)
+- New: Config for defining how much longer it should take to break another player's block compared to breaking one's own
+- New: The cage trap iron bars now also break when breaking a cage trap in creative mode
+- New: Readded ProjectE compatibility
+- New: The Camera Monitor, Mine/Sentry Remote Access Tool, and Sonic Security System can now be copied in the crafting table, by combining two of the same item (one empty, another one with things bound to it) in a crafting table
+- New: Reinforced dispensers are now able to user any level of Universal Block Reinforcer to un-/reinforce the block in front of them
+- Change: The block mine overlay now shows in the first person hand models as well
+- Change: Camera model animations are now synchronized between players
+- Change: The Secure Redstone Interface has new visuals for when it receives/outputs a redstone signal
+- Change: Owners of disguised blocks and players in creative mode now receive the actual block instead of the disguise when using Pick Block
+- Change: The text in the bottom-right corner of the camera overlay now fades out after 10 seconds
+- Change: The Security Camera item model has been changed to match the one used when the camera is placed in the world
+- Change: The Block Change Detector, Inventory Scanner Field, Projector, Protecto, Security Camera, Taser, and Username Logger textures have been tweaked
+- Change: The default value for the "inventoryScannerRange" config setting has been increased from 2 to 3
+- API: IDisguisable has been simplified
+- API: New method IPasscodeProtected#savePasscodeAndSalt for more conveniently saving passcode and salt key to NBT
+- API: New methods IPasscodeProtected#setSaveSalt and IPasscodeProtected#shouldSaveSalt to control storing the object's salt into its data storage
+- Fix: Reinforced Mud Bricks and Blackstone Slab/Stairs don't look 100% like their vanilla counterparts
+- Fix: Holding a camera monitor makes it possible to identify disguised cameras
+- Fix: Items that can have linked positions (e.g. Camera Monitor) show the idle animation even when they have positions and are either dropped, or held by a non-player entity
+- Fix: The mine remote access tool can identify block mines
+- Fix: The display of items in the SC Manual can change too fast in certain situations
+- Fix: Potential startup crash
+- Fix: The map color, instrument, and more properties of many reinforced blocks don't match their vanilla counterparts
+- Fix: Several reinforced blocks can be broken by pistons
+- Fix: Security sea boats cannot be broken by players like normal boats
+- Fix: The claymore does not ignore the owner if the "Ignore Owner" option is true, and vice versa
+- Fix: Cage traps can be used to maliciously change ownership of blocks
+- Fix: Limited use keycards can be used indefinitely in a keycard holder
+- Fix: A portable radar chat message is broken in German
+- Fix: Anything can pull books out of a Reinforced Chiseled Bookshelf
+- Fix: Reinforced buttons and levers can be triggered by wind charges
+- Fix: Reinforced grass blocks and water cauldrons are still tinted even if the reinforced tint is turned off
+- Fix: Fake water does not flow the same way as regular water
+- Fix: Laser and inventory scanner fields don't show up properly in the overlay of Jade/TOP/etc.
+- Fix: Loading a structure with passcode-protected objects onto itself using a structure block invalidates all passcodes
+- Fix: A system of connected laser blocks does not emit redstone correctly when walking into two or more laser fields 
+- Fix: Brushing suspicious sand mines does not respect the player's block_interaction_range attribute
+- Fix: Reinforced Block recipes are grouped and categorized differently in the recipe book compared to vanilla block recipes
+- Fix: Text above the Sonic Security System does not render correctly
+- Fix: Some blocks are not tinted correctly when rendered in the disguise module or projector screen's state selector
+- Fix: Crash when interacting with certain SecurityCraft blocks in spectator mode
+- Fix: The camera overlay renders even if HUD rendering is turned off through the use of F1
+- Fix: The Projector, projected blocks, Disguise Module, and block disguises do not properly show banner patterns, decorated pot sherds, etc.
+- Fix: A Projector projecting something can cause some block models to have incorrect rendering (e.g. decorated pot displays z-fighting)
+- Fix: Block mines are not grouped together in the creative inventory
+- Fix: Crash when dispensing a fake liquid bucket item into a block
+- Removed: Configuration "ableToBreakMines"
+- Misc.: The "security_camera.png" and "security_camera_viewing.png" textures have been moved from the "block" to the "entity/security_camera" folder
+- Misc.: The taser model and textures have been improved and optimized. Resource packs need to update
+- Misc.: The minimum required NeoForge version is now 21.1.151
+
+[1] Note: Frame blocks that already existed in the world prior to this update will lose their owner. These frames can be broken by anyone so they can be placed down with the proper owner again.
+
+--------------------------Changelog for v1.9.12 of SecurityCraft--------------------------
+
+- New: The Panic Button now supports the Allowlist Module
+- New: Config setting to disable the ability of the Universal Block Reinforcer to un-/reinforce blocks that are placed in the world
+- New: Option for the Portable Radar to only send notification messages to the owner instead of all members of the team
+- New: Server config setting to allow setting the precedence of team ownership checks (useful when FTB Teams is installed, and the mod should check for vanilla teams instead)
+- New: When linking a keycard, a player can optionally be set who will be the only player able to use the keycard
+- API: New method IPasscodeProtected#setPasscodeInAdjacentBlock for updating an adjacent block (e.g. the second half of a chest) with the passcode when setting it
+- Fix: Placing a Passcode-protected Chest or Barrel leads to unnecessary data being saved
+- Fix: Bouncing betties are rendered incorrectly
+- Fix: The Universal Block Reinforcer's screen title does not display the item's actual name
+- Fix: Reinforced tuff brick slabs cannot be crafted in the crafting table
+- Fix: The operator items creative tab shows when it's disabled
+- Fix: Changing the Keypad Trapdoor's signal length or disabled option plays the close sound even when already closed
+- Fix: Pressing enter when setting up a passcode does not save the passcode
+- Fix: The Reinforced Dispenser and Dropper don't have a reinforced tint when placed in the world
+- Fix: The Rift Stabilizer cannot open reinforced doors/trapdoors/etc. or interact with secure redstone interfaces
+- Fix: Right-clicking a passcode-protected block in spectator mode while holding a codebreaker does not work
+- Fix: Jade/TOP/WTHIT show the owner of block mines
+- Fix: Several instances of blocks disregarding the team ownership config setting being disabled when FTB Teams is installed
+- Fix: Security Camera entities are sent to every player instead of only the player mounting the camera
+- Misc.: Salt keys are now stored as integer arrays instead of strings, reducing file size
+- Misc.: The minimum required NeoForge version is now 21.1.49
+
+--------------------------Changelog for v1.9.11 of SecurityCraft--------------------------
+
+- New: More blocks now support the Disguise Module: Keypad Door, Keypad Trapdoor, Passcode-Protected Chest, Reinforced Dispenser, Reinforced Dropper, Reinforced Hopper, Scanner Door, Scanner Trapdoor, Security Camera, Sonic Security System
+- New: Server config setting to set the amount of damage received when suffocating in a reinforced block
+- New: Item tag "securitycraft:keycards" for all keycards (this notably excludes the Limited Use Keycard, as it's merely a crafting component)
+- New: Item tag "securitycraft:keycard_holder_can_hold" for all items that can be put into a Keycard Holder (contains the securitycraft:keycards item tag and the Limited Use Keycard by default)
+- New: Reinforced Soul Sand and Reinforced Magma Block
+- New: Reinforced Scaffolding
+- New: The Block Change Detector can now be placed on walls and the ceiling
+- New: Russian translation (Thanks cutiegin!)
+- New: The Smart Module in a Security Camera now also saves the zoom amount
+- New: Support for NeoForge's configuration screen
+- New: HUD mods like Jade and The One Probe now show whether an installed module is disabled
+- New: ɥsᴉꞁᵷuƎ (uʍoᗡ ǝpᴉsd∩) translation
+- New: The cage of a Cage Trap can now replace replaceable blocks like fern or dead bush
+- New: The Camera Monitor now displays the last known name of a camera if the camera is out of range
+- New: Option in the Username Logger to set the time that has to pass until the same player can be logged again
+- New: The Inventory Scanner can now detect and remove items in bundles
+- Change: Security Camera head display
+- Change: The damage taken when suffocating in a reinforced block is now halved (from 5 hearts to two and a half hearts)
+- Change: IMS bombs can no longer be diverted from their path using explosions
+- Change: The "(team)" suffix for owners is now only shown when the team has more than one player in it
+- Change: Only the owner and allowlisted players are now able to access a Username Logger
+- Change: Several blocks that can open reinforced doors now reset their state and data when the owner is changed (e.g. Keycard Reader loses its signature and levels, Keypad no longer has a passcode, ...)
+- Change: A Reinforced Observer now needs to be validated by the new owner after the owner was changed
+- Change: The Inventory Scanner now supports all items that save their inventory the same way as shulker boxes
+- API: New interface IDisguisable to abstract away from the DisguisableBlock class. This means blocks no longer need to extend it to be disguisable, but instead need to implement the interface
+- API: New overrides for IPasscodeProtected#hashAndSetPasscode that take in a consumer that's run after setting the passcode
+- Fix: Turning to a specific page in the SecurityCraft Manual can crash the game
+- Fix: The Alarm ceases to emit any sound when selecting a different sound
+- Fix: When closing the screen of a Briefcase, Disguise Module or Keycard Holder, items carried by the mouse are deleted
+- Fix: Players are kicked from the world when a Disguise Module is removed from certain blocks
+- Fix: Disabled security cameras sometimes start rotating again when near other rotating cameras
+- Fix: Disguising reinforced observers can have visual issues
+- Fix: Disguised secure redstone interfaces have incorrect collision, and are see-through
+- Fix: The Secure Redstone Interface screen cannot be closed by pressing the inventory key
+- Fix: Reinforced stairs can be destroyed through explosions
+- Fix: Potential crash when hovering over specific items of SecurityCraft in the inventory
+- Fix: Note info tooltips on items are positioned out of place sometimes
+- Fix: Client crash when trying to un-/reinforce blocks in a crafting table on a server
+- Fix: The Protecto can attack armor stands
+- Fix: The Protecto attacks when it shouldn't
+- Fix: Fake Water can be placed in the nether
+- Fix: Buckets containing Fake Water/Lava are incompatible with tanks of other mods
+- Fix: Lily pads cannot be placed on Reinforced Ice
+- Fix: The Block Change Detector keeps outputting a redstone signal when all its entries are cleared
+- Fix: The Denylist Module does not work
+- Fix: Option slider text shows the value in the incorrect position
+- Fix: Potential crash
+- Fix: Setting the signal length option to 0 on a Keypad Trapdoor makes the trapdoor not open at all
+- Fix: Block Pocket and Block Change Detector outline/block highlights are drawn too thin at certain angles
+- Fix: Cameras do not work from far away when using Sodium
+- Fix: Signs cannot be placed on some blocks
+- Fix: Rain falls directly through disguisable blocks
+- Fix: The Reinforced Lectern is at the wrong position in the creative tab
+- Fix: A Secure Redstone Interface in receiver mode does not update its neighboring blocks when the signal becomes un-/protected
+- Fix: Jade/WTHIT/TOP don't show the owner of an ownable block that is disguised with another ownable block
+- Fix: Disguised blocks are not hidden in F3
+- Fix: Un-/reinforcing extended pistons leaves a headless piston base behind
+- Fix: The screen to enter a passcode does not show after setting a new passcode
+- Fix: Creative inventory crash when the lens is not in the minecraft:dyeable tag
+- Misc.: Performance improvements for the Secure Redstone Interface
+
+--------------------------Changelog for v1.9.10-beta9 of SecurityCraft--------------------------
+
+- Fix: Crash when pushing or pulling reinforced blocks with reinforced pistons
+- Fix: Startup crash when other modded boats are present
+
+--------------------------Changelog for v1.9.10-beta8 of SecurityCraft--------------------------
+
+- Fix: Compatibility with Minecraft 1.21.1
+
+--------------------------Changelog for v1.9.10-beta7 of SecurityCraft--------------------------
+
+- Fix: Compatibility with NeoForge 21.0.66-beta and newer
+- Misc.: The minimum required NeoForge version is now 21.0.76-beta
+
+--------------------------Changelog for v1.9.10-beta6 of SecurityCraft--------------------------
+
+- Fix: IMS bombs do not fly towards their target after ascending
+- Fix: Compatibility with NeoForge 21.0.39-beta and newer
+- Misc.: The minimum required NeoForge version is now 21.0.39-beta
+
+--------------------------Changelog for v1.9.10-beta5 of SecurityCraft--------------------------
+
+- New: Readded JEI integration
+- Fix: Compatibility with NeoForge 21.0.31-beta and newer
+- Fix: Crash when a Sentry shoots through a portal
+- Misc.: The minimum required NeoForge version is now 21.0.31-beta
+
+--------------------------Changelog for v1.9.10-beta4 of SecurityCraft--------------------------
+
+- New: Block and item tags "securitycraft:reinforced/concrete" and "securitycraft:reinforced/glazed_terracotta"
+- Fix: Compatibility with NeoForge 21.0.10-beta and newer
+- Fix: Crash when a Sentry shoots through a portal
+- Misc.: The minimum required NeoForge version is now 21.0.10-beta
+
+--------------------------Changelog for v1.9.10-beta3 of SecurityCraft--------------------------
+
+- Fix: Crash when a Sentry shoots
+
+--------------------------Changelog for v1.9.10-beta2 of SecurityCraft--------------------------
+
+- Fix: Passcodes set in prior Minecraft versions are no longer accepted
+- Fix: Crash when viewing a camera while Embeddium is installed
+
+--------------------------Changelog for v1.9.10-beta1 of SecurityCraft--------------------------
+
+- New: Server config setting "allow_camera_night_vision" to set whether players are able to activate night vision without having the actual potion effect
+- New: Pressing "Enter" while typing a player name in an Allowlist/Denylist Module will now add the player to the list without needing to press the "Add Player" button
+- New: Security Sea Boats: Chest boats with a passcode-protected chest
+- New: Damage Type Tag "securitycraft:security_sea_boat_vulnerable_to" to define which damage types the Security Sea Boat can be destroyed by
+- New: Server config option "passcode_check_cooldown" to configure the time that needs to pass between two separate attempts from a player to enter a passcode
+- New: Secure Redstone Interface for owner-restricted redstone signal transfer
+- New: Operators in creative mode can now teleport to a camera via the camera monitor
+- New: The Reinforced Cobweb now supports the weaving effect
+- New: The Trophy System can now target wind charges
+- New: Reinforced Blocks: Chiseled Copper, Exposed Chiseled Copper, Weathered Chiseled Copper, Oxidized Chiseled Copper, Copper Grate, Exposed Copper Grate, Weathered Copper Grate, Oxidized Copper Grate, Copper Bulb, Exposed Copper Bulb, Weathered Copper Bulb, Oxidized Copper Bulb, Tuff Stairs, Tuff Slab, Tuff Wall, Chiseled Tuff, Polished Tuff, Polished Tuff Stairs, Polished Tuff Slab, Polished Tuff Wall, Tuff Bricks, Tuff Brick Stairs, Tuff Brick Slab, Tuff Brick Wall, Chiseled Tuff Bricks
+- New: The reinforcing and unreinforcing of blocks can now be automated by putting the convertible block with a Universal Block Reinforcer in a Crafter
+- Change: The cameraSpeed client side config setting has been moved to be a per-block option, accessible with the Universal Block Modifier
+- Change: Some SecurityCraft tip messages have been reworded for clarity
+- Change: Increased suffocation damage inside reinforced blocks no longer affects non-player entities and players owning the reinforced blocks
+- Change: The "preventReinforcedFloorGlitching" configuration option no longer affects players trying to glitch through reinforced blocks that they are the owner of
+- Change: Players in creative mode can once again use the codebreaker on their own blocks
+- Change: The "codebreaker_chance" config setting has been moved to the "securitycraft:success_chance" item component
+- Change: When picking up a placed sentry, the resulting sentry item will now be named according to the custom name of the removed sentry
+- Change: The "respect_invisibility" config setting has been moved to a per-block option
+- Change: The Sentry can no longer attack invisible entities
+- API: Changed constructors for IntOption and DoubleOption, they are now always sliders by default
+- API: Removed FloatOption. Use DoubleOption instead
+- API: IModuleInventory is no longer hardcoded to just block entities
+- API: New method IPasscodeProtected#openSetPasscodeScreen to define how to open the screen to set the passcode of the object
+- API: New method ICodebreakable#handleCodebreaking to define behavior when a codebreaker is used to break the code
+- API: The BlockState parameters in ICodebreakable's methods have been removed
+- API: New Option "EntityDataWrappedOption" that connects an EntityDataAccessor with an Option, and corresponding converter method "wrapForEntityData"
+- API: New method Option#getValueText for getting a textual representation of the option's value
+- API: ICustomizable#onOptionChanged now has a proper generic type
+- API: New method IViewActivated#isConsideredInvisible
+- API: New method Owner#copy to copy the owner into a new object
+- API: IOwnable#onOwnerChanged now has two new parameters: oldOwner and newOwner
+- API: New method IOwnable#onValidate that gets called when the underlying owner is validated
+- Fix: Trying to place a Panic Button where a normal button cannot be placed crashes the game
+- Fix: Occasional crash when opening the inventory in creative mode in certain situations
+- Fix: Reinforced fence gates don't properly retain their owner when reloading the world
+- Fix: The debug world does not work with SecurityCraft installed
+- Fix: The block pocket can be assembled without the necessary items
+- Fix: Reinforcing a placed end rod will make the resulting reinforced end rod behave as if it had no owner until rejoining the world
+- Fix: The Reinforced Lever has incorrect break/place sounds
+- Fix: SecurityCraft's WTHIT config does not work on the client
+- Fix: Crash when trying to toggle the redstone state of a camera immediately after mounting it
+- Fix: Crash when trying to remove the passcode of a Briefcase using a Universal Key Changer
+- Fix: The Display Case doesn't drop inserted modules when the block the display case is placed on is removed
+- Fix: A previously open Display Case would replay its opening animation when joining a world or teleporting to it
+- Fix: Fake Water/Fake Lava can be brewed using any kind of potion instead of only harming/healing potions
+- Fix: Randomizing the signature of a Keycard Reader stops working when interacting with the block from certain angles
+- Fix: Floor Trap cloud particles do not spawn when standing at certain positions relative to the Floor Trap
+- Fix: Cloning a passcode-protected block using the /clone command will invalidate the passcode of the original block if the clone is removed
+- Fix: Sonic Security System settings sometimes do not persist through world reloads
+- Fix: The Block Pocket Manager's storage does not persist through world reloads
+- Fix: Potential crash in SaltData (ConcurrentModificationException)
+- Fix: Crash when Laser Block/Inventory Scanner ranges are set high
+- Fix: Players are able to mount security cameras that have been shut down by an EMP from another mod
+- Fix: A Portable Radar configured to not send repeating messages still repeats messages when multiple players are in its range
+- Fix: Mine remote access tools automatically remove positions of mines that are no longer in the world from their list
+- Fix: Some reinforced blocks can conduct redstone while their vanilla counterpart cannot do so
+- Fix: The behaviour of reinforced pistons sometimes deviates from vanilla piston behaviour in advanced redstone contraptions
+- Fix: SecurityCraft's doors, trapdoors and fence gates are sometimes erroneously in their open state when placed down
+- Fix: The Codebreaker's cooldown still applies to players in creative mode
+- Fix: The Sentry is not immune to infested/oozing, causing unintentional side effects

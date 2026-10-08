@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "R": {
+      "tag": "c:dusts/redstone"
+    },
+    "S": {
+      "tag": "securitycraft:reinforced/stone_crafting_materials"
+    },
+    "_": [
+      {
+        "item": "securitycraft:reinforced_cobblestone_slab"
+      },
+      {
+        "item": "securitycraft:reinforced_blackstone_slab"
+      },
+      {
+        "item": "securitycraft:reinforced_cobbled_deepslate_slab"
+      }
+    ]
+  },
+  "pattern": [
+    "SS",
+    "R_",
+    "SS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "securitycraft:keycard_lock"
+  }
+}
