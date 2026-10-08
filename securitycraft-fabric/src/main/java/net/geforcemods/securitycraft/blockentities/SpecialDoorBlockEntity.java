@@ -26,7 +26,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.geforcemods.securitycraft.fabric.model.ModelData;
 
 public abstract class SpecialDoorBlockEntity extends LinkableBlockEntity implements ILockable {
 	protected LinkedBlock linkedBlock;

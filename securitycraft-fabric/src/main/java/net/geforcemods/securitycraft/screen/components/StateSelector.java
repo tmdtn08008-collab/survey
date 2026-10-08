@@ -52,7 +52,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.geforcemods.securitycraft.fabric.model.ModelData;
 
 public class StateSelector extends Screen implements GuiEventListener, NarratableEntry, ContainerListener {
 	private static final ResourceLocation TEXTURE = SecurityCraft.resLoc("textures/gui/container/state_selector.png");

@@ -10,8 +10,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.ChunkRenderTypeSet;
-import net.neoforged.neoforge.client.model.data.ModelData;
-import net.neoforged.neoforge.client.model.data.ModelProperty;
+import net.geforcemods.securitycraft.fabric.model.ModelData;
+import net.geforcemods.securitycraft.fabric.model.ModelProperty;
 
 public class SecureRedstoneInterfaceBakedModel extends DisguisableDynamicBakedModel {
 	public static final ModelProperty<Boolean> POWERED = new ModelProperty<>();

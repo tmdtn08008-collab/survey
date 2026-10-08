@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.geforcemods.securitycraft.fabric.model.ModelData;
 import net.neoforged.neoforge.common.world.AuxiliaryLightManager;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 

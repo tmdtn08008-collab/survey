@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "net.geforcemods.securitycraft.fabricmixin.core",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "securitycraft.refmap.json",
+  "mixins": [
+    "PoiTypeAccessor",
+    "PoiTypesAccessor"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8"
+}

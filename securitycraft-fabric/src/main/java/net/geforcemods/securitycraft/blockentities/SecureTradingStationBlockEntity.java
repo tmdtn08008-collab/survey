@@ -42,8 +42,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
+import net.geforcemods.securitycraft.fabric.items.IItemHandler;
+import net.geforcemods.securitycraft.fabric.items.SidedInvWrapper;
 
 public class SecureTradingStationBlockEntity extends DisguisableBlockEntity implements WorldlyContainer, MenuProvider, ITickingBlockEntity {
 	private static final int[] SLOTS_FOR_UP_AND_SIDES = new int[] {12, 13, 14, 15, 16, 17, 18, 19};

@@ -77,8 +77,8 @@ import net.geforcemods.securitycraft.fabric.event.BuildCreativeModeTabContentsEv
 import net.geforcemods.securitycraft.fabric.items.SCItemStorages;
 import net.geforcemods.securitycraft.fabric.network.PayloadRegistrar;
 import net.geforcemods.securitycraft.fabric.registry.DeferredBlock;
-import net.geforcemods.securitycraft.mixin.fabric.PoiTypeAccessor;
-import net.geforcemods.securitycraft.mixin.fabric.PoiTypesAccessor;
+import net.geforcemods.securitycraft.fabricmixin.core.PoiTypeAccessor;
+import net.geforcemods.securitycraft.fabricmixin.core.PoiTypesAccessor;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;

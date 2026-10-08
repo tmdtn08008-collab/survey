@@ -15,8 +15,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import net.neoforged.neoforge.client.model.IDynamicBakedModel;
-import net.neoforged.neoforge.client.model.data.ModelData;
-import net.neoforged.neoforge.client.model.data.ModelProperty;
+import net.geforcemods.securitycraft.fabric.model.ModelData;
+import net.geforcemods.securitycraft.fabric.model.ModelProperty;
 
 public class DisguisableDynamicBakedModel implements IDynamicBakedModel {
 	public static final ModelProperty<BlockState> DISGUISED_STATE = new ModelProperty<>();

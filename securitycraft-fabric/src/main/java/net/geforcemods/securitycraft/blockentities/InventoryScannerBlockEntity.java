@@ -47,8 +47,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.wrapper.EmptyItemHandler;
+import net.geforcemods.securitycraft.fabric.items.IItemHandler;
+import net.geforcemods.securitycraft.fabric.items.EmptyItemHandler;
 
 public class InventoryScannerBlockEntity extends DisguisableBlockEntity implements Container, MenuProvider, ITickingBlockEntity, ILockable, ContainerListener {
 	private BooleanOption horizontal = new BooleanOption("horizontal", false);

@@ -25,7 +25,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import net.geforcemods.securitycraft.fabric.items.IItemHandlerModifiable;
 
 /**
  * Let your object implement this to be able to add modules to it

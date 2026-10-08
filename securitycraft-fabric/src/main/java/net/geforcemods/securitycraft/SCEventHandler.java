@@ -93,7 +93,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.geforcemods.securitycraft.fabric.util.TriState;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityMountEvent;
-import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
+import net.geforcemods.securitycraft.fabric.event.EntityTeleportEvent;
 import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDestroyBlockEvent;

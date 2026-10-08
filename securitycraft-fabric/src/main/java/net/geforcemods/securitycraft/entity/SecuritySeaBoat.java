@@ -58,8 +58,8 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.fluids.FluidType;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
+import net.geforcemods.securitycraft.fabric.items.IItemHandler;
+import net.geforcemods.securitycraft.fabric.items.InvWrapper;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class SecuritySeaBoat extends ChestBoat implements IOwnable, IPasscodeProtected, IModuleInventory, ICustomizable {

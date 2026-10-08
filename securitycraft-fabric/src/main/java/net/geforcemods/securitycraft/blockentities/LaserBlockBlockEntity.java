@@ -53,9 +53,9 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.neoforged.neoforge.client.model.data.ModelData;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
+import net.geforcemods.securitycraft.fabric.model.ModelData;
+import net.geforcemods.securitycraft.fabric.items.IItemHandler;
+import net.geforcemods.securitycraft.fabric.items.InvWrapper;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class LaserBlockBlockEntity extends LinkableBlockEntity implements MenuProvider, ContainerListener {

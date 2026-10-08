@@ -28,7 +28,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.geforcemods.securitycraft.fabric.items.IItemHandler;
 
 public class IMSBlockEntity extends CustomizableBlockEntity implements ITickingBlockEntity {
 	private IntOption range = new IntOption("range", 15, 1, 30, 1);

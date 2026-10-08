@@ -1,4 +1,4 @@
-package net.geforcemods.securitycraft.mixin.fabric;
+package net.geforcemods.securitycraft.fabricmixin.core;
 
 import java.util.Map;
 

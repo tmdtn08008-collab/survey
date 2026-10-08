@@ -2,7 +2,7 @@ package net.geforcemods.securitycraft.inventory;
 
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
+import net.geforcemods.securitycraft.fabric.items.InvWrapper;
 
 public class InsertOnlyInvWrapper extends InvWrapper {
 	public InsertOnlyInvWrapper(Container inv) {

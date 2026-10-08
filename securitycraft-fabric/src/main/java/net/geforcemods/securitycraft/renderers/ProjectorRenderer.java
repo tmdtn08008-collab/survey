@@ -18,7 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.geforcemods.securitycraft.fabric.model.ModelData;
 
 public class ProjectorRenderer implements BlockEntityRenderer<ProjectorBlockEntity> {
 	public ProjectorRenderer(BlockEntityRendererProvider.Context ctx) {}

@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "net.geforcemods.securitycraft.fabricmixin.blocks",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "securitycraft.refmap.json",
+  "mixins": [],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8"
+}

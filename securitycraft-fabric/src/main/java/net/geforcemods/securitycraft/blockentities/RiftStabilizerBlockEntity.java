@@ -37,12 +37,12 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
-import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
-import net.neoforged.neoforge.event.entity.EntityTeleportEvent.ChorusFruit;
-import net.neoforged.neoforge.event.entity.EntityTeleportEvent.EnderEntity;
-import net.neoforged.neoforge.event.entity.EntityTeleportEvent.EnderPearl;
-import net.neoforged.neoforge.event.entity.EntityTeleportEvent.SpreadPlayersCommand;
-import net.neoforged.neoforge.event.entity.EntityTeleportEvent.TeleportCommand;
+import net.geforcemods.securitycraft.fabric.event.EntityTeleportEvent;
+import net.geforcemods.securitycraft.fabric.event.EntityTeleportEvent.ChorusFruit;
+import net.geforcemods.securitycraft.fabric.event.EntityTeleportEvent.EnderEntity;
+import net.geforcemods.securitycraft.fabric.event.EntityTeleportEvent.EnderPearl;
+import net.geforcemods.securitycraft.fabric.event.EntityTeleportEvent.SpreadPlayersCommand;
+import net.geforcemods.securitycraft.fabric.event.EntityTeleportEvent.TeleportCommand;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class RiftStabilizerBlockEntity extends DisguisableBlockEntity implements ITickingBlockEntity, ILockable, IToggleableEntries<TeleportationType> {
