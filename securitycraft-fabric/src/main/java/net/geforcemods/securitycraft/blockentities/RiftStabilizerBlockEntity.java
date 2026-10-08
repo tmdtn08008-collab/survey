@@ -43,7 +43,7 @@ import net.neoforged.neoforge.event.entity.EntityTeleportEvent.EnderEntity;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent.EnderPearl;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent.SpreadPlayersCommand;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent.TeleportCommand;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class RiftStabilizerBlockEntity extends DisguisableBlockEntity implements ITickingBlockEntity, ILockable, IToggleableEntries<TeleportationType> {
 	private final IntOption signalLength = new IntOption("signalLength", 60, 0, 400, 5); //20 seconds max

@@ -16,7 +16,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public record SetCameraView(int id) implements CustomPacketPayload {
 	public static final Type<SetCameraView> TYPE = new Type<>(SecurityCraft.resLoc("set_camera_view"));

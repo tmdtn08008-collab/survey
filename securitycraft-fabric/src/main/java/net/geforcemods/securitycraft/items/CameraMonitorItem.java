@@ -25,7 +25,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class CameraMonitorItem extends Item {
 	public static final int MAX_CAMERAS = 30;

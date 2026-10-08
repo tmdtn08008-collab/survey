@@ -14,7 +14,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public record MountCamera(BlockPos pos) implements CustomPacketPayload {
 	public static final Type<MountCamera> TYPE = new Type<>(SecurityCraft.resLoc("mount_camera"));

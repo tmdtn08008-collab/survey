@@ -10,7 +10,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public class SetPasscode implements CustomPacketPayload {
 	public static final Type<SetPasscode> TYPE = new Type<>(SecurityCraft.resLoc("set_passcode"));

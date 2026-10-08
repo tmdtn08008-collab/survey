@@ -9,7 +9,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public record SetListModuleData(ListModuleData listModuleData) implements CustomPacketPayload {
 	public static final Type<SetListModuleData> TYPE = new Type<>(SecurityCraft.resLoc("set_list_module_data"));

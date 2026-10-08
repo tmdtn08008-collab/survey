@@ -21,7 +21,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public class OpenScreen implements CustomPacketPayload {
 	public static final Type<OpenScreen> TYPE = new Type<>(SecurityCraft.resLoc("open_screen"));

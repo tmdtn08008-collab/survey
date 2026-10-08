@@ -11,7 +11,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public record SyncLaserSideConfig(BlockPos pos, CompoundTag sideConfig) implements CustomPacketPayload {
 	public static final Type<SyncLaserSideConfig> TYPE = new Type<>(SecurityCraft.resLoc("sync_laser_side_config"));

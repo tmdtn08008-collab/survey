@@ -7,7 +7,7 @@ import net.geforcemods.securitycraft.util.PlayerUtils;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class CameraMonitorScreen extends CameraSelectScreen {
 	private final ItemStack stack;

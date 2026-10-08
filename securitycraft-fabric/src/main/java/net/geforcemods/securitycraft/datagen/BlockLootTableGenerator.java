@@ -32,7 +32,7 @@ import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import net.neoforged.neoforge.registries.DeferredHolder;
+import net.geforcemods.securitycraft.fabric.registry.DeferredHolder;
 
 public class BlockLootTableGenerator extends BlockLootSubProvider {
 	public BlockLootTableGenerator(HolderLookup.Provider lookupProvider) {

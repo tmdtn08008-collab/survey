@@ -16,7 +16,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public record CheckBriefcasePasscode(String passcode) implements CustomPacketPayload {
 	public static final Type<CheckBriefcasePasscode> TYPE = new Type<>(SecurityCraft.resLoc("check_briefcase_passcode"));

@@ -43,7 +43,7 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class FrameBlock extends OwnableBlock implements SimpleWaterloggedBlock {
 	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;

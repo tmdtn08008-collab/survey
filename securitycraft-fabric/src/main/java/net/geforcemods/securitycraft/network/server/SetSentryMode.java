@@ -14,7 +14,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public record SetSentryMode(List<Info> sentriesToUpdate) implements CustomPacketPayload {
 	public static final Type<SetSentryMode> TYPE = new Type<>(SecurityCraft.resLoc("set_sentry_mode"));

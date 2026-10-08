@@ -25,7 +25,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.ContainerEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class CheckPasscodeScreen extends Screen implements StillValid {
 	private static final ResourceLocation TEXTURE = SecurityCraft.resLoc("textures/gui/container/check_passcode.png");

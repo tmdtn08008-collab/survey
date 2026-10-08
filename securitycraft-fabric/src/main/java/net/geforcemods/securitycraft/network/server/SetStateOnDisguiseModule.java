@@ -13,7 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public record SetStateOnDisguiseModule(BlockState state, StandingOrWallType standingOrWall) implements CustomPacketPayload {
 	public static final Type<SetStateOnDisguiseModule> TYPE = new Type<>(SecurityCraft.resLoc("set_state_on_disguise_module"));

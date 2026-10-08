@@ -10,7 +10,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public record SetTrophySystemTarget(BlockPos pos, int targetID) implements CustomPacketPayload {
 	public static final Type<SetTrophySystemTarget> TYPE = new Type<>(SecurityCraft.resLoc("set_trophy_system_target"));

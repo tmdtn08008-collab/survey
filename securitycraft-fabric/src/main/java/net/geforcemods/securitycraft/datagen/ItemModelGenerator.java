@@ -36,8 +36,8 @@ import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import net.neoforged.neoforge.client.model.generators.ModelFile.UncheckedModelFile;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredItem;
+import net.geforcemods.securitycraft.fabric.registry.DeferredHolder;
+import net.geforcemods.securitycraft.fabric.registry.DeferredItem;
 
 public class ItemModelGenerator extends ItemModelProvider {
 	private final Set<Block> generatedBlocks = new HashSet<>();

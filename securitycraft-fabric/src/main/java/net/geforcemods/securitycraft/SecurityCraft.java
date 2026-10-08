@@ -64,8 +64,8 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.world.chunk.RegisterTicketControllersEvent;
 import net.neoforged.neoforge.common.world.chunk.TicketController;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredHolder;
+import net.geforcemods.securitycraft.fabric.registry.DeferredBlock;
+import net.geforcemods.securitycraft.fabric.registry.DeferredHolder;
 
 @Mod(SecurityCraft.MODID)
 @EventBusSubscriber(modid = SecurityCraft.MODID)

@@ -33,7 +33,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class FrameBlockEntity extends CustomizableBlockEntity implements ITickingBlockEntity {
 	private final DisabledOption disabled = new DisabledOption(false);

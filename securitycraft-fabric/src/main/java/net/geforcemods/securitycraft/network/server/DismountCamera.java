@@ -7,7 +7,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public record DismountCamera() implements CustomPacketPayload {
 	public static final Type<DismountCamera> TYPE = new Type<>(SecurityCraft.resLoc("dismount_camera"));

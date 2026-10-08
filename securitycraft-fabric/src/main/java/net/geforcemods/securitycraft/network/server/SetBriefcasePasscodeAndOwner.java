@@ -14,8 +14,8 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public record SetBriefcasePasscodeAndOwner(String passcode) implements CustomPacketPayload {
 	public static final Type<SetBriefcasePasscodeAndOwner> TYPE = new Type<>(SecurityCraft.resLoc("set_briefcase_passcode_and_owner"));

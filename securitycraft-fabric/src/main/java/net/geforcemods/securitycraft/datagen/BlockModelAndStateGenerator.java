@@ -48,7 +48,7 @@ import net.neoforged.neoforge.client.model.generators.ModelProvider;
 import net.neoforged.neoforge.client.model.generators.MultiPartBlockStateBuilder;
 import net.neoforged.neoforge.client.model.generators.VariantBlockStateBuilder;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import net.neoforged.neoforge.registries.DeferredHolder;
+import net.geforcemods.securitycraft.fabric.registry.DeferredHolder;
 
 public class BlockModelAndStateGenerator extends BlockStateProvider {
 	//@formatter:off

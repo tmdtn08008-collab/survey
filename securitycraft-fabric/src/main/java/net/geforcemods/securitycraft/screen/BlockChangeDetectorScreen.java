@@ -44,7 +44,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.client.gui.widget.ScrollPanel;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class BlockChangeDetectorScreen extends AbstractContainerScreen<BlockChangeDetectorMenu> implements ContainerListener, IHasExtraAreas {
 	private static final ResourceLocation TEXTURE = SecurityCraft.resLoc("textures/gui/container/block_change_detector.png");

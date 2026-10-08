@@ -325,12 +325,12 @@ import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import net.neoforged.neoforge.common.NeoForgeMod;
-import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
+import net.geforcemods.securitycraft.fabric.menu.IMenuTypeExtension;
 import net.neoforged.neoforge.fluids.BaseFlowingFluid;
-import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredItem;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.geforcemods.securitycraft.fabric.registry.DeferredBlock;
+import net.geforcemods.securitycraft.fabric.registry.DeferredHolder;
+import net.geforcemods.securitycraft.fabric.registry.DeferredItem;
+import net.geforcemods.securitycraft.fabric.registry.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries.Keys;
 
 public class SCContent {

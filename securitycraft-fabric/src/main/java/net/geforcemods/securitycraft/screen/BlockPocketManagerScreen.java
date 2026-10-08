@@ -32,7 +32,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class BlockPocketManagerScreen extends AbstractContainerScreen<BlockPocketManagerMenu> implements IHasExtraAreas {
 	private static final ResourceLocation TEXTURE = SecurityCraft.resLoc("textures/gui/container/block_pocket_manager.png");

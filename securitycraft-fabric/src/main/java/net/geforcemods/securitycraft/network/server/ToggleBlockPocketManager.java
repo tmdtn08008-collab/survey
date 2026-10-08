@@ -19,7 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public record ToggleBlockPocketManager(BlockPos pos, int size, Action action) implements CustomPacketPayload {
 	public static final Type<ToggleBlockPocketManager> TYPE = new Type<>(SecurityCraft.resLoc("toggle_block_pocket_manager"));

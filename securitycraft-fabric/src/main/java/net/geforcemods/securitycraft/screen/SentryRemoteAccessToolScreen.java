@@ -33,7 +33,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class SentryRemoteAccessToolScreen extends Screen implements StillValid {
 	private static final ResourceLocation TEXTURE = SecurityCraft.resLoc("textures/gui/container/srat.png");

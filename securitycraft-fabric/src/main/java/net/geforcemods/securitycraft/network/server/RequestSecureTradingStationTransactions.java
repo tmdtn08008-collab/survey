@@ -8,7 +8,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public record RequestSecureTradingStationTransactions(BlockPos pos, int requestedTransactions) implements CustomPacketPayload {
 	public static final Type<RequestSecureTradingStationTransactions> TYPE = new Type<>(SecurityCraft.resLoc("request_secure_trading_station_transactions"));

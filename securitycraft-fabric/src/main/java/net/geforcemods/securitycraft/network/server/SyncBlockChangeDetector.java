@@ -12,7 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public record SyncBlockChangeDetector(BlockPos pos, DetectionMode mode, boolean showHighlights, int color) implements CustomPacketPayload {
 

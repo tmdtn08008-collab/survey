@@ -41,7 +41,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.client.gui.widget.ScrollPanel;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class AlarmScreen extends Screen implements StillValid {
 	private static final ResourceLocation GUI_TEXTURE = SecurityCraft.resLoc("textures/gui/container/alarm.png");

@@ -9,7 +9,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public record SetKeycardUses(BlockPos pos, int uses) implements CustomPacketPayload {
 	public static final Type<SetKeycardUses> TYPE = new Type<>(SecurityCraft.resLoc("set_keycard_uses"));

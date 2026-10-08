@@ -18,8 +18,8 @@ import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.geforcemods.securitycraft.fabric.registry.DeferredHolder;
+import net.geforcemods.securitycraft.fabric.registry.DeferredRegister;
 
 public class DumpCommand {
 	private static final DynamicCommandExceptionType ERROR_REGISTRY_NOT_FOUND = new DynamicCommandExceptionType(registry -> Component.translatableWithFallback("commands.securitycraft.dump.notFound", "SecurityCraft has nothing registered to \"%s\".", registry));

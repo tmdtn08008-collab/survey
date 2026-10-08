@@ -26,7 +26,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class SonicSecuritySystemScreen extends Screen implements ConnectionAccessor, StillValid {
 	private static final ResourceLocation TEXTURE = SecurityCraft.resLoc("textures/gui/container/sonic_security_system.png");

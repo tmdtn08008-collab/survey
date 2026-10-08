@@ -40,7 +40,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.scores.PlayerTeam;
 import net.neoforged.neoforge.client.gui.widget.ScrollPanel;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class EditModuleScreen extends Screen implements StillValid {
 	private static ListModuleData savedData;

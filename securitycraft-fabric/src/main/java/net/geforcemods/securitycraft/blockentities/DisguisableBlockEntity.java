@@ -25,7 +25,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import net.neoforged.neoforge.common.world.AuxiliaryLightManager;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class DisguisableBlockEntity extends CustomizableBlockEntity {
 	public DisguisableBlockEntity(BlockPos pos, BlockState state) {

@@ -60,7 +60,7 @@ import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class SecuritySeaBoat extends ChestBoat implements IOwnable, IPasscodeProtected, IModuleInventory, ICustomizable {
 	private static final EntityDataAccessor<Owner> OWNER = SynchedEntityData.<Owner>defineId(SecuritySeaBoat.class, Owner.getSerializer());

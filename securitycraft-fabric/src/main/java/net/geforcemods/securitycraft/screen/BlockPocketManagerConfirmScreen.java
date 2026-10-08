@@ -12,7 +12,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class BlockPocketManagerConfirmScreen extends Screen {
 	private static final ResourceLocation GUI_TEXTURE = SecurityCraft.resLoc("textures/gui/container/block_pocket_manager_confirm.png");

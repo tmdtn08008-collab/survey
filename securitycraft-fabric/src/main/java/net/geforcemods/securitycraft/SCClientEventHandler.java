@@ -57,7 +57,7 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
-import net.neoforged.neoforge.registries.DeferredHolder;
+import net.geforcemods.securitycraft.fabric.registry.DeferredHolder;
 
 @EventBusSubscriber(modid = SecurityCraft.MODID, value = Dist.CLIENT)
 public class SCClientEventHandler {

@@ -11,7 +11,7 @@ import net.minecraft.util.Unit;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public record SyncBlockReinforcer(boolean isReinforcing) implements CustomPacketPayload {
 	public static final Type<SyncBlockReinforcer> TYPE = new Type<>(SecurityCraft.resLoc("sync_block_reinforcer"));

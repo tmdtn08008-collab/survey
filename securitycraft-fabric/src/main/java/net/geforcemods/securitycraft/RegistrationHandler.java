@@ -101,7 +101,7 @@ import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.fluids.capability.wrappers.FluidBucketWrapper;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
-import net.neoforged.neoforge.registries.DeferredBlock;
+import net.geforcemods.securitycraft.fabric.registry.DeferredBlock;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
 @EventBusSubscriber(modid = SecurityCraft.MODID)

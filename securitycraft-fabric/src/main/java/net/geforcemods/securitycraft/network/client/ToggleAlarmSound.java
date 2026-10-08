@@ -10,7 +10,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public record ToggleAlarmSound(BlockPos bePos, boolean shouldPlay, int soundX, int soundY, int soundZ, float volume, long seed) implements CustomPacketPayload {
 	public static final Type<ToggleAlarmSound> TYPE = new Type<>(SecurityCraft.resLoc("toggle_alarm_sound"));

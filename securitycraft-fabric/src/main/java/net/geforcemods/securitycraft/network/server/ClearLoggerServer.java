@@ -7,7 +7,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public record ClearLoggerServer(BlockPos pos) implements CustomPacketPayload {
 	public static final Type<ClearLoggerServer> TYPE = new Type<>(SecurityCraft.resLoc("clear_logger_server"));

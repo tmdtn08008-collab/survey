@@ -20,7 +20,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class DisguiseModuleScreen extends AbstractContainerScreen<DisguiseModuleMenu> implements IHasExtraAreas {
 	private static final ResourceLocation TEXTURE = SecurityCraft.resLoc("textures/gui/container/customize1.png");

@@ -18,7 +18,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public class CheckPasscode implements CustomPacketPayload {
 	public static final Type<CheckPasscode> TYPE = new Type<>(SecurityCraft.resLoc("check_passcode"));

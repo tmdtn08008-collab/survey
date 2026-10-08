@@ -14,7 +14,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public record SyncKeycardSettings(BlockPos pos, boolean[] acceptedLevels, int signature, boolean link, Optional<String> usableBy) implements CustomPacketPayload {
 

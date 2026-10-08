@@ -177,7 +177,7 @@ import net.neoforged.neoforge.client.event.RegisterShadersEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.model.IDynamicBakedModel;
-import net.neoforged.neoforge.registries.DeferredBlock;
+import net.geforcemods.securitycraft.fabric.registry.DeferredBlock;
 
 @EventBusSubscriber(modid = SecurityCraft.MODID, value = Dist.CLIENT)
 public class ClientHandler {

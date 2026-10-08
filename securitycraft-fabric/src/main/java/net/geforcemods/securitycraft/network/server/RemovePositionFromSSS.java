@@ -10,7 +10,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.geforcemods.securitycraft.fabric.network.IPayloadContext;
 
 public record RemovePositionFromSSS(GlobalPos globalPos) implements CustomPacketPayload {
 	public static final Type<RemovePositionFromSSS> TYPE = new Type<>(SecurityCraft.resLoc("remove_position_from_sss"));
