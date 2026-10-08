@@ -28,7 +28,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.neoforged.neoforge.common.NeoForge;
+import net.geforcemods.securitycraft.fabric.event.NeoForge;
 
 public class ReinforcedObserverBlock extends DisguisableBlock implements IReinforcedBlock {
 	public static final BooleanProperty POWERED = BlockStateProperties.POWERED;

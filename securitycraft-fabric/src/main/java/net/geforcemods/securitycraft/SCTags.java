@@ -67,7 +67,7 @@ public class SCTags {
 		public static final TagKey<Block> SUSPICIOUS_MINES = tag("suspicious_mines");
 
 		private static TagKey<Block> tag(String name) {
-			return BlockTags.create(SecurityCraft.resLoc(name));
+			return TagKey.create(Registries.BLOCK, SecurityCraft.resLoc(name));
 		}
 	}
 
@@ -134,7 +134,7 @@ public class SCTags {
 		public static final TagKey<Item> SECRET_SIGNS = tag("secret_signs");
 
 		private static TagKey<Item> tag(String name) {
-			return ItemTags.create(SecurityCraft.resLoc(name));
+			return TagKey.create(Registries.ITEM, SecurityCraft.resLoc(name));
 		}
 	}
 }

@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.neoforge.common.NeoForge;
+import net.geforcemods.securitycraft.fabric.event.NeoForge;
 
 public class SecretStandingSignBlock extends StandingSignBlock {
 	private final float destroyTimeForOwner;

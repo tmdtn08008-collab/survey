@@ -25,8 +25,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
-import net.neoforged.neoforge.event.EventHooks;
-import net.neoforged.neoforge.fluids.BaseFlowingFluid;
+import net.geforcemods.securitycraft.fabric.fluid.BaseFlowingFluid;
 
 public abstract class FakeLavaFluid extends BaseFlowingFluid {
 	protected FakeLavaFluid(Properties properties) {
@@ -85,7 +84,7 @@ public abstract class FakeLavaFluid extends BaseFlowingFluid {
 
 					if (stateToUpdate.isAir()) {
 						if (isSurroundingBlockFlammable(level, posToUpdate)) {
-							level.setBlockAndUpdate(posToUpdate, EventHooks.fireFluidPlaceBlockEvent(level, posToUpdate, pos, Blocks.FIRE.defaultBlockState()));
+							level.setBlockAndUpdate(posToUpdate, Blocks.FIRE.defaultBlockState());
 							return;
 						}
 					}
@@ -103,7 +102,7 @@ public abstract class FakeLavaFluid extends BaseFlowingFluid {
 					BlockPos posAbove = posToUpdate.above();
 
 					if (level.isEmptyBlock(posAbove) && isFlammable(level, posToUpdate, Direction.UP))
-						level.setBlockAndUpdate(posAbove, EventHooks.fireFluidPlaceBlockEvent(level, posAbove, pos, Blocks.FIRE.defaultBlockState()));
+						level.setBlockAndUpdate(posAbove, Blocks.FIRE.defaultBlockState());
 				}
 			}
 		}
@@ -124,7 +123,7 @@ public abstract class FakeLavaFluid extends BaseFlowingFluid {
 
 		BlockState state = level.getBlockState(pos);
 
-		return state.ignitedByLava() && state.isFlammable(level, pos, face);
+		return state.ignitedByLava();
 	}
 
 	@Nullable
@@ -135,7 +134,7 @@ public abstract class FakeLavaFluid extends BaseFlowingFluid {
 
 	@Override
 	protected boolean canConvertToSource(Level level) {
-		return level.getGameRules().getBoolean(SecurityCraft.RULE_FAKE_LAVA_SOURCE_CONVERSION.get());
+		return level.getGameRules().getBoolean(SecurityCraft.RULE_FAKE_LAVA_SOURCE_CONVERSION);
 	}
 
 	@Override
@@ -196,7 +195,7 @@ public abstract class FakeLavaFluid extends BaseFlowingFluid {
 	protected void spreadTo(LevelAccessor level, BlockPos pos, BlockState state, Direction direction, FluidState fluidState) {
 		if (direction == Direction.DOWN && is(FluidTags.LAVA) && fluidState.is(FluidTags.WATER)) {
 			if (state.getBlock() instanceof LiquidBlock)
-				level.setBlock(pos, EventHooks.fireFluidPlaceBlockEvent(level, pos, pos, Blocks.STONE.defaultBlockState()), 3);
+				level.setBlock(pos, Blocks.STONE.defaultBlockState(), 3);
 
 			triggerEffects(level, pos);
 			return;

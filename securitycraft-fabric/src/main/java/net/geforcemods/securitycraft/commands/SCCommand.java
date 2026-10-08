@@ -12,7 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.common.CommonHooks;
+import net.geforcemods.securitycraft.fabric.util.CommonHooks;
 
 public class SCCommand {
 	private SCCommand() {}

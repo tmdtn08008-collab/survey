@@ -324,22 +324,21 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
-import net.neoforged.neoforge.common.NeoForgeMod;
 import net.geforcemods.securitycraft.fabric.menu.IMenuTypeExtension;
-import net.neoforged.neoforge.fluids.BaseFlowingFluid;
+import net.geforcemods.securitycraft.fabric.fluid.BaseFlowingFluid;
+import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;
 import net.geforcemods.securitycraft.fabric.registry.DeferredBlock;
 import net.geforcemods.securitycraft.fabric.registry.DeferredHolder;
 import net.geforcemods.securitycraft.fabric.registry.DeferredItem;
 import net.geforcemods.securitycraft.fabric.registry.DeferredRegister;
-import net.neoforged.neoforge.registries.NeoForgeRegistries.Keys;
 
 public class SCContent {
 	public static final DeferredRegister<ArmorMaterial> ARMOR_MATERIALS = DeferredRegister.create(Registries.ARMOR_MATERIAL, SecurityCraft.MODID);
 	public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(SecurityCraft.MODID);
 	public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, SecurityCraft.MODID);
-	public static final DeferredRegister<ArgumentTypeInfo<?, ?>> COMMAND_ARGUMENT_TYPES = DeferredRegister.create(Registries.COMMAND_ARGUMENT_TYPE, SecurityCraft.MODID);
+	public static final DeferredRegister.ArgumentTypes COMMAND_ARGUMENT_TYPES = DeferredRegister.createArgumentTypes(SecurityCraft.MODID);
 	public static final DeferredRegister.DataComponents DATA_COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, SecurityCraft.MODID);
-	public static final DeferredRegister<EntityDataSerializer<?>> DATA_SERIALIZERS = DeferredRegister.create(Keys.ENTITY_DATA_SERIALIZERS, SecurityCraft.MODID);
+	public static final DeferredRegister.EntityDataSerializers_ DATA_SERIALIZERS = DeferredRegister.createEntityDataSerializers(SecurityCraft.MODID);
 	public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(Registries.ENTITY_TYPE, SecurityCraft.MODID);
 	public static final DeferredRegister<Fluid> FLUIDS = DeferredRegister.create(Registries.FLUID, SecurityCraft.MODID);
 	public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(SecurityCraft.MODID);
@@ -353,9 +352,9 @@ public class SCContent {
 	public static final int CRYSTAL_QUARTZ_TINT = 0xFF15B3A2;
 
 	//command argument types
-	public static final DeferredHolder<ArgumentTypeInfo<?, ?>, SingletonArgumentInfo<SingleGameProfileArgument>> SINGLE_GAME_PROFILE_COMMAND_ARGUMENT_TYPE = COMMAND_ARGUMENT_TYPES.register("single_game_profile", () -> ArgumentTypeInfos.registerByClass(SingleGameProfileArgument.class, SingletonArgumentInfo.contextFree(SingleGameProfileArgument::singleGameProfile)));
-	@SuppressWarnings("rawtypes")
-	public static final Holder<ArgumentTypeInfo<?, ?>> LOWERCASED_ENUM_COMMAND_ARGUMENT_TYPE = COMMAND_ARGUMENT_TYPES.register("lowercased_enum", () -> ArgumentTypeInfos.registerByClass(LowercasedEnumArgument.class, new LowercasedEnumArgument.Info()));
+	public static final DeferredHolder<ArgumentTypeInfo<?, ?>, SingletonArgumentInfo<SingleGameProfileArgument>> SINGLE_GAME_PROFILE_COMMAND_ARGUMENT_TYPE = COMMAND_ARGUMENT_TYPES.registerArgumentType("single_game_profile", SingleGameProfileArgument.class, () -> SingletonArgumentInfo.contextFree(SingleGameProfileArgument::singleGameProfile));
+	@SuppressWarnings({"rawtypes", "unchecked"})
+	public static final DeferredHolder<ArgumentTypeInfo<?, ?>, ?> LOWERCASED_ENUM_COMMAND_ARGUMENT_TYPE = COMMAND_ARGUMENT_TYPES.registerArgumentType("lowercased_enum", (Class) LowercasedEnumArgument.class, () -> (ArgumentTypeInfo) new LowercasedEnumArgument.Info());
 
 	//loot item condition types
 	public static final DeferredHolder<LootItemConditionType, LootItemConditionType> BLOCK_ENTITY_NBT = LOOT_ITEM_CONDITION_TYPES.register("tile_entity_nbt", () -> new LootItemConditionType(BlockEntityNBTCondition.CODEC));
@@ -364,19 +363,19 @@ public class SCContent {
 	public static final DeferredHolder<ArmorMaterial, ArmorMaterial> INCOGNITO_MASK_ARMOR_MATERIAL = ARMOR_MATERIALS.register("incognito_mask", () -> new ArmorMaterial(new HashMap<>(), 0, SoundEvents.ARMOR_EQUIP_GENERIC, Ingredient::of, List.of(new ArmorMaterial.Layer(SecurityCraft.resLoc("incognito_mask"))), 0, 0));
 
 	//data components
-	public static final DeferredHolder<DataComponentType<?>, DataComponentType<KeycardData>> KEYCARD_DATA = DATA_COMPONENTS.registerComponentType("keycard_data", builder -> builder.persistent(KeycardData.CODEC).networkSynchronized(KeycardData.STREAM_CODEC).cacheEncoding());
-	public static final DeferredHolder<DataComponentType<?>, DataComponentType<OwnerData>> OWNER_DATA = DATA_COMPONENTS.registerComponentType("owner", builder -> builder.persistent(OwnerData.CODEC).networkSynchronized(OwnerData.STREAM_CODEC).cacheEncoding());
-	public static final DeferredHolder<DataComponentType<?>, DataComponentType<PasscodeData>> PASSCODE_DATA = DATA_COMPONENTS.registerComponentType("passcode_data", builder -> builder.persistent(PasscodeData.CODEC).cacheEncoding());
-	public static final DeferredHolder<DataComponentType<?>, DataComponentType<CodebreakerData>> CODEBREAKER_DATA = DATA_COMPONENTS.registerComponentType("codebreaker_data", builder -> builder.persistent(CodebreakerData.CODEC).networkSynchronized(CodebreakerData.STREAM_CODEC).cacheEncoding());
-	public static final DeferredHolder<DataComponentType<?>, DataComponentType<NamedPositions>> BOUND_CAMERAS = DATA_COMPONENTS.registerComponentType("bound_cameras", builder -> builder.persistent(NamedPositions.codec(CameraMonitorItem.MAX_CAMERAS)).networkSynchronized(NamedPositions.streamCodec(CameraMonitorItem.MAX_CAMERAS)).cacheEncoding());
-	public static final DeferredHolder<DataComponentType<?>, DataComponentType<GlobalPositions>> BOUND_MINES = DATA_COMPONENTS.registerComponentType("bound_mines", builder -> builder.persistent(GlobalPositions.codec(MineRemoteAccessToolItem.MAX_MINES)).networkSynchronized(GlobalPositions.streamCodec(MineRemoteAccessToolItem.MAX_MINES)).cacheEncoding());
-	public static final DeferredHolder<DataComponentType<?>, DataComponentType<GlobalPositions>> SSS_LINKED_BLOCKS = DATA_COMPONENTS.registerComponentType("sss_linked_blocks", builder -> builder.persistent(GlobalPositions.codec(SonicSecuritySystemBlockEntity.MAX_LINKED_BLOCKS)).networkSynchronized(GlobalPositions.streamCodec(SonicSecuritySystemBlockEntity.MAX_LINKED_BLOCKS)).cacheEncoding());
-	public static final DeferredHolder<DataComponentType<?>, DataComponentType<NamedPositions>> BOUND_SENTRIES = DATA_COMPONENTS.registerComponentType("bound_sentries", builder -> builder.persistent(NamedPositions.codec(SentryRemoteAccessToolItem.MAX_SENTRIES)).networkSynchronized(NamedPositions.streamCodec(SentryRemoteAccessToolItem.MAX_SENTRIES)).cacheEncoding());
-	public static final DeferredHolder<DataComponentType<?>, DataComponentType<Notes>> NOTES = DATA_COMPONENTS.registerComponentType("notes", builder -> builder.persistent(Notes.CODEC).networkSynchronized(Notes.STREAM_CODEC).cacheEncoding());
-	public static final DeferredHolder<DataComponentType<?>, DataComponentType<Unit>> UNREINFORCING = DATA_COMPONENTS.registerComponentType("unreinforcing", builder -> builder.persistent(Codec.unit(Unit.INSTANCE)));
-	public static final DeferredHolder<DataComponentType<?>, DataComponentType<ListModuleData>> LIST_MODULE_DATA = DATA_COMPONENTS.registerComponentType("list_module_data", builder -> builder.persistent(ListModuleData.CODEC).networkSynchronized(ListModuleData.STREAM_CODEC).cacheEncoding());
-	public static final DeferredHolder<DataComponentType<?>, DataComponentType<SavedBlockState>> SAVED_BLOCK_STATE = DATA_COMPONENTS.registerComponentType("saved_block_state", builder -> builder.persistent(SavedBlockState.CODEC).networkSynchronized(SavedBlockState.STREAM_CODEC).cacheEncoding());
-	public static final DeferredHolder<DataComponentType<?>, DataComponentType<Double>> SUCCESS_CHANCE = DATA_COMPONENTS.registerComponentType("success_chance", builder -> builder.persistent(Codec.doubleRange(-1.0D, 1.0D)).networkSynchronized(ByteBufCodecs.DOUBLE).cacheEncoding());
+	public static final DataComponentType<KeycardData> KEYCARD_DATA = DATA_COMPONENTS.registerComponentType("keycard_data", builder -> builder.persistent(KeycardData.CODEC).networkSynchronized(KeycardData.STREAM_CODEC).cacheEncoding());
+	public static final DataComponentType<OwnerData> OWNER_DATA = DATA_COMPONENTS.registerComponentType("owner", builder -> builder.persistent(OwnerData.CODEC).networkSynchronized(OwnerData.STREAM_CODEC).cacheEncoding());
+	public static final DataComponentType<PasscodeData> PASSCODE_DATA = DATA_COMPONENTS.registerComponentType("passcode_data", builder -> builder.persistent(PasscodeData.CODEC).cacheEncoding());
+	public static final DataComponentType<CodebreakerData> CODEBREAKER_DATA = DATA_COMPONENTS.registerComponentType("codebreaker_data", builder -> builder.persistent(CodebreakerData.CODEC).networkSynchronized(CodebreakerData.STREAM_CODEC).cacheEncoding());
+	public static final DataComponentType<NamedPositions> BOUND_CAMERAS = DATA_COMPONENTS.registerComponentType("bound_cameras", builder -> builder.persistent(NamedPositions.codec(CameraMonitorItem.MAX_CAMERAS)).networkSynchronized(NamedPositions.streamCodec(CameraMonitorItem.MAX_CAMERAS)).cacheEncoding());
+	public static final DataComponentType<GlobalPositions> BOUND_MINES = DATA_COMPONENTS.registerComponentType("bound_mines", builder -> builder.persistent(GlobalPositions.codec(MineRemoteAccessToolItem.MAX_MINES)).networkSynchronized(GlobalPositions.streamCodec(MineRemoteAccessToolItem.MAX_MINES)).cacheEncoding());
+	public static final DataComponentType<GlobalPositions> SSS_LINKED_BLOCKS = DATA_COMPONENTS.registerComponentType("sss_linked_blocks", builder -> builder.persistent(GlobalPositions.codec(SonicSecuritySystemBlockEntity.MAX_LINKED_BLOCKS)).networkSynchronized(GlobalPositions.streamCodec(SonicSecuritySystemBlockEntity.MAX_LINKED_BLOCKS)).cacheEncoding());
+	public static final DataComponentType<NamedPositions> BOUND_SENTRIES = DATA_COMPONENTS.registerComponentType("bound_sentries", builder -> builder.persistent(NamedPositions.codec(SentryRemoteAccessToolItem.MAX_SENTRIES)).networkSynchronized(NamedPositions.streamCodec(SentryRemoteAccessToolItem.MAX_SENTRIES)).cacheEncoding());
+	public static final DataComponentType<Notes> NOTES = DATA_COMPONENTS.registerComponentType("notes", builder -> builder.persistent(Notes.CODEC).networkSynchronized(Notes.STREAM_CODEC).cacheEncoding());
+	public static final DataComponentType<Unit> UNREINFORCING = DATA_COMPONENTS.registerComponentType("unreinforcing", builder -> builder.persistent(Codec.unit(Unit.INSTANCE)));
+	public static final DataComponentType<ListModuleData> LIST_MODULE_DATA = DATA_COMPONENTS.registerComponentType("list_module_data", builder -> builder.persistent(ListModuleData.CODEC).networkSynchronized(ListModuleData.STREAM_CODEC).cacheEncoding());
+	public static final DataComponentType<SavedBlockState> SAVED_BLOCK_STATE = DATA_COMPONENTS.registerComponentType("saved_block_state", builder -> builder.persistent(SavedBlockState.CODEC).networkSynchronized(SavedBlockState.STREAM_CODEC).cacheEncoding());
+	public static final DataComponentType<Double> SUCCESS_CHANCE = DATA_COMPONENTS.registerComponentType("success_chance", builder -> builder.persistent(Codec.doubleRange(-1.0D, 1.0D)).networkSynchronized(ByteBufCodecs.DOUBLE).cacheEncoding());
 
 	//recipe serializers
 	public static final DeferredHolder<RecipeSerializer<?>, SimpleCraftingRecipeSerializer<BlockReinforcingRecipe>> BLOCK_REINFORCING_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("block_reinforcing_recipe", () -> new SimpleCraftingRecipeSerializer<>(BlockReinforcingRecipe::new));
@@ -393,7 +392,7 @@ public class SCContent {
 	public static final DeferredHolder<EntityDataSerializer<?>, EntityDataSerializer<NonNullList<ItemStack>>> ITEM_STACK_LIST_SERIALIZER = DATA_SERIALIZERS.register("item_stack_list", () -> new ItemStackListSerializer());
 
 	//particle types
-	public static final DeferredHolder<ParticleType<?>, SimpleParticleType> FLOOR_TRAP_CLOUD = PARTICLE_TYPES.register("floor_trap_cloud", () -> new SimpleParticleType(false));
+	public static final DeferredHolder<ParticleType<?>, SimpleParticleType> FLOOR_TRAP_CLOUD = PARTICLE_TYPES.register("floor_trap_cloud", () -> FabricParticleTypes.simple(false));
 	public static final DeferredHolder<ParticleType<?>, InterfaceHighlightParticleType> INTERFACE_HIGHLIGHT = PARTICLE_TYPES.register("interface_highlight", () -> new InterfaceHighlightParticleType(false));
 
 	//fluids
@@ -2753,7 +2752,7 @@ public class SCContent {
 	public static final DeferredItem<FakeLiquidBucketItem> FAKE_WATER_BUCKET = ITEMS.register("bucket_f_water", () -> new FakeLiquidBucketItem(SCContent.FAKE_WATER.get(), itemProp(1)));
 	public static final DeferredItem<BlockItem> GLOW_DISPLAY_CASE_ITEM = ITEMS.registerSimpleBlockItem(GLOW_DISPLAY_CASE_PATH, SCContent.GLOW_DISPLAY_CASE, itemProp());
 	@HasManualPage
-	public static final DeferredItem<Item> INCOGNITO_MASK = ITEMS.register("incognito_mask", () -> new ArmorItem(INCOGNITO_MASK_ARMOR_MATERIAL, ArmorItem.Type.HELMET, itemProp(1)));
+	public static final DeferredItem<Item> INCOGNITO_MASK = ITEMS.register("incognito_mask", () -> new ArmorItem(INCOGNITO_MASK_ARMOR_MATERIAL.getDelegate(), ArmorItem.Type.HELMET, itemProp(1)));
 	@HasManualPage
 	public static final DeferredItem<KeycardHolderItem> KEYCARD_HOLDER = ITEMS.register("keycard_holder", () -> new KeycardHolderItem(itemProp(1).component(DataComponents.CONTAINER, ItemContainerContents.EMPTY)));
 	@HasManualPage(PageGroup.KEYCARDS)
@@ -2914,11 +2913,11 @@ public class SCContent {
 
 		//@formatter:on
 		return BlockEntityType.Builder.of((pos, state) -> {
-			if (state.is(REINFORCED_OBSERVER))
+			if (state.is(REINFORCED_OBSERVER.get()))
 				return new ReinforcedObserverBlockEntity(pos, state);
-			else if (state.is(MINE))
+			else if (state.is(MINE.get()))
 				return new MineBlockEntity(pos, state);
-			else if (state.is(PANIC_BUTTON))
+			else if (state.is(PANIC_BUTTON.get()))
 				return new PanicButtonBlockEntity(pos, state);
 			else
 				return new OwnableBlockEntity(pos, state);
@@ -2926,9 +2925,9 @@ public class SCContent {
 	});
 	//@formatter:off
 	public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<NamedBlockEntity>> ABSTRACT_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register("abstract", () -> BlockEntityType.Builder.of((pos, state) -> {
-		if (state.is(ELECTRIFIED_IRON_FENCE) || state.is(ELECTRIFIED_IRON_FENCE_GATE))
+		if (state.is(ELECTRIFIED_IRON_FENCE.get()) || state.is(ELECTRIFIED_IRON_FENCE_GATE.get()))
 			return new ElectrifiedFenceAndGateBlockEntity(pos, state);
-		else if (state.is(BOUNCING_BETTY))
+		else if (state.is(BOUNCING_BETTY.get()))
 			return new BouncingBettyBlockEntity(pos, state);
 		else
 			return new NamedBlockEntity(pos, state);
@@ -3136,38 +3135,38 @@ public class SCContent {
 	public static final DeferredHolder<EntityType<?>, EntityType<BouncingBetty>> BOUNCING_BETTY_ENTITY = ENTITY_TYPES.register("bouncingbetty",
 			() -> EntityType.Builder.<BouncingBetty>of(BouncingBetty::new, MobCategory.MISC)
 			.sized(0.5F, 0.2F)
-			.setTrackingRange(128)
-			.setUpdateInterval(1)
-			.setShouldReceiveVelocityUpdates(true)
+			.clientTrackingRange(128)
+			.updateInterval(1)
+			.alwaysUpdateVelocity(true)
 			.build(SecurityCraft.MODID + ":bouncingbetty"));
 	public static final DeferredHolder<EntityType<?>, EntityType<IMSBomb>> IMS_BOMB_ENTITY = ENTITY_TYPES.register("imsbomb",
 			() -> EntityType.Builder.<IMSBomb>of(IMSBomb::new, MobCategory.MISC)
 			.sized(0.25F, 0.3F)
-			.setTrackingRange(256)
-			.setUpdateInterval(1)
-			.setShouldReceiveVelocityUpdates(true)
+			.clientTrackingRange(256)
+			.updateInterval(1)
+			.alwaysUpdateVelocity(true)
 			.build(SecurityCraft.MODID + ":imsbomb"));
 	public static final DeferredHolder<EntityType<?>, EntityType<SecurityCamera>> SECURITY_CAMERA_ENTITY = ENTITY_TYPES.register("securitycamera",
 			() -> EntityType.Builder.<SecurityCamera>of(SecurityCamera::new, MobCategory.MISC)
 			.sized(0.0001F, 0.0001F)
-			.setTrackingRange(256)
-			.setUpdateInterval(20)
-			.setShouldReceiveVelocityUpdates(true)
+			.clientTrackingRange(256)
+			.updateInterval(20)
+			.alwaysUpdateVelocity(true)
 			.build(SecurityCraft.MODID + ":securitycamera"));
 	public static final DeferredHolder<EntityType<?>, EntityType<Sentry>> SENTRY_ENTITY = ENTITY_TYPES.register("sentry",
 			() -> EntityType.Builder.<Sentry>of(Sentry::new, MobCategory.MISC)
 			.sized(1.0F, 1.01F)
-			.setTrackingRange(256)
-			.setUpdateInterval(1)
-			.setShouldReceiveVelocityUpdates(true)
+			.clientTrackingRange(256)
+			.updateInterval(1)
+			.alwaysUpdateVelocity(true)
 			.eyeHeight(1.6F)
 			.build(SecurityCraft.MODID + ":sentry"));
 	public static final DeferredHolder<EntityType<?>, EntityType<Bullet>> BULLET_ENTITY = ENTITY_TYPES.register("bullet",
 			() -> EntityType.Builder.<Bullet>of(Bullet::new, MobCategory.MISC)
 			.sized(0.15F, 0.1F)
-			.setTrackingRange(256)
-			.setUpdateInterval(1)
-			.setShouldReceiveVelocityUpdates(true)
+			.clientTrackingRange(256)
+			.updateInterval(1)
+			.alwaysUpdateVelocity(true)
 			.build(SecurityCraft.MODID + ":bullet"));
 	public static final DeferredHolder<EntityType<?>, EntityType<SecuritySeaBoat>> SECURITY_SEA_BOAT_ENTITY = ENTITY_TYPES.register("security_sea_boat",
 			() -> EntityType.Builder.<SecuritySeaBoat>of(SecuritySeaBoat::new, MobCategory.MISC)
@@ -3254,11 +3253,11 @@ public class SCContent {
 	}
 
 	private static BaseFlowingFluid.Properties fakeWaterProperties() {
-		return new BaseFlowingFluid.Properties(() -> NeoForgeMod.WATER_TYPE.value(), FAKE_WATER, FLOWING_FAKE_WATER).block(FAKE_WATER_BLOCK).bucket(FAKE_WATER_BUCKET);
+		return new BaseFlowingFluid.Properties(FAKE_WATER, FLOWING_FAKE_WATER).block(FAKE_WATER_BLOCK).bucket(FAKE_WATER_BUCKET);
 	}
 
 	private static BaseFlowingFluid.Properties fakeLavaProperties() {
-		return new BaseFlowingFluid.Properties(() -> NeoForgeMod.LAVA_TYPE.value(), FAKE_LAVA, FLOWING_FAKE_LAVA).block(FAKE_LAVA_BLOCK).bucket(FAKE_LAVA_BUCKET);
+		return new BaseFlowingFluid.Properties(FAKE_LAVA, FLOWING_FAKE_LAVA).block(FAKE_LAVA_BLOCK).bucket(FAKE_LAVA_BUCKET);
 	}
 
 	private static DeferredBlock<BaseReinforcedBlock> reinforcedBlock(String name, Block vanillaBlock) {

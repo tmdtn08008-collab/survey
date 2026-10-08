@@ -26,8 +26,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.util.TriState;
+import net.geforcemods.securitycraft.fabric.event.NeoForge;
+import net.geforcemods.securitycraft.fabric.util.TriState;
 
 public class ReinforcedGrassBlock extends GrassBlock implements IReinforcedBlock, EntityBlock {
 	private final float destroyTimeForOwner;

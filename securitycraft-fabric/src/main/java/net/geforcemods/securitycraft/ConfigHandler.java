@@ -7,18 +7,15 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import net.geforcemods.securitycraft.misc.TintMode;
 import net.geforcemods.securitycraft.util.TeamUtils;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.config.ModConfigEvent;
+import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeModConfigEvents;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.ModConfigSpec.BooleanValue;
 import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
 import net.neoforged.neoforge.common.ModConfigSpec.DoubleValue;
 import net.neoforged.neoforge.common.ModConfigSpec.EnumValue;
 import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
-import net.neoforged.neoforge.data.loading.DatagenModLoader;
 
-@EventBusSubscriber
 public class ConfigHandler {
 	public static final ModConfigSpec CLIENT_SPEC;
 	public static final Client CLIENT;
@@ -283,19 +280,15 @@ public class ConfigHandler {
 		}
 	}
 
-	@SubscribeEvent
-	public static void onModConfigReloading(ModConfigEvent.Loading event) {
-		updateTeamPrecedence(event);
-
-		if (event.getConfig().getSpec() == CLIENT_SPEC)
-			loadTintSettingsFromConfig();
+	public static void registerConfigEvents() {
+		NeoForgeModConfigEvents.loading(SecurityCraft.MODID).register(ConfigHandler::onModConfigLoadingOrReloading);
+		NeoForgeModConfigEvents.reloading(SecurityCraft.MODID).register(ConfigHandler::onModConfigLoadingOrReloading);
 	}
 
-	@SubscribeEvent
-	public static void onModConfigReloading(ModConfigEvent.Reloading event) {
-		updateTeamPrecedence(event);
+	private static void onModConfigLoadingOrReloading(ModConfig config) {
+		updateTeamPrecedence(config);
 
-		if (event.getConfig().getSpec() == CLIENT_SPEC)
+		if (config.getSpec() == CLIENT_SPEC)
 			loadTintSettingsFromConfig();
 	}
 
@@ -304,8 +297,8 @@ public class ConfigHandler {
 		TintMode.setMode(ConfigHandler.CLIENT.reinforcedBlockTintMode.get());
 	}
 
-	private static void updateTeamPrecedence(ModConfigEvent event) {
-		if (event.getConfig().getSpec() == SERVER_SPEC) {
+	private static void updateTeamPrecedence(ModConfig config) {
+		if (config.getSpec() == SERVER_SPEC) {
 			//@formatter:off
 			TeamUtils.setPrecedence(SERVER.teamOwnershipPrecedence.get()
 					.stream()
@@ -330,10 +323,8 @@ public class ConfigHandler {
 			return value.get();
 		}
 		catch (Exception e) {
-			if (!DatagenModLoader.isRunningDataGen()) {
-				SecurityCraft.LOGGER.warn("Error when getting config value with getOrDefault! Please report this.");
-				e.printStackTrace();
-			}
+			SecurityCraft.LOGGER.warn("Error when getting config value with getOrDefault! Please report this.");
+			e.printStackTrace();
 
 			return value.getDefault();
 		}

@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.neoforged.neoforge.common.NeoForge;
+import net.geforcemods.securitycraft.fabric.event.NeoForge;
 
 public class OwnableFenceGateBlock extends FenceGateBlock implements EntityBlock {
 	private final float destroyTimeForOwner;

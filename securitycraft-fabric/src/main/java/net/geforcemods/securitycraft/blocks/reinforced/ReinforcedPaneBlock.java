@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.common.NeoForge;
+import net.geforcemods.securitycraft.fabric.event.NeoForge;
 
 public class ReinforcedPaneBlock extends IronBarsBlock implements IReinforcedBlock, EntityBlock {
 	private final Block vanillaBlock;

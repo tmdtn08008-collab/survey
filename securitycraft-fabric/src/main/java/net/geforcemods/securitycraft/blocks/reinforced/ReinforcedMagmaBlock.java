@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.TallSeagrassBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.enums.BubbleColumnDirection;
-import net.neoforged.neoforge.common.util.TriState;
+import net.geforcemods.securitycraft.fabric.util.TriState;
 
 public class ReinforcedMagmaBlock extends BaseReinforcedBlock {
 	public ReinforcedMagmaBlock(BlockBehaviour.Properties properties, Block vanillaBlock) {

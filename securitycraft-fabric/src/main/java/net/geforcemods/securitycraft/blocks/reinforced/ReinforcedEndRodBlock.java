@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.NeoForge;
+import net.geforcemods.securitycraft.fabric.event.NeoForge;
 
 public class ReinforcedEndRodBlock extends EndRodBlock implements EntityBlock, IReinforcedBlock {
 	private final float destroyTimeForOwner;

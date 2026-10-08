@@ -4,12 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import net.geforcemods.securitycraft.SecurityCraft;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.InterModProcessEvent;
 
-@EventBusSubscriber(modid = SecurityCraft.MODID)
 public class SecurityCraftAPI {
 	private static List<IExtractionBlock> registeredExtractionBlocks = new ArrayList<>();
 	private static List<IPasscodeConvertible> registeredPasscodeConvertibles = new ArrayList<>();
@@ -22,13 +17,27 @@ public class SecurityCraftAPI {
 
 	private SecurityCraftAPI() {}
 
-	@SubscribeEvent
-	public static void onInterModProcess(InterModProcessEvent event) {
-		event.getIMCStream(s -> s.equals(IMC_EXTRACTION_BLOCK_MSG)).forEach(msg -> registeredExtractionBlocks.add((IExtractionBlock) msg.messageSupplier().get()));
-		event.getIMCStream(s -> s.equals(IMC_PASSCODE_CONVERTIBLE_MSG)).forEach(msg -> registeredPasscodeConvertibles.add((IPasscodeConvertible) msg.messageSupplier().get()));
-		event.getIMCStream(s -> s.equals(IMC_SENTRY_ATTACK_TARGET_MSG)).forEach(msg -> registeredSentryAttackTargetChecks.add((IAttackTargetCheck) msg.messageSupplier().get()));
-		event.getIMCStream(s -> s.equals(IMC_DOOR_ACTIVATOR_MSG)).forEach(msg -> registeredDoorActivators.add((IDoorActivator) msg.messageSupplier().get()));
+	public static void registerExtractionBlock(IExtractionBlock extractionBlock) {
+		registeredExtractionBlocks.add(extractionBlock);
+	}
 
+	public static void registerPasscodeConvertible(IPasscodeConvertible passcodeConvertible) {
+		registeredPasscodeConvertibles.add(passcodeConvertible);
+	}
+
+	public static void registerSentryAttackTargetCheck(IAttackTargetCheck attackTargetCheck) {
+		registeredSentryAttackTargetChecks.add(attackTargetCheck);
+	}
+
+	public static void registerDoorActivator(IDoorActivator doorActivator) {
+		registeredDoorActivators.add(doorActivator);
+	}
+
+	/**
+	 * Called at the end of SecurityCraft's initialization, after SecurityCraft's own entries and those of every
+	 * "securitycraft" entrypoint ({@link SecurityCraftPlugin}) have been registered. Replaces NeoForge's IMC processing.
+	 */
+	public static void freeze() {
 		registeredExtractionBlocks = Collections.unmodifiableList(registeredExtractionBlocks);
 		registeredPasscodeConvertibles = Collections.unmodifiableList(registeredPasscodeConvertibles);
 		registeredSentryAttackTargetChecks = Collections.unmodifiableList(registeredSentryAttackTargetChecks);

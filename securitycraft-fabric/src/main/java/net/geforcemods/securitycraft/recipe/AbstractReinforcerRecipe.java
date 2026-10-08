@@ -15,8 +15,8 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import net.geforcemods.securitycraft.fabric.util.CommonHooks;
+import net.geforcemods.securitycraft.fabric.util.ServerLifecycleHooks;
 
 public abstract class AbstractReinforcerRecipe extends CustomRecipe {
 	protected AbstractReinforcerRecipe(CraftingBookCategory category) {

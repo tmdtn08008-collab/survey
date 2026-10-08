@@ -1,16 +1,18 @@
 package net.geforcemods.securitycraft;
 
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.Mod;
+import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
+import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.client.ConfigScreenFactoryRegistry;
+import net.fabricmc.api.ClientModInitializer;
+import net.geforcemods.securitycraft.fabric.network.PayloadRegistrar;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
-@Mod(value = SecurityCraft.MODID, dist = Dist.CLIENT)
-public class SecurityCraftClient {
-	public SecurityCraftClient(ModContainer container) {
-		container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
-		container.registerConfig(ModConfig.Type.CLIENT, ConfigHandler.CLIENT_SPEC);
+public class SecurityCraftClient implements ClientModInitializer {
+	@Override
+	public void onInitializeClient() {
+		NeoForgeConfigRegistry.INSTANCE.register(SecurityCraft.MODID, ModConfig.Type.CLIENT, ConfigHandler.CLIENT_SPEC);
+		ConfigScreenFactoryRegistry.INSTANCE.register(SecurityCraft.MODID, ConfigurationScreen::new);
+		PayloadRegistrar.registerClientReceivers();
+		ClientHandler.init();
 	}
 }

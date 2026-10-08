@@ -7,7 +7,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.syncher.EntityDataSerializer;
-import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
+import net.geforcemods.securitycraft.fabric.util.NeoForgeStreamCodecs;
 
 public class ModuleStatesSerializer implements EntityDataSerializer<Map<ModuleType, Boolean>> {
 	//@formatter:off

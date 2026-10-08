@@ -5,10 +5,10 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.registries.GameData;
+import net.minecraft.world.level.block.Block;
 
 public class SCStreamCodecs {
-	public static final StreamCodec<ByteBuf, BlockState> BLOCK_STATE = ByteBufCodecs.VAR_INT.map(GameData.getBlockStateIDMap()::byId, GameData.getBlockStateIDMap()::getId);
+	public static final StreamCodec<ByteBuf, BlockState> BLOCK_STATE = ByteBufCodecs.VAR_INT.map(Block.BLOCK_STATE_REGISTRY::byId, Block.BLOCK_STATE_REGISTRY::getId);
 	public static final StreamCodec<FriendlyByteBuf, boolean[]> BOOLEAN_ARRAY = new StreamCodec<>() {
 		@Override
 		public boolean[] decode(FriendlyByteBuf buf) {

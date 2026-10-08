@@ -6,16 +6,13 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 
-import com.google.common.base.Suppliers;
 import com.mojang.logging.LogUtils;
 
 import net.geforcemods.securitycraft.api.IReinforcedBlock;
 import net.geforcemods.securitycraft.api.SecurityCraftAPI;
-import net.geforcemods.securitycraft.blockentities.SecurityCameraBlockEntity;
 import net.geforcemods.securitycraft.blocks.AbstractKeypadFurnaceBlock;
 import net.geforcemods.securitycraft.blocks.InventoryScannerBlock;
 import net.geforcemods.securitycraft.blocks.KeypadBarrelBlock;
@@ -29,10 +26,7 @@ import net.geforcemods.securitycraft.blocks.reinforced.ReinforcedHopperBlock;
 import net.geforcemods.securitycraft.blocks.reinforced.ReinforcedPressurePlateBlock;
 import net.geforcemods.securitycraft.blocks.reinforced.ReinforcedRedstoneBlock;
 import net.geforcemods.securitycraft.commands.SCCommand;
-import net.geforcemods.securitycraft.compat.distanthorizons.DistantHorizonsCompat;
-import net.geforcemods.securitycraft.compat.hudmods.TOPDataProvider;
 import net.geforcemods.securitycraft.items.SCManualItem;
-import net.geforcemods.securitycraft.misc.BlockEntityTracker;
 import net.geforcemods.securitycraft.misc.CommonDoorActivator;
 import net.geforcemods.securitycraft.misc.ConfigAttackTargetCheck;
 import net.geforcemods.securitycraft.misc.PageGroup;
@@ -46,108 +40,92 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.GameRules;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
+import net.fabricmc.loader.api.FabricLoader;
+import net.geforcemods.securitycraft.api.SecurityCraftPlugin;
+import net.geforcemods.securitycraft.fabric.event.NeoForge;
+import net.geforcemods.securitycraft.fabric.registry.DeferredBlock;
+import net.geforcemods.securitycraft.misc.OwnershipEvent;
+import net.geforcemods.securitycraft.fabric.registry.DeferredHolder;
+import net.geforcemods.securitycraft.fabric.util.ServerLifecycleHooks;
+import net.geforcemods.securitycraft.fabric.world.TicketController;
+import net.neoforged.fml.config.ModConfig;
+import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.InterModComms;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModList;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.fml.event.lifecycle.InterModEnqueueEvent;
-import net.neoforged.fml.event.lifecycle.InterModProcessEvent;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.world.chunk.RegisterTicketControllersEvent;
-import net.neoforged.neoforge.common.world.chunk.TicketController;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.geforcemods.securitycraft.fabric.event.NeoForge;
 import net.geforcemods.securitycraft.fabric.registry.DeferredBlock;
+import net.geforcemods.securitycraft.misc.OwnershipEvent;
 import net.geforcemods.securitycraft.fabric.registry.DeferredHolder;
 
-@Mod(SecurityCraft.MODID)
-@EventBusSubscriber(modid = SecurityCraft.MODID)
-public class SecurityCraft {
+public class SecurityCraft implements ModInitializer {
 	public static final Logger LOGGER = LogUtils.getLogger();
 	public static final String MODID = "securitycraft";
-	public static final Supplier<GameRules.Key<GameRules.BooleanValue>> RULE_FAKE_WATER_SOURCE_CONVERSION = Suppliers.memoize(() -> GameRules.register("fakeWaterSourceConversion", GameRules.Category.UPDATES, GameRules.BooleanValue.create(true)));
-	public static final Supplier<GameRules.Key<GameRules.BooleanValue>> RULE_FAKE_LAVA_SOURCE_CONVERSION = Suppliers.memoize(() -> GameRules.register("fakeLavaSourceConversion", GameRules.Category.UPDATES, GameRules.BooleanValue.create(false)));
+	public static GameRules.Key<GameRules.BooleanValue> RULE_FAKE_WATER_SOURCE_CONVERSION;
+	public static GameRules.Key<GameRules.BooleanValue> RULE_FAKE_LAVA_SOURCE_CONVERSION;
 	public static final Random RANDOM = new Random();
-	public static final TicketController CAMERA_TICKET_CONTROLLER = new TicketController(resLoc("camera_chunks"), (level, ticketHelper) -> { //this will only check against SecurityCraft's camera chunks, so no need to add an (instanceof SecurityCamera) somewhere
-		ticketHelper.getEntityTickets().forEach(((uuid, chunk) -> {
-			if (level.getEntity(uuid) == null)
-				ticketHelper.removeAllTickets(uuid);
-		}));
-		ticketHelper.getBlockTickets().forEach((pos, chunk) -> {
-			if (!(level.getBlockEntity(pos) instanceof SecurityCameraBlockEntity) || !BlockEntityTracker.FRAME_VIEWED_SECURITY_CAMERAS.getTrackedBlockEntities(level).contains(pos))
-				ticketHelper.removeAllTickets(pos);
-		});
-	});
+	public static final TicketController CAMERA_TICKET_CONTROLLER = new TicketController(resLoc("camera_chunks"));
 
-	public SecurityCraft(IEventBus modEventBus, ModContainer container) {
-		NeoForge.EVENT_BUS.addListener(this::registerCommands);
-		NeoForge.EVENT_BUS.addListener(RegistrationHandler::registerBrewingRecipes);
-		container.registerConfig(ModConfig.Type.SERVER, ConfigHandler.SERVER_SPEC);
-		SCContent.ARMOR_MATERIALS.register(modEventBus);
-		SCContent.BLOCKS.register(modEventBus);
-		SCContent.BLOCK_ENTITY_TYPES.register(modEventBus);
-		SCContent.COMMAND_ARGUMENT_TYPES.register(modEventBus);
-		SCContent.DATA_COMPONENTS.register(modEventBus);
-		SCContent.DATA_SERIALIZERS.register(modEventBus);
-		SCContent.ENTITY_TYPES.register(modEventBus);
-		SCContent.FLUIDS.register(modEventBus);
-		SCContent.ITEMS.register(modEventBus);
-		SCContent.LOOT_ITEM_CONDITION_TYPES.register(modEventBus);
-		SCContent.MENU_TYPES.register(modEventBus);
-		SCContent.PARTICLE_TYPES.register(modEventBus);
-		SCContent.RECIPE_SERIALIZERS.register(modEventBus);
-		SCCreativeModeTabs.CREATIVE_MODE_TABS.register(modEventBus);
-	}
-
-	@SubscribeEvent
-	public static void onFMLCommonSetup(FMLCommonSetupEvent event) {
-		event.enqueueWork(() -> {
-			RULE_FAKE_WATER_SOURCE_CONVERSION.get();
-			RULE_FAKE_LAVA_SOURCE_CONVERSION.get();
-		});
-	}
-
-	@SubscribeEvent
-	public static void onInterModEnqueue(InterModEnqueueEvent event) {
-		InterModComms.sendTo(SecurityCraft.MODID, SecurityCraftAPI.IMC_EXTRACTION_BLOCK_MSG, ReinforcedHopperBlock.ExtractionBlock::new);
-		InterModComms.sendTo(SecurityCraft.MODID, SecurityCraftAPI.IMC_EXTRACTION_BLOCK_MSG, IMSBlock.ExtractionBlock::new);
-		InterModComms.sendTo(SecurityCraft.MODID, SecurityCraftAPI.IMC_PASSCODE_CONVERTIBLE_MSG, KeypadBlock.Convertible::new);
-		InterModComms.sendTo(SecurityCraft.MODID, SecurityCraftAPI.IMC_PASSCODE_CONVERTIBLE_MSG, KeypadBarrelBlock.Convertible::new);
-		InterModComms.sendTo(SecurityCraft.MODID, SecurityCraftAPI.IMC_PASSCODE_CONVERTIBLE_MSG, KeypadChestBlock.Convertible::new);
-		InterModComms.sendTo(SecurityCraft.MODID, SecurityCraftAPI.IMC_PASSCODE_CONVERTIBLE_MSG, KeypadTrapDoorBlock.Convertible::new);
-		InterModComms.sendTo(SecurityCraft.MODID, SecurityCraftAPI.IMC_PASSCODE_CONVERTIBLE_MSG, () -> new AbstractKeypadFurnaceBlock.Convertible(Blocks.FURNACE, SCContent.KEYPAD_FURNACE.get()));
-		InterModComms.sendTo(SecurityCraft.MODID, SecurityCraftAPI.IMC_PASSCODE_CONVERTIBLE_MSG, () -> new AbstractKeypadFurnaceBlock.Convertible(Blocks.SMOKER, SCContent.KEYPAD_SMOKER.get()));
-		InterModComms.sendTo(SecurityCraft.MODID, SecurityCraftAPI.IMC_PASSCODE_CONVERTIBLE_MSG, () -> new AbstractKeypadFurnaceBlock.Convertible(Blocks.BLAST_FURNACE, SCContent.KEYPAD_BLAST_FURNACE.get()));
-		InterModComms.sendTo(SecurityCraft.MODID, SecurityCraftAPI.IMC_SENTRY_ATTACK_TARGET_MSG, ConfigAttackTargetCheck::new);
-		InterModComms.sendTo(SecurityCraft.MODID, SecurityCraftAPI.IMC_DOOR_ACTIVATOR_MSG, CommonDoorActivator::new);
-		InterModComms.sendTo(SecurityCraft.MODID, SecurityCraftAPI.IMC_DOOR_ACTIVATOR_MSG, InventoryScannerBlock.DoorActivator::new);
-		InterModComms.sendTo(SecurityCraft.MODID, SecurityCraftAPI.IMC_DOOR_ACTIVATOR_MSG, ReinforcedPressurePlateBlock.DoorActivator::new);
-		InterModComms.sendTo(SecurityCraft.MODID, SecurityCraftAPI.IMC_DOOR_ACTIVATOR_MSG, ReinforcedRedstoneBlock.DoorActivator::new);
-		InterModComms.sendTo(SecurityCraft.MODID, SecurityCraftAPI.IMC_DOOR_ACTIVATOR_MSG, SecureRedstoneInterfaceBlock.DoorActivator::new);
-
-		if (ModList.get().isLoaded("theoneprobe"))
-			InterModComms.sendTo("theoneprobe", "getTheOneProbe", TOPDataProvider::new);
-
-		if (ModList.get().isLoaded("distanthorizons"))
-			DistantHorizonsCompat.registerEvent();
-	}
-
-	@SubscribeEvent
-	public static void onInterModProcess(InterModProcessEvent event) {
+	@Override
+	public void onInitialize() {
+		ConfigHandler.registerConfigEvents();
+		NeoForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.SERVER, ConfigHandler.SERVER_SPEC);
+		ServerLifecycleHooks.init();
+		RULE_FAKE_WATER_SOURCE_CONVERSION = GameRuleRegistry.register("fakeWaterSourceConversion", GameRules.Category.UPDATES, GameRuleFactory.createBooleanRule(true));
+		RULE_FAKE_LAVA_SOURCE_CONVERSION = GameRuleRegistry.register("fakeLavaSourceConversion", GameRules.Category.UPDATES, GameRuleFactory.createBooleanRule(false));
+		//same order in which NeoForge fires its registry events
+		RegistrationHandler.registerSounds();
+		SCContent.FLUIDS.register();
+		SCContent.BLOCKS.register();
+		SCContent.DATA_COMPONENTS.register();
+		SCContent.ENTITY_TYPES.register();
+		SCContent.ARMOR_MATERIALS.register();
+		SCContent.ITEMS.register();
+		RegistrationHandler.registerBlockItems();
+		SCContent.BLOCK_ENTITY_TYPES.register();
+		SCContent.PARTICLE_TYPES.register();
+		SCContent.MENU_TYPES.register();
+		SCContent.RECIPE_SERIALIZERS.register();
+		SCContent.COMMAND_ARGUMENT_TYPES.register();
+		SCContent.LOOT_ITEM_CONDITION_TYPES.register();
+		SCContent.DATA_SERIALIZERS.register();
+		SCCreativeModeTabs.CREATIVE_MODE_TABS.register();
+		RegistrationHandler.init();
+		//sets the owner of placed SecurityCraft blocks, so this must never be removed
+		NeoForge.EVENT_BUS.addListener(OwnershipEvent.class, SCEventHandler::onOwnership);
+		SCEventHandler.init();
+		CommandRegistrationCallback.EVENT.register((dispatcher, buildContext, selection) -> SCCommand.register(dispatcher));
+		registerApiObjects();
 		collectSCContentData();
 		IReinforcedCauldronInteraction.bootStrap();
 	}
 
-	@SubscribeEvent
-	public static void onRegisterTicketControllers(RegisterTicketControllersEvent event) {
-		event.register(CAMERA_TICKET_CONTROLLER);
+	private static void registerApiObjects() {
+		SecurityCraftAPI.registerExtractionBlock(new ReinforcedHopperBlock.ExtractionBlock());
+		SecurityCraftAPI.registerExtractionBlock(new IMSBlock.ExtractionBlock());
+		SecurityCraftAPI.registerPasscodeConvertible(new KeypadBlock.Convertible());
+		SecurityCraftAPI.registerPasscodeConvertible(new KeypadBarrelBlock.Convertible());
+		SecurityCraftAPI.registerPasscodeConvertible(new KeypadChestBlock.Convertible());
+		SecurityCraftAPI.registerPasscodeConvertible(new KeypadTrapDoorBlock.Convertible());
+		SecurityCraftAPI.registerPasscodeConvertible(new AbstractKeypadFurnaceBlock.Convertible(Blocks.FURNACE, SCContent.KEYPAD_FURNACE.get()));
+		SecurityCraftAPI.registerPasscodeConvertible(new AbstractKeypadFurnaceBlock.Convertible(Blocks.SMOKER, SCContent.KEYPAD_SMOKER.get()));
+		SecurityCraftAPI.registerPasscodeConvertible(new AbstractKeypadFurnaceBlock.Convertible(Blocks.BLAST_FURNACE, SCContent.KEYPAD_BLAST_FURNACE.get()));
+		SecurityCraftAPI.registerSentryAttackTargetCheck(new ConfigAttackTargetCheck());
+		SecurityCraftAPI.registerDoorActivator(new CommonDoorActivator());
+		SecurityCraftAPI.registerDoorActivator(new InventoryScannerBlock.DoorActivator());
+		SecurityCraftAPI.registerDoorActivator(new ReinforcedPressurePlateBlock.DoorActivator());
+		SecurityCraftAPI.registerDoorActivator(new ReinforcedRedstoneBlock.DoorActivator());
+		SecurityCraftAPI.registerDoorActivator(new SecureRedstoneInterfaceBlock.DoorActivator());
+
+		for (SecurityCraftPlugin plugin : FabricLoader.getInstance().getEntrypoints(MODID, SecurityCraftPlugin.class)) {
+			plugin.register();
+		}
+
+		SecurityCraftAPI.freeze();
 	}
 
 	public static void collectSCContentData() {
@@ -199,12 +177,8 @@ public class SecurityCraft {
 		groupStacks.forEach((group, list) -> group.setItems(Ingredient.of(list.stream())));
 	}
 
-	public void registerCommands(RegisterCommandsEvent event) {
-		SCCommand.register(event.getDispatcher());
-	}
-
 	public static String getVersion() {
-		return "v" + ModList.get().getModContainerById(MODID).get().getModInfo().getVersion().toString();
+		return "v" + FabricLoader.getInstance().getModContainer(MODID).orElseThrow().getMetadata().getVersion().getFriendlyString();
 	}
 
 	public static ResourceLocation resLoc(String path) {

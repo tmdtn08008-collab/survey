@@ -10,7 +10,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
+import net.geforcemods.securitycraft.fabric.util.NeoForgeStreamCodecs;
 
 public record SavedBlockState(BlockState state, StandingOrWallType standingOrWallType) {
 	public static final SavedBlockState EMPTY = new SavedBlockState(Blocks.AIR.defaultBlockState(), StandingOrWallType.NONE);

@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
-import net.neoforged.neoforge.fluids.BaseFlowingFluid;
+import net.geforcemods.securitycraft.fabric.fluid.BaseFlowingFluid;
 
 public abstract class FakeWaterFluid extends BaseFlowingFluid {
 	protected FakeWaterFluid(Properties properties) {
@@ -61,7 +61,7 @@ public abstract class FakeWaterFluid extends BaseFlowingFluid {
 
 	@Override
 	protected boolean canConvertToSource(Level level) {
-		return level.getGameRules().getBoolean(SecurityCraft.RULE_FAKE_WATER_SOURCE_CONVERSION.get());
+		return level.getGameRules().getBoolean(SecurityCraft.RULE_FAKE_WATER_SOURCE_CONVERSION);
 	}
 
 	@Override

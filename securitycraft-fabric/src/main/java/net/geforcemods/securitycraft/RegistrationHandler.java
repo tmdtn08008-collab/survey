@@ -1,6 +1,8 @@
 package net.geforcemods.securitycraft;
 
 import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.List;
 
 import net.geforcemods.securitycraft.blockentities.AbstractKeypadFurnaceBlockEntity;
@@ -69,7 +71,19 @@ import net.geforcemods.securitycraft.util.RegisterItemBlock;
 import net.geforcemods.securitycraft.util.Reinforced;
 import net.geforcemods.securitycraft.util.SCItemGroup;
 import net.geforcemods.securitycraft.util.Utils;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.geforcemods.securitycraft.fabric.event.BuildCreativeModeTabContentsEvent;
+import net.geforcemods.securitycraft.fabric.items.SCItemStorages;
+import net.geforcemods.securitycraft.fabric.network.PayloadRegistrar;
+import net.geforcemods.securitycraft.fabric.registry.DeferredBlock;
+import net.geforcemods.securitycraft.mixin.fabric.PoiTypeAccessor;
+import net.geforcemods.securitycraft.mixin.fabric.PoiTypesAccessor;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -88,81 +102,78 @@ import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.common.crafting.CompoundIngredient;
-import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
-import net.neoforged.neoforge.common.world.poi.ExtendPoiTypesEvent;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
-import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
-import net.neoforged.neoforge.fluids.capability.wrappers.FluidBucketWrapper;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
-import net.geforcemods.securitycraft.fabric.registry.DeferredBlock;
-import net.neoforged.neoforge.registries.RegisterEvent;
 
-@EventBusSubscriber(modid = SecurityCraft.MODID)
 public class RegistrationHandler {
 	private RegistrationHandler() {}
 
-	@SubscribeEvent
-	public static void onRegister(RegisterEvent event) {
-		event.register(Registries.ITEM, helper -> {
-			//register item blocks from annotated fields
-			for (Field field : SCContent.class.getFields()) {
-				try {
-					if (field.isAnnotationPresent(Reinforced.class) && field.getAnnotation(Reinforced.class).registerBlockItem()) {
-						SCItemGroup group = field.getAnnotation(Reinforced.class).itemGroup();
-						Block block = ((DeferredBlock<Block>) field.get(null)).get();
-						Item blockItem = new BlockItem(block, new Item.Properties().fireResistant());
+	/**
+	 * Registers everything that NeoForge handled through mod bus events, apart from the deferred registers. Called from
+	 * {@link SecurityCraft#onInitialize()} after all registries have been filled.
+	 */
+	public static void init() {
+		FabricDefaultAttributeRegistry.register(SCContent.SENTRY_ENTITY.get(), Mob.createMobAttributes());
+		addBlockToPoi(PoiTypes.LIGHTNING_ROD, SCContent.REINFORCED_LIGHTNING_ROD.get());
+		registerPayloads();
+		SCItemStorages.register();
+		ItemGroupEvents.MODIFY_ENTRIES_ALL.register((tab, entries) -> onCreativeModeTabRegister(new BuildCreativeModeTabContentsEvent(tab, entries)));
+	}
 
-						helper.register(Utils.getRegistryName(block), blockItem);
+	public static void registerBlockItems() {
+		//register item blocks from annotated fields
+		for (Field field : SCContent.class.getFields()) {
+			try {
+				if (field.isAnnotationPresent(Reinforced.class) && field.getAnnotation(Reinforced.class).registerBlockItem()) {
+					SCItemGroup group = field.getAnnotation(Reinforced.class).itemGroup();
+					Block block = ((DeferredBlock<Block>) field.get(null)).get();
+					Item blockItem = new BlockItem(block, new Item.Properties().fireResistant());
 
-						if (group != SCItemGroup.MANUAL)
-							SCCreativeModeTabs.STACKS_FOR_ITEM_GROUPS.get(group).add(new ItemStack(blockItem));
-					}
-					else if (field.isAnnotationPresent(RegisterItemBlock.class)) {
-						SCItemGroup group = field.getAnnotation(RegisterItemBlock.class).value();
-						Block block = ((DeferredBlock<Block>) field.get(null)).get();
-						Item blockItem = new BlockItem(block, new Item.Properties());
+					Registry.register(BuiltInRegistries.ITEM, Utils.getRegistryName(block), blockItem);
 
-						helper.register(Utils.getRegistryName(block), blockItem);
-
-						if (group != SCItemGroup.MANUAL)
-							SCCreativeModeTabs.STACKS_FOR_ITEM_GROUPS.get(group).add(new ItemStack(blockItem));
-					}
+					if (group != SCItemGroup.MANUAL)
+						SCCreativeModeTabs.STACKS_FOR_ITEM_GROUPS.get(group).add(new ItemStack(blockItem));
 				}
-				catch (IllegalArgumentException | IllegalAccessException e) {
-					e.printStackTrace();
+				else if (field.isAnnotationPresent(RegisterItemBlock.class)) {
+					SCItemGroup group = field.getAnnotation(RegisterItemBlock.class).value();
+					Block block = ((DeferredBlock<Block>) field.get(null)).get();
+					Item blockItem = new BlockItem(block, new Item.Properties());
+
+					Registry.register(BuiltInRegistries.ITEM, Utils.getRegistryName(block), blockItem);
+
+					if (group != SCItemGroup.MANUAL)
+						SCCreativeModeTabs.STACKS_FOR_ITEM_GROUPS.get(group).add(new ItemStack(blockItem));
 				}
 			}
-		});
-
-		event.register(Registries.SOUND_EVENT, helper -> {
-			for (int i = 0; i < SCSounds.values().length; i++) {
-				SCSounds sound = SCSounds.values()[i];
-
-				helper.register(sound.location, sound.event);
+			catch (IllegalArgumentException | IllegalAccessException e) {
+				e.printStackTrace();
 			}
-		});
+		}
 	}
 
-	@SubscribeEvent
-	public static void onEntityAttributeCreation(EntityAttributeCreationEvent event) {
-		event.put(SCContent.SENTRY_ENTITY.get(), Mob.createMobAttributes().build());
+	public static void registerSounds() {
+		for (int i = 0; i < SCSounds.values().length; i++) {
+			SCSounds sound = SCSounds.values()[i];
+
+			Registry.register(BuiltInRegistries.SOUND_EVENT, sound.location, sound.event);
+		}
 	}
 
-	@SubscribeEvent
-	public static void onExtendPoiTypes(ExtendPoiTypesEvent event) {
-		event.addBlockToPoi(PoiTypes.LIGHTNING_ROD, SCContent.REINFORCED_LIGHTNING_ROD.get());
+	/**
+	 * Replacement for NeoForge's ExtendPoiTypesEvent#addBlockToPoi
+	 */
+	private static void addBlockToPoi(ResourceKey<PoiType> poiKey, Block block) {
+		Holder<PoiType> poi = BuiltInRegistries.POINT_OF_INTEREST_TYPE.getHolderOrThrow(poiKey);
+		Set<BlockState> matchingStates = new HashSet<>(poi.value().matchingStates());
+
+		for (BlockState state : block.getStateDefinition().getPossibleStates()) {
+			PoiTypesAccessor.securitycraft$getTypeByState().putIfAbsent(state, poi);
+			matchingStates.add(state);
+		}
+
+		((PoiTypeAccessor) (Object) poi.value()).securitycraft$setMatchingStates(Set.copyOf(matchingStates));
 	}
 
-	@SubscribeEvent
-	public static void onRegisterPayloadHandlers(RegisterPayloadHandlersEvent event) {
-		PayloadRegistrar registrar = event.registrar(SecurityCraft.MODID).versioned(SecurityCraft.getVersion());
+	private static void registerPayloads() {
+		PayloadRegistrar registrar = new PayloadRegistrar();
 
 		registrar.playToClient(InteractWithFrame.TYPE, InteractWithFrame.STREAM_CODEC, InteractWithFrame::handle);
 		registrar.playToClient(OpenScreen.TYPE, OpenScreen.STREAM_CODEC, OpenScreen::handle);
@@ -212,32 +223,7 @@ public class RegistrationHandler {
 		registrar.playToServer(UpdateSliderValue.TYPE, UpdateSliderValue.STREAM_CODEC, UpdateSliderValue::handle);
 	}
 
-	@SubscribeEvent
-	public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SCContent.KEYPAD_BLAST_FURNACE_BLOCK_ENTITY.get(), AbstractKeypadFurnaceBlockEntity::getCapability);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SCContent.KEYPAD_FURNACE_BLOCK_ENTITY.get(), AbstractKeypadFurnaceBlockEntity::getCapability);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SCContent.KEYPAD_SMOKER_BLOCK_ENTITY.get(), AbstractKeypadFurnaceBlockEntity::getCapability);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SCContent.BLOCK_POCKET_MANAGER_BLOCK_ENTITY.get(), BlockPocketManagerBlockEntity::getCapability);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SCContent.CLAYMORE_BLOCK_ENTITY.get(), ClaymoreBlockEntity::getCapability);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SCContent.INVENTORY_SCANNER_BLOCK_ENTITY.get(), InventoryScannerBlockEntity::getCapability);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SCContent.KEYPAD_BARREL_BLOCK_ENTITY.get(), KeypadBarrelBlockEntity::getCapability);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SCContent.KEYPAD_CHEST_BLOCK_ENTITY.get(), (chest, dir) -> KeypadChestBlockEntity.getCapability((KeypadChestBlockEntity) chest, dir));
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SCContent.LASER_BLOCK_BLOCK_ENTITY.get(), LaserBlockBlockEntity::getCapability);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SCContent.REINFORCED_HOPPER_BLOCK_ENTITY.get(), ReinforcedHopperBlockEntity::getCapability);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SCContent.TROPHY_SYSTEM_BLOCK_ENTITY.get(), TrophySystemBlockEntity::getCapability);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SCContent.REINFORCED_CHISELED_BOOKSHELF_BLOCK_ENTITY.get(), ReinforcedChiseledBookshelfBlockEntity::getCapability);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SCContent.REINFORCED_DISPENSER_BLOCK_ENTITY.get(), ReinforcedDispenserBlockEntity::getCapability);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SCContent.REINFORCED_DROPPER_BLOCK_ENTITY.get(), ReinforcedDropperBlockEntity::getCapability);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SCContent.SECURITY_CAMERA_BLOCK_ENTITY.get(), SecurityCameraBlockEntity::getCapability);
-		event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, SCContent.SECURE_TRADING_STATION_BLOCK_ENTITY.get(), SecureTradingStationBlockEntity::getCapability);
-		event.registerEntity(Capabilities.ItemHandler.ENTITY, SCContent.SECURITY_SEA_BOAT_ENTITY.get(), (boat, ctx) -> SecuritySeaBoat.getCapability(boat, null));
-		event.registerEntity(Capabilities.ItemHandler.ENTITY_AUTOMATION, SCContent.SECURITY_SEA_BOAT_ENTITY.get(), SecuritySeaBoat::getCapability);
-		event.registerItem(Capabilities.FluidHandler.ITEM, (stack, ctx) -> new FluidBucketWrapper(stack), SCContent.FAKE_WATER_BUCKET);
-		event.registerItem(Capabilities.FluidHandler.ITEM, (stack, ctx) -> new FluidBucketWrapper(stack), SCContent.FAKE_LAVA_BUCKET);
-	}
-
-	@SubscribeEvent
-	public static void onCreativeModeTabRegister(BuildCreativeModeTabContentsEvent event) {
+	private static void onCreativeModeTabRegister(BuildCreativeModeTabContentsEvent event) {
 		ResourceKey<CreativeModeTab> tabKey = event.getTabKey();
 
 		//@formatter:off
@@ -427,17 +413,4 @@ public class RegistrationHandler {
 		}
 	}
 
-	public static void registerBrewingRecipes(RegisterBrewingRecipesEvent event) {
-		PotionBrewing.Builder builder = event.getBuilder();
-
-		builder.addRecipe(Ingredient.of(Items.WATER_BUCKET), getPotionIngredient(Potions.HARMING, Potions.STRONG_HARMING), new ItemStack(SCContent.FAKE_WATER_BUCKET.get()));
-		builder.addRecipe(Ingredient.of(Items.LAVA_BUCKET), getPotionIngredient(Potions.HEALING, Potions.STRONG_HEALING), new ItemStack(SCContent.FAKE_LAVA_BUCKET.get()));
-	}
-
-	private static Ingredient getPotionIngredient(Holder<Potion> normalPotion, Holder<Potion> strongPotion) {
-		Ingredient normalPotions = DataComponentIngredient.of(false, DataComponents.POTION_CONTENTS, new PotionContents(normalPotion), Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION);
-		Ingredient strongPotions = DataComponentIngredient.of(false, DataComponents.POTION_CONTENTS, new PotionContents(strongPotion), Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION);
-
-		return CompoundIngredient.of(normalPotions, strongPotions);
-	}
 }

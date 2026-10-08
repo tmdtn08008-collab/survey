@@ -17,7 +17,7 @@ import net.neoforged.fml.VersionChecker;
 import net.neoforged.fml.VersionChecker.Status;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.common.CommonHooks;
+import net.geforcemods.securitycraft.fabric.util.CommonHooks;
 
 @EventBusSubscriber(modid = SecurityCraft.MODID, value = Dist.CLIENT)
 public class Tips {

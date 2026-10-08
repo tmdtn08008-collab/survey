@@ -18,6 +18,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.DyeColor;
@@ -33,8 +34,7 @@ public class SCCreativeModeTabs {
 	public static final Map<SCItemGroup, List<ItemStack>> STACKS_FOR_ITEM_GROUPS = Util.make(new EnumMap<>(SCItemGroup.class), map -> Arrays.stream(SCItemGroup.values()).forEach(key -> map.put(key, new ArrayList<>())));
 	public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, SecurityCraft.MODID);
 	//@formatter:off
-	public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TECHNICAL_TAB = CREATIVE_MODE_TABS.register("technical", () -> CreativeModeTab.builder()
-			.withTabsBefore(CreativeModeTabs.SPAWN_EGGS)
+	public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TECHNICAL_TAB = CREATIVE_MODE_TABS.register("technical", () -> FabricItemGroup.builder()
 			.icon(() -> new ItemStack(SCContent.USERNAME_LOGGER.get()))
 			.title(Component.translatable("itemGroup.securitycraft.technical"))
 			.displayItems((itemDisplayParameters, output) -> {
@@ -151,8 +151,7 @@ public class SCCreativeModeTabs {
 				output.acceptAll(STACKS_FOR_ITEM_GROUPS.get(SCItemGroup.TECHNICAL));
 			}).build());
 	//@formatter:off
-	public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MINE_TAB = CREATIVE_MODE_TABS.register("mine", () -> CreativeModeTab.builder()
-			.withTabsBefore(TECHNICAL_TAB.getKey())
+	public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MINE_TAB = CREATIVE_MODE_TABS.register("mine", () -> FabricItemGroup.builder()
 			.icon(() -> new ItemStack(SCContent.MINE.get()))
 			.title(Component.translatable("itemGroup.securitycraft.explosives"))
 			.displayItems((itemDisplayParameters, output) -> {
@@ -177,8 +176,7 @@ public class SCCreativeModeTabs {
 				output.accept(new ItemStack(SCContent.BLAST_FURNACE_MINE.get()));
 			}).build());
 	//@formatter:off
-	public static final DeferredHolder<CreativeModeTab, CreativeModeTab> DECORATION_TAB = CREATIVE_MODE_TABS.register("decoration", () -> CreativeModeTab.builder()
-			.withTabsBefore(MINE_TAB.getKey())
+	public static final DeferredHolder<CreativeModeTab, CreativeModeTab> DECORATION_TAB = CREATIVE_MODE_TABS.register("decoration", () -> FabricItemGroup.builder()
 			.icon(() -> new ItemStack(SCContent.REINFORCED_OAK_STAIRS.get()))
 			.title(Component.translatable("itemGroup.securitycraft.decoration"))
 			.displayItems((itemDisplayParameters, output) -> {
