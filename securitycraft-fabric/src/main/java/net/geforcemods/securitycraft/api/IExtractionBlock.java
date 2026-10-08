@@ -10,10 +10,11 @@ import net.minecraft.world.level.block.state.BlockState;
  * Security Sea Boat, ... <p>Call
  *
  * <pre>
- * InterModComms.sendTo("securitycraft", SecurityCraftAPI.IMC_EXTRACTION_BLOCK_MSG, ClassThatImplementsIExtractionBlock::new);
+ * SecurityCraftAPI.registerExtractionBlock(new ClassThatImplementsIExtractionBlock());
  * </pre>
  *
- * during InterModEnqueueEvent to register this with SecurityCraft.
+ * in the {@link SecurityCraftPlugin#register()} method of a "securitycraft" entrypoint to register this with SecurityCraft (on
+ * NeoForge, this was done with an InterModComms message).
  *
  * @author bl4ckscor3
  */

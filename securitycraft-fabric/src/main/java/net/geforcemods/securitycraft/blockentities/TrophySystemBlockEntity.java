@@ -37,7 +37,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerListener;
-import net.minecraft.world.MenuProvider;
+import net.geforcemods.securitycraft.fabric.menu.IMenuProviderExtension;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Entity.RemovalReason;
@@ -60,7 +60,7 @@ import net.geforcemods.securitycraft.fabric.items.IItemHandler;
 import net.geforcemods.securitycraft.fabric.items.InvWrapper;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
-public class TrophySystemBlockEntity extends DisguisableBlockEntity implements ITickingBlockEntity, ILockable, IToggleableEntries<EntityType<?>>, MenuProvider, ContainerListener {
+public class TrophySystemBlockEntity extends DisguisableBlockEntity implements ITickingBlockEntity, ILockable, IToggleableEntries<EntityType<?>>, IMenuProviderExtension, ContainerListener {
 	/** The range (in blocks) that the trophy system will search for projectiles in */
 	public static final int RANGE = 10;
 	private final Map<EntityType<?>, Boolean> projectileFilter = new LinkedHashMap<>();
@@ -176,7 +176,7 @@ public class TrophySystemBlockEntity extends DisguisableBlockEntity implements I
 
 	@Override
 	public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-		MenuProvider.super.writeClientSideData(menu, buffer);
+		IMenuProviderExtension.super.writeClientSideData(menu, buffer);
 		buffer.writeBlockPos(worldPosition);
 	}
 

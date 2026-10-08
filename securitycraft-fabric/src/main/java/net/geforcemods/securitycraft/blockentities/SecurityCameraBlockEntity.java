@@ -46,7 +46,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerListener;
-import net.minecraft.world.MenuProvider;
+import net.geforcemods.securitycraft.fabric.menu.IMenuProviderExtension;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -57,7 +57,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.geforcemods.securitycraft.fabric.items.IItemHandler;
 import net.geforcemods.securitycraft.fabric.items.InvWrapper;
 
-public class SecurityCameraBlockEntity extends DisguisableBlockEntity implements ITickingBlockEntity, IEMPAffectedBE, MenuProvider, ContainerListener, SingleLensContainer {
+public class SecurityCameraBlockEntity extends DisguisableBlockEntity implements ITickingBlockEntity, IEMPAffectedBE, IMenuProviderExtension, ContainerListener, SingleLensContainer {
 	private static final Map<ServerPlayer, Set<SecurityCameraBlockEntity>> RECENTLY_UNVIEWED_CAMERAS = new HashMap<>();
 	private static final Map<ResourceKey<Level>, Set<Long>> FORCE_LOADED_CAMERA_CHUNKS = new HashMap<>();
 	private static int forceLoadingCounter = 0;
@@ -207,7 +207,7 @@ public class SecurityCameraBlockEntity extends DisguisableBlockEntity implements
 
 	@Override
 	public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-		MenuProvider.super.writeClientSideData(menu, buffer);
+		IMenuProviderExtension.super.writeClientSideData(menu, buffer);
 		buffer.writeBlockPos(worldPosition);
 	}
 

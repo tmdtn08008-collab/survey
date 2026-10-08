@@ -23,11 +23,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.geforcemods.securitycraft.fabric.blockentity.IBlockEntityExtension;
 import net.geforcemods.securitycraft.fabric.model.ModelData;
 import net.geforcemods.securitycraft.fabric.items.IItemHandler;
 import net.geforcemods.securitycraft.fabric.items.VanillaHopperItemHandler;
 
-public class ReinforcedHopperBlockEntity extends HopperBlockEntity implements IOwnable, IModuleInventory {
+public class ReinforcedHopperBlockEntity extends HopperBlockEntity implements IOwnable, IModuleInventory, IBlockEntityExtension {
 	private NonNullList<ItemStack> modules = NonNullList.withSize(getMaxNumberOfModules(), ItemStack.EMPTY);
 	private Owner owner = new Owner();
 	private Map<ModuleType, Boolean> moduleStates = new EnumMap<>(ModuleType.class);
@@ -78,13 +79,13 @@ public class ReinforcedHopperBlockEntity extends HopperBlockEntity implements IO
 
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider lookupProvider) {
-		super.onDataPacket(net, packet, lookupProvider);
+		IBlockEntityExtension.super.onDataPacket(net, packet, lookupProvider);
 		DisguisableBlockEntity.onHandleUpdateTag(this);
 	}
 
 	@Override
 	public void onLoad() {
-		super.onLoad();
+		IBlockEntityExtension.super.onLoad();
 		DisguisableBlockEntity.onHandleUpdateTag(this);
 	}
 

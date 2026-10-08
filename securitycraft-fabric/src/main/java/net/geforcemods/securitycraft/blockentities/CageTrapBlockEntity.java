@@ -58,7 +58,7 @@ public class CageTrapBlockEntity extends DisguisableBlockEntity implements ITick
 				while (stateInLevel == stateToPlace);
 
 				if (stateInLevel.canBeReplaced()) {
-					SoundType soundType = stateToPlace.getSoundType(level, placeLocation, null);
+					SoundType soundType = stateToPlace.getSoundType(); //PORT-NOTE: NeoForge's position-aware getSoundType(level, pos, entity); the cage's reinforced iron bars have no position-dependent sound type
 					BlockEntity placedBe;
 
 					level.setBlockAndUpdate(placeLocation, stateToPlace);

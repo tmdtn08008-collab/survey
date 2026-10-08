@@ -45,7 +45,7 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerListener;
-import net.minecraft.world.MenuProvider;
+import net.geforcemods.securitycraft.fabric.menu.IMenuProviderExtension;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -58,7 +58,7 @@ import net.geforcemods.securitycraft.fabric.items.IItemHandler;
 import net.geforcemods.securitycraft.fabric.items.InvWrapper;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
-public class LaserBlockBlockEntity extends LinkableBlockEntity implements MenuProvider, ContainerListener {
+public class LaserBlockBlockEntity extends LinkableBlockEntity implements IMenuProviderExtension, ContainerListener {
 	protected List<LinkedBlock> linkedBlocks = new ArrayList<>();
 	private DisabledOption disabled = new DisabledOption(false) {
 		@Override
@@ -134,7 +134,7 @@ public class LaserBlockBlockEntity extends LinkableBlockEntity implements MenuPr
 
 	@Override
 	public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-		MenuProvider.super.writeClientSideData(menu, buffer);
+		IMenuProviderExtension.super.writeClientSideData(menu, buffer);
 		buffer.writeBlockPos(worldPosition);
 		buffer.writeNbt(LaserBlockBlockEntity.saveSideConfig(sideConfig));
 	}

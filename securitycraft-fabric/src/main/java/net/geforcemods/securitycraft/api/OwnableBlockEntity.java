@@ -1,16 +1,18 @@
 package net.geforcemods.securitycraft.api;
 
 import net.geforcemods.securitycraft.SCContent;
+import net.geforcemods.securitycraft.fabric.blockentity.IBlockEntityExtension;
 import net.geforcemods.securitycraft.util.PasscodeUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class OwnableBlockEntity extends BlockEntity implements IOwnable {
+public class OwnableBlockEntity extends BlockEntity implements IOwnable, IBlockEntityExtension {
 	private Owner owner = new Owner();
 
 	public OwnableBlockEntity(BlockPos pos, BlockState state) {
@@ -44,6 +46,17 @@ public class OwnableBlockEntity extends BlockEntity implements IOwnable {
 	@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket() {
 		return ClientboundBlockEntityDataPacket.create(this);
+	}
+
+	//PORT-NOTE: These two only forward to the defaults of SecurityCraft's IBlockEntityExtension (NeoForge's are inherited from BlockEntity). Declaring them in the class keeps the calls unambiguous if another mod injects same-named default methods into every BlockEntity.
+	@Override
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider lookupProvider) {
+		IBlockEntityExtension.super.onDataPacket(net, packet, lookupProvider);
+	}
+
+	@Override
+	public void onLoad() {
+		IBlockEntityExtension.super.onLoad();
 	}
 
 	@Override

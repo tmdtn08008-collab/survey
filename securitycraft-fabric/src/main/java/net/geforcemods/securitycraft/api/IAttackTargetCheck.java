@@ -6,10 +6,11 @@ import net.minecraft.world.entity.Entity;
  * Defines a callback that the Sentry checks before trying to attack an entity. Call
  *
  * <pre>
- * InterModComms.sendTo("securitycraft", SecurityCraftAPI.IMC_SENTRY_ATTACK_TARGET_MSG, ClassThatImplementsIAttackTargetCheck::new);
+ * SecurityCraftAPI.registerSentryAttackTargetCheck(new ClassThatImplementsIAttackTargetCheck());
  * </pre>
  *
- * during InterModEnqueueEvent to register this with SecurityCraft.
+ * in the {@link SecurityCraftPlugin#register()} method of a "securitycraft" entrypoint to register this with SecurityCraft (on
+ * NeoForge, this was done with an InterModComms message).
  *
  * @author bl4ckscor3
  */

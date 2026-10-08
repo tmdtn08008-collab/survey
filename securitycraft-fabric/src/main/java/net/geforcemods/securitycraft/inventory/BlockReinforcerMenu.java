@@ -4,6 +4,7 @@ import net.geforcemods.securitycraft.SCContent;
 import net.geforcemods.securitycraft.api.IReinforcedBlock;
 import net.geforcemods.securitycraft.items.UniversalBlockReinforcerItem;
 import net.geforcemods.securitycraft.util.PlayerUtils;
+import net.geforcemods.securitycraft.fabricmixin.inventory.PlayerInvoker;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.LivingEntity;
@@ -150,7 +151,7 @@ public class BlockReinforcerMenu extends AbstractContainerMenu {
 			blockReinforcer.hurtAndBreak(itemsTaken.getCount(), player, LivingEntity.getSlotForHand(player.getUsedItemHand()));
 
 			if (blockReinforcer.isEmpty()) //Ran out of durability
-				player.closeContainer();
+				((PlayerInvoker) player).securitycraft$closeContainer(); //Player#closeContainer is made public by NeoForge's access transformer
 		}
 	}
 }

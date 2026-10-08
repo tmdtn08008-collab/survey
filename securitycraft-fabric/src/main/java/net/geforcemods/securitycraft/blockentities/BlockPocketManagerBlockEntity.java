@@ -38,7 +38,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
-import net.minecraft.world.MenuProvider;
+import net.geforcemods.securitycraft.fabric.menu.IMenuProviderExtension;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -54,7 +54,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.geforcemods.securitycraft.fabric.items.IItemHandler;
 import net.geforcemods.securitycraft.fabric.items.ItemStackHandler;
 
-public class BlockPocketManagerBlockEntity extends CustomizableBlockEntity implements MenuProvider, ITickingBlockEntity, ILockable {
+public class BlockPocketManagerBlockEntity extends CustomizableBlockEntity implements IMenuProviderExtension, ITickingBlockEntity, ILockable {
 	private static final int BLOCK_PLACEMENTS_PER_TICK = 4;
 	private boolean enabled = false;
 	private boolean showOutline = false;
@@ -713,7 +713,7 @@ public class BlockPocketManagerBlockEntity extends CustomizableBlockEntity imple
 
 	@Override
 	public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-		MenuProvider.super.writeClientSideData(menu, buffer);
+		IMenuProviderExtension.super.writeClientSideData(menu, buffer);
 		buffer.writeBlockPos(worldPosition);
 	}
 

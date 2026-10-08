@@ -43,11 +43,12 @@ import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ChestType;
+import net.geforcemods.securitycraft.fabric.blockentity.IBlockEntityExtension;
 import net.geforcemods.securitycraft.fabric.model.ModelData;
 import net.geforcemods.securitycraft.fabric.items.IItemHandler;
 import net.geforcemods.securitycraft.fabric.items.InvWrapper;
 
-public class KeypadChestBlockEntity extends ChestBlockEntity implements IPasscodeProtected, IOwnable, IModuleInventory, ICustomizable, ILockable, ISentryBulletContainer {
+public class KeypadChestBlockEntity extends ChestBlockEntity implements IPasscodeProtected, IOwnable, IModuleInventory, ICustomizable, ILockable, ISentryBulletContainer, IBlockEntityExtension {
 	private byte[] passcode;
 	private UUID saltKey;
 	private boolean saveSalt = false;
@@ -124,13 +125,13 @@ public class KeypadChestBlockEntity extends ChestBlockEntity implements IPasscod
 
 	@Override
 	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet, HolderLookup.Provider lookupProvider) {
-		super.onDataPacket(net, packet, lookupProvider);
+		IBlockEntityExtension.super.onDataPacket(net, packet, lookupProvider);
 		DisguisableBlockEntity.onHandleUpdateTag(this);
 	}
 
 	@Override
 	public void onLoad() {
-		super.onLoad();
+		IBlockEntityExtension.super.onLoad();
 		DisguisableBlockEntity.onHandleUpdateTag(this);
 	}
 

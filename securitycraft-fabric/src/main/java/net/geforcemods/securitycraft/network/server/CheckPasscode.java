@@ -14,6 +14,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -90,7 +91,7 @@ public class CheckPasscode implements CustomPacketPayload {
 			PasscodeUtils.setOnCooldown(player);
 			PasscodeUtils.hashPasscode(passcode, passcodeProtected.getSalt(), p -> {
 				if (Arrays.equals(passcodeProtected.getPasscode(), p)) {
-					player.closeContainer();
+					((ServerPlayer) player).closeContainer(); //Fabric: Player#closeContainer is protected in vanilla (NeoForge's AT makes it public); this handler only ever gets a ServerPlayer
 					passcodeProtected.activate(player);
 				}
 				else

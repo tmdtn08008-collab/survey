@@ -19,7 +19,7 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
-import net.minecraft.world.MenuProvider;
+import net.geforcemods.securitycraft.fabric.menu.IMenuProviderExtension;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -30,7 +30,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
-public class ProjectorBlockEntity extends DisguisableBlockEntity implements Container, MenuProvider, ILockable {
+public class ProjectorBlockEntity extends DisguisableBlockEntity implements Container, IMenuProviderExtension, ILockable {
 	public static final int MIN_WIDTH = 1; //also for height
 	public static final int MAX_WIDTH = 10; //also for height
 	public static final int MIN_RANGE = 1;
@@ -211,7 +211,7 @@ public class ProjectorBlockEntity extends DisguisableBlockEntity implements Cont
 
 	@Override
 	public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-		MenuProvider.super.writeClientSideData(menu, buffer);
+		IMenuProviderExtension.super.writeClientSideData(menu, buffer);
 		buffer.writeBlockPos(worldPosition);
 	}
 

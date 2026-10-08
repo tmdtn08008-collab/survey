@@ -3,8 +3,17 @@
   "package": "net.geforcemods.securitycraft.fabricmixin.inventory",
   "compatibilityLevel": "JAVA_21",
   "refmap": "securitycraft.refmap.json",
-  "mixins": [],
-  "client": [],
+  "mixins": [
+    "CompoundContainerAccessor",
+    "HopperBlockEntityAccessor",
+    "HopperBlockEntityMixin",
+    "LevelChunkMixin",
+    "LevelMixin",
+    "PlayerInvoker"
+  ],
+  "client": [
+    "ClientPacketListenerMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   },

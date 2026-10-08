@@ -32,7 +32,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
-import net.minecraft.world.MenuProvider;
+import net.geforcemods.securitycraft.fabric.menu.IMenuProviderExtension;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -45,7 +45,7 @@ import net.minecraft.world.phys.Vec3;
 import net.geforcemods.securitycraft.fabric.items.IItemHandler;
 import net.geforcemods.securitycraft.fabric.items.SidedInvWrapper;
 
-public class SecureTradingStationBlockEntity extends DisguisableBlockEntity implements WorldlyContainer, MenuProvider, ITickingBlockEntity {
+public class SecureTradingStationBlockEntity extends DisguisableBlockEntity implements WorldlyContainer, IMenuProviderExtension, ITickingBlockEntity {
 	private static final int[] SLOTS_FOR_UP_AND_SIDES = new int[] {12, 13, 14, 15, 16, 17, 18, 19};
 	private static final int[] SLOTS_FOR_DOWN = new int[] {4, 5, 6, 7, 8, 9, 10, 11};
 	private IntOption signalLength = new SignalLengthOption(60);
@@ -415,7 +415,7 @@ public class SecureTradingStationBlockEntity extends DisguisableBlockEntity impl
 
 	@Override
 	public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-		MenuProvider.super.writeClientSideData(menu, buffer);
+		IMenuProviderExtension.super.writeClientSideData(menu, buffer);
 		buffer.writeBlockPos(worldPosition);
 	}
 }

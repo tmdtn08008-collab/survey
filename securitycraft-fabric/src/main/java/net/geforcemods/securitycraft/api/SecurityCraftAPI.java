@@ -10,6 +10,7 @@ public class SecurityCraftAPI {
 	private static List<IPasscodeConvertible> registeredPasscodeConvertibles = new ArrayList<>();
 	private static List<IAttackTargetCheck> registeredSentryAttackTargetChecks = new ArrayList<>();
 	private static List<IDoorActivator> registeredDoorActivators = new ArrayList<>();
+	//The InterModComms message names used on NeoForge. They are unused on Fabric, where the register methods below are called from a SecurityCraftPlugin entrypoint, and are only kept for source compatibility.
 	public static final String IMC_EXTRACTION_BLOCK_MSG = "registerExtractionBlock";
 	public static final String IMC_PASSCODE_CONVERTIBLE_MSG = "registerPasscodeConvertible";
 	public static final String IMC_SENTRY_ATTACK_TARGET_MSG = "registerSentryAttackTargetCheck";

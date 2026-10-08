@@ -14,10 +14,11 @@ import net.minecraft.world.level.block.state.BlockState;
  * as "the doors"). Call
  *
  * <pre>
- * InterModComms.sendTo("securitycraft", SecurityCraftAPI.IMC_DOOR_ACTIVATOR_MSG, ClassThatImplementsIDoorActivator::new);
+ * SecurityCraftAPI.registerDoorActivator(new ClassThatImplementsIDoorActivator());
  * </pre>
  *
- * during InterModEnqueueEvent to register this with SecurityCraft.
+ * in the {@link SecurityCraftPlugin#register()} method of a "securitycraft" entrypoint to register this with SecurityCraft (on
+ * NeoForge, this was done with an InterModComms message).
  *
  * @author bl4ckscor3
  */

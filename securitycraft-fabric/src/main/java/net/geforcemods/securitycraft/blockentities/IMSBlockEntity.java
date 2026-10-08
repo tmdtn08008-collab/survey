@@ -27,8 +27,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.geforcemods.securitycraft.fabric.items.IItemHandler;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 
 public class IMSBlockEntity extends CustomizableBlockEntity implements ITickingBlockEntity {
 	private IntOption range = new IntOption("range", 15, 1, 30, 1);
@@ -56,13 +59,22 @@ public class IMSBlockEntity extends CustomizableBlockEntity implements ITickingB
 				BlockEntity be = level.getBlockEntity(pos.below());
 
 				if (be != null) {
-					IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, pos, be.getBlockState(), be, Direction.UP);
+					//PORT-NOTE: NeoForge passed the IMS's own position here, which only worked for block entity capabilities. The position of the inventory is used instead, so that Fabric's storage for vanilla chests works.
+					Storage<ItemVariant> storage = ItemStorage.SIDED.find(level, pos.below(), be.getBlockState(), be, Direction.UP);
 
-					if (handler != null) {
-						for (int i = 0; i < handler.getSlots(); i++) {
-							if (handler.getStackInSlot(i).getItem() == SCContent.BOUNCING_BETTY.get().asItem()) {
-								handler.extractItem(i, 1, false);
-								bombsRemaining++;
+					if (storage != null) {
+						for (StorageView<ItemVariant> view : storage.nonEmptyViews()) {
+							if (view.getResource().getItem() == SCContent.BOUNCING_BETTY.get().asItem()) {
+								ItemVariant bouncingBetty = view.getResource();
+
+								//PORT-NOTE: NeoForge added a bomb even when the item handler did not allow extracting it (e.g. someone else's protected inventory). Here, a bomb is only added when one was actually taken out.
+								try (Transaction transaction = Transaction.openOuter()) {
+									if (storage.extract(bouncingBetty, 1, transaction) == 1) {
+										transaction.commit();
+										bombsRemaining++;
+									}
+								}
+
 								return;
 							}
 						}

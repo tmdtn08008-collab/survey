@@ -40,7 +40,7 @@ public class BrushableMineBlockEntity extends BrushableBlockEntity implements IO
 			int previousCompletionState = getCompletionState();
 
 			if (++brushCount >= 10) {
-				brushingCompleted(player);
+				completeBrushing(player);
 				return true;
 			}
 			else {
@@ -86,8 +86,8 @@ public class BrushableMineBlockEntity extends BrushableBlockEntity implements IO
 		}
 	}
 
-	@Override
-	public void brushingCompleted(Player player) {
+	//PORT-NOTE: Overrides BrushableBlockEntity#brushingCompleted on NeoForge. That method is private in vanilla and Fabric's access widener makes widened private methods final, so it cannot be overridden here. The only vanilla caller is brush(), which this class replaces, so calling this from brush() keeps the behavior.
+	public void completeBrushing(Player player) {
 		if (level != null && level.getServer() != null) {
 			Block turnInto = Blocks.AIR;
 

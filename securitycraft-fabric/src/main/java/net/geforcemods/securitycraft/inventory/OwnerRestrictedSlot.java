@@ -34,7 +34,7 @@ public class OwnerRestrictedSlot extends Slot {
 	@Override
 	public void set(ItemStack stack) {
 		if (mayPlace(stack)) {
-			container.setItem(getSlotIndex(), stack);
+			container.setItem(getContainerSlot(), stack);
 			setChanged();
 			menu.slotsChanged(container);
 		}

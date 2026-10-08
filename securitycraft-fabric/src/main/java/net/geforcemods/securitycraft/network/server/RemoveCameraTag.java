@@ -33,7 +33,7 @@ public record RemoveCameraTag(GlobalPos globalPos) implements CustomPacketPayloa
 			NamedPositions cameras = stack.get(SCContent.BOUND_CAMERAS);
 
 			if (cameras != null)
-				cameras.remove(SCContent.BOUND_CAMERAS, stack, globalPos);
+				cameras.remove(() -> SCContent.BOUND_CAMERAS, stack, globalPos);
 		}
 	}
 }

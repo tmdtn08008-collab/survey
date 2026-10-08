@@ -33,7 +33,7 @@ public record RemoveMineFromMRAT(GlobalPos globalPos) implements CustomPacketPay
 			GlobalPositions mines = stack.get(SCContent.BOUND_MINES);
 
 			if (mines != null)
-				mines.remove(SCContent.BOUND_MINES, stack, globalPos);
+				mines.remove(() -> SCContent.BOUND_MINES, stack, globalPos);
 		}
 	}
 }

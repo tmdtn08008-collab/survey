@@ -9,10 +9,11 @@ import net.minecraft.world.level.block.state.BlockState;
  * Defines a block that can be converted to a passcode-protected variant by rightclicking it with a Key Panel. Call
  *
  * <pre>
- * InterModComms.sendTo("securitycraft", SecurityCraftAPI.IMC_PASSCODE_CONVERTIBLE_MSG, ClassThatImplementsIPasscodeConvertible::new);
+ * SecurityCraftAPI.registerPasscodeConvertible(new ClassThatImplementsIPasscodeConvertible());
  * </pre>
  *
- * during InterModEnqueueEvent to register this with SecurityCraft. <p> - SecurityCraft already comes with a few built-in
+ * in the {@link SecurityCraftPlugin#register()} method of a "securitycraft" entrypoint to register this with SecurityCraft (on
+ * NeoForge, this was done with an InterModComms message). <p> - SecurityCraft already comes with a few built-in
  * implementations, for example for barrels, chests, or furnaces.
  *
  * @author bl4ckscor3

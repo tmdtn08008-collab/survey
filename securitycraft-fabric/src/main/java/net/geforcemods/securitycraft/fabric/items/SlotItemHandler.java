@@ -40,6 +40,14 @@ public class SlotItemHandler extends Slot {
 		setChanged();
 	}
 
+	/**
+	 * Kept for parity with NeoForge's SlotItemHandler, so subclasses that override it still compile. Like on NeoForge
+	 * 1.21.1, nothing in vanilla calls this (AbstractContainerMenu#initializeContents calls {@link #set(ItemStack)}).
+	 */
+	public void initialize(ItemStack stack) {
+		set(stack);
+	}
+
 	@Override
 	public void setByPlayer(ItemStack newStack, ItemStack oldStack) {
 		set(newStack);

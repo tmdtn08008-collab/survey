@@ -133,7 +133,7 @@ public class ReinforcedPistonMovingBlockEntity extends BlockEntity implements IO
 
 			if (!list.isEmpty()) {
 				List<AABB> boundingBoxes = collisionShape.toAabbs();
-				boolean isSlimeBlock = be.movedState.isSlimeBlock();
+				boolean isSlimeBlock = be.movedState.is(Blocks.SLIME_BLOCK); //NeoForge's isSlimeBlock() defaults to this, and no SecurityCraft block overrides it
 				Iterator<Entity> entities = list.iterator();
 
 				while (true) {

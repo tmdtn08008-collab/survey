@@ -24,7 +24,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluids;
 import net.geforcemods.securitycraft.fabric.model.ModelData;
-import net.neoforged.neoforge.common.world.AuxiliaryLightManager;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class DisguisableBlockEntity extends CustomizableBlockEntity {
@@ -48,8 +47,8 @@ public class DisguisableBlockEntity extends CustomizableBlockEntity {
 		BlockState state = be.getBlockState();
 		Level level = be.getLevel();
 		BlockPos worldPosition = be.getBlockPos();
-		int newLight = IDisguisable.getDisguisedBlockStateFromStack(stack).map(s -> s.getLightEmission(level, worldPosition)).orElse(0);
 
+		//PORT-NOTE: NeoForge's AuxiliaryLightManager (per-position light levels, used to make a block disguised as a light source emit light) has no Fabric equivalent, so disguises do not emit light on Fabric. The block side (getLightEmission overrides) is dropped as well.
 		if (!level.isClientSide) {
 			PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, new ChunkPos(worldPosition), new RefreshDisguisableModel(worldPosition, true, stack, toggled));
 
@@ -60,13 +59,6 @@ public class DisguisableBlockEntity extends CustomizableBlockEntity {
 		}
 		else
 			ClientHandler.putDisguisedBeRenderer(be, stack);
-
-		if (newLight > 0) {
-			AuxiliaryLightManager lightManager = level.getAuxLightManager(worldPosition);
-
-			if (lightManager != null)
-				lightManager.setLightAt(worldPosition, newLight);
-		}
 	}
 
 	@Override
@@ -93,10 +85,7 @@ public class DisguisableBlockEntity extends CustomizableBlockEntity {
 		else
 			ClientHandler.DISGUISED_BLOCK_RENDER_DELEGATE.removeDelegateOf(be);
 
-		IDisguisable.getDisguisedBlockStateFromStack(stack).ifPresent(disguisedState -> {
-			if (disguisedState.getLightEmission(level, worldPosition) > 0)
-				level.getAuxLightManager(worldPosition).removeLightAt(worldPosition);
-		});
+		//PORT-NOTE: The disguise's light (NeoForge AuxiliaryLightManager) is not removed here, because it is never set on Fabric (see onDisguiseModuleInserted).
 	}
 
 	@Override

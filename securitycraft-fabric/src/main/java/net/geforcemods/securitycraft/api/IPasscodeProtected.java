@@ -24,6 +24,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabricmixin.inventory.PlayerInvoker;
 
 /**
  * Implementing this interface designates an object as being passcode-protected. Implementing this allows you to use
@@ -301,7 +302,7 @@ public interface IPasscodeProtected extends ICodebreakable {
 				startCooldown();
 
 			if (moduleInv.isModuleEnabled(ModuleType.HARMING) && player.hurt(CustomDamageSources.incorrectPasscode(player.level().registryAccess()), ConfigHandler.SERVER.incorrectPasscodeDamage.get()))
-				player.closeContainer();
+				((PlayerInvoker) player).securitycraft$closeContainer(); //Player#closeContainer is made public by NeoForge's access transformer
 		}
 	}
 }
