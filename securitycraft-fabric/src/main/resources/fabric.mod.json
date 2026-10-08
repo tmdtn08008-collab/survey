@@ -1,0 +1,28 @@
+{
+	"schemaVersion": 1,
+	"id": "securitycraft",
+	"version": "${version}",
+	"name": "SecurityCraft",
+	"description": "Adds a load of things to keep your house safe with and defend yourself from attackers. Unofficial Fabric port of SecurityCraft.",
+	"authors": ["Geforce", "bl4ckscor3", "Redstone_Dubstep", "ChainmailPickaxe"],
+	"contact": {
+		"homepage": "https://github.com/Geforce132/SecurityCraft",
+		"issues": "https://github.com/Geforce132/SecurityCraft/issues"
+	},
+	"license": "MIT",
+	"icon": "sc_logo.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": ["net.geforcemods.securitycraft.SecurityCraft"],
+		"client": ["net.geforcemods.securitycraft.SecurityCraftClient"]
+	},
+	"mixins": ["securitycraft.mixins.json"],
+	"accessWidener": "securitycraft.accesswidener",
+	"depends": {
+		"fabricloader": ">=0.16.0",
+		"minecraft": "~1.21.1",
+		"java": ">=21",
+		"fabric-api": "*",
+		"forgeconfigapiport": "*"
+	}
+}
