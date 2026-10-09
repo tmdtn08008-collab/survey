@@ -17,7 +17,10 @@ import net.minecraft.world.item.ItemStack;
 public class InventoryScannerGhostIngredientHandler implements IGhostIngredientHandler<InventoryScannerScreen> {
 	@Override
 	public <I> List<Target<I>> getTargetsTyped(InventoryScannerScreen screen, ITypedIngredient<I> ingredient, boolean doStart) {
-		if (!screen.be.isOwnedBy(Minecraft.getInstance().player))
+		//JEI offers every ingredient type here, including fluids, but the scanner's ghost slots can only hold items
+		ItemStack stack = ingredient.getItemStack().orElse(ItemStack.EMPTY);
+
+		if (stack.isEmpty() || !screen.be.isOwnedBy(Minecraft.getInstance().player))
 			return List.of();
 
 		List<Target<I>> targets = new ArrayList<>();
@@ -34,8 +37,8 @@ public class InventoryScannerGhostIngredientHandler implements IGhostIngredientH
 
 					@Override
 					public void accept(I ingredient) {
-						screen.be.getContents().set(slot.index, (ItemStack) ingredient);
-						PacketDistributor.sendToServer(new SetGhostSlot(slot.index, (ItemStack) ingredient));
+						screen.be.getContents().set(slot.index, stack);
+						PacketDistributor.sendToServer(new SetGhostSlot(slot.index, stack));
 					}
 				});
 			}
