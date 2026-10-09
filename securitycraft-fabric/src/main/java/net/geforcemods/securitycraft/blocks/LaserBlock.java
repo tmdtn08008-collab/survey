@@ -13,6 +13,8 @@ import net.geforcemods.securitycraft.util.BlockUtils;
 import net.geforcemods.securitycraft.util.LevelUtils;
 import net.geforcemods.securitycraft.util.PlayerUtils;
 import net.geforcemods.securitycraft.util.Utils;
+import net.geforcemods.securitycraft.fabricmixin.inventory.PlayerInvoker;
+import net.geforcemods.securitycraft.fabric.block.WeakPowerBlockHook;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -40,7 +42,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class LaserBlock extends DisguisableBlock {
+public class LaserBlock extends DisguisableBlock implements WeakPowerBlockHook {
 	public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
 	public LaserBlock(BlockBehaviour.Properties properties) {
@@ -111,7 +113,7 @@ public class LaserBlock extends DisguisableBlock {
 							PlayerUtils.sendMessageToPlayer(player, Utils.localize(getDescriptionId()), Utils.localize("messages.securitycraft:laser.sync_failed", Utils.getFormattedCoordinates(thatBe.getBlockPos()), Utils.localize(failedType.getTranslationKey())), ChatFormatting.RED);
 							thisBe.setSideEnabled(facing, false, null);
 							thatBe.setSideEnabled(facing.getOpposite(), false, null);
-							player.closeContainer();
+							((PlayerInvoker) player).securitycraft$closeContainer(); //Player#closeContainer is made public by NeoForge's access transformer
 						}
 
 						return;

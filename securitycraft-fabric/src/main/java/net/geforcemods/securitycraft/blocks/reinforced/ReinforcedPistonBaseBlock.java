@@ -44,7 +44,6 @@ import net.minecraft.world.level.block.state.properties.PistonType;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.PushReaction;
 import net.geforcemods.securitycraft.fabric.event.NeoForge;
-import net.neoforged.neoforge.event.EventHooks;
 
 public class ReinforcedPistonBaseBlock extends PistonBaseBlock implements IReinforcedBlock, EntityBlock {
 	private final float destroyTimeForOwner;
@@ -136,10 +135,8 @@ public class ReinforcedPistonBaseBlock extends PistonBaseBlock implements IReinf
 				return false;
 		}
 
+		//PORT-NOTE: NeoForge fires its cancelable PistonEvent.Pre here (EventHooks.onPistonMovePre) and PistonEvent.Post at the end of this method. SecurityCraft does not listen to these events and Fabric has no piston event, so the calls were removed; other mods can no longer cancel the reinforced piston's movement this way.
 		if (id == 0) {
-			if (EventHooks.onPistonMovePre(level, pos, direction, true))
-				return false;
-
 			if (!this.moveBlocks(level, pos, direction, true))
 				return false;
 
@@ -148,9 +145,6 @@ public class ReinforcedPistonBaseBlock extends PistonBaseBlock implements IReinf
 			level.gameEvent(GameEvent.BLOCK_ACTIVATE, pos, GameEvent.Context.of(extendedState));
 		}
 		else if (id == 1 || id == 2) {
-			if (EventHooks.onPistonMovePre(level, pos, direction, false))
-				return false;
-
 			if (level.getBlockEntity(pos.relative(direction)) instanceof ReinforcedPistonMovingBlockEntity pistonBe)
 				pistonBe.finalTick();
 
@@ -186,7 +180,6 @@ public class ReinforcedPistonBaseBlock extends PistonBaseBlock implements IReinf
 			level.gameEvent(GameEvent.BLOCK_DEACTIVATE, pos, GameEvent.Context.of(movingPiston));
 		}
 
-		EventHooks.onPistonMovePost(level, pos, direction, id == 0);
 		return true;
 	}
 

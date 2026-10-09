@@ -8,6 +8,8 @@ import net.geforcemods.securitycraft.api.OwnableBlockEntity;
 import net.geforcemods.securitycraft.compat.IOverlayDisplay;
 import net.geforcemods.securitycraft.util.BlockUtils;
 import net.geforcemods.securitycraft.util.IBlockMine;
+import net.geforcemods.securitycraft.fabric.block.PlayerDestroyBlockHook;
+import net.geforcemods.securitycraft.fabric.block.CloneItemStackBlockHook;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
@@ -31,7 +33,7 @@ import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class BaseFullMineBlock extends ExplosiveBlock implements IOverlayDisplay, IBlockMine {
+public class BaseFullMineBlock extends ExplosiveBlock implements IOverlayDisplay, IBlockMine, PlayerDestroyBlockHook, CloneItemStackBlockHook {
 	private final Block blockDisguisedAs;
 
 	public BaseFullMineBlock(BlockBehaviour.Properties properties, Block disguisedBlock) {
@@ -73,14 +75,14 @@ public class BaseFullMineBlock extends ExplosiveBlock implements IOverlayDisplay
 	public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
 		if (!level.isClientSide) {
 			if (player != null && player.isCreative() && !ConfigHandler.SERVER.mineExplodesWhenInCreative.get())
-				return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+				return PlayerDestroyBlockHook.super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
 			else if (!(level.getBlockEntity(pos) instanceof IOwnable ownable && ownable.isOwnedBy(player))) {
 				explode(level, pos);
-				return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+				return PlayerDestroyBlockHook.super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
 			}
 		}
 
-		return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+		return PlayerDestroyBlockHook.super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
 	}
 
 	@Override
@@ -141,7 +143,7 @@ public class BaseFullMineBlock extends ExplosiveBlock implements IOverlayDisplay
 		if (IDisguisable.shouldPickBlockDisguise(level, pos, player))
 			return new ItemStack(blockDisguisedAs);
 
-		return super.getCloneItemStack(state, target, level, pos, player);
+		return CloneItemStackBlockHook.super.getCloneItemStack(state, target, level, pos, player);
 	}
 
 	@Override

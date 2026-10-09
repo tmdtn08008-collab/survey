@@ -10,6 +10,7 @@ import net.geforcemods.securitycraft.misc.SaltData;
 import net.geforcemods.securitycraft.util.LevelUtils;
 import net.geforcemods.securitycraft.util.PlayerUtils;
 import net.geforcemods.securitycraft.util.Utils;
+import net.geforcemods.securitycraft.fabric.block.CloneItemStackBlockHook;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -52,7 +53,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class DisplayCaseBlock extends OwnableBlock implements SimpleWaterloggedBlock {
+public class DisplayCaseBlock extends OwnableBlock implements SimpleWaterloggedBlock, CloneItemStackBlockHook {
 	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 	public static final EnumProperty<AttachFace> ATTACH_FACE = BlockStateProperties.ATTACH_FACE;
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -240,7 +241,7 @@ public class DisplayCaseBlock extends OwnableBlock implements SimpleWaterloggedB
 				return displayedStack;
 		}
 
-		return super.getCloneItemStack(state, target, level, pos, player);
+		return CloneItemStackBlockHook.super.getCloneItemStack(state, target, level, pos, player);
 	}
 
 	@Override

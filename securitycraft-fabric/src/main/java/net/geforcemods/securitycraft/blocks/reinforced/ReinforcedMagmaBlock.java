@@ -1,6 +1,8 @@
 package net.geforcemods.securitycraft.blocks.reinforced;
 
 import net.geforcemods.securitycraft.api.OwnableBlockEntity;
+import net.geforcemods.securitycraft.fabric.block.BubbleColumnBlockHook;
+import net.geforcemods.securitycraft.fabric.block.BubbleColumnDirection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -17,10 +19,9 @@ import net.minecraft.world.level.block.SeagrassBlock;
 import net.minecraft.world.level.block.TallSeagrassBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.enums.BubbleColumnDirection;
 import net.geforcemods.securitycraft.fabric.util.TriState;
 
-public class ReinforcedMagmaBlock extends BaseReinforcedBlock {
+public class ReinforcedMagmaBlock extends BaseReinforcedBlock implements BubbleColumnBlockHook {
 	public ReinforcedMagmaBlock(BlockBehaviour.Properties properties, Block vanillaBlock) {
 		super(properties, vanillaBlock);
 	}

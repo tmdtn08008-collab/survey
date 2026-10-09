@@ -10,6 +10,9 @@ import net.geforcemods.securitycraft.api.IPasscodeConvertible;
 import net.geforcemods.securitycraft.api.IPasscodeProtected;
 import net.geforcemods.securitycraft.blockentities.KeypadChestBlockEntity;
 import net.geforcemods.securitycraft.compat.IOverlayDisplay;
+import net.geforcemods.securitycraft.fabric.block.CloneItemStackBlockHook;
+import net.geforcemods.securitycraft.fabric.block.NeighborChangeBlockHook;
+import net.geforcemods.securitycraft.fabric.block.SoundTypeBlockHook;
 import net.geforcemods.securitycraft.misc.ModuleType;
 import net.geforcemods.securitycraft.misc.OwnershipEvent;
 import net.geforcemods.securitycraft.misc.SaltData;
@@ -59,11 +62,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
 import net.geforcemods.securitycraft.fabric.event.NeoForge;
-import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.common.world.AuxiliaryLightManager;
 
-public class KeypadChestBlock extends ChestBlock implements IOverlayDisplay, IDisguisable {
+public class KeypadChestBlock extends ChestBlock implements IOverlayDisplay, IDisguisable, NeighborChangeBlockHook, SoundTypeBlockHook, CloneItemStackBlockHook {
 	private static final DoubleBlockCombiner.Combiner<ChestBlockEntity, Optional<MenuProvider>> CONTAINER_MERGER = new DoubleBlockCombiner.Combiner<>() {
 		@Override
 		public Optional<MenuProvider> acceptDouble(final ChestBlockEntity chest1, final ChestBlockEntity chest2) {
@@ -211,7 +213,7 @@ public class KeypadChestBlock extends ChestBlock implements IOverlayDisplay, IDi
 
 	@Override
 	public void onNeighborChange(BlockState state, LevelReader level, BlockPos pos, BlockPos neighbor) {
-		super.onNeighborChange(state, level, pos, neighbor);
+		NeighborChangeBlockHook.super.onNeighborChange(state, level, pos, neighbor);
 
 		if (level.getBlockEntity(pos) instanceof KeypadChestBlockEntity be)
 			be.setBlockState(state);
@@ -268,25 +270,16 @@ public class KeypadChestBlock extends ChestBlock implements IOverlayDisplay, IDi
 			return super.getShape(state, level, pos, ctx);
 	}
 
-	@Override
-	public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
-		AuxiliaryLightManager lightManager = level.getAuxLightManager(pos);
-		int lightValue = 0;
-
-		if (lightManager != null)
-			lightValue = lightManager.getLightAt(pos);
-
-		return lightValue > 0 ? lightValue : super.getLightEmission(state, level, pos);
-	}
+	//PORT-NOTE: NeoForge's getLightEmission(BlockState, BlockGetter, BlockPos) and hasDynamicLightEmission(BlockState) overrides were removed. They made a disguised block emit the light of its disguise through NeoForge's AuxiliaryLightManager, which has no Fabric equivalent, so a disguised block now emits the light of the real block instead (concealment only, no protection is lost).
 
 	@Override
 	public SoundType getSoundType(BlockState state, LevelReader level, BlockPos pos, Entity entity) {
 		BlockState disguisedState = IDisguisable.getDisguisedBlockState(level.getBlockEntity(pos)).orElse(state);
 
 		if (disguisedState.getBlock() != this)
-			return disguisedState.getSoundType(level, pos, entity);
+			return SoundTypeBlockHook.getSoundTypeAt(disguisedState, level, pos, entity);
 		else
-			return super.getSoundType(state, level, pos, entity);
+			return SoundTypeBlockHook.super.getSoundType(state, level, pos, entity);
 	}
 
 	@Override
@@ -329,7 +322,7 @@ public class KeypadChestBlock extends ChestBlock implements IOverlayDisplay, IDi
 		if (IDisguisable.shouldPickBlockDisguise(level, pos, player))
 			return getDisguisedStack(level, pos);
 
-		return super.getCloneItemStack(state, target, level, pos, player);
+		return CloneItemStackBlockHook.super.getCloneItemStack(state, target, level, pos, player);
 	}
 
 	@Override
@@ -337,15 +330,10 @@ public class KeypadChestBlock extends ChestBlock implements IOverlayDisplay, IDi
 		return RenderShape.MODEL;
 	}
 
-	@Override
-	public boolean hasDynamicLightEmission(BlockState state) {
-		return true;
-	}
-
 	public static class Convertible implements IPasscodeConvertible {
 		@Override
 		public boolean isUnprotectedBlock(BlockState state) {
-			return state.is(Tags.Blocks.CHESTS_WOODEN);
+			return state.is(ConventionalBlockTags.WOODEN_CHESTS);
 		}
 
 		@Override

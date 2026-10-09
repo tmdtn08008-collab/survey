@@ -7,8 +7,11 @@ import net.geforcemods.securitycraft.SCContent;
 import net.geforcemods.securitycraft.SCTags;
 import net.geforcemods.securitycraft.api.IReinforcedBlock;
 import net.geforcemods.securitycraft.blocks.OwnableBlock;
+import net.geforcemods.securitycraft.fabric.block.SoilBlockHook;
+import net.geforcemods.securitycraft.fabric.block.ConduitFrameBlockHook;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;
@@ -31,7 +34,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.geforcemods.securitycraft.fabric.util.TriState;
 
-public class BaseReinforcedBlock extends OwnableBlock implements IReinforcedBlock {
+public class BaseReinforcedBlock extends OwnableBlock implements IReinforcedBlock, SoilBlockHook, ConduitFrameBlockHook {
 	private final Supplier<? extends Block> vanillaBlockSupplier;
 
 	public BaseReinforcedBlock(BlockBehaviour.Properties properties, Block vB) {
@@ -76,7 +79,7 @@ public class BaseReinforcedBlock extends OwnableBlock implements IReinforcedBloc
 				FluidState fluidState = level.getFluidState(soilPos.relative(face));
 
 				hasWater |= blockState.is(Blocks.FROSTED_ICE);
-				hasWater |= fluidState.canHydrate(level, soilPos, blockState, soilPos.relative(face));
+				hasWater |= fluidState.is(FluidTags.WATER); //PORT-NOTE: NeoForge's FluidState#canHydrate is true exactly for fluids of the water fluid type, which on Fabric are the fluids in #minecraft:water (SecurityCraft's fake water is added to that tag)
 
 				if (hasWater)
 					break; //No point continuing.

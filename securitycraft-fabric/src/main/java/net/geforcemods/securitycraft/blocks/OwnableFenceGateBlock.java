@@ -3,6 +3,7 @@ package net.geforcemods.securitycraft.blocks;
 import java.util.function.BiConsumer;
 
 import net.geforcemods.securitycraft.api.OwnableBlockEntity;
+import net.geforcemods.securitycraft.fabricmixin.blocks.BlockBehaviourPropertiesAccessor;
 import net.geforcemods.securitycraft.misc.OwnershipEvent;
 import net.geforcemods.securitycraft.util.BlockUtils;
 import net.minecraft.core.BlockPos;
@@ -18,24 +19,30 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.geforcemods.securitycraft.fabric.event.NeoForge;
 
 public class OwnableFenceGateBlock extends FenceGateBlock implements EntityBlock {
+	//PORT-NOTE: NeoForge adds these fields to FenceGateBlock itself. Vanilla only has the private WoodType they are taken from
+	protected final SoundEvent openSound, closeSound;
 	private final float destroyTimeForOwner;
 
 	public OwnableFenceGateBlock(BlockBehaviour.Properties properties, WoodType woodType) {
 		super(woodType, OwnableBlock.withReinforcedDestroyTime(properties));
 		destroyTimeForOwner = OwnableBlock.getStoredDestroyTime();
+		openSound = woodType.fenceGateOpen();
+		closeSound = woodType.fenceGateClose();
 	}
 
 	public OwnableFenceGateBlock(BlockBehaviour.Properties properties, SoundEvent openSound, SoundEvent closeSound) {
-		super(OwnableBlock.withReinforcedDestroyTime(properties), openSound, closeSound);
-		destroyTimeForOwner = OwnableBlock.getStoredDestroyTime();
+		//PORT-NOTE: Vanilla's FenceGateBlock has no constructor that takes sounds (NeoForge adds one) and always plays the sounds of its WoodType, so an unregistered WoodType carrying these sounds is passed instead. Its sound type is the one already set in the properties, because vanilla applies the WoodType's sound type to the properties.
+		this(properties, new WoodType("securitycraft:fence_gate_sounds", BlockSetType.IRON, ((BlockBehaviourPropertiesAccessor) properties).securitycraft$getSoundType(), SoundType.HANGING_SIGN, closeSound, openSound));
 	}
 
 	@Override

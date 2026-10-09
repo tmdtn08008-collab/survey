@@ -8,6 +8,7 @@ import net.geforcemods.securitycraft.misc.ModuleType;
 import net.geforcemods.securitycraft.util.LevelUtils;
 import net.geforcemods.securitycraft.util.PlayerUtils;
 import net.geforcemods.securitycraft.util.Utils;
+import net.geforcemods.securitycraft.fabric.block.PlayerDestroyBlockHook;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
@@ -40,7 +41,7 @@ import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class CageTrapBlock extends DisguisableBlock {
+public class CageTrapBlock extends DisguisableBlock implements PlayerDestroyBlockHook {
 	public static final BooleanProperty DEACTIVATED = BooleanProperty.create("deactivated");
 
 	public CageTrapBlock(BlockBehaviour.Properties properties) {
@@ -159,6 +160,6 @@ public class CageTrapBlock extends DisguisableBlock {
 		if (!level.isClientSide() && level.getBlockEntity(pos) instanceof CageTrapBlockEntity be)
 			be.disassembleIronBars();
 
-		return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+		return PlayerDestroyBlockHook.super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
 	}
 }

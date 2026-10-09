@@ -9,6 +9,8 @@ import net.geforcemods.securitycraft.network.client.OpenScreen.DataType;
 import net.geforcemods.securitycraft.util.BlockUtils;
 import net.geforcemods.securitycraft.util.LevelUtils;
 import net.geforcemods.securitycraft.util.Utils;
+import net.geforcemods.securitycraft.fabric.block.RedstoneConnectionBlockHook;
+import net.geforcemods.securitycraft.fabric.block.NeighborChangeBlockHook;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -43,7 +45,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
-public class AlarmBlock extends OwnableBlock implements SimpleWaterloggedBlock {
+public class AlarmBlock extends OwnableBlock implements SimpleWaterloggedBlock, RedstoneConnectionBlockHook, NeighborChangeBlockHook {
 	public static final BooleanProperty LIT = BlockStateProperties.LIT;
 	public static final DirectionProperty FACING = BlockStateProperties.FACING;
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;

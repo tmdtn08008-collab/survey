@@ -9,6 +9,8 @@ import net.geforcemods.securitycraft.api.IReinforcedBlock;
 import net.geforcemods.securitycraft.blockentities.ReinforcedHopperBlockEntity;
 import net.geforcemods.securitycraft.blocks.OwnableBlock;
 import net.geforcemods.securitycraft.compat.IOverlayDisplay;
+import net.geforcemods.securitycraft.fabric.block.CloneItemStackBlockHook;
+import net.geforcemods.securitycraft.fabric.block.SoundTypeBlockHook;
 import net.geforcemods.securitycraft.misc.OwnershipEvent;
 import net.geforcemods.securitycraft.util.BlockUtils;
 import net.minecraft.core.BlockPos;
@@ -38,9 +40,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.geforcemods.securitycraft.fabric.event.NeoForge;
-import net.neoforged.neoforge.common.world.AuxiliaryLightManager;
 
-public class ReinforcedHopperBlock extends HopperBlock implements IReinforcedBlock, IOverlayDisplay, IDisguisable {
+public class ReinforcedHopperBlock extends HopperBlock implements IReinforcedBlock, IOverlayDisplay, IDisguisable, SoundTypeBlockHook, CloneItemStackBlockHook {
 	private final float destroyTimeForOwner;
 
 	public ReinforcedHopperBlock(BlockBehaviour.Properties properties) {
@@ -123,25 +124,16 @@ public class ReinforcedHopperBlock extends HopperBlock implements IReinforcedBlo
 			return Shapes.or(super.getBlockSupportShape(state, level, pos), INSIDE);
 	}
 
-	@Override
-	public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
-		AuxiliaryLightManager lightManager = level.getAuxLightManager(pos);
-		int lightValue = 0;
-
-		if (lightManager != null)
-			lightValue = lightManager.getLightAt(pos);
-
-		return lightValue > 0 ? lightValue : super.getLightEmission(state, level, pos);
-	}
+	//PORT-NOTE: NeoForge's getLightEmission(BlockState, BlockGetter, BlockPos) and hasDynamicLightEmission(BlockState) overrides were removed. They made a disguised block emit the light of its disguise through NeoForge's AuxiliaryLightManager, which has no Fabric equivalent, so a disguised block now emits the light of the real block instead (concealment only, no protection is lost).
 
 	@Override
 	public SoundType getSoundType(BlockState state, LevelReader level, BlockPos pos, Entity entity) {
 		BlockState disguisedState = IDisguisable.getDisguisedBlockState(level.getBlockEntity(pos)).orElse(state);
 
 		if (disguisedState.getBlock() != this)
-			return disguisedState.getSoundType(level, pos, entity);
+			return SoundTypeBlockHook.getSoundTypeAt(disguisedState, level, pos, entity);
 		else
-			return super.getSoundType(state, level, pos, entity);
+			return SoundTypeBlockHook.super.getSoundType(state, level, pos, entity);
 	}
 
 	@Override
@@ -184,12 +176,7 @@ public class ReinforcedHopperBlock extends HopperBlock implements IReinforcedBlo
 		if (IDisguisable.shouldPickBlockDisguise(level, pos, player))
 			return getDisguisedStack(level, pos);
 
-		return super.getCloneItemStack(state, target, level, pos, player);
-	}
-
-	@Override
-	public boolean hasDynamicLightEmission(BlockState state) {
-		return true;
+		return CloneItemStackBlockHook.super.getCloneItemStack(state, target, level, pos, player);
 	}
 
 	public static class ExtractionBlock implements IExtractionBlock {

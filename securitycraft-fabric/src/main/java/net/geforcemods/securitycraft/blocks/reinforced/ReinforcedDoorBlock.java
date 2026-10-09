@@ -6,6 +6,8 @@ import net.geforcemods.securitycraft.api.Owner;
 import net.geforcemods.securitycraft.blockentities.ReinforcedDoorBlockEntity;
 import net.geforcemods.securitycraft.blocks.OwnableBlock;
 import net.geforcemods.securitycraft.util.BlockUtils;
+import net.geforcemods.securitycraft.fabric.block.CloneItemStackBlockHook;
+import net.geforcemods.securitycraft.fabric.event.EventHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -42,7 +44,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class ReinforcedDoorBlock extends OwnableBlock {
+public class ReinforcedDoorBlock extends OwnableBlock implements CloneItemStackBlockHook {
 	public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 	public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
 	public static final EnumProperty<DoorHingeSide> HINGE = BlockStateProperties.DOOR_HINGE;
@@ -84,7 +86,7 @@ public class ReinforcedDoorBlock extends OwnableBlock {
 
 	@Override
 	public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-		if (!level.isClientSide() && (player.isCreative() || !player.hasCorrectToolForDrops(state, level, pos)))
+		if (!level.isClientSide() && (player.isCreative() || !EventHooks.doPlayerHarvestCheck(player, state, level, pos))) //Player#hasCorrectToolForDrops(BlockState, Level, BlockPos) is added by NeoForge
 			DoublePlantBlock.preventDropFromBottomPart(level, pos, state, player);
 
 		return super.playerWillDestroy(level, pos, state, player);

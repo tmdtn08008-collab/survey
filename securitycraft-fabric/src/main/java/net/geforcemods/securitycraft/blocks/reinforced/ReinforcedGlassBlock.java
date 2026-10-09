@@ -1,5 +1,6 @@
 package net.geforcemods.securitycraft.blocks.reinforced;
 
+import net.geforcemods.securitycraft.fabric.block.FluidOverlayBlockHook;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -9,7 +10,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 
-public class ReinforcedGlassBlock extends BaseReinforcedBlock {
+public class ReinforcedGlassBlock extends BaseReinforcedBlock implements FluidOverlayBlockHook {
 	public ReinforcedGlassBlock(BlockBehaviour.Properties properties, Block vB) {
 		super(properties, vB);
 	}

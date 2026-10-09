@@ -1,5 +1,7 @@
 package net.geforcemods.securitycraft.blocks.reinforced;
 
+import net.geforcemods.securitycraft.fabric.block.BubbleColumnBlockHook;
+import net.geforcemods.securitycraft.fabric.block.BubbleColumnDirection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -16,9 +18,8 @@ import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.common.enums.BubbleColumnDirection;
 
-public class ReinforcedSoulSandBlock extends BaseReinforcedBlock {
+public class ReinforcedSoulSandBlock extends BaseReinforcedBlock implements BubbleColumnBlockHook {
 	protected static final VoxelShape SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 14.0D, 16.0D);
 
 	public ReinforcedSoulSandBlock(BlockBehaviour.Properties properties, Block vanillaBlock) {

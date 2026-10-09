@@ -5,6 +5,8 @@ import net.geforcemods.securitycraft.api.IDisguisable;
 import net.geforcemods.securitycraft.blockentities.ScannerTrapdoorBlockEntity;
 import net.geforcemods.securitycraft.blocks.reinforced.BaseIronTrapDoorBlock;
 import net.geforcemods.securitycraft.compat.IOverlayDisplay;
+import net.geforcemods.securitycraft.fabric.block.CloneItemStackBlockHook;
+import net.geforcemods.securitycraft.fabric.block.SoundTypeBlockHook;
 import net.geforcemods.securitycraft.misc.OwnershipEvent;
 import net.geforcemods.securitycraft.util.LevelUtils;
 import net.minecraft.core.BlockPos;
@@ -34,9 +36,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.geforcemods.securitycraft.fabric.event.NeoForge;
-import net.neoforged.neoforge.common.world.AuxiliaryLightManager;
 
-public class ScannerTrapDoorBlock extends BaseIronTrapDoorBlock implements IDisguisable, IOverlayDisplay {
+public class ScannerTrapDoorBlock extends BaseIronTrapDoorBlock implements IDisguisable, IOverlayDisplay, SoundTypeBlockHook, CloneItemStackBlockHook {
 	public ScannerTrapDoorBlock(BlockBehaviour.Properties properties, BlockSetType blockSetType) {
 		super(properties, blockSetType);
 	}
@@ -102,28 +103,19 @@ public class ScannerTrapDoorBlock extends BaseIronTrapDoorBlock implements IDisg
 		if (IDisguisable.shouldPickBlockDisguise(level, pos, player))
 			return getDisguisedStack(level, pos);
 
-		return super.getCloneItemStack(state, target, level, pos, player);
+		return CloneItemStackBlockHook.super.getCloneItemStack(state, target, level, pos, player);
 	}
 
-	@Override
-	public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
-		AuxiliaryLightManager lightManager = level.getAuxLightManager(pos);
-		int lightValue = 0;
-
-		if (lightManager != null)
-			lightValue = lightManager.getLightAt(pos);
-
-		return lightValue > 0 ? lightValue : super.getLightEmission(state, level, pos);
-	}
+	//PORT-NOTE: NeoForge's getLightEmission(BlockState, BlockGetter, BlockPos) and hasDynamicLightEmission(BlockState) overrides were removed. They made a disguised block emit the light of its disguise through NeoForge's AuxiliaryLightManager, which has no Fabric equivalent, so a disguised block now emits the light of the real block instead (concealment only, no protection is lost).
 
 	@Override
 	public SoundType getSoundType(BlockState state, LevelReader level, BlockPos pos, Entity entity) {
 		BlockState disguisedState = IDisguisable.getDisguisedBlockState(level.getBlockEntity(pos)).orElse(state);
 
 		if (disguisedState.getBlock() != this)
-			return disguisedState.getSoundType(level, pos, entity);
+			return SoundTypeBlockHook.getSoundTypeAt(disguisedState, level, pos, entity);
 		else
-			return super.getSoundType(state, level, pos, entity);
+			return SoundTypeBlockHook.super.getSoundType(state, level, pos, entity);
 	}
 
 	@Override
@@ -159,10 +151,5 @@ public class ScannerTrapDoorBlock extends BaseIronTrapDoorBlock implements IDisg
 	@Override
 	public boolean shouldShowSCInfo(Level level, BlockState state, BlockPos pos) {
 		return getDisguisedStack(level, pos).getItem() == asItem();
-	}
-
-	@Override
-	public boolean hasDynamicLightEmission(BlockState state) {
-		return true;
 	}
 }

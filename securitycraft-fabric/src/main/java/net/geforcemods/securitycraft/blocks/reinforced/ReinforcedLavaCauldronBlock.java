@@ -1,6 +1,7 @@
 package net.geforcemods.securitycraft.blocks.reinforced;
 
 import net.geforcemods.securitycraft.SCContent;
+import net.geforcemods.securitycraft.fabric.block.CloneItemStackBlockHook;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -13,7 +14,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
 
-public class ReinforcedLavaCauldronBlock extends ReinforcedCauldronBlock {
+public class ReinforcedLavaCauldronBlock extends ReinforcedCauldronBlock implements CloneItemStackBlockHook {
 	public ReinforcedLavaCauldronBlock(BlockBehaviour.Properties properties) {
 		super(properties, IReinforcedCauldronInteraction.LAVA);
 	}

@@ -82,7 +82,7 @@ public class FrameBlock extends OwnableBlock implements SimpleWaterloggedBlock {
 				PlayerUtils.sendMessageToPlayer(player, Utils.localize(SCContent.FRAME.get().getDescriptionId()), Utils.localize("messages.securitycraft:frame.disabled"), ChatFormatting.RED);
 			else if (!be.isOwnedBy(player))
 				PlayerUtils.sendMessageToPlayer(player, Utils.localize(SCContent.FRAME.get().getDescriptionId()), Utils.localize("messages.securitycraft:notOwned", be.getOwner().getName()), ChatFormatting.RED);
-			else if (stack.has(SCContent.BOUND_CAMERAS.get())) {
+			else if (stack.has(SCContent.BOUND_CAMERAS)) {
 				NamedPositions cameras = stack.get(SCContent.BOUND_CAMERAS);
 
 				if (!cameras.isEmpty()) {

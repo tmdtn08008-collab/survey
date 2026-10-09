@@ -8,6 +8,7 @@ import net.geforcemods.securitycraft.api.OwnableBlockEntity;
 import net.geforcemods.securitycraft.blocks.OwnableBlock;
 import net.geforcemods.securitycraft.misc.OwnershipEvent;
 import net.geforcemods.securitycraft.util.BlockUtils;
+import net.geforcemods.securitycraft.fabric.block.SoilBlockHook;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -28,7 +29,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.TreeConfigurati
 import net.geforcemods.securitycraft.fabric.event.NeoForge;
 import net.geforcemods.securitycraft.fabric.util.TriState;
 
-public class ReinforcedSnowyDirtBlock extends SnowyDirtBlock implements IReinforcedBlock, EntityBlock {
+public class ReinforcedSnowyDirtBlock extends SnowyDirtBlock implements IReinforcedBlock, EntityBlock, SoilBlockHook {
 	private Block vanillaBlock;
 	private final float destroyTimeForOwner;
 

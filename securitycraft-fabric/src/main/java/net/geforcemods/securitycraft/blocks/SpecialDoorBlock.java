@@ -6,6 +6,8 @@ import net.geforcemods.securitycraft.api.IModuleInventory;
 import net.geforcemods.securitycraft.api.IPasscodeProtected;
 import net.geforcemods.securitycraft.api.LinkableBlockEntity;
 import net.geforcemods.securitycraft.compat.IOverlayDisplay;
+import net.geforcemods.securitycraft.fabric.block.CloneItemStackBlockHook;
+import net.geforcemods.securitycraft.fabric.block.SoundTypeBlockHook;
 import net.geforcemods.securitycraft.misc.SaltData;
 import net.geforcemods.securitycraft.util.BlockUtils;
 import net.minecraft.core.BlockPos;
@@ -36,9 +38,8 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.common.world.AuxiliaryLightManager;
 
-public abstract class SpecialDoorBlock extends DoorBlock implements EntityBlock, IDisguisable, IOverlayDisplay {
+public abstract class SpecialDoorBlock extends DoorBlock implements EntityBlock, IDisguisable, IOverlayDisplay, SoundTypeBlockHook, CloneItemStackBlockHook {
 	private final float destroyTimeForOwner;
 
 	protected SpecialDoorBlock(BlockBehaviour.Properties properties, BlockSetType blockSetType) {
@@ -167,7 +168,7 @@ public abstract class SpecialDoorBlock extends DoorBlock implements EntityBlock,
 		if (IDisguisable.shouldPickBlockDisguise(level, pos, player))
 			return getDisguisedStack(level, pos);
 
-		return super.getCloneItemStack(state, target, level, pos, player);
+		return CloneItemStackBlockHook.super.getCloneItemStack(state, target, level, pos, player);
 	}
 
 	@Override
@@ -175,25 +176,16 @@ public abstract class SpecialDoorBlock extends DoorBlock implements EntityBlock,
 		return new ItemStack(getDoorItem());
 	}
 
-	@Override
-	public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
-		AuxiliaryLightManager lightManager = level.getAuxLightManager(pos);
-		int lightValue = 0;
-
-		if (lightManager != null)
-			lightValue = lightManager.getLightAt(pos);
-
-		return lightValue > 0 ? lightValue : super.getLightEmission(state, level, pos);
-	}
+	//PORT-NOTE: NeoForge's getLightEmission(BlockState, BlockGetter, BlockPos) and hasDynamicLightEmission(BlockState) overrides were removed. They made a disguised block emit the light of its disguise through NeoForge's AuxiliaryLightManager, which has no Fabric equivalent, so a disguised block now emits the light of the real block instead (concealment only, no protection is lost).
 
 	@Override
 	public SoundType getSoundType(BlockState state, LevelReader level, BlockPos pos, Entity entity) {
 		BlockState disguisedState = IDisguisable.getDisguisedBlockState(level.getBlockEntity(pos)).orElse(state);
 
 		if (disguisedState.getBlock() != this)
-			return disguisedState.getSoundType(level, pos, entity);
+			return SoundTypeBlockHook.getSoundTypeAt(disguisedState, level, pos, entity);
 		else
-			return super.getSoundType(state, level, pos, entity);
+			return SoundTypeBlockHook.super.getSoundType(state, level, pos, entity);
 	}
 
 	@Override
@@ -229,11 +221,6 @@ public abstract class SpecialDoorBlock extends DoorBlock implements EntityBlock,
 	@Override
 	public boolean shouldShowSCInfo(Level level, BlockState state, BlockPos pos) {
 		return getDisguisedStack(level, pos).getItem() == asItem();
-	}
-
-	@Override
-	public boolean hasDynamicLightEmission(BlockState state) {
-		return true;
 	}
 
 	public abstract Item getDoorItem();

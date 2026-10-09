@@ -3,8 +3,35 @@
   "package": "net.geforcemods.securitycraft.fabricmixin.blocks",
   "compatibilityLevel": "JAVA_21",
   "refmap": "securitycraft.refmap.json",
-  "mixins": [],
-  "client": [],
+  "mixins": [
+    "AbstractHorseAccessor",
+    "AbstractHorseMixin",
+    "AbstractMinecartMixin",
+    "BaseFireBlockMixin",
+    "BlockBehaviourPropertiesAccessor",
+    "BlockItemMixin",
+    "BubbleColumnBlockMixin",
+    "BushBlockMixin",
+    "CactusBlockMixin",
+    "ConduitBlockEntityMixin",
+    "EntityMixin",
+    "LevelNeighborChangeMixin",
+    "LivingEntityMixin",
+    "PlayerMixin",
+    "PortalShapeMixin",
+    "RedStoneWireBlockMixin",
+    "ServerPlayerGameModeMixin",
+    "SignalGetterMixin",
+    "SnifferMixin",
+    "SugarCaneBlockMixin",
+    "TrunkPlacerMixin"
+  ],
+  "client": [
+    "client.LevelRendererMixin",
+    "client.LiquidBlockRendererMixin",
+    "client.MinecraftPickBlockMixin",
+    "client.MultiPlayerGameModeMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   },

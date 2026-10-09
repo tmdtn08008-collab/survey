@@ -8,6 +8,7 @@ import net.geforcemods.securitycraft.api.IModuleInventory;
 import net.geforcemods.securitycraft.blockentities.ClaymoreBlockEntity;
 import net.geforcemods.securitycraft.util.BlockUtils;
 import net.geforcemods.securitycraft.util.LevelUtils;
+import net.geforcemods.securitycraft.fabric.block.PlayerDestroyBlockHook;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Containers;
@@ -41,7 +42,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class ClaymoreBlock extends ExplosiveBlock implements SimpleWaterloggedBlock {
+public class ClaymoreBlock extends ExplosiveBlock implements SimpleWaterloggedBlock, PlayerDestroyBlockHook {
 	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 	public static final BooleanProperty DEACTIVATED = BooleanProperty.create("deactivated");
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -98,7 +99,7 @@ public class ClaymoreBlock extends ExplosiveBlock implements SimpleWaterloggedBl
 				explode(level, pos);
 		}
 
-		return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+		return PlayerDestroyBlockHook.super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
 	}
 
 	@Override

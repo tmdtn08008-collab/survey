@@ -8,6 +8,7 @@ import net.geforcemods.securitycraft.api.OwnableBlockEntity;
 import net.geforcemods.securitycraft.blocks.OwnableBlock;
 import net.geforcemods.securitycraft.misc.OwnershipEvent;
 import net.geforcemods.securitycraft.util.BlockUtils;
+import net.geforcemods.securitycraft.fabric.block.SoilBlockHook;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -29,7 +30,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.TreeConfigurati
 import net.geforcemods.securitycraft.fabric.event.NeoForge;
 import net.geforcemods.securitycraft.fabric.util.TriState;
 
-public class ReinforcedGrassBlock extends GrassBlock implements IReinforcedBlock, EntityBlock {
+public class ReinforcedGrassBlock extends GrassBlock implements IReinforcedBlock, EntityBlock, SoilBlockHook {
 	private final float destroyTimeForOwner;
 
 	public ReinforcedGrassBlock(BlockBehaviour.Properties properties) {

@@ -6,6 +6,7 @@ import net.geforcemods.securitycraft.api.OwnableBlockEntity;
 import net.geforcemods.securitycraft.blocks.OwnableBlock;
 import net.geforcemods.securitycraft.misc.OwnershipEvent;
 import net.geforcemods.securitycraft.util.BlockUtils;
+import net.geforcemods.securitycraft.fabric.block.CloneItemStackBlockHook;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -25,7 +26,7 @@ import net.minecraft.world.level.block.state.properties.PistonType;
 import net.minecraft.world.phys.HitResult;
 import net.geforcemods.securitycraft.fabric.event.NeoForge;
 
-public class ReinforcedPistonHeadBlock extends PistonHeadBlock implements EntityBlock, IReinforcedBlock {
+public class ReinforcedPistonHeadBlock extends PistonHeadBlock implements EntityBlock, IReinforcedBlock, CloneItemStackBlockHook {
 	private final float destroyTimeForOwner;
 
 	public ReinforcedPistonHeadBlock(BlockBehaviour.Properties properties) {

@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.items.VanillaInventoryCodeHooks;
+import net.geforcemods.securitycraft.fabric.items.VanillaInventoryCodeHooks;
 
 public class ReinforcedDropperBlock extends ReinforcedDispenserBlock {
 	private static final DispenseItemBehavior DISPENSE_BEHAVIOUR = new DefaultDispenseItemBehavior();

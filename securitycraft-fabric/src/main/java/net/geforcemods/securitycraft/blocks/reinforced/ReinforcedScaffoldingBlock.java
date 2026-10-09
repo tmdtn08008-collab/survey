@@ -7,6 +7,7 @@ import net.geforcemods.securitycraft.api.OwnableBlockEntity;
 import net.geforcemods.securitycraft.blocks.OwnableBlock;
 import net.geforcemods.securitycraft.misc.OwnershipEvent;
 import net.geforcemods.securitycraft.util.BlockUtils;
+import net.geforcemods.securitycraft.fabric.block.ClimbableBlockHook;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -35,7 +36,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.geforcemods.securitycraft.fabric.event.NeoForge;
 
-public class ReinforcedScaffoldingBlock extends ScaffoldingBlock implements EntityBlock, IReinforcedBlock {
+public class ReinforcedScaffoldingBlock extends ScaffoldingBlock implements EntityBlock, IReinforcedBlock, ClimbableBlockHook {
 	private final float destroyTimeForOwner;
 
 	public ReinforcedScaffoldingBlock(BlockBehaviour.Properties properties) {
@@ -87,7 +88,7 @@ public class ReinforcedScaffoldingBlock extends ScaffoldingBlock implements Enti
 
 	@Override
 	public boolean isLadder(BlockState state, LevelReader level, BlockPos pos, LivingEntity entity) {
-		return super.isLadder(state, level, pos, entity) && ownsScaffolding(level, pos, entity);
+		return ClimbableBlockHook.super.isLadder(state, level, pos, entity) && ownsScaffolding(level, pos, entity);
 	}
 
 	public boolean ownsScaffolding(BlockGetter level, BlockPos pos, Entity entity) {
@@ -132,7 +133,7 @@ public class ReinforcedScaffoldingBlock extends ScaffoldingBlock implements Enti
 		BlockState mutableState = level.getBlockState(mutable);
 		int distance = 7;
 
-		if (mutableState.is(SCContent.REINFORCED_SCAFFOLDING))
+		if (mutableState.is(SCContent.REINFORCED_SCAFFOLDING.get()))
 			distance = mutableState.getValue(DISTANCE);
 		else if (mutableState.isFaceSturdy(level, mutable, Direction.UP))
 			return 0;
@@ -140,7 +141,7 @@ public class ReinforcedScaffoldingBlock extends ScaffoldingBlock implements Enti
 		for (Direction direction : Direction.Plane.HORIZONTAL) {
 			BlockState offsetState = level.getBlockState(mutable.setWithOffset(pos, direction));
 
-			if (offsetState.is(SCContent.REINFORCED_SCAFFOLDING)) {
+			if (offsetState.is(SCContent.REINFORCED_SCAFFOLDING.get())) {
 				distance = Math.min(distance, offsetState.getValue(DISTANCE) + 1);
 
 				if (distance == 1)

@@ -3,8 +3,30 @@
   "package": "net.geforcemods.securitycraft.fabricmixin.events",
   "compatibilityLevel": "JAVA_21",
   "refmap": "securitycraft.refmap.json",
-  "mixins": [],
-  "client": [],
+  "mixins": [
+    "BlockBehaviourMixin",
+    "BrewingStandBlockEntityMixin",
+    "BrewingStandPotionSlotMixin",
+    "ChorusFruitItemMixin",
+    "DoorBlockMixin",
+    "EnderManMixin",
+    "EntityMixin",
+    "ItemStackMixin",
+    "LevelPlacementCaptureMixin",
+    "LivingEntityMixin",
+    "MobMixin",
+    "NoteBlockMixin",
+    "PlayerMixin",
+    "PotionBrewingMixin",
+    "ServerPlayerGameModeMixin",
+    "ShulkerMixin",
+    "StartAttackingMixin",
+    "ThrownEnderpearlMixin",
+    "WitherBossMixin"
+  ],
+  "client": [
+    "client.MultiPlayerGameModeMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   },

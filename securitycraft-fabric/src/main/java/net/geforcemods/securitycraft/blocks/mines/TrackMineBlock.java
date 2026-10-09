@@ -7,6 +7,7 @@ import net.geforcemods.securitycraft.blockentities.TrackMineBlockEntity;
 import net.geforcemods.securitycraft.blocks.OwnableBlock;
 import net.geforcemods.securitycraft.misc.OwnershipEvent;
 import net.geforcemods.securitycraft.util.BlockUtils;
+import net.geforcemods.securitycraft.fabric.block.MinecartPassBlockHook;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -28,7 +29,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 import net.geforcemods.securitycraft.fabric.event.NeoForge;
 
-public class TrackMineBlock extends RailBlock implements IExplosive, EntityBlock {
+public class TrackMineBlock extends RailBlock implements IExplosive, EntityBlock, MinecartPassBlockHook {
 	private final float destroyTimeForOwner;
 
 	public TrackMineBlock(BlockBehaviour.Properties properties) {

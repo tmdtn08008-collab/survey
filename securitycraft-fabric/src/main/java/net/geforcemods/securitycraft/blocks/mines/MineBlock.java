@@ -4,6 +4,7 @@ import net.geforcemods.securitycraft.ConfigHandler;
 import net.geforcemods.securitycraft.blockentities.MineBlockEntity;
 import net.geforcemods.securitycraft.misc.TargetingMode;
 import net.geforcemods.securitycraft.util.BlockUtils;
+import net.geforcemods.securitycraft.fabric.block.PlayerDestroyBlockHook;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
@@ -28,7 +29,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class MineBlock extends ExplosiveBlock implements SimpleWaterloggedBlock {
+public class MineBlock extends ExplosiveBlock implements SimpleWaterloggedBlock, PlayerDestroyBlockHook {
 	public static final BooleanProperty DEACTIVATED = BooleanProperty.create("deactivated");
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 	private static final VoxelShape SHAPE = Block.box(5, 0, 5, 11, 3, 11);
@@ -78,14 +79,14 @@ public class MineBlock extends ExplosiveBlock implements SimpleWaterloggedBlock 
 			TargetingMode mode = mine.getTargetingMode();
 
 			if (!mode.allowsPlayers() || player != null && player.isCreative() && !ConfigHandler.SERVER.mineExplodesWhenInCreative.get())
-				return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+				return PlayerDestroyBlockHook.super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
 			else if (mine.isOwnedBy(player) && !mine.ignoresOwner()) {
 				explode(level, pos);
-				return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+				return PlayerDestroyBlockHook.super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
 			}
 		}
 
-		return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
+		return PlayerDestroyBlockHook.super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import net.geforcemods.securitycraft.network.client.OpenScreen;
 import net.geforcemods.securitycraft.network.client.OpenScreen.DataType;
 import net.geforcemods.securitycraft.util.LevelUtils;
 import net.geforcemods.securitycraft.util.Utils;
+import net.geforcemods.securitycraft.fabric.block.RedstoneConnectionBlockHook;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
@@ -30,7 +31,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
-public class UsernameLoggerBlock extends DisguisableBlock {
+public class UsernameLoggerBlock extends DisguisableBlock implements RedstoneConnectionBlockHook {
 	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
 	public UsernameLoggerBlock(BlockBehaviour.Properties properties) {

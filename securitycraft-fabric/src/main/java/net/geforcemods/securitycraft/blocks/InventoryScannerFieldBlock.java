@@ -5,11 +5,13 @@ import java.util.List;
 import net.geforcemods.securitycraft.SCContent;
 import net.geforcemods.securitycraft.api.OwnableBlockEntity;
 import net.geforcemods.securitycraft.blockentities.InventoryScannerBlockEntity;
-import net.geforcemods.securitycraft.compat.curios.CuriosCompat;
 import net.geforcemods.securitycraft.misc.ModuleType;
 import net.geforcemods.securitycraft.util.BlockUtils;
 import net.geforcemods.securitycraft.util.InventoryUtils;
 import net.geforcemods.securitycraft.util.InventoryUtils.ItemAccess;
+import net.geforcemods.securitycraft.fabricmixin.blocks.AbstractHorseAccessor;
+import net.geforcemods.securitycraft.fabricmixin.inventory.PlayerInvoker;
+import net.geforcemods.securitycraft.fabric.block.CloneItemStackBlockHook;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
@@ -40,9 +42,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.fml.ModList;
 
-public class InventoryScannerFieldBlock extends OwnableBlock implements SimpleWaterloggedBlock {
+public class InventoryScannerFieldBlock extends OwnableBlock implements SimpleWaterloggedBlock, CloneItemStackBlockHook {
 	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 	public static final BooleanProperty HORIZONTAL = InventoryScannerBlock.HORIZONTAL;
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
@@ -101,23 +102,18 @@ public class InventoryScannerFieldBlock extends OwnableBlock implements SimpleWa
 			boolean foundItem;
 
 			if (living instanceof Player player && (!be.isOwnedBy(player) || !be.ignoresOwner())) {
-				player.closeContainer(); //Fixes item smuggling using nearby containers
+				((PlayerInvoker) player).securitycraft$closeContainer(); //Fixes item smuggling using nearby containers. Player#closeContainer is made public by NeoForge's access transformer
 
 				foundItem = checkInventory(ItemAccess.forContainer(player.getInventory()), be, allowInteraction);
 
-				if (ModList.get().isLoaded("curios") && CuriosCompat.hasCuriosInventory(player)) {
-					for (ItemAccess itemAccess : CuriosCompat.getCuriosItemAccess(player)) {
-						foundItem |= checkInventory(itemAccess, be, allowInteraction);
-					}
-				}
-
+				//PORT-NOTE: The NeoForge version also scans the player's Curios slots here. Curios does not exist on Fabric, and no compatibility with Fabric's accessory mods (Trinkets, Accessories) is implemented, so items in accessory slots are not detected by the inventory scanner on Fabric.
 				return foundItem;
 			}
 
 			foundItem = checkInventory(ItemAccess.forEntityEquipment(living), be, allowInteraction);
 
 			if (living instanceof AbstractChestedHorse horse)
-				foundItem |= checkInventory(ItemAccess.forContainer(horse.getInventory()), be, allowInteraction);
+				foundItem |= checkInventory(ItemAccess.forContainer(((AbstractHorseAccessor) horse).securitycraft$getInventory()), be, allowInteraction); //AbstractHorse#getInventory is added by NeoForge
 
 			return foundItem;
 		}

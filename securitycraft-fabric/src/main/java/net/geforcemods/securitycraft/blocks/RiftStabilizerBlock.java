@@ -10,6 +10,7 @@ import net.geforcemods.securitycraft.network.client.OpenScreen.DataType;
 import net.geforcemods.securitycraft.util.BlockUtils;
 import net.geforcemods.securitycraft.util.LevelUtils;
 import net.geforcemods.securitycraft.util.Utils;
+import net.geforcemods.securitycraft.fabric.block.WeakPowerBlockHook;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -46,7 +47,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.geforcemods.securitycraft.fabric.event.NeoForge;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
-public class RiftStabilizerBlock extends DisguisableBlock {
+public class RiftStabilizerBlock extends DisguisableBlock implements WeakPowerBlockHook {
 	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 	public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
 	public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
