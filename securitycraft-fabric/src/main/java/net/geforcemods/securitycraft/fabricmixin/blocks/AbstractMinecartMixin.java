@@ -18,7 +18,8 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 @Mixin(AbstractMinecart.class)
 public abstract class AbstractMinecartMixin {
-	@Inject(method = "moveAlongTrack", at = @At("TAIL"))
+	// RETURN, not TAIL: moveAlongTrack has an early return in its powered rail branch, and NeoForge calls onMinecartPass before it
+	@Inject(method = "moveAlongTrack", at = @At("RETURN"))
 	private void securitycraft$callOnMinecartPass(BlockPos pos, BlockState state, CallbackInfo ci) {
 		if (state.getBlock() instanceof MinecartPassBlockHook hook) {
 			AbstractMinecart self = (AbstractMinecart) (Object) this;

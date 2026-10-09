@@ -80,7 +80,12 @@ public abstract class ClientChunkCacheMixin implements IChunkStorageProvider {
 	/**
 	 * If the requested chunk is absent in the vanilla storage but present in the camera client chunk cache, return that chunk
 	 */
-	@Inject(method = "getChunk(IILnet/minecraft/world/level/chunk/status/ChunkStatus;Z)Lnet/minecraft/world/level/chunk/LevelChunk;", at = @At("TAIL"), cancellable = true)
+	// PORT-NOTE: Upstream injects at TAIL. NeoForge recompiles ClientChunkCache (it patches the class), which leaves getChunk with a
+	// single return. Mojang's original bytecode, which Fabric runs, has a separate return for "return emptyChunk", and TAIL only
+	// matches the last one ("return null"). Level#getChunk always asks for a chunk, so the camera chunks were never found and the
+	// view of a camera outside the player's render distance stayed empty. RETURN matches every return; the one for a chunk in the
+	// player's range is left alone by the inRange check below, as before.
+	@Inject(method = "getChunk(IILnet/minecraft/world/level/chunk/status/ChunkStatus;Z)Lnet/minecraft/world/level/chunk/LevelChunk;", at = @At("RETURN"), cancellable = true)
 	private void securitycraft$onGetChunk(int x, int z, ChunkStatus requiredStatus, boolean requireChunk, CallbackInfoReturnable<LevelChunk> cir) {
 		if (!storage.inRange(x, z)) {
 			LevelChunk chunk = CameraClientChunkCacheExtension.getChunk(x, z);

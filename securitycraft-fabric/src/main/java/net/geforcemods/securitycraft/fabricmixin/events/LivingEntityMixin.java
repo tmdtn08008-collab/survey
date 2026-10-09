@@ -16,7 +16,9 @@ import net.minecraft.world.entity.LivingEntity;
  */
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
-	@Inject(method = "actuallyHurt", at = @At("TAIL"))
+	// RETURN, not TAIL: actuallyHurt also returns early when the damage left after absorption is 0, and NeoForge fires
+	// LivingDamageEvent.Post in that case too
+	@Inject(method = "actuallyHurt", at = @At("RETURN"))
 	private void securitycraft$fireLivingDamagePost(DamageSource source, float amount, CallbackInfo ci) {
 		LivingEntity self = (LivingEntity) (Object) this;
 

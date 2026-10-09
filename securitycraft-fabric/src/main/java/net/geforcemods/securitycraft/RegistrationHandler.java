@@ -21,6 +21,7 @@ import net.geforcemods.securitycraft.blockentities.SecurityCameraBlockEntity;
 import net.geforcemods.securitycraft.blockentities.TrophySystemBlockEntity;
 import net.geforcemods.securitycraft.entity.SecuritySeaBoat;
 import net.geforcemods.securitycraft.misc.SCSounds;
+import net.geforcemods.securitycraft.network.VersionCheck;
 import net.geforcemods.securitycraft.network.client.InteractWithFrame;
 import net.geforcemods.securitycraft.network.client.OpenScreen;
 import net.geforcemods.securitycraft.network.client.RefreshDisguisableModel;
@@ -168,6 +169,8 @@ public class RegistrationHandler {
 
 	private static void registerPayloads() {
 		PayloadRegistrar registrar = new PayloadRegistrar();
+
+		VersionCheck.register();
 
 		registrar.playToClient(InteractWithFrame.TYPE, InteractWithFrame.STREAM_CODEC, InteractWithFrame::handle);
 		registrar.playToClient(OpenScreen.TYPE, OpenScreen.STREAM_CODEC, OpenScreen::handle);
