@@ -1,7 +1,5 @@
 package net.geforcemods.securitycraft.fabric.blockentity;
 
-import javax.annotation.Nullable;
-
 import net.fabricmc.fabric.api.blockview.v2.RenderDataBlockEntity;
 import net.geforcemods.securitycraft.fabric.model.ModelData;
 import net.minecraft.core.HolderLookup;
@@ -21,9 +19,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
  * sides.</li>
  * <li>{@link #onDataPacket}: called on the client by ClientPacketListener#handleBlockEntityData instead of the vanilla
  * loadWithComponents call.</li>
- * <li>{@link #getModelData()}: passed to Fabric's renderer as this block entity's render data
- * ({@link RenderDataBlockEntity#getRenderData()}), so models can read it through
- * {@code blockView.getBlockEntityRenderData(pos)}.</li>
+ * <li>{@link #getModelData()}: passed to Fabric's renderer as this block entity's render data, so models can read it
+ * through {@code blockView.getBlockEntityRenderData(pos)}. Every class that overrides getModelData() must also declare
+ * {@code getRenderData()} itself and return getModelData() from it: Fabric API's rendering-data-attachment module adds a
+ * concrete getRenderData() to BlockEntity, and a method inherited from a superclass always wins over an interface
+ * default, so a default method here would never be called.</li>
  * </ul>
  */
 public interface IBlockEntityExtension extends RenderDataBlockEntity {
@@ -58,13 +58,4 @@ public interface IBlockEntityExtension extends RenderDataBlockEntity {
 		return ModelData.EMPTY;
 	}
 
-	/**
-	 * Hands {@link #getModelData()} to Fabric's renderer. Models receive it as a {@link ModelData} from
-	 * {@code blockView.getBlockEntityRenderData(pos)}.
-	 */
-	@Nullable
-	@Override
-	default Object getRenderData() {
-		return getModelData();
-	}
 }

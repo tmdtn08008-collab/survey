@@ -173,6 +173,12 @@ public class ReinforcedDispenserBlockEntity extends DispenserBlockEntity impleme
 	}
 
 	@Override
+	public Object getRenderData() {
+		//declared here and not only in IBlockEntityExtension: Fabric API adds a concrete getRenderData() to BlockEntity, which wins over interface defaults
+		return getModelData();
+	}
+
+	@Override
 	public ModelData getModelData() {
 		return DisguisableBlockEntity.getModelData(this);
 	}
