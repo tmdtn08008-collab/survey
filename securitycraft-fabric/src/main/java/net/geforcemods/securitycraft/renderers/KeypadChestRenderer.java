@@ -45,8 +45,11 @@ public class KeypadChestRenderer extends ChestRenderer<ChestBlockEntity> {
 			super.render(be, partialTicks, poseStack, buffer, packedLight, packedOverlay);
 	}
 
-	@Override
-	protected Material getMaterial(ChestBlockEntity be, ChestType type) {
+	/**
+	 * PORT-NOTE: Overrode the getMaterial method NeoForge adds to ChestRenderer. On Fabric, fabricmixin.client.ChestRendererMixin
+	 * calls this where NeoForge's ChestRenderer calls getMaterial.
+	 */
+	public Material getMaterial(ChestBlockEntity be, ChestType type) {
 		if (isChristmas)
 			return getMaterialForType(type, CHRISTMAS_LEFT, CHRISTMAS_RIGHT, CHRISTMAS);
 		else if (be.getOpenNess(0.0F) >= 0.9F)

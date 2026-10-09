@@ -10,7 +10,6 @@
 		"camera.LocalPlayerMixin",
 		"camera.MinecraftMixin",
 		"camera.ViewAreaMixin",
-		"f3.BetterF3TargetModuleMixin",
 		"f3.DebugScreenOverlayMixin",
 		"sri.ModelManagerMixin",
 		"taser.ItemInHandRendererMixin"
@@ -31,5 +30,8 @@
 		"reinforced.SwordItemMixin",
 		"suspiciousmines.BrushItemMixin"
 	],
+	"injectors": {
+		"defaultRequire": 1
+	},
 	"minVersion": "0.8"
 }

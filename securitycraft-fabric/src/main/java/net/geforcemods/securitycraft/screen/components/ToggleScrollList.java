@@ -23,7 +23,7 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
-import net.neoforged.neoforge.client.gui.widget.ScrollPanel;
+import net.geforcemods.securitycraft.fabric.client.gui.ScrollPanel;
 
 public class ToggleScrollList<T> extends ScrollPanel {
 	private static final ResourceLocation CONFIRM_SPRITE = SecurityCraft.mcResLoc("container/beacon/confirm");

@@ -208,6 +208,7 @@ package net.geforcemods.securitycraft.entity.camera;
 import java.util.function.Consumer;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.geforcemods.securitycraft.compat.ium.IumCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -216,12 +217,13 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.level.ChunkEvent;
 
 // Taken and modified from Immersive Portals
 // Modifications include simplifications, adaptation to NeoForge, MC version porting-related changes, and removals of code unused by SecurityCraft
 // https://github.com/iPortalTeam/ImmersivePortalsMod/blob/1.21/src/main/java/qouteall/imm_ptl/core/chunk_loading/ImmPtlClientChunkMap.java
+// PORT-NOTE: NeoForge's ChunkEvent.Unload/Load are replaced by Fabric's ClientChunkEvents, fired at the same points. Firing the
+// load event here is required on Fabric too: when ClientChunkCacheMixin cancels ClientChunkCache#replaceWithPacketData for a
+// chunk outside of the player's view, Fabric's own CHUNK_LOAD (fired at the end of that method) is skipped.
 public class CameraClientChunkCacheExtension {
 	private static final Long2ObjectOpenHashMap<LevelChunk> CHUNK_MAP = new Long2ObjectOpenHashMap<>();
 	private static final Long2ObjectOpenHashMap<LevelChunk> CHUNK_MAP_OTHER_THREADS = new Long2ObjectOpenHashMap<>();
@@ -235,7 +237,7 @@ public class CameraClientChunkCacheExtension {
 
 			if (chunk != null) {
 				modifyChunkMaps(map -> map.remove(chunkPosLong));
-				NeoForge.EVENT_BUS.post(new ChunkEvent.Unload(chunk));
+				ClientChunkEvents.CHUNK_UNLOAD.invoker().onChunkUnload(level, chunk);
 				level.unload(chunk);
 				IumCompat.get().onChunkStatusRemoved(level, chunkPos.x, chunkPos.z);
 			}
@@ -272,7 +274,7 @@ public class CameraClientChunkCacheExtension {
 
 		level.onChunkLoaded(chunkPos);
 		IumCompat.get().onChunkStatusAdded(level, x, z);
-		NeoForge.EVENT_BUS.post(new ChunkEvent.Load(chunk, false));
+		ClientChunkEvents.CHUNK_LOAD.invoker().onChunkLoad(level, chunk);
 		return chunk;
 	}
 

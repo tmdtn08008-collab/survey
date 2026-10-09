@@ -18,6 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.client.gui.KeyMappings;
 
 public class BriefcasePasscodeScreen extends Screen implements StillValid {
 	public static final String UP_ARROW = "\u2191";
@@ -74,7 +75,7 @@ public class BriefcasePasscodeScreen extends Screen implements StillValid {
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (minecraft.options.keyInventory.isActiveAndMatches(InputConstants.getKey(keyCode, scanCode))) {
+		if (KeyMappings.isActiveAndMatches(minecraft.options.keyInventory, InputConstants.getKey(keyCode, scanCode))) {
 			onClose();
 			return true;
 		}

@@ -25,6 +25,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.geforcemods.securitycraft.fabric.client.gui.KeyMappings;
 
 public abstract class CameraSelectScreen extends Screen implements StillValid {
 	private static final ResourceLocation TEXTURE = SecurityCraft.resLoc("textures/gui/container/blank.png");
@@ -177,7 +178,7 @@ public abstract class CameraSelectScreen extends Screen implements StillValid {
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (minecraft.options.keyInventory.isActiveAndMatches(InputConstants.getKey(keyCode, scanCode))) {
+		if (KeyMappings.isActiveAndMatches(minecraft.options.keyInventory, InputConstants.getKey(keyCode, scanCode))) {
 			onClose();
 			return true;
 		}

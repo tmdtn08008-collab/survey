@@ -3,11 +3,10 @@ package net.geforcemods.securitycraft.models;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -26,16 +25,24 @@ public class BlockMineModel implements BakedModel {
 		this.guiModel = guiModel;
 	}
 
-	@Override
-	public BakedModel applyTransform(ItemDisplayContext displayContext, PoseStack pose, boolean applyLeftHandTransform) {
-		if (displayContext == ItemDisplayContext.GUI || displayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND || displayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND) {
-			guiModel.getTransforms().getTransform(displayContext).apply(applyLeftHandTransform, pose);
+	/**
+	 * PORT-NOTE: Replaces the override of NeoForge's IBakedModelExtension#applyTransform. SecurityCraft's ItemRenderer mixin
+	 * swaps this model for the returned one before vanilla applies the model's transforms and renders its quads, which is what
+	 * applyTransform did on NeoForge (apply the chosen model's transforms and render it).
+	 *
+	 * @param displayContext The context the item is rendered in
+	 * @return The model to render the mine with in the given context
+	 */
+	public BakedModel getModelFor(ItemDisplayContext displayContext) {
+		if (displayContext == ItemDisplayContext.GUI || displayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND || displayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND)
 			return guiModel;
-		}
-		else {
-			defaultModel.getTransforms().getTransform(displayContext).apply(applyLeftHandTransform, pose);
+		else
 			return defaultModel;
-		}
+	}
+
+	@Override
+	public ItemTransforms getTransforms() {
+		return defaultModel == null ? ItemTransforms.NO_TRANSFORMS : defaultModel.getTransforms();
 	}
 
 	@Override

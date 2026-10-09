@@ -15,20 +15,15 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider.Context;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.Boat.Type;
-import net.neoforged.fml.common.asm.enumextension.ExtensionInfo;
 
 public class SecuritySeaBoatRenderer extends BoatRenderer {
 	public SecuritySeaBoatRenderer(EntityRendererProvider.Context ctx) {
 		super(ctx, true);
 
 		ImmutableMap.Builder<Boat.Type, Pair<ResourceLocation, ListModel<Boat>>> mapBuilder = ImmutableMap.builder();
-		ExtensionInfo extensionInfo = Boat.Type.getExtensionInfo();
-		int size;
-
-		if (!extensionInfo.extended())
-			size = Boat.Type.values().length;
-		else
-			size = extensionInfo.vanillaCount();
+		//PORT-NOTE: NeoForge reports how many of the boat types are vanilla ones (Boat.Type.getExtensionInfo), as mods can add
+		//more there. Fabric has no enum extensions; vanilla's types end with bamboo, and any type a mod adds is appended after it
+		int size = Boat.Type.BAMBOO.ordinal() + 1;
 
 		for (int i = 0; i < size; i++) {
 			Boat.Type type = Boat.Type.values()[i];

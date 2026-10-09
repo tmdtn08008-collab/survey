@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -67,11 +66,11 @@ public record NamedPositions(List<Entry> positions) implements GlobalPositionCom
 	}
 
 	@Override
-	public void setOnStack(Supplier<DataComponentType<NamedPositions>> dataComponentType, ItemStack stack, List<Entry> newPositionList) {
+	public void setOnStack(DataComponentType<NamedPositions> dataComponentType, ItemStack stack, List<Entry> newPositionList) {
 		stack.set(dataComponentType, new NamedPositions(newPositionList));
 	}
 
-	public static void updateComponentWithNames(Supplier<DataComponentType<NamedPositions>> dataComponentType, ItemStack stack, Function<NamedPositions.Entry, Nameable> nameableGetter) {
+	public static void updateComponentWithNames(DataComponentType<NamedPositions> dataComponentType, ItemStack stack, Function<NamedPositions.Entry, Nameable> nameableGetter) {
 		NamedPositions positions = stack.get(dataComponentType);
 
 		if (positions != null && !positions.isEmpty()) {

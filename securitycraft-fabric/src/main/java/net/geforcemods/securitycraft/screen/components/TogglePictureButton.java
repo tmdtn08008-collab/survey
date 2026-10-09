@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.geforcemods.securitycraft.fabricmixin.client.AbstractButtonAccessor;
 
 public class TogglePictureButton extends Button implements IToggleableButton {
 	private final ResourceLocation[] sprites;
@@ -37,7 +38,7 @@ public class TogglePictureButton extends Button implements IToggleableButton {
 
 			RenderSystem.setShader(GameRenderer::getPositionTexShader);
 			isHovered = mouseX >= getX() && mouseY >= getY() && mouseX < getX() + width && mouseY < getY() + height;
-			guiGraphics.blitSprite(SPRITES.get(active, isHoveredOrFocused()), getX(), getY(), getWidth(), getHeight());
+			guiGraphics.blitSprite(AbstractButtonAccessor.securitycraft$getSprites().get(active, isHoveredOrFocused()), getX(), getY(), getWidth(), getHeight());
 
 			if (sprite != null)
 				guiGraphics.blitSprite(sprite, getX() + drawOffset, getY() + drawOffset, drawWidth, drawHeight);

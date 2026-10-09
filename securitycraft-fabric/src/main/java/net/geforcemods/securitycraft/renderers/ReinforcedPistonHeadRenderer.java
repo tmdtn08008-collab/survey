@@ -1,23 +1,25 @@
 package net.geforcemods.securitycraft.renderers;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.geforcemods.securitycraft.SCContent;
 import net.geforcemods.securitycraft.blockentities.ReinforcedPistonMovingBlockEntity;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.piston.PistonBaseBlock;
 import net.minecraft.world.level.block.piston.PistonHeadBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.PistonType;
-import net.neoforged.neoforge.client.ClientHooks;
 
 public class ReinforcedPistonHeadRenderer implements BlockEntityRenderer<ReinforcedPistonMovingBlockEntity> {
 	private BlockRenderDispatcher blockRenderer;
@@ -68,7 +70,11 @@ public class ReinforcedPistonHeadRenderer implements BlockEntityRenderer<Reinfor
 		if (blockRenderer == null)
 			blockRenderer = Minecraft.getInstance().getBlockRenderer();
 
-		ClientHooks.renderPistonMovedBlocks(pos, state, poseStack, buffer, level, checkSides, combinedOverlay, blockRenderer);
+		//PORT-NOTE: NeoForge's ClientHooks#renderPistonMovedBlocks renders the model once per render type of the model. Fabric has no
+		//per-model render types, so this renders the block like vanilla's PistonHeadRenderer does, in the block's moving block layer
+		VertexConsumer vertexConsumer = buffer.getBuffer(ItemBlockRenderTypes.getMovingBlockRenderType(state));
+
+		blockRenderer.getModelRenderer().tesselateBlock(level, blockRenderer.getBlockModel(state), state, pos, poseStack, vertexConsumer, checkSides, RandomSource.create(), state.getSeed(pos), combinedOverlay);
 	}
 
 	@Override

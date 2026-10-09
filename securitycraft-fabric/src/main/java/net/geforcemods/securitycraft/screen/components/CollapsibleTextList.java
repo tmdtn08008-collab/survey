@@ -12,6 +12,8 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import net.geforcemods.securitycraft.fabricmixin.client.AbstractButtonAccessor;
+import net.geforcemods.securitycraft.fabric.client.gui.WidgetColors;
 
 public class CollapsibleTextList extends Button {
 	private static final Component PLUS = Component.literal("+ ");
@@ -64,8 +66,8 @@ public class CollapsibleTextList extends Button {
 		Font font = Minecraft.getInstance().font;
 		int heightOffset = (height - 8) / 2;
 
-		guiGraphics.blitSprite(SPRITES.get(active, isHoveredOrFocused()), getX(), getY(), getWidth(), getHeight());
-		guiGraphics.drawCenteredString(font, getMessage(), getX() + font.width(getMessage()) / 2 + 3, getY() + heightOffset, getFGColor());
+		guiGraphics.blitSprite(AbstractButtonAccessor.securitycraft$getSprites().get(active, isHoveredOrFocused()), getX(), getY(), getWidth(), getHeight());
+		guiGraphics.drawCenteredString(font, getMessage(), getX() + font.width(getMessage()) / 2 + 3, getY() + heightOffset, WidgetColors.getFGColor(this));
 
 		int renderedLines = 0;
 		int interpolatedHeight = (int) Mth.lerp(partialTick, previousHeight, currentHeight);
@@ -86,7 +88,7 @@ public class CollapsibleTextList extends Button {
 				if (lineY + font.lineHeight > getY() + interpolatedHeight)
 					return;
 
-				guiGraphics.drawString(font, linesToDraw.get(lineIndex), getX() + 2, lineY, getFGColor(), false);
+				guiGraphics.drawString(font, linesToDraw.get(lineIndex), getX() + 2, lineY, WidgetColors.getFGColor(this), false);
 			}
 
 			renderedLines += linesToDraw.size() - 1;

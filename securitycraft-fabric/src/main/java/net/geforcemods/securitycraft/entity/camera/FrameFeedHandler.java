@@ -17,6 +17,7 @@ import net.geforcemods.securitycraft.SecurityCraft;
 import net.geforcemods.securitycraft.blockentities.FrameBlockEntity;
 import net.geforcemods.securitycraft.blockentities.SecurityCameraBlockEntity;
 import net.geforcemods.securitycraft.blocks.SecurityCameraBlock;
+import net.geforcemods.securitycraft.fabricmixin.camera.LevelRendererAccessor;
 import net.geforcemods.securitycraft.util.PlayerUtils;
 import net.geforcemods.securitycraft.util.Utils;
 import net.minecraft.ChatFormatting;
@@ -42,12 +43,9 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
 
-@EventBusSubscriber(modid = SecurityCraft.MODID, value = Dist.CLIENT)
+// PORT-NOTE: NeoForge's @EventBusSubscriber registered onClientTickPost automatically; on Fabric, CameraClientEvents#register
+// calls it from ClientTickEvents.END_CLIENT_TICK.
 public class FrameFeedHandler {
 	private static final Map<GlobalPos, CameraFeed> FRAME_CAMERA_FEEDS = new ConcurrentHashMap<>();
 	private static GlobalPos currentlyCapturedCamera;
@@ -97,7 +95,7 @@ public class FrameFeedHandler {
 		RenderTarget oldItemEntityTarget = mc.levelRenderer.itemEntityTarget;
 		RenderTarget oldWeatherTarget = mc.levelRenderer.weatherTarget;
 		PostChain oldTransparencyChain = mc.levelRenderer.transparencyChain;
-		Frustum playerFrustum = mc.levelRenderer.getFrustum(); //Saved once before the loop, because the frustum changes depending on which camera is viewed
+		Frustum playerFrustum = getFrustum(mc.levelRenderer); //Saved once before the loop, because the frustum changes depending on which camera is viewed
 
 		mc.gameRenderer.setRenderBlockOutline(false);
 		mc.gameRenderer.setRenderHand(false);
@@ -155,7 +153,7 @@ public class FrameFeedHandler {
 
 					profiler.push("securitycraft:apply_frame_frustum");
 
-					Frustum frustum = LevelRenderer.offsetFrustum(mc.levelRenderer.getFrustum()); //This needs the frame's newly calculated frustum, so it needs to be queried from inside the loop
+					Frustum frustum = LevelRenderer.offsetFrustum(getFrustum(mc.levelRenderer)); //This needs the frame's newly calculated frustum, so it needs to be queried from inside the loop
 
 					if (be.shouldRotate() || !feed.hasVisibleSections() || feed.requiresFrustumUpdate())
 						feed.updateVisibleSections(frustum);
@@ -195,10 +193,20 @@ public class FrameFeedHandler {
 		currentlyCapturedCamera = null;
 	}
 
-	@SubscribeEvent
-	public static void onClientTickPost(ClientTickEvent.Post event) {
+	public static void onClientTickPost() {
 		if (hasFeeds())
 			FRAME_CAMERA_FEEDS.entrySet().removeIf(e -> e.getValue().shouldBeRemoved());
+	}
+
+	/**
+	 * Replaces LevelRenderer#getFrustum, which NeoForge adds: the frustum captured with F3+U if there is one, otherwise the
+	 * frustum that the last level rendering culled with.
+	 */
+	private static Frustum getFrustum(LevelRenderer levelRenderer) {
+		LevelRendererAccessor accessor = (LevelRendererAccessor) levelRenderer;
+		Frustum capturedFrustum = accessor.securitycraft$getCapturedFrustum();
+
+		return capturedFrustum != null ? capturedFrustum : accessor.securitycraft$getCullingFrustum();
 	}
 
 	public static Map<GlobalPos, CameraFeed> getFeedsToRender(Minecraft mc, double currentTime) {

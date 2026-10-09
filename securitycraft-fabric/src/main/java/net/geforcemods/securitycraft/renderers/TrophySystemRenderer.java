@@ -59,7 +59,11 @@ public class TrophySystemRenderer implements BlockEntityRenderer<TrophySystemBlo
 		return true;
 	}
 
-	@Override
+	/**
+	 * PORT-NOTE: Overrode NeoForge's IBlockEntityRendererExtension#getRenderBoundingBox, which NeoForge uses for frustum culling of
+	 * block entity renderers. Vanilla and Fabric do not cull block entity renderers by a bounding box, and this renderer renders
+	 * off screen anyway, so nothing calls this on Fabric and nothing gets culled.
+	 */
 	public AABB getRenderBoundingBox(TrophySystemBlockEntity be) {
 		return new AABB(be.getBlockPos()).inflate(RENDER_DISTANCE);
 	}

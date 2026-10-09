@@ -12,6 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.geforcemods.securitycraft.fabricmixin.client.AbstractButtonAccessor;
 
 public class PictureButton extends Button {
 	private ItemStack blockToRender = ItemStack.EMPTY;
@@ -53,7 +54,7 @@ public class PictureButton extends Button {
 
 			RenderSystem.setShader(GameRenderer::getPositionTexShader);
 			isHovered = mouseX >= getX() && mouseY >= getY() && mouseX < getX() + width && mouseY < getY() + height;
-			guiGraphics.blitSprite(SPRITES.get(active, isHoveredOrFocused()), getX(), getY(), getWidth(), getHeight());
+			guiGraphics.blitSprite(AbstractButtonAccessor.securitycraft$getSprites().get(active, isHoveredOrFocused()), getX(), getY(), getWidth(), getHeight());
 
 			if (!blockToRender.isEmpty()) {
 				guiGraphics.renderItem(blockToRender, getX() + 2, getY() + 3);

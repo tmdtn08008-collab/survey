@@ -3,24 +3,18 @@ package net.geforcemods.securitycraft.misc;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.geforcemods.securitycraft.SecurityCraft;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 
-@EventBusSubscriber(modid = SecurityCraft.MODID, value = Dist.CLIENT)
+/**
+ * Keeps track of the HUD layers SecurityCraft hides (vanilla ones while viewing a camera) or shows (its camera overlay).
+ * PORT-NOTE: On NeoForge, this class subscribed to RenderGuiLayerEvent.Pre and canceled disabled layers. Fabric has no named HUD
+ * layers, so the layers check {@link #isDisabled} themselves: the vanilla ones in fabricmixin.camera.GuiMixin, and
+ * SecurityCraft's camera overlay in its HUD callback (ClientHandler#registerGuiLayers).
+ */
 public class LayerToggleHandler {
 	private static final List<ResourceLocation> DISABLED_LAYERS = new ArrayList<>();
 
 	private LayerToggleHandler() {}
-
-	@SubscribeEvent
-	public static void onRenderGuiOverlayPre(RenderGuiLayerEvent.Pre event) {
-		if (isDisabled(event.getName()))
-			event.setCanceled(true);
-	}
 
 	public static boolean isDisabled(ResourceLocation layer) {
 		return DISABLED_LAYERS.contains(layer);

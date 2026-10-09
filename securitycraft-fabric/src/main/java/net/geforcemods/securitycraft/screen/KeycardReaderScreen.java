@@ -35,6 +35,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.client.gui.KeyMappings;
 
 public class KeycardReaderScreen extends AbstractContainerScreen<KeycardReaderMenu> {
 	private static final ResourceLocation TEXTURE = SecurityCraft.resLoc("textures/gui/container/keycard_reader.png");
@@ -316,7 +317,7 @@ public class KeycardReaderScreen extends AbstractContainerScreen<KeycardReaderMe
 		if (usableByTextField.isFocused()) {
 			Key key = InputConstants.getKey(keyCode, scanCode);
 
-			if (minecraft.options.keyInventory.isActiveAndMatches(key) || minecraft.options.keySwapOffhand.isActiveAndMatches(key) || minecraft.options.keyPickItem.isActiveAndMatches(key))
+			if (KeyMappings.isActiveAndMatches(minecraft.options.keyInventory, key) || KeyMappings.isActiveAndMatches(minecraft.options.keySwapOffhand, key) || KeyMappings.isActiveAndMatches(minecraft.options.keyPickItem, key))
 				return false;
 		}
 

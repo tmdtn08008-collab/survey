@@ -27,7 +27,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.client.gui.widget.ScrollPanel;
+import net.geforcemods.securitycraft.fabric.client.gui.ScrollPanel;
 
 public class SSSConnectionList<T extends Screen & ConnectionAccessor> extends ScrollPanel {
 	private static final ResourceLocation CANCEL_SPRITE = SecurityCraft.mcResLoc("container/beacon/cancel");

@@ -19,7 +19,7 @@ public class LimitedUseKeycardRecipe extends CombineRecipe {
 
 	@Override
 	public boolean matchesSecondItem(ItemStack stack) {
-		return stack.is(SCContent.LIMITED_USE_KEYCARD);
+		return stack.is(SCContent.LIMITED_USE_KEYCARD.get());
 	}
 
 	@Override

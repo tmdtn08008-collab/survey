@@ -88,7 +88,7 @@ public class GameRendererMixin {
 	 * Prevents {@link Minecraft#hitResult} from being modified while the mod is capturing a Frame feed. This resolves issues
 	 * like the wrong teleport position sometimes being suggested when using /tp
 	 */
-	@Inject(method = "pick", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "pick(F)V", at = @At("HEAD"), cancellable = true) //pick is overloaded, so the descriptor selects the public one explicitly
 	private void securitycraft$preventFramePick(float partialTicks, CallbackInfo ci) {
 		if (FrameFeedHandler.isCapturingCamera())
 			ci.cancel();

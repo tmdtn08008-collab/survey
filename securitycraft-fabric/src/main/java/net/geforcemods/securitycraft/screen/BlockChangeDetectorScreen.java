@@ -43,7 +43,7 @@ import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.client.gui.widget.ScrollPanel;
+import net.geforcemods.securitycraft.fabric.client.gui.ScrollPanel;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
 public class BlockChangeDetectorScreen extends AbstractContainerScreen<BlockChangeDetectorMenu> implements ContainerListener, IHasExtraAreas {

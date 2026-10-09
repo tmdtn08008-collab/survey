@@ -39,8 +39,9 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.scores.PlayerTeam;
-import net.neoforged.neoforge.client.gui.widget.ScrollPanel;
+import net.geforcemods.securitycraft.fabric.client.gui.ScrollPanel;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.client.gui.KeyMappings;
 
 public class EditModuleScreen extends Screen implements StillValid {
 	private static ListModuleData savedData;
@@ -167,7 +168,7 @@ public class EditModuleScreen extends Screen implements StillValid {
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (!inputField.isFocused() && minecraft.options.keyInventory.isActiveAndMatches(InputConstants.getKey(keyCode, scanCode))) {
+		if (!inputField.isFocused() && KeyMappings.isActiveAndMatches(minecraft.options.keyInventory, InputConstants.getKey(keyCode, scanCode))) {
 			onClose();
 			return true;
 		}

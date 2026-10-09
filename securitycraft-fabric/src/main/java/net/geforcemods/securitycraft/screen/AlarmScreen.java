@@ -40,8 +40,10 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.client.gui.widget.ScrollPanel;
+import net.geforcemods.securitycraft.fabric.client.gui.ScrollPanel;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.client.gui.KeyMappings;
+import net.geforcemods.securitycraft.fabric.client.gui.GuiLayers;
 
 public class AlarmScreen extends Screen implements StillValid {
 	private static final ResourceLocation GUI_TEXTURE = SecurityCraft.resLoc("textures/gui/container/alarm.png");
@@ -86,7 +88,7 @@ public class AlarmScreen extends Screen implements StillValid {
 		searchBar.setHint(searchText);
 		searchBar.setFilter(s -> s.matches("[a-zA-Z0-9\\._]*"));
 		searchBar.setResponder(soundList::updateFilteredEntries);
-		addRenderableWidget(new Button(leftPos + imageWidth / 2 - 170 / 2, topPos + 215, 170, 20, Utils.localize("menu.options"), b -> Minecraft.getInstance().pushGuiLayer(new AlarmOptionsScreen(this)), Button.DEFAULT_NARRATION));
+		addRenderableWidget(new Button(leftPos + imageWidth / 2 - 170 / 2, topPos + 215, 170, 20, Utils.localize("menu.options"), b -> GuiLayers.push(new AlarmOptionsScreen(this)), Button.DEFAULT_NARRATION));
 	}
 
 	@Override
@@ -139,7 +141,7 @@ public class AlarmScreen extends Screen implements StillValid {
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (!searchBar.isFocused() && minecraft.options.keyInventory.isActiveAndMatches(InputConstants.getKey(keyCode, scanCode))) {
+		if (!searchBar.isFocused() && KeyMappings.isActiveAndMatches(minecraft.options.keyInventory, InputConstants.getKey(keyCode, scanCode))) {
 			onClose();
 			return true;
 		}

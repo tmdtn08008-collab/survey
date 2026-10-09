@@ -55,7 +55,11 @@ public class BlockPocketManagerRenderer implements BlockEntityRenderer<BlockPock
 		return be.showsOutline();
 	}
 
-	@Override
+	/**
+	 * PORT-NOTE: Overrode NeoForge's IBlockEntityRendererExtension#getRenderBoundingBox, which NeoForge uses for frustum culling of
+	 * block entity renderers. Vanilla and Fabric do not cull block entity renderers by a bounding box, and this renderer renders
+	 * off screen while it shows the outline, so nothing calls this on Fabric and nothing gets culled.
+	 */
 	public AABB getRenderBoundingBox(BlockPocketManagerBlockEntity be) {
 		return new AABB(be.getBlockPos()).inflate(RENDER_DISTANCE);
 	}

@@ -24,7 +24,8 @@ import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.neoforged.neoforge.client.gui.widget.ExtendedSlider;
+import net.geforcemods.securitycraft.fabric.client.gui.ExtendedSlider;
+import net.geforcemods.securitycraft.fabric.client.gui.KeyMappings;
 
 public class ColorChooser extends Screen implements GuiEventListener, NarratableEntry {
 	private static final ResourceLocation TEXTURE = SecurityCraft.resLoc("textures/gui/container/color_chooser.png");
@@ -191,7 +192,7 @@ public class ColorChooser extends Screen implements GuiEventListener, Narratable
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (minecraft.options.keyInventory.isActiveAndMatches(InputConstants.getKey(keyCode, scanCode))) {
+		if (KeyMappings.isActiveAndMatches(minecraft.options.keyInventory, InputConstants.getKey(keyCode, scanCode))) {
 			onClose();
 			return true;
 		}

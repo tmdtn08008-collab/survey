@@ -3,7 +3,6 @@ package net.geforcemods.securitycraft.components;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
@@ -56,7 +55,7 @@ public interface GlobalPositionComponent<C, T, E> {
 
 	public T createEntry(GlobalPos globalPos, E extra);
 
-	public void setOnStack(Supplier<DataComponentType<C>> dataComponentType, ItemStack stack, List<T> newPositionList);
+	public void setOnStack(DataComponentType<C> dataComponentType, ItemStack stack, List<T> newPositionList);
 
 	public default int size() {
 		return positions().size();
@@ -66,7 +65,7 @@ public interface GlobalPositionComponent<C, T, E> {
 		return positions().stream().allMatch(Objects::isNull);
 	}
 
-	public default boolean add(Supplier<DataComponentType<C>> dataComponentType, ItemStack stack, GlobalPos globalPos, E extra) {
+	public default boolean add(DataComponentType<C> dataComponentType, ItemStack stack, GlobalPos globalPos, E extra) {
 		if (!isPositionAdded(globalPos)) {
 			List<T> newPositionsList = new ArrayList<>(positions());
 
@@ -84,7 +83,7 @@ public interface GlobalPositionComponent<C, T, E> {
 		return false;
 	}
 
-	public default boolean remove(Supplier<DataComponentType<C>> dataComponentType, ItemStack stack, GlobalPos globalPos) {
+	public default boolean remove(DataComponentType<C> dataComponentType, ItemStack stack, GlobalPos globalPos) {
 		if (globalPos != null && !isEmpty()) {
 			List<T> newPositionsList = new ArrayList<>(positions());
 

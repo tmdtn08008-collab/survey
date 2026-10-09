@@ -1,17 +1,16 @@
 package net.geforcemods.securitycraft.models;
 
-import java.util.List;
+import java.util.function.Supplier;
 
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.core.Direction;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.ChunkRenderTypeSet;
+import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.geforcemods.securitycraft.fabric.model.ModelData;
 import net.geforcemods.securitycraft.fabric.model.ModelProperty;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class SecureRedstoneInterfaceBakedModel extends DisguisableDynamicBakedModel {
 	public static final ModelProperty<Boolean> POWERED = new ModelProperty<>();
@@ -23,32 +22,24 @@ public class SecureRedstoneInterfaceBakedModel extends DisguisableDynamicBakedMo
 	}
 
 	@Override
-	public List<BakedQuad> getOldQuads(BlockState state, Direction side, RandomSource rand, ModelData modelData, RenderType renderType) {
+	public void emitOldQuads(BlockAndTintGetter level, BlockState state, BlockPos pos, Supplier<RandomSource> randomSupplier, RenderContext context, ModelData modelData) {
 		Boolean powered = modelData.get(POWERED);
 
-		if (powered != null && powered)
-			return poweredModel.getQuads(state, side, rand, modelData, renderType);
+		if (powered != null && powered && poweredModel != null) {
+			poweredModel.emitBlockQuads(level, state, pos, randomSupplier, context);
+			return;
+		}
 
-		return super.getOldQuads(state, side, rand, modelData, renderType);
+		super.emitOldQuads(level, state, pos, randomSupplier, context, modelData);
 	}
 
 	@Override
 	public TextureAtlasSprite getOldParticleIcon(ModelData modelData) {
 		Boolean powered = modelData.get(POWERED);
 
-		if (powered != null && powered)
-			return poweredModel.getParticleIcon(modelData);
+		if (powered != null && powered && poweredModel != null)
+			return poweredModel.getParticleIcon();
 
 		return super.getOldParticleIcon(modelData);
-	}
-
-	@Override
-	public ChunkRenderTypeSet getOldRenderTypes(BlockState state, RandomSource rand, ModelData modelData) {
-		Boolean powered = modelData.get(POWERED);
-
-		if (powered != null && powered)
-			return poweredModel.getRenderTypes(state, rand, modelData);
-
-		return super.getOldRenderTypes(state, rand, modelData);
 	}
 }

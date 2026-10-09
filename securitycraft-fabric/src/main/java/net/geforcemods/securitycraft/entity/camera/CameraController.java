@@ -4,7 +4,6 @@ import java.util.function.Consumer;
 
 import net.geforcemods.securitycraft.ClientHandler;
 import net.geforcemods.securitycraft.ConfigHandler;
-import net.geforcemods.securitycraft.SecurityCraft;
 import net.geforcemods.securitycraft.api.IModuleInventory;
 import net.geforcemods.securitycraft.blockentities.SecurityCameraBlockEntity;
 import net.geforcemods.securitycraft.blocks.SecurityCameraBlock;
@@ -30,15 +29,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.ScreenshotEvent;
-import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
-@EventBusSubscriber(modid = SecurityCraft.MODID, value = Dist.CLIENT)
+// PORT-NOTE: NeoForge's @EventBusSubscriber registered the tick and screenshot handlers below automatically. On Fabric,
+// CameraClientEvents#register hooks up the tick handlers (ClientTickEvents), and fabricmixin.camera.ScreenshotMixin calls
+// onScreenshot where NeoForge posts ScreenshotEvent. VanillaGuiLayers now refers to entity.camera.VanillaGuiLayers (same ids).
 public class CameraController {
 	public static CameraType previousCameraType;
 	public static boolean resetOverlaysAfterDismount = false;
@@ -63,8 +58,7 @@ public class CameraController {
 
 	private CameraController() {}
 
-	@SubscribeEvent
-	public static void onClientTickPre(ClientTickEvent.Pre event) {
+	public static void onClientTickPre() {
 		//up/down/left/right handling is split to prevent players who are viewing a camera from moving around in a boat or on a horse
 		Entity cameraEntity = Minecraft.getInstance().cameraEntity;
 
@@ -82,8 +76,7 @@ public class CameraController {
 		}
 	}
 
-	@SubscribeEvent
-	public static void onClientTickPost(ClientTickEvent.Post event) {
+	public static void onClientTickPost() {
 		Entity cameraEntity = Minecraft.getInstance().cameraEntity;
 
 		if (cameraEntity instanceof SecurityCamera cam) {
@@ -122,8 +115,7 @@ public class CameraController {
 		}
 	}
 
-	@SubscribeEvent
-	public static void onScreenshot(ScreenshotEvent event) {
+	public static void onScreenshot() {
 		Player player = Minecraft.getInstance().player;
 
 		if (PlayerUtils.isPlayerMountedOnCamera(player) && screenshotSoundCooldown <= 0) {

@@ -2,7 +2,6 @@ package net.geforcemods.securitycraft.components;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Supplier;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -50,11 +49,11 @@ public record GlobalPositions(List<GlobalPos> positions) implements GlobalPositi
 	}
 
 	@Override
-	public void setOnStack(Supplier<DataComponentType<GlobalPositions>> dataComponentType, ItemStack stack, List<GlobalPos> newPositionList) {
+	public void setOnStack(DataComponentType<GlobalPositions> dataComponentType, ItemStack stack, List<GlobalPos> newPositionList) {
 		stack.set(dataComponentType, new GlobalPositions(newPositionList));
 	}
 
-	public boolean add(Supplier<DataComponentType<GlobalPositions>> boundCameras, ItemStack stack, GlobalPos globalPos) {
+	public boolean add(DataComponentType<GlobalPositions> boundCameras, ItemStack stack, GlobalPos globalPos) {
 		return add(boundCameras, stack, globalPos, null);
 	}
 }

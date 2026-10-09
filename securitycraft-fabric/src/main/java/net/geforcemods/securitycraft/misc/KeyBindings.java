@@ -4,21 +4,16 @@ import java.util.function.Consumer;
 
 import org.lwjgl.glfw.GLFW;
 
-import net.geforcemods.securitycraft.SecurityCraft;
 import net.geforcemods.securitycraft.entity.camera.CameraController;
 import net.geforcemods.securitycraft.entity.camera.SecurityCamera;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 
 /**
  * Custom {@link KeyMapping}s that SecurityCraft uses.
  *
  * @author Geforce
  */
-@EventBusSubscriber(modid = SecurityCraft.MODID, value = Dist.CLIENT)
 public class KeyBindings {
 	public static KeyMapping cameraZoomIn;
 	public static KeyMapping cameraZoomOut;
@@ -28,26 +23,30 @@ public class KeyBindings {
 
 	private KeyBindings() {}
 
-	@SubscribeEvent
-	public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
-		cameraZoomIn = register(event, "cameraZoomIn", GLFW.GLFW_KEY_EQUAL);
-		cameraZoomOut = register(event, "cameraZoomOut", GLFW.GLFW_KEY_MINUS);
-		cameraEmitRedstone = registerTicking(event, "cameraEmitRedstone", GLFW.GLFW_KEY_R, CameraController::toggleRedstone);
-		cameraActivateNightVision = registerTicking(event, "cameraActivateNightVision", GLFW.GLFW_KEY_N, CameraController::toggleNightVision);
-		setDefaultViewingDirection = registerTicking(event, "setDefaultViewingDirection", GLFW.GLFW_KEY_U, CameraController::setDefaultViewingDirection);
+	/**
+	 * Registers the key mappings with Fabric API. Called once from ClientHandler#init (NeoForge: RegisterKeyMappingsEvent).
+	 * PORT-NOTE: Vanilla, unlike NeoForge, only allows one key mapping per key, so these mappings can conflict with other mods'
+	 * mappings that use the same keys (vanilla then shows the conflict in the controls screen).
+	 */
+	public static void registerKeyMappings() {
+		cameraZoomIn = register("cameraZoomIn", GLFW.GLFW_KEY_EQUAL);
+		cameraZoomOut = register("cameraZoomOut", GLFW.GLFW_KEY_MINUS);
+		cameraEmitRedstone = registerTicking("cameraEmitRedstone", GLFW.GLFW_KEY_R, CameraController::toggleRedstone);
+		cameraActivateNightVision = registerTicking("cameraActivateNightVision", GLFW.GLFW_KEY_N, CameraController::toggleNightVision);
+		setDefaultViewingDirection = registerTicking("setDefaultViewingDirection", GLFW.GLFW_KEY_U, CameraController::setDefaultViewingDirection);
 	}
 
-	private static KeyMapping register(RegisterKeyMappingsEvent event, String name, int defaultKey) {
+	private static KeyMapping register(String name, int defaultKey) {
 		KeyMapping keyMapping = new SCKeyMapping(name, defaultKey);
 
-		event.register(keyMapping);
+		KeyBindingHelper.registerKeyBinding(keyMapping);
 		return keyMapping;
 	}
 
-	private static <T> TickingKeyMapping<T> registerTicking(RegisterKeyMappingsEvent event, String name, int defaultKey, Consumer<T> action) {
+	private static <T> TickingKeyMapping<T> registerTicking(String name, int defaultKey, Consumer<T> action) {
 		TickingKeyMapping<T> keyMapping = new TickingKeyMapping<>(name, defaultKey, action);
 
-		event.register(keyMapping);
+		KeyBindingHelper.registerKeyBinding(keyMapping);
 		return keyMapping;
 	}
 

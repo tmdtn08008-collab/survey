@@ -5,10 +5,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 
 import net.geforcemods.securitycraft.compat.ium.IumCompat;
@@ -39,7 +39,9 @@ public class LevelRendererMixin {
 	 * Fixes camera chunks disappearing when the player entity moves while mounted to a camera (e.g. while being in a minecart or
 	 * falling)
 	 */
-	@WrapWithCondition(method = "setupRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ViewArea;repositionCamera(DD)V"))
+	// require = 0: Sodium @Overwrites LevelRenderer#setupRender, and its version has no ViewArea#repositionCamera call. This is the
+	// same with Sodium on NeoForge; Sodium manages its own render sections there.
+	@WrapWithCondition(method = "setupRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ViewArea;repositionCamera(DD)V"), require = 0)
 	private boolean securitycraft$shouldRepositionCamera(ViewArea viewArea, double x, double z) {
 		return !PlayerUtils.isPlayerMountedOnCamera(minecraft.player);
 	}
@@ -49,6 +51,8 @@ public class LevelRendererMixin {
 	 * usually does the same process in setupRender, so that method is exited early when a frame feed is rendered. However, when
 	 * Embeddium or Sodium is installed, these mods may perform their visible section capture themselves since it's much more
 	 * performant, and since that happens in setupRender too, the method is not exited early in this case.
+	 * On Fabric, only Sodium can be installed (Embeddium is NeoForge-only). This HEAD injection also applies to Sodium's
+	 * overwritten setupRender.
 	 */
 	@Inject(method = "setupRender", at = @At("HEAD"), cancellable = true)
 	private void securitycraft$onSetupRender(Camera camera, Frustum frustum, boolean hasCapturedFrustum, boolean isSpectator, CallbackInfo ci) {
@@ -84,7 +88,13 @@ public class LevelRendererMixin {
 	 * Note that the frame block entity chunk loading distance option is not respected for this, since it is only supposed to
 	 * affect the server by setting a limit on forceloaded chunks and unfit to be handled on the client side.
 	 */
-	@ModifyVariable(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/FogRenderer;setupColor(Lnet/minecraft/client/Camera;FLnet/minecraft/client/multiplayer/ClientLevel;IF)V"), ordinal = 1)
+	// PORT-NOTE: Upstream uses @ModifyVariable(ordinal = 1) on a float local at the FogRenderer#setupColor call. At that call the
+	// only float local is the partial tick; the render distance local is only stored afterwards from GameRenderer#getRenderDistance,
+	// so the upstream injection matched nothing and silently did nothing (also on NeoForge, where the code has the same layout).
+	// With "defaultRequire": 1 it would crash the game, so it now modifies the value of the getRenderDistance call itself (the only
+	// one in renderLevel), which is the value the fog distance is computed from. Frame feeds therefore now get the documented fog
+	// distance, where upstream used the player's render distance.
+	@ModifyExpressionValue(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;getRenderDistance()F"))
 	private float securitycraft$modifyFogRenderDistance(float original) {
 		if (FrameFeedHandler.isCapturingCamera())
 			return FrameFeedHandler.getFrameFeedViewDistance(null) * 16;

@@ -45,7 +45,10 @@ public class V1460Mixin {
 	/**
 	 * Captures the Schema method parameter necessary for the mixin below.
 	 */
-	@Inject(method = "lambda$registerTypes$35", at = @At("HEAD"))
+	// PORT-NOTE: Upstream targets the lambda as "lambda$registerTypes$35", the name it has in NeoForge's recompiled V1460. Loom's
+	// Mojang mappings do not name lambdas, so in the Fabric development environment and in production (intermediary) this lambda
+	// (the ITEM_STACK template with "id", "tag", "EntityTag", ..., "ChargedProjectiles") is method_5259.
+	@Inject(method = "method_5259(Lcom/mojang/datafixers/schemas/Schema;)Lcom/mojang/datafixers/types/templates/TypeTemplate;", at = @At("HEAD"))
 	private static void securitycraft$captureSchema(Schema schema, CallbackInfoReturnable<TypeTemplate> cir, @Share("schema") LocalRef<Schema> schemaRef) {
 		schemaRef.set(schema);
 	}
@@ -56,7 +59,7 @@ public class V1460Mixin {
 	 * keycard holders and disguise modules.
 	 */
 	@SuppressWarnings("unchecked")
-	@ModifyArg(method = "lambda$registerTypes$35", at = @At(value = "INVOKE", target = "Lcom/mojang/datafixers/DSL;optionalFields([Lcom/mojang/datafixers/util/Pair;)Lcom/mojang/datafixers/types/templates/TypeTemplate;"))
+	@ModifyArg(method = "method_5259(Lcom/mojang/datafixers/schemas/Schema;)Lcom/mojang/datafixers/types/templates/TypeTemplate;", at = @At(value = "INVOKE", target = "Lcom/mojang/datafixers/DSL;optionalFields([Lcom/mojang/datafixers/util/Pair;)Lcom/mojang/datafixers/types/templates/TypeTemplate;"))
 	private static Pair<String, TypeTemplate>[] securitycraft$registerCustomInventoryTag(Pair<String, TypeTemplate>[] originalFields, @Share("schema") LocalRef<Schema> schemaRef) {
 		List<Pair<String, TypeTemplate>> newFields = Lists.newArrayList(originalFields);
 

@@ -13,6 +13,8 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.client.gui.KeyMappings;
+import net.geforcemods.securitycraft.fabric.client.gui.GuiLayers;
 
 public class BlockPocketManagerConfirmScreen extends Screen {
 	private static final ResourceLocation GUI_TEXTURE = SecurityCraft.resLoc("textures/gui/container/block_pocket_manager_confirm.png");
@@ -33,7 +35,7 @@ public class BlockPocketManagerConfirmScreen extends Screen {
 		int buttonX = leftPos + 10;
 		int buttonY = topPos + 30;
 
-		addRenderableWidget(Button.builder(Component.translatable("gui.securitycraft:blockPocketManager.cancel"), b -> Minecraft.getInstance().popGuiLayer()).pos(buttonX, buttonY).size(98, 20).build());
+		addRenderableWidget(Button.builder(Component.translatable("gui.securitycraft:blockPocketManager.cancel"), b -> GuiLayers.pop()).pos(buttonX, buttonY).size(98, 20).build());
 		addRenderableWidget(Button.builder(Component.translatable("gui.securitycraft:blockPocketManager.confirm"), this::confirmDisassemblyButtonClicked).pos(buttonX + 106, buttonY).size(98, 20).build());
 	}
 
@@ -50,7 +52,7 @@ public class BlockPocketManagerConfirmScreen extends Screen {
 
 	@Override
 	public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-		if (minecraft.options.keyInventory.isActiveAndMatches(InputConstants.getKey(keyCode, scanCode))) {
+		if (KeyMappings.isActiveAndMatches(minecraft.options.keyInventory, InputConstants.getKey(keyCode, scanCode))) {
 			onClose();
 			return true;
 		}

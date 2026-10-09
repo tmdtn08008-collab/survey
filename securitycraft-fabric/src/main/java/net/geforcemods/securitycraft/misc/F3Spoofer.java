@@ -1,5 +1,6 @@
 package net.geforcemods.securitycraft.misc;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.geforcemods.securitycraft.SCContent;
 import net.geforcemods.securitycraft.api.IDisguisable;
 import net.geforcemods.securitycraft.blocks.mines.BaseFullMineBlock;
@@ -14,7 +15,6 @@ import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.fml.loading.FMLEnvironment;
 
 public class F3Spoofer {
 	private F3Spoofer() {}
@@ -22,7 +22,7 @@ public class F3Spoofer {
 	public static BlockState spoofBlockState(BlockState originalState, BlockPos pos) {
 		Block originalBlock = originalState.getBlock();
 
-		if (FMLEnvironment.production) {
+		if (!FabricLoader.getInstance().isDevelopmentEnvironment()) {
 			return switch (originalBlock) {
 				case IDisguisable disguisable -> IDisguisable.getDisguisedBlockState(Minecraft.getInstance().level.getBlockEntity(pos)).orElse(originalState);
 				case FurnaceMineBlock mine -> Blocks.FURNACE.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, originalState.getValue(BlockStateProperties.HORIZONTAL_FACING));
@@ -37,7 +37,7 @@ public class F3Spoofer {
 	public static FluidState spoofFluidState(FluidState originalState) {
 		Fluid originalFluid = originalState.getType();
 
-		if (FMLEnvironment.production) {
+		if (!FabricLoader.getInstance().isDevelopmentEnvironment()) {
 			if (originalFluid == SCContent.FAKE_WATER.get())
 				return Fluids.WATER.defaultFluidState().setValue(FlowingFluid.FALLING, originalState.getValue(FlowingFluid.FALLING));
 			else if (originalFluid == SCContent.FLOWING_FAKE_WATER.get())

@@ -4,7 +4,22 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "securitycraft.refmap.json",
   "mixins": [],
-  "client": [],
+  "client": [
+    "AbstractButtonAccessor",
+    "AbstractButtonMixin",
+    "AbstractWidgetMixin",
+    "ChestRendererMixin",
+    "EntitySprintParticleMixin",
+    "GameRendererGuiLayersMixin",
+    "HumanoidModelMixin",
+    "ItemInHandRendererMixin",
+    "ItemRendererMixin",
+    "MinecraftGuiLayersMixin",
+    "PlayerRendererInvoker",
+    "ScreenAccessor",
+    "ScreenMixin",
+    "TerrainParticleMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   },

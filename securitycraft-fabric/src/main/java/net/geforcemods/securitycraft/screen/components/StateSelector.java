@@ -25,6 +25,7 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.Rect2i;
@@ -52,7 +53,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
-import net.geforcemods.securitycraft.fabric.model.ModelData;
 
 public class StateSelector extends Screen implements GuiEventListener, NarratableEntry, ContainerListener {
 	private static final ResourceLocation TEXTURE = SecurityCraft.resLoc("textures/gui/container/state_selector.png");
@@ -270,9 +270,11 @@ public class StateSelector extends Screen implements GuiEventListener, Narratabl
 			BlockRenderDispatcher blockRenderer = minecraft.getBlockRenderer();
 			BakedModel blockModel = blockRenderer.getBlockModel(state);
 
-			for (RenderType renderType : blockModel.getRenderTypes(state, minecraft.level.random, ModelData.EMPTY)) {
-				blockRenderer.getModelRenderer().tesselateWithoutAO(fullbrightBlockAndTintGetter, blockModel, state, BlockPos.ZERO, pose, bufferSource.getBuffer(renderType), false, minecraft.level.random, 42L, OverlayTexture.NO_OVERLAY);
-			}
+			//PORT-NOTE: NeoForge renders the model once per render type of the model (by default the block's render layer). Fabric
+			//has no per-model render types, so the model is rendered in the block's render layer
+			RenderType renderType = ItemBlockRenderTypes.getChunkRenderType(state);
+
+			blockRenderer.getModelRenderer().tesselateWithoutAO(fullbrightBlockAndTintGetter, blockModel, state, BlockPos.ZERO, pose, bufferSource.getBuffer(renderType), false, minecraft.level.random, 42L, OverlayTexture.NO_OVERLAY);
 		}
 	}
 

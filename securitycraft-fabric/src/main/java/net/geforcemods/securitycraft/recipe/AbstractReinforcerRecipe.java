@@ -5,7 +5,9 @@ import java.util.Map;
 import net.geforcemods.securitycraft.items.UniversalBlockReinforcerItem;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -79,10 +81,12 @@ public abstract class AbstractReinforcerRecipe extends CustomRecipe {
 
 			if (stack.getItem() instanceof UniversalBlockReinforcerItem) {
 				Player player = CommonHooks.getCraftingPlayer();
-				Level level = player != null ? player.level() : ServerLifecycleHooks.getCurrentServer().overworld();
+				MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+				Level level = player != null ? player.level() : (server != null ? server.overworld() : null);
 
+				//NeoForge's hurtAndBreak overload takes any LivingEntity, vanilla's only a ServerPlayer, which a crafting player on the server always is
 				if (level != null && !level.isClientSide)
-					stack.hurtAndBreak(1, (ServerLevel) level, player, item -> {});
+					stack.hurtAndBreak(1, (ServerLevel) level, player instanceof ServerPlayer serverPlayer ? serverPlayer : null, item -> {});
 
 				newInv.set(i, stack.copy());
 			}

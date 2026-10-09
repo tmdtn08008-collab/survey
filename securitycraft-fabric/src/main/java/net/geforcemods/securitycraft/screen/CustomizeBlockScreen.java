@@ -36,6 +36,7 @@ import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
+import net.geforcemods.securitycraft.fabric.client.gui.WidgetColors;
 
 public class CustomizeBlockScreen extends AbstractContainerScreen<CustomizeBlockMenu> implements IHasExtraAreas, ContainerListener {
 	private static final ResourceLocation CONFIRM_SPRITE = SecurityCraft.mcResLoc("container/beacon/confirm");
@@ -125,11 +126,11 @@ public class CustomizeBlockScreen extends AbstractContainerScreen<CustomizeBlock
 							};
 						}
 
-						optionButtons[i].setFGColor(14737632);
+						WidgetColors.setFGColor(optionButtons[i], 14737632);
 					}
 					else {
 						optionButtons[i] = new Button(leftPos + 178, (topPos + 10) + (i * 25), 120, 20, getOptionButtonTitle(option), this::optionButtonClicked, Button.DEFAULT_NARRATION);
-						optionButtons[i].setFGColor(option.toString().equals(option.getDefaultValue().toString()) ? 16777120 : 14737632);
+						WidgetColors.setFGColor(optionButtons[i], option.toString().equals(option.getDefaultValue().toString()) ? 16777120 : 14737632);
 					}
 
 					addRenderableWidget(optionButtons[i]);
@@ -223,7 +224,7 @@ public class CustomizeBlockScreen extends AbstractContainerScreen<CustomizeBlock
 			Option<?> tempOption = ((ICustomizable) moduleInv).customOptions()[i]; //safe cast, as this method is only called when it can be casted
 
 			tempOption.toggle();
-			button.setFGColor(tempOption.toString().equals(tempOption.getDefaultValue().toString()) ? 16777120 : 14737632);
+			WidgetColors.setFGColor(button, tempOption.toString().equals(tempOption.getDefaultValue().toString()) ? 16777120 : 14737632);
 			button.setMessage(getOptionButtonTitle(tempOption));
 			optionButtons[i].setTooltip(Tooltip.create(getOptionDescription(i)));
 

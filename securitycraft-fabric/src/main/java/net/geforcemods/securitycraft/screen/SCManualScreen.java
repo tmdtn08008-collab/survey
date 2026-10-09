@@ -65,8 +65,9 @@ import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.client.gui.widget.ScrollPanel;
+import net.geforcemods.securitycraft.fabric.client.gui.ScrollPanel;
+import net.geforcemods.securitycraft.fabricmixin.client.ScreenAccessor;
+import net.fabricmc.loader.api.FabricLoader;
 
 public class SCManualScreen extends Screen implements StillValid {
 	private static final ResourceLocation PAGE = SecurityCraft.resLoc("textures/gui/info_book_texture.png");
@@ -152,7 +153,7 @@ public class SCManualScreen extends Screen implements StillValid {
 		renderTransparentBackground(guiGraphics);
 		guiGraphics.blit(currentPage == -1 ? TITLE_PAGE : (recipe != null && !recipe.isEmpty() ? PAGE : PAGE_WITH_SCROLL), startX, 5, 0, 0, 256, 250);
 
-		for (Renderable renderable : renderables) {
+		for (Renderable renderable : ((ScreenAccessor) this).securitycraft$getRenderables()) {
 			renderable.render(guiGraphics, mouseX, mouseY, partialTicks);
 		}
 
@@ -598,7 +599,7 @@ public class SCManualScreen extends Screen implements StillValid {
 	}
 
 	class PatronList extends ScrollPanel {
-		private static final String PATRON_LIST_LINK = FMLEnvironment.production ? "https://gist.githubusercontent.com/bl4ckscor3/bdda6596012b1206816db034350b5717/raw" : "https://gist.githubusercontent.com/bl4ckscor3/3196e6740774e386871a74a9606eaa61/raw";
+		private static final String PATRON_LIST_LINK = !FabricLoader.getInstance().isDevelopmentEnvironment() ? "https://gist.githubusercontent.com/bl4ckscor3/bdda6596012b1206816db034350b5717/raw" : "https://gist.githubusercontent.com/bl4ckscor3/3196e6740774e386871a74a9606eaa61/raw";
 		private static final int SLOT_HEIGHT = 12;
 		private final ExecutorService executor = Executors.newSingleThreadExecutor();
 		private Future<List<String>> patronRequestFuture;

@@ -26,7 +26,11 @@ public abstract class TrackedEntityMixin {
 	@Final
 	Entity entity;
 
-	@ModifyVariable(method = "updatePlayer", name = "flag", at = @At(value = "JUMP", opcode = Opcodes.IFEQ, shift = At.Shift.BEFORE, ordinal = 2))
+	// PORT-NOTE: Upstream selects the local by name ("flag"), which only exists in NeoForge's recompiled ChunkMap; in the Fabric
+	// (Mojang-named and intermediary) bytecode it is called "bl". It is the only boolean local of updatePlayer, so it is selected
+	// by ordinal instead. JUMP IFEQ ordinal 2 is still the "if (bl)" check (the other two are the broadcastToPlayer and
+	// isChunkTracked checks that compute it), and shift BEFORE places the modification before bl is loaded for that check.
+	@ModifyVariable(method = "updatePlayer", ordinal = 0, at = @At(value = "JUMP", opcode = Opcodes.IFEQ, shift = At.Shift.BEFORE, ordinal = 2))
 	private boolean securitycraft$modifyFlag(boolean original, ServerPlayer player, @Local(ordinal = 0) double viewDistance) {
 		if (original)
 			return true;

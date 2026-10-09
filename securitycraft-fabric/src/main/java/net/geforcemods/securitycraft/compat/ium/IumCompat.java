@@ -1,7 +1,7 @@
 package net.geforcemods.securitycraft.compat.ium;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.neoforged.fml.ModList;
 
 public class IumCompat {
 	private static final IumMod NONE = new IumMod() {
@@ -26,10 +26,10 @@ public class IumCompat {
 		return get() != NONE;
 	}
 
+	// PORT-NOTE: Embeddium only exists for (Neo)Forge, so its branch and compat class are gone. Sodium 0.6 for Fabric has the same
+	// ChunkTrackerHolder API (same package) as the NeoForge build, so the Sodium compat is unchanged.
 	private static IumMod getInstalledIumMod() {
-		if (ModList.get().isLoaded("embeddium"))
-			return new Embeddium();
-		else if (ModList.get().isLoaded("sodium"))
+		if (FabricLoader.getInstance().isModLoaded("sodium"))
 			return new Sodium();
 		else
 			return NONE;

@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
+import net.geforcemods.securitycraft.fabric.client.gui.GuiLayers;
 
 public class ColorChooserButton extends Button {
 	private final ColorChooser colorChooser;
@@ -25,9 +26,9 @@ public class ColorChooserButton extends Button {
 	@Override
 	public void onPress() {
 		if (colorChooser.disabled)
-			Minecraft.getInstance().pushGuiLayer(colorChooser);
+			GuiLayers.push(colorChooser);
 		else
-			Minecraft.getInstance().popGuiLayer();
+			GuiLayers.pop();
 
 		colorChooser.disabled = !colorChooser.disabled;
 	}

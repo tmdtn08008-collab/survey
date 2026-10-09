@@ -14,15 +14,16 @@ import net.geforcemods.securitycraft.blockentities.BlockChangeDetectorBlockEntit
 import net.geforcemods.securitycraft.blockentities.BlockChangeDetectorBlockEntity.ChangeEntry;
 import net.geforcemods.securitycraft.blockentities.SecurityCameraBlockEntity;
 import net.geforcemods.securitycraft.blocks.SecurityCameraBlock;
-import net.geforcemods.securitycraft.entity.camera.CameraClientChunkCacheExtension;
-import net.geforcemods.securitycraft.entity.camera.CameraViewAreaExtension;
-import net.geforcemods.securitycraft.entity.camera.FrameFeedHandler;
 import net.geforcemods.securitycraft.misc.BlockEntityTracker;
 import net.geforcemods.securitycraft.misc.CameraRedstoneModuleState;
 import net.geforcemods.securitycraft.misc.KeyBindings;
 import net.geforcemods.securitycraft.misc.ModuleType;
 import net.geforcemods.securitycraft.misc.StillValid;
 import net.geforcemods.securitycraft.util.Utils;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -34,32 +35,17 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipProvider;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.client.event.RenderHandEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage;
-import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
-import net.neoforged.neoforge.event.level.ChunkEvent;
-import net.neoforged.neoforge.event.level.LevelEvent;
-import net.geforcemods.securitycraft.fabric.registry.DeferredHolder;
 
-@EventBusSubscriber(modid = SecurityCraft.MODID, value = Dist.CLIENT)
 public class SCClientEventHandler {
 	public static final ResourceLocation BACKGROUND_SPRITE = SecurityCraft.resLoc("hud/camera/background");
 	public static final ResourceLocation LIVE_SPRITE = SecurityCraft.resLoc("hud/camera/live");
@@ -82,13 +68,29 @@ public class SCClientEventHandler {
 			new CameraKeyInfoEntry(() -> true, $ -> SMART_MODULE_NOTE, be -> be.isModuleEnabled(ModuleType.SMART))
 	};
 	//@formatter:on
-	private static final List<DeferredHolder<DataComponentType<?>, ? extends DataComponentType<? extends TooltipProvider>>> COMPONENTS_WITH_GLOBAL_TOOLTIP = List.of(SCContent.OWNER_DATA, SCContent.NOTES);
+	private static final List<DataComponentType<? extends TooltipProvider>> COMPONENTS_WITH_GLOBAL_TOOLTIP = List.of(SCContent.OWNER_DATA, SCContent.NOTES);
 	private static float cameraInfoMessageTime;
 
 	private SCClientEventHandler() {}
 
-	@SubscribeEvent
-	public static void onClientTickPost(ClientTickEvent.Post event) {
+	/**
+	 * Registers the Fabric API listeners that replace NeoForge's @EventBusSubscriber registration of this class. Called once
+	 * from {@link ClientHandler#init()}.
+	 * <p>
+	 * PORT-NOTE: The camera parts of this handler (ChunkEvent.Unload, LevelEvent.Unload and InputEvent.InteractionKeyMappingTriggered
+	 * while viewing a camera) moved to entity.camera.CameraClientEvents and the camera mixins, which call them where NeoForge
+	 * fires those events. RenderHandEvent is replaced by fabricmixin.client.ItemInHandRendererMixin, which asks
+	 * {@link #shouldRenderHand()}.
+	 */
+	public static void register() {
+		ClientTickEvents.END_CLIENT_TICK.register(mc -> onClientTickPost());
+		//PORT-NOTE: NeoForge's AFTER_TRIPWIRE_BLOCKS stage has no Fabric equivalent. AFTER_TRANSLUCENT runs a bit later (after
+		//particles), which does not matter for these lines, as they are drawn into the outline target
+		WorldRenderEvents.AFTER_TRANSLUCENT.register(context -> onRenderLevelStage(context.camera()));
+		ItemTooltipCallback.EVENT.register(SCClientEventHandler::onItemTooltip);
+	}
+
+	public static void onClientTickPost() {
 		Minecraft mc = Minecraft.getInstance();
 
 		if (cameraInfoMessageTime >= 0)
@@ -98,11 +100,10 @@ public class SCClientEventHandler {
 			mc.setScreen(null);
 	}
 
-	@SubscribeEvent
-	public static void onRenderLevelStage(RenderLevelStageEvent event) {
-		if (event.getStage() == Stage.AFTER_TRIPWIRE_BLOCKS) {
-			Vec3 camPos = event.getCamera().getPosition();
-			PoseStack pose = event.getPoseStack();
+	public static void onRenderLevelStage(Camera camera) {
+		if (camera != null) {
+			Vec3 camPos = camera.getPosition();
+			PoseStack pose = new PoseStack();
 			Minecraft mc = Minecraft.getInstance();
 			Level level = mc.level;
 			VertexConsumer consumer = mc.renderBuffers().bufferSource().getBuffer(ClientHandler.OVERLAY_LINES);
@@ -131,48 +132,16 @@ public class SCClientEventHandler {
 		}
 	}
 
-	@SubscribeEvent
-	public static void renderHandEvent(RenderHandEvent event) {
-		if (ClientHandler.isPlayerMountedOnCamera())
-			event.setCanceled(true);
+	/**
+	 * Replaces the RenderHandEvent subscription, which canceled the event while viewing through a security camera
+	 *
+	 * @return false if the first person hands should not be rendered
+	 */
+	public static boolean shouldRenderHand() {
+		return !ClientHandler.isPlayerMountedOnCamera();
 	}
 
-	@SubscribeEvent
-	public static void onClickInput(InputEvent.InteractionKeyMappingTriggered event) {
-		if (ClientHandler.isPlayerMountedOnCamera()) {
-			Minecraft mc = Minecraft.getInstance();
-			InteractionHand hand = event.getHand();
-
-			if (mc.player.getItemInHand(hand).is(SCContent.CAMERA_MONITOR.get()) && event.isUseItem())
-				SCContent.CAMERA_MONITOR.get().use(mc.level, mc.player, hand);
-
-			event.setCanceled(true);
-			event.setSwingHand(false);
-		}
-	}
-
-	@SubscribeEvent
-	public static void onChunkUnload(ChunkEvent.Unload event) {
-		if (event.getLevel().isClientSide()) {
-			ChunkPos pos = event.getChunk().getPos();
-
-			CameraViewAreaExtension.onChunkUnload(pos.x, pos.z);
-		}
-	}
-
-	@SubscribeEvent
-	public static void onLevelUnload(LevelEvent.Unload event) {
-		FrameFeedHandler.removeAllFeeds();
-		CameraClientChunkCacheExtension.clear();
-		CameraViewAreaExtension.clear();
-	}
-
-	@SubscribeEvent
-	public static void onItemTooltip(ItemTooltipEvent event) {
-		ItemStack stack = event.getItemStack();
-		TooltipContext ctx = event.getContext();
-		List<Component> tooltip = event.getToolTip();
-		TooltipFlag flag = event.getFlags();
+	public static void onItemTooltip(ItemStack stack, TooltipContext ctx, TooltipFlag flag, List<Component> tooltip) {
 		int nextIndex = 0;
 
 		for (int i = 0; i < COMPONENTS_WITH_GLOBAL_TOOLTIP.size(); i++) {

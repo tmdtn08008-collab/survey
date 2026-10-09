@@ -10,16 +10,8 @@ import net.geforcemods.securitycraft.util.Utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.ModList;
-import net.neoforged.fml.VersionChecker;
-import net.neoforged.fml.VersionChecker.Status;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.geforcemods.securitycraft.fabric.util.CommonHooks;
 
-@EventBusSubscriber(modid = SecurityCraft.MODID, value = Dist.CLIENT)
 public class Tips {
 	public static final Map<String, String> TIPS_WITH_LINK = new HashMap<>();
 
@@ -31,8 +23,11 @@ public class Tips {
 
 	private Tips() {}
 
-	@SubscribeEvent
-	public static void onLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
+	/**
+	 * Called when the client joined a world (NeoForge: ClientPlayerNetworkEvent.LoggingIn, Fabric:
+	 * ClientPlayConnectionEvents.JOIN, registered in ClientHandler#init)
+	 */
+	public static void onLoggingIn() {
 		if (!ConfigHandler.SERVER.disableThanksMessage.get() && ConfigHandler.CLIENT.sayThanksMessage.get()) {
 			//@formatter:off
 			String tipKey = getRandomTip();
@@ -67,6 +62,8 @@ public class Tips {
 	}
 
 	private static boolean isOutdated() {
-		return VersionChecker.getResult(ModList.get().getModContainerById(SecurityCraft.MODID).get().getModInfo()).status() == Status.OUTDATED;
+		//PORT-NOTE: NeoForge's update checker (VersionChecker, fed by the mod's updateJSONURL) has no Fabric equivalent, so the
+		//mod is never considered outdated and the "outdated" tip is not shown
+		return false;
 	}
 }
