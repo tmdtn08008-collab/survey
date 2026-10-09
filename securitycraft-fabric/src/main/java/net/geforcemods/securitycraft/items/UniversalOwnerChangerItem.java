@@ -8,6 +8,7 @@ import net.geforcemods.securitycraft.api.IOwnable;
 import net.geforcemods.securitycraft.api.Owner;
 import net.geforcemods.securitycraft.blockentities.DisplayCaseBlockEntity;
 import net.geforcemods.securitycraft.components.OwnerData;
+import net.geforcemods.securitycraft.fabric.event.ItemUseFirstHook;
 import net.geforcemods.securitycraft.misc.ModuleType;
 import net.geforcemods.securitycraft.util.ClientUtils;
 import net.geforcemods.securitycraft.util.IBlockMine;
@@ -28,9 +29,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.fml.loading.FMLEnvironment;
+import net.fabricmc.loader.api.FabricLoader;
 
-public class UniversalOwnerChangerItem extends Item {
+public class UniversalOwnerChangerItem extends Item implements ItemUseFirstHook {
 	public UniversalOwnerChangerItem(Item.Properties properties) {
 		super(properties);
 	}
@@ -95,7 +96,7 @@ public class UniversalOwnerChangerItem extends Item {
 			ClientUtils.recompileChunk(pos);
 
 		//disable this in a development environment
-		if (FMLEnvironment.production && be instanceof IModuleInventory inv) {
+		if (!FabricLoader.getInstance().isDevelopmentEnvironment() && be instanceof IModuleInventory inv) {
 			for (ModuleType moduleType : inv.getInsertedModules()) {
 				ItemStack moduleStack = inv.getModule(moduleType);
 

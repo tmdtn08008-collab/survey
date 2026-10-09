@@ -28,12 +28,27 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ResolvableProfile;
-import net.neoforged.fml.LogicalSide;
-import net.neoforged.fml.util.thread.EffectiveSide;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.server.MinecraftServer;
 import net.geforcemods.securitycraft.fabric.util.ServerLifecycleHooks;
 
 public class PlayerUtils {
 	private PlayerUtils() {}
+
+	/**
+	 * Replacement for NeoForge's EffectiveSide.get() == LogicalSide.CLIENT, which decides by the thread group of the current
+	 * thread: code running on the server's thread is on the logical server, everything else on a physical client is on the
+	 * logical client.
+	 */
+	private static boolean isLogicalClient() {
+		MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+
+		if (server != null && server.isSameThread())
+			return false;
+
+		return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
+	}
 
 	/**
 	 * Gets the PlayerEntity instance of a player (if they're online) using their name. <p>
@@ -41,7 +56,7 @@ public class PlayerUtils {
 	public static <T extends Player> T getPlayerFromName(String name) {
 		List<T> players = null;
 
-		if (EffectiveSide.get() == LogicalSide.CLIENT)
+		if (isLogicalClient())
 			players = (List<T>) Minecraft.getInstance().level.players();
 		else
 			players = (List<T>) ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayers();
@@ -60,7 +75,7 @@ public class PlayerUtils {
 	 * Returns true if a player with the given name is in the world.
 	 */
 	public static boolean isPlayerOnline(String name) {
-		if (EffectiveSide.get() == LogicalSide.CLIENT) {
+		if (isLogicalClient()) {
 			for (AbstractClientPlayer player : Minecraft.getInstance().level.players()) {
 				if (player != null && player.getName().getString().equals(name))
 					return true;
@@ -147,7 +162,7 @@ public class PlayerUtils {
 	public static Owner getOwnerFromPlayerOrMask(Player player) {
 		ItemStack headItem = player.getItemBySlot(EquipmentSlot.HEAD);
 
-		if (headItem.is(SCContent.INCOGNITO_MASK))
+		if (headItem.is(SCContent.INCOGNITO_MASK.get()))
 			return new Owner(getNameFromMask(headItem), "ownerUUID");
 
 		return new Owner(player);
@@ -156,7 +171,7 @@ public class PlayerUtils {
 	public static String getNameFromPlayerOrMask(Player player) {
 		ItemStack headItem = player.getItemBySlot(EquipmentSlot.HEAD);
 
-		if (headItem.is(SCContent.INCOGNITO_MASK))
+		if (headItem.is(SCContent.INCOGNITO_MASK.get()))
 			return getNameFromMask(headItem);
 
 		return player.getName().getString();

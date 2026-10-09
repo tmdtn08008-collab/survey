@@ -33,7 +33,7 @@ public record RemoveSentryFromSRAT(GlobalPos globalPos) implements CustomPacketP
 			NamedPositions sentries = stack.get(SCContent.BOUND_SENTRIES);
 
 			if (sentries != null)
-				sentries.remove(() -> SCContent.BOUND_SENTRIES, stack, globalPos);
+				sentries.remove(SCContent.BOUND_SENTRIES, stack, globalPos);
 		}
 	}
 }

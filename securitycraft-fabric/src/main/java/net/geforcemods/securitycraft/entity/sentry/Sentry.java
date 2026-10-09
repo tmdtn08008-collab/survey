@@ -65,10 +65,11 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.capabilities.Capabilities;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.geforcemods.securitycraft.fabric.items.IItemHandler;
+import net.geforcemods.securitycraft.fabric.items.StorageItemHandler;
+import net.geforcemods.securitycraft.fabricmixin.inventory.PlayerInvoker;
 
 public class Sentry extends PathfinderMob implements RangedAttackMob, IEMPAffected, IOwnable { //needs to be a pathfinder mob so it can target a player, ai is also only given to living entities
 	private static final EntityDataAccessor<Owner> OWNER = SynchedEntityData.<Owner>defineId(Sentry.class, Owner.getSerializer());
@@ -170,8 +171,9 @@ public class Sentry extends PathfinderMob implements RangedAttackMob, IEMPAffect
 		}
 	}
 
+	//NeoForge: getPickedResult(HitResult), whose default (and only call site, Minecraft#pickBlock) uses vanilla's getPickResult
 	@Override
-	public ItemStack getPickedResult(HitResult target) {
+	public ItemStack getPickResult() {
 		return new ItemStack(SCContent.SENTRY.get());
 	}
 
@@ -182,7 +184,7 @@ public class Sentry extends PathfinderMob implements RangedAttackMob, IEMPAffect
 		if (isOwnedBy(player) && hand == InteractionHand.MAIN_HAND) {
 			Item item = player.getMainHandItem().getItem();
 
-			player.closeContainer();
+			((PlayerInvoker) player).securitycraft$closeContainer(); //NeoForge makes Player#closeContainer public, the invoker calls it the same way
 
 			if (player.isCrouching())
 				kill();
@@ -356,7 +358,7 @@ public class Sentry extends PathfinderMob implements RangedAttackMob, IEMPAffect
 		if (blockEntity instanceof ISentryBulletContainer be)
 			handler = be.getHandlerForSentry(this);
 		else if (blockEntity != null)
-			handler = level.getCapability(Capabilities.ItemHandler.BLOCK, blockEntity.getBlockPos(), blockEntity.getBlockState(), blockEntity, Direction.UP);
+			handler = StorageItemHandler.of(ItemStorage.SIDED.find(level, blockEntity.getBlockPos(), blockEntity.getBlockState(), blockEntity, Direction.UP)); //NeoForge: the Capabilities.ItemHandler.BLOCK capability, whose counterpart is Fabric's ItemStorage.SIDED
 
 		if (handler != null) {
 			for (int i = 0; i < handler.getSlots(); i++) {

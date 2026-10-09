@@ -8,6 +8,7 @@ import net.geforcemods.securitycraft.blocks.reinforced.ReinforcedPistonBaseBlock
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
 
@@ -57,12 +58,34 @@ public class ReinforcedPistonStructureResolver { //this class doesn't extend Pis
 			for (int i = 0; i < toPush.size(); ++i) {
 				BlockPos pos = toPush.get(i);
 
-				if (level.getBlockState(pos).isStickyBlock() && !addBranchingBlocks(pos))
+				if (isStickyBlock(level.getBlockState(pos)) && !addBranchingBlocks(pos))
 					return false;
 			}
 
 			return true;
 		}
+	}
+
+	/**
+	 * Replacement for NeoForge's BlockState#isStickyBlock, whose default is used here: no SecurityCraft block overrides it. This
+	 * is the same as vanilla's PistonStructureResolver#isSticky, which is private.
+	 */
+	//PORT-NOTE: Blocks of other mods that made themselves sticky through NeoForge's IBlockExtension#isStickyBlock have no Fabric counterpart; vanilla pistons on Fabric only treat slime and honey blocks as sticky as well
+	private static boolean isStickyBlock(BlockState state) {
+		return state.is(Blocks.SLIME_BLOCK) || state.is(Blocks.HONEY_BLOCK);
+	}
+
+	/**
+	 * Replacement for NeoForge's BlockState#canStickTo, whose default is used here: no SecurityCraft block overrides it. This is
+	 * the same as vanilla's PistonStructureResolver#canStickToEachOther, which is private.
+	 */
+	private static boolean canStickTo(BlockState state, BlockState other) {
+		if (state.is(Blocks.HONEY_BLOCK) && other.is(Blocks.SLIME_BLOCK))
+			return false;
+		else if (state.is(Blocks.SLIME_BLOCK) && other.is(Blocks.HONEY_BLOCK))
+			return false;
+		else
+			return isStickyBlock(state) || isStickyBlock(other);
 	}
 
 	private boolean addBlockLine(BlockPos originPos, Direction facing) {
@@ -83,13 +106,13 @@ public class ReinforcedPistonStructureResolver { //this class doesn't extend Pis
 			else {
 				BlockState oldState;
 
-				while (state.isStickyBlock()) {
+				while (isStickyBlock(state)) {
 					BlockPos offsetPos = originPos.relative(pushDirection.getOpposite(), i);
 
 					oldState = state;
 					state = level.getBlockState(offsetPos);
 
-					if (state.isAir() || !oldState.canStickTo(state) || !ReinforcedPistonBaseBlock.isPushable(state, level, pistonPos, offsetPos, pushDirection, false, pushDirection.getOpposite()) || offsetPos.equals(pistonPos))
+					if (state.isAir() || !canStickTo(oldState, state) || !ReinforcedPistonBaseBlock.isPushable(state, level, pistonPos, offsetPos, pushDirection, false, pushDirection.getOpposite()) || offsetPos.equals(pistonPos))
 						break;
 
 					++i;
@@ -118,7 +141,7 @@ public class ReinforcedPistonStructureResolver { //this class doesn't extend Pis
 						for (int k = 0; k <= j + l; ++k) {
 							BlockPos posToPush = toPush.get(k);
 
-							if (level.getBlockState(posToPush).isStickyBlock() && !addBranchingBlocks(posToPush))
+							if (isStickyBlock(level.getBlockState(posToPush)) && !addBranchingBlocks(posToPush))
 								return false;
 						}
 
@@ -171,7 +194,7 @@ public class ReinforcedPistonStructureResolver { //this class doesn't extend Pis
 				BlockPos offsetPos = fromPos.relative(direction);
 				BlockState offsetState = level.getBlockState(offsetPos);
 
-				if (offsetState.canStickTo(state) && !addBlockLine(offsetPos, direction))
+				if (canStickTo(offsetState, state) && !addBlockLine(offsetPos, direction))
 					return false;
 			}
 		}

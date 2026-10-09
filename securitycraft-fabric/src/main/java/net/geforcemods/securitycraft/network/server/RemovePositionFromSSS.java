@@ -33,7 +33,7 @@ public record RemovePositionFromSSS(GlobalPos globalPos) implements CustomPacket
 			GlobalPositions sssLinkedBlocks = stack.get(SCContent.SSS_LINKED_BLOCKS);
 
 			if (sssLinkedBlocks != null)
-				sssLinkedBlocks.remove(() -> SCContent.SSS_LINKED_BLOCKS, stack, globalPos);
+				sssLinkedBlocks.remove(SCContent.SSS_LINKED_BLOCKS, stack, globalPos);
 		}
 	}
 }

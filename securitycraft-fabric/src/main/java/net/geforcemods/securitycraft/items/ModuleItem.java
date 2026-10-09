@@ -9,6 +9,7 @@ import net.geforcemods.securitycraft.api.IModuleInventory;
 import net.geforcemods.securitycraft.api.IOwnable;
 import net.geforcemods.securitycraft.api.LinkableBlockEntity;
 import net.geforcemods.securitycraft.components.ListModuleData;
+import net.geforcemods.securitycraft.fabric.menu.IMenuProviderExtension;
 import net.geforcemods.securitycraft.inventory.DisguiseModuleMenu;
 import net.geforcemods.securitycraft.inventory.ModuleItemContainer;
 import net.geforcemods.securitycraft.misc.ModuleType;
@@ -19,7 +20,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -87,7 +87,7 @@ public class ModuleItem extends Item {
 			}
 			else if (module == ModuleType.DISGUISE) {
 				if (!level.isClientSide) {
-					player.openMenu(new MenuProvider() {
+					player.openMenu(new IMenuProviderExtension() {
 						@Override
 						public AbstractContainerMenu createMenu(int windowId, Inventory inv, Player player) {
 							return new DisguiseModuleMenu(windowId, inv, new ModuleItemContainer(player.getItemInHand(hand)));

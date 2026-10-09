@@ -19,6 +19,7 @@ import net.geforcemods.securitycraft.blocks.LaserBlock;
 import net.geforcemods.securitycraft.blocks.OwnableBlock;
 import net.geforcemods.securitycraft.blocks.SpecialDoorBlock;
 import net.geforcemods.securitycraft.blocks.reinforced.ReinforcedDoorBlock;
+import net.geforcemods.securitycraft.fabric.event.ItemUseFirstHook;
 import net.geforcemods.securitycraft.util.IBlockMine;
 import net.geforcemods.securitycraft.util.PlayerUtils;
 import net.geforcemods.securitycraft.util.Utils;
@@ -40,7 +41,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 
-public class UniversalBlockRemoverItem extends Item {
+public class UniversalBlockRemoverItem extends Item implements ItemUseFirstHook {
 	private static final Component DISABLED_ITEM_TOOLTIP = Component.translatable("tooltip.securitycraft:universal_block_remover.disabled").withStyle(ChatFormatting.RED);
 
 	public UniversalBlockRemoverItem(Properties properties) {

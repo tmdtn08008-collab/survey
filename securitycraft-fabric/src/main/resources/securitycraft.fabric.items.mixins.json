@@ -3,8 +3,14 @@
   "package": "net.geforcemods.securitycraft.fabricmixin.items",
   "compatibilityLevel": "JAVA_21",
   "refmap": "securitycraft.refmap.json",
-  "mixins": [],
-  "client": [],
+  "mixins": [
+    "AnvilMenuMixin",
+    "BoatMixin",
+    "ResultSlotMixin"
+  ],
+  "client": [
+    "client.ItemInHandRendererReequipMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   },

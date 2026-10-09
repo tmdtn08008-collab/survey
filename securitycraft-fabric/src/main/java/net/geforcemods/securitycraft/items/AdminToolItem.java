@@ -9,6 +9,7 @@ import net.geforcemods.securitycraft.api.IOwnable;
 import net.geforcemods.securitycraft.api.Owner;
 import net.geforcemods.securitycraft.blockentities.DisplayCaseBlockEntity;
 import net.geforcemods.securitycraft.components.OwnerData;
+import net.geforcemods.securitycraft.fabric.event.ItemUseFirstHook;
 import net.geforcemods.securitycraft.misc.ModuleType;
 import net.geforcemods.securitycraft.util.PlayerUtils;
 import net.geforcemods.securitycraft.util.Utils;
@@ -28,7 +29,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
 
-public class AdminToolItem extends Item {
+public class AdminToolItem extends Item implements ItemUseFirstHook {
 	public AdminToolItem(Item.Properties properties) {
 		super(properties);
 	}

@@ -17,6 +17,7 @@
     "MinecraftGuiLayersMixin",
     "PlayerRendererInvoker",
     "ScreenAccessor",
+    "ScreenEffectRendererMixin",
     "ScreenMixin",
     "TerrainParticleMixin"
   ],

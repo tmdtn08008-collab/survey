@@ -5,6 +5,8 @@ import java.util.List;
 import net.geforcemods.securitycraft.SCContent;
 import net.geforcemods.securitycraft.SecurityCraft;
 import net.geforcemods.securitycraft.components.CodebreakerData;
+import net.geforcemods.securitycraft.fabric.item.BookEnchantableItemHook;
+import net.geforcemods.securitycraft.fabric.menu.IMenuProviderExtension;
 import net.geforcemods.securitycraft.inventory.BriefcaseMenu;
 import net.geforcemods.securitycraft.inventory.ItemContainer;
 import net.geforcemods.securitycraft.util.PlayerUtils;
@@ -15,7 +17,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -26,7 +27,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 
-public class CodebreakerItem extends Item {
+public class CodebreakerItem extends Item implements BookEnchantableItemHook {
 	public static final ResourceLocation STATE_PROPERTY = SecurityCraft.resLoc("codebreaker_state");
 	private static final Component DISABLED = Component.translatable("tooltip.securitycraft.component.success_chance.disabled").withStyle(ChatFormatting.RED);
 
@@ -61,7 +62,7 @@ public class CodebreakerItem extends Item {
 							codebreaker.set(SCContent.CODEBREAKER_DATA, new CodebreakerData(System.currentTimeMillis(), isSuccessful));
 
 							if (isSuccessful) {
-								player.openMenu(new MenuProvider() {
+								player.openMenu(new IMenuProviderExtension() {
 									@Override
 									public AbstractContainerMenu createMenu(int windowId, Inventory inv, Player player) {
 										return new BriefcaseMenu(windowId, inv, ItemContainer.briefcase(briefcase));
@@ -101,7 +102,10 @@ public class CodebreakerItem extends Item {
 		return true;
 	}
 
-	@Override
+	//PORT-NOTE: NeoForge's IItemExtension#isPrimaryItemFor has no Fabric counterpart and is not wired back, because it is not needed: NeoForge only calls it from
+	//EnchantmentHelper#getAvailableEnchantmentResults, which vanilla only reaches from EnchantmentHelper#selectEnchantment after checking that the item's
+	//enchantment value is above 0. The codebreaker's is 0 (Item#getEnchantmentValue), and the enchanting table already rejects it through isEnchantable.
+	//The codebreaker is in no enchantable tag either, so vanilla's Enchantment#isPrimaryItem is false for it as well
 	public boolean isPrimaryItemFor(ItemStack stack, Holder<Enchantment> enchantment) {
 		return false;
 	}

@@ -4,6 +4,7 @@ import net.geforcemods.securitycraft.SCContent;
 import net.geforcemods.securitycraft.api.Owner;
 import net.geforcemods.securitycraft.components.OwnerData;
 import net.geforcemods.securitycraft.components.PasscodeData;
+import net.geforcemods.securitycraft.fabric.menu.IMenuProviderExtension;
 import net.geforcemods.securitycraft.inventory.BriefcaseMenu;
 import net.geforcemods.securitycraft.inventory.ItemContainer;
 import net.geforcemods.securitycraft.network.client.OpenScreen;
@@ -14,7 +15,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -54,7 +54,7 @@ public class BriefcaseItem extends Item {
 			if (!briefcase.has(SCContent.OWNER_DATA)) //If the briefcase doesn't have an owner (that usually gets set when assigning a new passcode), set the player that first enters the correct passcode as the owner
 				briefcase.set(SCContent.OWNER_DATA, OwnerData.fromPlayer(player, true));
 
-			player.openMenu(new MenuProvider() {
+			player.openMenu(new IMenuProviderExtension() {
 				@Override
 				public AbstractContainerMenu createMenu(int windowId, Inventory inv, Player player) {
 					return new BriefcaseMenu(windowId, inv, ItemContainer.briefcase(briefcase));

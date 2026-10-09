@@ -20,7 +20,8 @@ public class SaltData extends SavedData {
 	private SaltData() {}
 
 	public static void refreshLevel(ServerLevel level) {
-		instance = level.getDataStorage().computeIfAbsent(new SavedData.Factory<>(SaltData::new, SaltData::load), "securitycraft-salts");
+		//NeoForge's two argument constructor passes null as the DataFixTypes as well. Fabric API skips data fixing for a null type when reading the file
+		instance = level.getDataStorage().computeIfAbsent(new SavedData.Factory<>(SaltData::new, SaltData::load, null), "securitycraft-salts");
 	}
 
 	public static void invalidate() {

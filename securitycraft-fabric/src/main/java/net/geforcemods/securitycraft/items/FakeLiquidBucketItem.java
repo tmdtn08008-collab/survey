@@ -24,7 +24,9 @@ public class FakeLiquidBucketItem extends BucketItem {
 				BlockPos dispenseAt = source.pos().relative(source.state().getValue(DispenserBlock.FACING));
 				Level level = source.level();
 
-				if (bucket.emptyContents(null, level, dispenseAt, null, stack)) {
+				//PORT-NOTE: NeoForge's overload additionally takes the bucket stack, only to check whether its fluid vaporizes through the fluid type. Fake water uses the water fluid type there
+				//and is in the water fluid tag here, so vanilla's own ultra warm dimension check vaporizes it the same way
+				if (bucket.emptyContents(null, level, dispenseAt, null)) {
 					bucket.checkExtraContent(null, level, stack, dispenseAt);
 					return consumeWithRemainder(source, stack, new ItemStack(Items.BUCKET));
 				}

@@ -5,6 +5,8 @@ import net.geforcemods.securitycraft.api.IModuleInventory;
 import net.geforcemods.securitycraft.api.IOwnable;
 import net.geforcemods.securitycraft.api.IReinforcedBlock;
 import net.geforcemods.securitycraft.api.Owner;
+import net.geforcemods.securitycraft.fabric.item.BookEnchantableItemHook;
+import net.geforcemods.securitycraft.fabric.menu.IMenuProviderExtension;
 import net.geforcemods.securitycraft.inventory.BlockReinforcerMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -21,7 +23,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -37,7 +38,7 @@ import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class UniversalBlockReinforcerItem extends Item {
+public class UniversalBlockReinforcerItem extends Item implements BookEnchantableItemHook {
 	public UniversalBlockReinforcerItem(Item.Properties properties) {
 		super(properties);
 
@@ -48,7 +49,7 @@ public class UniversalBlockReinforcerItem extends Item {
 			public ItemStack execute(BlockSource source, ItemStack stack) {
 				BlockState state = source.state();
 
-				if (state.is(SCContent.REINFORCED_DISPENSER)) {
+				if (state.is(SCContent.REINFORCED_DISPENSER.get())) {
 					Level level = source.level();
 					BlockPos modifyPos = source.pos().relative(state.getValue(DispenserBlock.FACING));
 					BlockState modifyState = level.getBlockState(modifyPos);
@@ -72,7 +73,7 @@ public class UniversalBlockReinforcerItem extends Item {
 
 		if (!level.isClientSide) {
 			maybeRemoveMending(level.registryAccess(), heldItem);
-			player.openMenu(new MenuProvider() {
+			player.openMenu(new IMenuProviderExtension() {
 				@Override
 				public AbstractContainerMenu createMenu(int windowId, Inventory inv, Player player) {
 					return new BlockReinforcerMenu(windowId, inv, UniversalBlockReinforcerItem.this == SCContent.UNIVERSAL_BLOCK_REINFORCER_LVL_1.get());
@@ -85,7 +86,7 @@ public class UniversalBlockReinforcerItem extends Item {
 
 				@Override
 				public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-					MenuProvider.super.writeClientSideData(menu, buffer);
+					IMenuProviderExtension.super.writeClientSideData(menu, buffer);
 					buffer.writeBoolean(UniversalBlockReinforcerItem.this == SCContent.UNIVERSAL_BLOCK_REINFORCER_LVL_1.get());
 				}
 			});

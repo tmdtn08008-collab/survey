@@ -10,6 +10,7 @@ import net.geforcemods.securitycraft.api.ILockable;
 import net.geforcemods.securitycraft.api.IOwnable;
 import net.geforcemods.securitycraft.blockentities.SonicSecuritySystemBlockEntity;
 import net.geforcemods.securitycraft.components.GlobalPositions;
+import net.geforcemods.securitycraft.fabric.event.ItemUseFirstHook;
 import net.geforcemods.securitycraft.util.PlayerUtils;
 import net.geforcemods.securitycraft.util.Utils;
 import net.minecraft.ChatFormatting;
@@ -27,7 +28,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-public class SonicSecuritySystemItem extends BlockItem {
+public class SonicSecuritySystemItem extends BlockItem implements ItemUseFirstHook {
 	public static final GlobalPositions DEFAULT_POSITIONS = GlobalPositions.sized(SonicSecuritySystemBlockEntity.MAX_LINKED_BLOCKS);
 
 	public SonicSecuritySystemItem(Properties properties) {

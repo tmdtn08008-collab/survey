@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.geforcemods.securitycraft.ConfigHandler;
 import net.geforcemods.securitycraft.SCContent;
+import net.geforcemods.securitycraft.fabric.item.ReequipAnimationItemHook;
 import net.geforcemods.securitycraft.misc.CustomDamageSources;
 import net.geforcemods.securitycraft.misc.SCSounds;
 import net.minecraft.core.component.DataComponents;
@@ -27,7 +28,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
-public class TaserItem extends Item {
+public class TaserItem extends Item implements ReequipAnimationItemHook {
 	private boolean powered;
 
 	public TaserItem(Item.Properties properties, boolean isPowered) {

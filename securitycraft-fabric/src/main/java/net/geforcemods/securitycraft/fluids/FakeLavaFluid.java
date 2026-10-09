@@ -2,6 +2,7 @@ package net.geforcemods.securitycraft.fluids;
 
 import javax.annotation.Nullable;
 
+import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.geforcemods.securitycraft.SCContent;
 import net.geforcemods.securitycraft.SecurityCraft;
 import net.minecraft.core.BlockPos;
@@ -23,6 +24,7 @@ import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.geforcemods.securitycraft.fabric.fluid.BaseFlowingFluid;
@@ -68,6 +70,7 @@ public abstract class FakeLavaFluid extends BaseFlowingFluid {
 
 	@Override
 	public void randomTick(Level level, BlockPos pos, FluidState state, RandomSource random) {
+		//PORT-NOTE: NeoForge posted its FluidPlaceBlockEvent for the fire and stone placed by fake lava (EventHooks.fireFluidPlaceBlockEvent), letting other mods change the placed state. SecurityCraft does not listen to it and Fabric has no such event, so the states are placed directly
 		if (level.getGameRules().getBoolean(GameRules.RULE_DOFIRETICK)) {
 			int i = random.nextInt(3);
 
@@ -123,7 +126,20 @@ public abstract class FakeLavaFluid extends BaseFlowingFluid {
 
 		BlockState state = level.getBlockState(pos);
 
-		return state.ignitedByLava();
+		return state.ignitedByLava() && isFlammable(state);
+	}
+
+	/**
+	 * Replacement for NeoForge's BlockState#isFlammable(level, pos, face), whose default checks whether the fire block's burn
+	 * odds of the state are above 0 (no SecurityCraft block overrides it). Fabric API's flammable block registry for fire holds
+	 * these values for vanilla's and other mods' blocks, its spread chance being vanilla's burn odds. Like vanilla's
+	 * FireBlock#getBurnOdds, waterlogged states are not flammable.
+	 */
+	private static boolean isFlammable(BlockState state) {
+		if (state.hasProperty(BlockStateProperties.WATERLOGGED) && state.getValue(BlockStateProperties.WATERLOGGED))
+			return false;
+
+		return FlammableBlockRegistry.getDefaultInstance().get(state.getBlock()).getSpreadChance() > 0;
 	}
 
 	@Nullable

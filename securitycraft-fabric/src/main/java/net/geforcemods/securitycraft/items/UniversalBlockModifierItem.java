@@ -4,6 +4,8 @@ import net.geforcemods.securitycraft.api.IDisguisable;
 import net.geforcemods.securitycraft.api.IModuleInventory;
 import net.geforcemods.securitycraft.api.IOwnable;
 import net.geforcemods.securitycraft.blockentities.DisplayCaseBlockEntity;
+import net.geforcemods.securitycraft.fabric.event.ItemUseFirstHook;
+import net.geforcemods.securitycraft.fabric.menu.IMenuProviderExtension;
 import net.geforcemods.securitycraft.inventory.CustomizeBlockMenu;
 import net.geforcemods.securitycraft.util.PlayerUtils;
 import net.geforcemods.securitycraft.util.Utils;
@@ -12,7 +14,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -24,7 +25,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-public class UniversalBlockModifierItem extends Item {
+public class UniversalBlockModifierItem extends Item implements ItemUseFirstHook {
 	public UniversalBlockModifierItem(Item.Properties properties) {
 		super(properties);
 	}
@@ -46,7 +47,7 @@ public class UniversalBlockModifierItem extends Item {
 				return InteractionResult.FAIL;
 			}
 			else if (!ctx.getLevel().isClientSide) {
-				player.openMenu(new MenuProvider() {
+				player.openMenu(new IMenuProviderExtension() {
 					@Override
 					public AbstractContainerMenu createMenu(int windowId, Inventory inv, Player player) {
 						return new CustomizeBlockMenu(windowId, level, pos, inv);
@@ -62,7 +63,7 @@ public class UniversalBlockModifierItem extends Item {
 
 					@Override
 					public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-						MenuProvider.super.writeClientSideData(menu, buffer);
+						IMenuProviderExtension.super.writeClientSideData(menu, buffer);
 						buffer.writeBlockPos(pos);
 					}
 				});

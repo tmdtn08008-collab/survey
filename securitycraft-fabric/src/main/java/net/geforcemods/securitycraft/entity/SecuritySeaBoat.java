@@ -16,6 +16,8 @@ import net.geforcemods.securitycraft.api.Option.SendAllowlistMessageOption;
 import net.geforcemods.securitycraft.api.Option.SendDenylistMessageOption;
 import net.geforcemods.securitycraft.api.Option.SmartModuleCooldownOption;
 import net.geforcemods.securitycraft.api.Owner;
+import net.geforcemods.securitycraft.fabric.item.BoatFluidHook;
+import net.geforcemods.securitycraft.fabric.menu.IMenuProviderExtension;
 import net.geforcemods.securitycraft.inventory.CustomizeBlockMenu;
 import net.geforcemods.securitycraft.inventory.InsertOnlyInvWrapper;
 import net.geforcemods.securitycraft.misc.ModuleType;
@@ -36,10 +38,11 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -52,17 +55,16 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.common.NeoForgeMod;
-import net.neoforged.neoforge.fluids.FluidType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.geforcemods.securitycraft.fabric.items.IItemHandler;
 import net.geforcemods.securitycraft.fabric.items.InvWrapper;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
-public class SecuritySeaBoat extends ChestBoat implements IOwnable, IPasscodeProtected, IModuleInventory, ICustomizable {
+public class SecuritySeaBoat extends ChestBoat implements IOwnable, IPasscodeProtected, IModuleInventory, ICustomizable, BoatFluidHook {
 	private static final EntityDataAccessor<Owner> OWNER = SynchedEntityData.<Owner>defineId(SecuritySeaBoat.class, Owner.getSerializer());
 	private static final EntityDataAccessor<Boolean> SEND_ALLOWLIST_MESSAGE = SynchedEntityData.<Boolean>defineId(SecuritySeaBoat.class, EntityDataSerializers.BOOLEAN);
 	private static final EntityDataAccessor<Boolean> SEND_DENYLIST_MESSAGE = SynchedEntityData.<Boolean>defineId(SecuritySeaBoat.class, EntityDataSerializers.BOOLEAN);
@@ -141,7 +143,7 @@ public class SecuritySeaBoat extends ChestBoat implements IOwnable, IPasscodePro
 					String newOwner = stack.getHoverName().getString();
 
 					//disable this in a development environment
-					if (FMLEnvironment.production)
+					if (!FabricLoader.getInstance().isDevelopmentEnvironment())
 						dropAllModules();
 
 					setOwner(PlayerUtils.isPlayerOnline(newOwner) ? PlayerUtils.getPlayerFromName(newOwner).getUUID().toString() : "ownerUUID", newOwner);
@@ -155,7 +157,7 @@ public class SecuritySeaBoat extends ChestBoat implements IOwnable, IPasscodePro
 					if (!level.isClientSide) {
 						BlockPos pos = blockPosition();
 
-						player.openMenu(new MenuProvider() {
+						player.openMenu(new IMenuProviderExtension() {
 							@Override
 							public AbstractContainerMenu createMenu(int windowId, Inventory inv, Player player) {
 								return new CustomizeBlockMenu(windowId, level, pos, SecuritySeaBoat.super.getId(), inv);
@@ -239,12 +241,13 @@ public class SecuritySeaBoat extends ChestBoat implements IOwnable, IPasscodePro
 
 	@Override
 	public boolean canBoatInFluid(FluidState state) {
-		return super.canBoatInFluid(state) || state.is(Fluids.LAVA);
+		return BoatFluidHook.super.canBoatInFluid(state) || state.is(Fluids.LAVA);
 	}
 
+	//NeoForge: canBoatInFluid(FluidType), with the lava fluid type represented by the lava fluid tag on Fabric
 	@Override
-	public boolean canBoatInFluid(FluidType type) {
-		return super.canBoatInFluid(type) || type == NeoForgeMod.LAVA_TYPE;
+	public boolean canBoatInFluidType(TagKey<Fluid> type) {
+		return BoatFluidHook.super.canBoatInFluidType(type) || type == FluidTags.LAVA;
 	}
 
 	@Override

@@ -8,12 +8,16 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import org.lwjgl.opengl.GL11;
+
 import com.google.common.base.Suppliers;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexFormat;
 
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -322,9 +326,11 @@ public class ClientHandler {
 		SCClientEventHandler.register();
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, mc) -> Tips.onLoggingIn());
 		CameraClientEvents.register();
-
-		if (!RendererAccess.INSTANCE.hasRenderer())
-			SecurityCraft.LOGGER.warn("No implementation of the Fabric Rendering API is present (Indigo or Sodium provide one). Disguised blocks will look like their actual block instead of their disguise!");
+		//Indigo and Sodium register their renderer from their own client entrypoints, which may run after this one
+		ClientLifecycleEvents.CLIENT_STARTED.register(mc -> {
+			if (!RendererAccess.INSTANCE.hasRenderer())
+				SecurityCraft.LOGGER.warn("No implementation of the Fabric Rendering API is present (Indigo or Sodium provide one). Disguised blocks will look like their actual block instead of their disguise!");
+		});
 	}
 
 	public static void onModelRegisterAdditional(ModelLoadingPlugin.Context pluginContext) {
@@ -449,12 +455,19 @@ public class ClientHandler {
 
 	/**
 	 * PORT-NOTE: NeoForge's GUI layer above all others becomes a HUD callback, which Fabric runs after all of vanilla's HUD. As
-	 * with NeoForge's layer, it is only drawn while LayerToggleHandler has it enabled.
+	 * with NeoForge's layer, it is only drawn while LayerToggleHandler has it enabled. NeoForge draws every layer further in
+	 * front than the one before it, so its topmost layer covers vanilla's HUD wherever they overlap (for example the scoreboard
+	 * or the subtitles). Vanilla's HUD layers are drawn further in front than the HUD callback's default depth, so the depth
+	 * buffer is cleared before drawing the overlay to keep it in front of them. GameRenderer clears it right after the HUD
+	 * anyway.
 	 */
 	public static void registerGuiLayers() {
 		HudRenderCallback.EVENT.register((guiGraphics, deltaTracker) -> {
-			if (!LayerToggleHandler.isDisabled(CAMERA_LAYER))
+			if (!LayerToggleHandler.isDisabled(CAMERA_LAYER)) {
+				guiGraphics.flush();
+				RenderSystem.clear(GL11.GL_DEPTH_BUFFER_BIT, Minecraft.ON_OSX);
 				SCClientEventHandler.cameraOverlay(guiGraphics, deltaTracker);
+			}
 		});
 		LayerToggleHandler.disable(CAMERA_LAYER);
 	}

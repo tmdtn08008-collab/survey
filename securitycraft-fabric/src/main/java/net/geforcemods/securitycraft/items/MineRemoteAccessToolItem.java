@@ -7,6 +7,7 @@ import net.geforcemods.securitycraft.SCContent;
 import net.geforcemods.securitycraft.api.IExplosive;
 import net.geforcemods.securitycraft.api.IOwnable;
 import net.geforcemods.securitycraft.components.GlobalPositions;
+import net.geforcemods.securitycraft.fabric.event.ItemUseFirstHook;
 import net.geforcemods.securitycraft.util.PlayerUtils;
 import net.geforcemods.securitycraft.util.Utils;
 import net.minecraft.ChatFormatting;
@@ -23,7 +24,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 
-public class MineRemoteAccessToolItem extends Item {
+public class MineRemoteAccessToolItem extends Item implements ItemUseFirstHook {
 	public static final int MAX_MINES = 6;
 	public static final GlobalPositions DEFAULT_POSITIONS = GlobalPositions.sized(MAX_MINES);
 

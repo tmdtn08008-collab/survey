@@ -6,6 +6,7 @@ import net.geforcemods.securitycraft.api.IOwnable;
 import net.geforcemods.securitycraft.api.IPasscodeProtected;
 import net.geforcemods.securitycraft.blockentities.DisplayCaseBlockEntity;
 import net.geforcemods.securitycraft.components.PasscodeData;
+import net.geforcemods.securitycraft.fabric.event.ItemUseFirstHook;
 import net.geforcemods.securitycraft.misc.SaltData;
 import net.geforcemods.securitycraft.network.client.OpenScreen;
 import net.geforcemods.securitycraft.network.client.OpenScreen.DataType;
@@ -26,7 +27,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.geforcemods.securitycraft.fabric.network.PacketDistributor;
 
-public class UniversalKeyChangerItem extends Item {
+public class UniversalKeyChangerItem extends Item implements ItemUseFirstHook {
 	public UniversalKeyChangerItem(Item.Properties properties) {
 		super(properties);
 	}

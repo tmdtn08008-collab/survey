@@ -6,12 +6,14 @@ import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * Makes block particles (breaking, hitting and sprinting) of disguised blocks look like the disguise. Replaces NeoForge's
- * TerrainParticle#updateSprite, which asks the block's model for its particle icon with the model data of the block entity
- * at the particle's source position.
+ * Makes block particles (breaking, hitting and sprinting) and the in-wall screen overlay of disguised blocks look like the
+ * disguise. Replaces NeoForge's BlockModelShaper#getTexture(BlockState, Level, BlockPos), which TerrainParticle#updateSprite
+ * and ScreenEffectRenderer use to ask the block's model for its particle icon with the model data of the block entity at
+ * the block's position.
  */
 public final class DisguiseParticles {
 	/**
@@ -33,11 +35,20 @@ public final class DisguiseParticles {
 	 *         icon otherwise
 	 */
 	public static TextureAtlasSprite getParticleIcon(BlockModelShaper modelShaper, BlockState state, ClientLevel level, BlockPos pos, TextureAtlasSprite original) {
-		BlockPos lookupPos = sourcePos != null ? sourcePos : pos;
+		return getTexture(modelShaper, state, level, sourcePos != null ? sourcePos : pos, original);
+	}
+
+	/**
+	 * @param pos The position of the block
+	 * @param original The vanilla particle icon lookup
+	 * @return The particle icon of the block's disguise if the block at the given position is disguised, the vanilla particle
+	 *         icon otherwise
+	 */
+	public static TextureAtlasSprite getTexture(BlockModelShaper modelShaper, BlockState state, BlockAndTintGetter level, BlockPos pos, TextureAtlasSprite original) {
 		BakedModel model = modelShaper.getBlockModel(state);
 
-		if (model instanceof DisguisableDynamicBakedModel disguisableModel && level != null && lookupPos != null)
-			return disguisableModel.getParticleIcon(DisguisableDynamicBakedModel.getModelData(level, lookupPos));
+		if (model instanceof DisguisableDynamicBakedModel disguisableModel && level != null && pos != null)
+			return disguisableModel.getParticleIcon(DisguisableDynamicBakedModel.getModelData(level, pos));
 
 		return original;
 	}
