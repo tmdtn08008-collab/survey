@@ -23,6 +23,12 @@
 		],
 		"client": [
 			"net.geforcemods.securitycraft.SecurityCraftClient"
+		],
+		"jei_mod_plugin": [
+			"net.geforcemods.securitycraft.compat.jei.SCJEIPlugin"
+		],
+		"jade": [
+			"net.geforcemods.securitycraft.compat.hudmods.JadeDataProvider"
 		]
 	},
 	"mixins": [
@@ -42,5 +48,9 @@
 		"java": ">=21",
 		"fabric-api": "*",
 		"forgeconfigapiport": "*"
+	},
+	"suggests": {
+		"jei": "*",
+		"jade": "*"
 	}
 }

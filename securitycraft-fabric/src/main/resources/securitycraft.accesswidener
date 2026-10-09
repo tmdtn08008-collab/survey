@@ -31,6 +31,9 @@ accessible field net/minecraft/world/level/block/state/StateHolder PROPERTY_ENTR
 accessible method net/minecraft/world/level/block/ChestBlock candidatePartnerFacing (Lnet/minecraft/world/item/context/BlockPlaceContext;Lnet/minecraft/core/Direction;)Lnet/minecraft/core/Direction;
 extendable method net/minecraft/world/level/block/ChestBlock candidatePartnerFacing (Lnet/minecraft/world/item/context/BlockPlaceContext;Lnet/minecraft/core/Direction;)Lnet/minecraft/core/Direction;
 accessible field net/minecraft/client/renderer/RenderType sortOnUpload Z
+# NeoForge adds getGuiLeft()/getGuiTop() for these; the JEI ghost ingredient handler needs them
+accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen leftPos I
+accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen topPos I
 accessible field net/minecraft/client/gui/components/EditBox value Ljava/lang/String;
 accessible method net/minecraft/client/gui/components/EditBox scrollTo (I)V
 extendable method net/minecraft/client/gui/components/EditBox scrollTo (I)V
