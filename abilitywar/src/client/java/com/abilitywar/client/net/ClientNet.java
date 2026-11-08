@@ -1,0 +1,51 @@
+package com.abilitywar.client.net;
+
+import com.abilitywar.client.ClientState;
+import com.abilitywar.client.anim.PlayerAnimator;
+import com.abilitywar.client.camera.CameraController;
+import com.abilitywar.client.fx.VfxManager;
+import com.abilitywar.client.hud.DamageNumbers;
+import com.abilitywar.net.AWNet;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.Vec3d;
+
+public final class ClientNet {
+    public static void init() {
+        ClientPlayNetworking.registerGlobalReceiver(AWNet.S2C_STATE, (client, handler, buf, sender) -> {
+            net.minecraft.network.PacketByteBuf copy = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.copy(buf);
+            client.execute(() -> {
+                ClientState.read(copy);
+                copy.release();
+            });
+        });
+        ClientPlayNetworking.registerGlobalReceiver(AWNet.S2C_ANIM, (client, handler, buf, sender) -> {
+            int id = buf.readVarInt();
+            String anim = buf.readString();
+            float speed = buf.readFloat();
+            client.execute(() -> PlayerAnimator.play(id, anim, speed));
+        });
+        ClientPlayNetworking.registerGlobalReceiver(AWNet.S2C_FX, (client, handler, buf, sender) -> {
+            String type = buf.readString();
+            NbtCompound n = buf.readNbt();
+            client.execute(() -> VfxManager.spawn(type, n == null ? new NbtCompound() : n));
+        });
+        ClientPlayNetworking.registerGlobalReceiver(AWNet.S2C_DAMAGE, (client, handler, buf, sender) -> {
+            int id = buf.readVarInt();
+            float amount = buf.readFloat();
+            byte kind = buf.readByte();
+            double x = buf.readDouble(), y = buf.readDouble(), z = buf.readDouble();
+            client.execute(() -> DamageNumbers.add(id, amount, kind, x, y, z));
+        });
+        ClientPlayNetworking.registerGlobalReceiver(AWNet.S2C_CINEMATIC, (client, handler, buf, sender) -> {
+            int caster = buf.readVarInt();
+            String type = buf.readString();
+            int dur = buf.readVarInt();
+            Vec3d target = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
+            client.execute(() -> CameraController.startCinematic(caster, type, dur, target));
+        });
+    }
+
+    private ClientNet() {
+    }
+}

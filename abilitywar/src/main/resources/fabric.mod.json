@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "abilitywar",
+  "version": "${version}",
+  "name": "Ability War (능력대전쟁)",
+  "description": "능력을 골라 싸우는 능력대전쟁 모드. 첫 번째 능력: 공허(Void).",
+  "authors": ["tmdtn08008"],
+  "license": "MIT",
+  "icon": "assets/abilitywar/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.abilitywar.AbilityWar"],
+    "client": ["com.abilitywar.client.AbilityWarClient"]
+  },
+  "mixins": [
+    "abilitywar.mixins.json",
+    {
+      "config": "abilitywar.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "accessWidener": "abilitywar.accesswidener",
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": "~1.20.1",
+    "java": ">=17",
+    "fabric-api": "*"
+  }
+}

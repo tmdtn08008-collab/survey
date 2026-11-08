@@ -1,0 +1,9 @@
+accessWidener v2 named
+accessible class net/minecraft/client/render/RenderLayer$MultiPhase
+accessible class net/minecraft/client/render/RenderLayer$MultiPhaseParameters
+accessible field net/minecraft/client/gl/PostEffectProcessor passes Ljava/util/List;
+accessible field net/minecraft/client/option/KeyBinding KEY_TO_BINDINGS Ljava/util/Map;
+accessible field net/minecraft/client/option/KeyBinding KEYS_BY_ID Ljava/util/Map;
+accessible field net/minecraft/client/option/KeyBinding boundKey Lnet/minecraft/client/util/InputUtil$Key;
+accessible field net/minecraft/client/render/entity/model/PlayerEntityModel thinArms Z
+accessible field net/minecraft/client/MinecraftClient attackCooldown I
