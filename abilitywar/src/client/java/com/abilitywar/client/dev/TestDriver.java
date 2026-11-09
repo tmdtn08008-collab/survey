@@ -80,6 +80,7 @@ public final class TestDriver {
                 case "cmd" -> mc.player.networkHandler.sendChatCommand(arg.startsWith("/") ? arg.substring(1) : arg);
                 case "skill" -> InputHandler.useSkill(SkillSlot.VALUES[Integer.parseInt(arg)]);
                 case "attack" -> InputHandler.onAttack();
+                case "orbitcine" -> com.abilitywar.client.camera.CameraController.debugOverCinematic = arg.equals("on");
                 case "hold" -> InputHandler.testHold(SkillSlot.VALUES[Integer.parseInt(arg)]);
                 case "dash" -> {
                     // dash forward|back|left|right : 이동키를 누른 채로 대시

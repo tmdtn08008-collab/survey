@@ -72,6 +72,32 @@ public final class CinematicOverlay {
             int tw = tr.getWidth(title);
             float cy = sh - bar - 46;
             int alpha = (int) (a * 255) << 24;
+            net.minecraft.util.Identifier tex = com.abilitywar.AbilityWar.id("textures/gui/ult_title_" + th.key() + ".png");
+            if (MinecraftClient.getInstance().getResourceManager().getResource(tex).isPresent()) {
+                // 능력별 제목 그림 (용기사 = 한자, 공허 = 영어): 크게 들어왔다가 자리 잡음
+                float[] sz = {1024, th == DRAGON ? 300 : 220}; // tools/gen_titles.py 의 그림 크기
+                float w = Math.min(sw * 0.62f, 380f);
+                float h = w * sz[1] / sz[0];
+                float zoom = 1f + 0.35f * (float) Math.pow(1 - Math.min(1, tt / 7f), 3);
+                MinecraftClient.getInstance().getTextureManager().getTexture(tex).setFilter(true, false);
+                ctx.getMatrices().push();
+                ctx.getMatrices().translate(sw / 2f, cy - h * 0.18f, 0);
+                ctx.getMatrices().scale(zoom, zoom, 1);
+                RenderSystem.enableBlend();
+                RenderSystem.defaultBlendFunc();
+                RenderSystem.setShaderColor(1, 1, 1, a);
+                ctx.drawTexture(tex, (int) (-w / 2), (int) (-h / 2), (int) w, (int) h, 0, 0, (int) sz[0], (int) sz[1], (int) sz[0], (int) sz[1]);
+                // 처음 들어올 때 번쩍임
+                float bloom = Math.max(0, 1 - tt / 6f);
+                if (bloom > 0) {
+                    RenderSystem.blendFunc(org.lwjgl.opengl.GL11.GL_SRC_ALPHA, org.lwjgl.opengl.GL11.GL_ONE);
+                    RenderSystem.setShaderColor(1, 1, 1, bloom * 0.8f * out);
+                    ctx.drawTexture(tex, (int) (-w / 2), (int) (-h / 2), (int) w, (int) h, 0, 0, (int) sz[0], (int) sz[1], (int) sz[0], (int) sz[1]);
+                    RenderSystem.defaultBlendFunc();
+                }
+                RenderSystem.setShaderColor(1, 1, 1, 1);
+                ctx.getMatrices().pop();
+            } else {
             ctx.getMatrices().push();
             ctx.getMatrices().translate(sw / 2f, cy, 0);
             ctx.getMatrices().scale(scale, scale, 1);
@@ -84,6 +110,7 @@ public final class CinematicOverlay {
             }
             ctx.drawText(tr, title, -tw / 2, -4, alpha | th.title(), false);
             ctx.getMatrices().pop();
+            }
             float sa = Math.min(1, Math.max(0, (tt - 3) / 5f)) * out;
             int sw2 = tr.getWidth(sub);
             float lineW = (sw2 * 1.4f + 40) * Math.min(1, tt / 10f);

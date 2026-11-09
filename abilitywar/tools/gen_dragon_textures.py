@@ -338,28 +338,107 @@ def card():
     img.save(os.path.join(GUI, 'card_dragon.png'))
 
 
-def dragon_swirl():
-    """고룡 환영에 흐르는 불꽃 무늬 (이음매 없이 반복, 가산 합성용)."""
-    S = 256
-    x, y = np.meshgrid(np.arange(S) / S, np.arange(S) / S)
-    rng = np.random.RandomState(5)
-    f = np.zeros((S, S), np.float32)
-    for k in range(9):
-        fx, fy = rng.randint(1, 7), rng.randint(2, 11)
-        ph = rng.rand() * 6.283
-        f += np.sin(2 * np.pi * (fx * x + fy * y) + ph + 1.5 * np.sin(2 * np.pi * (rng.randint(1, 4) * x + rng.randint(1, 4) * y))) / (1 + k * 0.35)
-    f = (f - f.min()) / (f.max() - f.min())
-    ridge = 1 - np.abs(f - 0.5) * 2
-    v = np.clip((ridge - 0.55) / 0.45, 0, 1) ** 1.6
+def _periodic_noise(S, cells, seed):
+    """이음매 없는 값 노이즈 (S x S, cells 간격)."""
+    rng = np.random.RandomState(seed)
+    g = rng.rand(cells, cells).astype(np.float32)
+    x = np.arange(S) / S * cells
+    x0 = np.floor(x).astype(int)
+    t = x - x0
+    t = t * t * (3 - 2 * t)
+    x1 = (x0 + 1) % cells
+    x0 %= cells
+    a = g[x0][:, x0] * (1 - t)[None, :] + g[x0][:, x1] * t[None, :]
+    b = g[x1][:, x0] * (1 - t)[None, :] + g[x1][:, x1] * t[None, :]
+    return a * (1 - t)[:, None] + b * t[:, None]
+
+
+def elder_textures():
+    """고룡 (직접 만든 모델) 텍스처: 비늘 / 비늘 틈 빛 / 배 / 뿔 / 날개막."""
+    S = 64
+    yy, xx = np.mgrid[0:S, 0:S].astype(np.float32)
+    # 비늘: 16px 간격, 줄마다 반칸 어긋남, 아래로 둥근 비늘
+    best = np.full((S, S), 9.0, np.float32)
+    shade = np.zeros((S, S), np.float32)
+    for row in range(-1, 6):
+        for col in range(-1, 6):
+            cx = col * 16 + (8 if row % 2 else 0)
+            cy = row * 13
+            dx = ((xx - cx + S / 2) % S) - S / 2
+            dy = ((yy - cy + S / 2) % S) - S / 2
+            d = np.sqrt((dx / 9.5) ** 2 + (np.maximum(dy, 0) / 11.0) ** 2 + (np.minimum(dy, 0) / 6.0) ** 2)
+            closer = d < best
+            best = np.where(closer, d, best)
+            shade = np.where(closer, np.clip(1 - dy / 12.0, 0, 1), shade)
+    n = _periodic_noise(S, 8, 31)
+    gap = np.clip((best - 0.82) / 0.18, 0, 1)
+    body = (1 - gap)
     out = np.zeros((S, S, 4), np.float32)
-    out[..., 0] = v
-    out[..., 1] = v ** 1.4 * 0.75
-    out[..., 2] = v ** 2.2 * 0.4
+    base = np.array([0.40, 0.07, 0.05]); hi = np.array([0.72, 0.18, 0.09]); dark = np.array([0.08, 0.015, 0.01])
+    for k in range(3):
+        c = base[k] + (hi[k] - base[k]) * (shade * 0.7 + 0.3 * n) * (1 - best * 0.5)
+        out[..., k] = c * body + dark[k] * gap
     out[..., 3] = 1
-    save(out, os.path.join(FX, 'dragon_swirl.png'))
+    save(out, os.path.join(FX, 'elder_scales.png'))
+    # 비늘 틈에서 새어 나오는 용암빛 (가산 합성용, 미리 곱한 알파)
+    n2 = _periodic_noise(S, 4, 37)
+    gl = np.clip((best - 0.7) / 0.22, 0, 1) * np.clip(n2 * 1.5 - 0.15, 0, 1)
+    glow = np.zeros((S, S, 4), np.float32)
+    for k, c in enumerate((1.0, 0.42, 0.1)):
+        glow[..., k] = c * gl
+    glow[..., 3] = gl
+    save(glow, os.path.join(FX, 'elder_glow.png'))
+    # 배: 가로 띠 판
+    band = (yy % 16) / 16
+    edge = np.clip(1 - np.abs(band - 0.5) * 2.2, 0, 1) ** 0.6
+    n3 = _periodic_noise(S, 8, 41)
+    belly = np.zeros((S, S, 4), np.float32)
+    for k, (a, b) in enumerate(((0.30, 0.68), (0.10, 0.32), (0.05, 0.12))):
+        belly[..., k] = a + (b - a) * edge * (0.85 + 0.3 * n3)
+    belly[..., 3] = 1
+    save(belly, os.path.join(FX, 'elder_belly.png'))
+    # 뿔/뼈: 상아색, 고리 무늬 (세로로 반복)
+    H2 = 64
+    yy2, xx2 = np.mgrid[0:H2, 0:32].astype(np.float32)
+    ring = 0.5 + 0.5 * np.cos(yy2 / H2 * np.pi * 2 * 6)
+    n4 = _periodic_noise(64, 8, 43)[:, :32]
+    horn = np.zeros((H2, 32, 4), np.float32)
+    for k, (a, b) in enumerate(((0.55, 0.92), (0.45, 0.84), (0.32, 0.68))):
+        horn[..., k] = a + (b - a) * (0.65 + 0.35 * ring) * (0.85 + 0.25 * n4)
+    horn[..., 3] = 1
+    save(horn, os.path.join(FX, 'elder_horn.png'))
+    # 날개막: 반투명 가죽 + 핏줄
+    M = 128
+    n5 = _periodic_noise(M, 8, 47) * 0.6 + _periodic_noise(M, 32, 48) * 0.4
+    veins = Image.new('L', (M, M), 0)
+    vd = ImageDraw.Draw(veins)
+    rr = random.Random(9)
+    for i in range(26):
+        x, y = rr.uniform(0, M), rr.uniform(0, M)
+        ang = rr.uniform(0, math.tau)
+        pts = [(x, y)]
+        for k in range(10):
+            ang += rr.uniform(-0.5, 0.5)
+            x += math.cos(ang) * 7
+            y += math.sin(ang) * 7
+            pts.append((x, y))
+        for ox in (-M, 0, M):
+            for oy in (-M, 0, M):
+                vd.line([(px + ox, py + oy) for px, py in pts], fill=200, width=2)
+    v = np.asarray(veins.filter(ImageFilter.GaussianBlur(0.8)), np.float32) / 255
+    mem = np.zeros((M, M, 4), np.float32)
+    for k, (a, b) in enumerate(((0.30, 0.55), (0.05, 0.12), (0.03, 0.06))):
+        mem[..., k] = a + (b - a) * n5 + v * (0.35 if k == 0 else 0.12)
+    mem[..., 3] = 0.88 + 0.1 * n5
+    save(mem, os.path.join(FX, 'elder_membrane.png'))
+    mg = np.zeros((M, M, 4), np.float32)
+    for k, c in enumerate((1.0, 0.4, 0.1)):
+        mg[..., k] = c * v * 0.8
+    mg[..., 3] = v * 0.8
+    save(mg, os.path.join(FX, 'elder_membrane_glow.png'))
 
 
 if __name__ == '__main__':
-    wing(); skin_layout_overlay(); rune(); flame(); fire_strip(); scale_shield(); tail_strip(); dragon_swirl()
+    wing(); skin_layout_overlay(); rune(); flame(); fire_strip(); scale_shield(); tail_strip(); elder_textures()
     # 스킬 아이콘/카드는 스킬바 그림에서 잘라 씀 (tools/gen_dragon_hud.py + tools/gen_hud.py dragon)
     print('done')

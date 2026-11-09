@@ -64,9 +64,17 @@ public final class ArtSkillBar {
         RenderSystem.defaultBlendFunc();
         TextRenderer tr = mc.textRenderer;
         for (int i = 0; i < 6; i++) relabel(ctx, tr, NAMES[i], keys[i]);
-        // 공통 대시(Q): 스킬 줄 왼쪽
+        float[] ds = L.slots.get("dash");
+        if (ds != null) {
+            // 그림에 대시(Q) 칸이 들어 있음
+            dash(td);
+            isAdditive = false;
+            RenderSystem.defaultBlendFunc();
+            relabel(ctx, tr, "dash", InputHandler.DASH);
+        }
+        // 공통 대시(Q): 그림에 없으면 스킬 줄 왼쪽에 배지
         float[] s1 = L.slots.get("skill1");
-        if (s1 != null) {
+        if (s1 != null && ds == null) {
             float size = Math.max(14, (s1[3] - s1[1]) * sc * 0.8f);
             DashBadge.render(ctx, td, bx + s1[0] * sc - size / 2f - 7, by + (s1[1] + s1[3]) / 2f * sc, size);
         }
@@ -103,6 +111,22 @@ public final class ArtSkillBar {
     /** 빛 색을 하얗게 섞음. */
     private static float mix(float c) {
         return c + (1 - c) * 0.45f;
+    }
+
+    private static void dash(float td) {
+        float[] s = L.slots.get("dash");
+        int i = SkillSlot.DASH.ordinal();
+        float frac = ClientState.cooldownFraction(i, td);
+        if (frac > 0) {
+            maskPie(s, 1 - frac, 1f, 0, 0, 0, 0.66f);
+            sweepLine(s, 1 - frac, 0.85f);
+        }
+        float flash = Math.max(ClientState.readyFlash[i], ClientState.pressFlash[i] * 0.6f);
+        if (flash > 0) {
+            additive(true);
+            maskRect(s, 0, 1, mix(ar), mix(ag), mix(ab), flash * 0.8f);
+            additive(false);
+        }
     }
 
     private static void ultimate(float td, float time, boolean locked) {

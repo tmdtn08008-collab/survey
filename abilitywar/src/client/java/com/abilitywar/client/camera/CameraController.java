@@ -168,10 +168,12 @@ public final class CameraController {
 
     // 개발용 고정 카메라 (플레이어 기준 궤도)
     public static float[] debugOrbit;
+    /** 개발용: 궁극기 연출 중에도 고정 카메라 사용. */
+    public static boolean debugOverCinematic;
 
     @Nullable
     public static Shot currentShot(float td) {
-        if (debugOrbit != null && !isCinematic()) {
+        if (debugOrbit != null && (!isCinematic() || debugOverCinematic)) {
             MinecraftClient mc = MinecraftClient.getInstance();
             if (mc.player == null) return null;
             Vec3d C = mc.player.getLerpedPos(td);
@@ -204,36 +206,38 @@ public final class CameraController {
         Vec3d cam, look;
         double fov;
         if (cin.type.equals("dragon_ult")) {
+            // 고룡은 용기사 뒤 10칸에 있고 머리는 높이 9~13칸
             Vec3d S = cin.start;
-            Vec3d head = S.subtract(F.multiply(1.8)).add(0, 5.8, 0);
+            Vec3d head = S.subtract(F.multiply(1.5)).add(0, 11.5, 0);
             if (t < 22) {
-                // 웅크려 힘을 모으는 클로즈업 → 뒤로 빠지며 고룡을 드러냄
+                // 웅크려 힘을 모으는 클로즈업 → 뒤로 빠지며 올려다봐 고룡을 드러냄
                 float k = smooth(t / 22f);
-                double th = Math.toRadians(34 - 14 * k);
-                double rad = 2.5 + 3.4 * k;
-                cam = C.add(F.multiply(Math.cos(th) * rad)).add(R.multiply(Math.sin(th) * rad)).add(0, 0.45 + 0.35 * k, 0);
-                look = C.add(0, 1.0 + 2.2 * k, 0);
-                fov = 58 + 12 * k;
+                double th = Math.toRadians(34 - 18 * k);
+                double rad = 2.5 + 6.5 * k;
+                cam = C.add(F.multiply(Math.cos(th) * rad)).add(R.multiply(Math.sin(th) * rad)).add(0, 0.45 + 0.6 * k, 0);
+                look = C.add(0, 1.0, 0).lerp(head.subtract(F.multiply(3)), 0.55 * k);
+                fov = 58 + 20 * k;
             } else if (t < 42) {
-                // 포효: 정면 로우앵글 (용기사 + 고룡)
+                // 포효: 정면 로우앵글 와이드 (용기사 + 고룡 전체)
                 float k = smooth((t - 22) / 20f);
-                cam = S.add(F.multiply(7.2 + 1.2 * k)).add(R.multiply(2.6 - 1.4 * k)).add(0, 0.5, 0);
-                look = S.add(0, 3.6 + 0.4 * k, 0).subtract(F.multiply(1.5));
-                fov = 74 + 4 * k;
+                cam = S.add(F.multiply(8.5 + 1.5 * k)).add(R.multiply(4.5 - 2 * k)).add(0, 0.5, 0);
+                look = S.subtract(F.multiply(4)).add(0, 7.8 + 0.6 * k, 0);
+                fov = 84 + 3 * k;
             } else if (t < 56) {
-                // 도약: 지면에서 올려다보며 추적
+                // 도약: 지면에서 올려다보며 용기사를 따라감 (뒤에 고룡)
                 float k = smooth((t - 42) / 14f);
-                cam = S.add(R.multiply(4.2)).add(F.multiply(3.0 + k)).add(0, 0.35, 0);
-                look = C.add(0, 1.0, 0).lerp(head, 0.25 * k);
-                fov = 76;
+                cam = S.add(R.multiply(7)).add(F.multiply(6 + 2 * k)).add(0, 0.4, 0);
+                look = C.add(0, 1.0, 0).lerp(head, 0.3 + 0.2 * k);
+                fov = 82;
             } else {
-                // 브레스 → 폭발: 측면 와이드
+                // 브레스 → 폭발: 측면 와이드 (고룡 머리 → 목표)
                 float k = smooth((t - 56) / 18f);
-                Vec3d M = head.lerp(T, 0.55);
+                Vec3d mouth = S.add(0, 9.5, 0);
+                Vec3d M = mouth.lerp(T, 0.5);
                 double dist = new Vec3d(T.x - S.x, 0, T.z - S.z).length();
-                cam = M.add(R.multiply((dist * 0.6 + 7.5) * (1 - 0.08 * k))).add(0, 1.0 + 0.6 * k, 0).subtract(F.multiply(1.5));
-                look = head.lerp(T, 0.62 + 0.25 * k);
-                fov = 78 - 4 * k;
+                cam = M.add(R.multiply((dist * 0.6 + 14) * (1 - 0.06 * k))).add(0, 1.5 + 1.0 * k, 0).subtract(F.multiply(4));
+                look = mouth.lerp(T, 0.55 + 0.25 * k).subtract(F.multiply(1.5));
+                fov = 82 - 4 * k;
             }
         } else if (t < 24) {
             float k = smooth(t / 24f);

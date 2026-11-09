@@ -34,8 +34,31 @@ LAYOUTS = {
         'accent': [0.75, 0.55, 1.0], 'accent2': [0.45, 0.2, 0.85],
     },
 }
-# 용기사: tools/gen_dragon_hud.py 로 그린 그림, 공허와 같은 배치
-LAYOUTS['dragon'] = dict(LAYOUTS['void'], accent=[1.0, 0.62, 0.28], accent2=[0.9, 0.3, 0.08])
+# 용기사: 사용자가 준 그림 (tools/import_hud_art.py 로 체크무늬 배경 제거). Q 대시 칸이 그림에 들어 있음.
+# 모서리깎기 값이 음수면 원형 슬롯.
+LAYOUTS['dragon'] = {
+    'slots': {
+        'skill1': (310, 313, 547, 586, 8),
+        'skill2': (599, 313, 837, 586, 8),
+        'skill3': (887, 313, 1126, 586, 8),
+        'skill4': (1177, 313, 1415, 586, 8),
+        'ultimate': (1471, 313, 1897, 586, 10),
+        'passive': (1304, 62, 1480, 220, 8),
+        'dash': (71, 381, 231, 539, -1),
+    },
+    'labels': {
+        'skill1': (488, 505, 546, 586),
+        'skill2': (776, 505, 836, 586),
+        'skill3': (1062, 505, 1126, 586),
+        'skill4': (1352, 505, 1414, 586),
+        'ultimate': (1822, 505, 1890, 590),
+        'passive': (1192, 105, 1252, 180),
+        'dash': (200, 515, 272, 592),
+    },
+    'accent': [1.0, 0.62, 0.28], 'accent2': [0.9, 0.3, 0.08],
+    'ult_crop': 'center',
+    'card': (1478, 335, 1818, 548),
+}
 
 
 def octagon(x0, y0, x1, y1, c):
@@ -57,19 +80,30 @@ def main():
         big = Image.new('L', (W, H), 0)
         d = ImageDraw.Draw(big)
         for (x0, y0, x1, y1, c) in lay['slots'].values():
-            d.polygon(octagon(x0, y0, x1, y1, c), fill=255)
+            if c < 0:
+                d.ellipse([x0, y0, x1, y1], fill=255)
+            else:
+                d.polygon(octagon(x0, y0, x1, y1, c), fill=255)
         mask = Image.new('RGBA', (W, H), (255, 255, 255, 0))
         mask.putalpha(big)
         mask.resize((HUD_W, hud_h), Image.LANCZOS).save(os.path.join(out_dir, ab + '_mask.png'))
         # 선택 화면 등에 쓰는 개별 아이콘 (64x64)
         for name, (x0, y0, x1, y1, c) in lay['slots'].items():
+            if name == 'dash':
+                continue
             w, h = x1 - x0, y1 - y0
             s = min(w, h)
             cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
-            if w > h:  # 가로로 긴 슬롯(궁극기)은 오른쪽 아래 키 글자가 잘리지 않게 왼쪽 정사각형
+            if w > h and lay.get('ult_crop') != 'center':  # 가로로 긴 슬롯(궁극기)은 오른쪽 아래 키 글자가 잘리지 않게 왼쪽 정사각형
                 cx = x0 + s / 2 + 8
             ic = src.crop((int(cx - s / 2), int(cy - s / 2), int(cx + s / 2), int(cy + s / 2))).resize((64, 64), Image.LANCZOS)
             ic.save(os.path.join(ASSETS, 'textures', 'gui', f'{ab}_{name}.png'))
+        if 'card' in lay:
+            # 능력 선택 카드 (256x160)
+            card = src.crop(lay['card']).resize((256, 160), Image.LANCZOS)
+            bgc = Image.new('RGBA', card.size, (12, 4, 2, 255))
+            bgc.alpha_composite(card)
+            bgc.save(os.path.join(ASSETS, 'textures', 'gui', f'card_{ab}.png'))
         layout = {
             'texture': f'abilitywar:textures/gui/hud/{ab}_bar.png',
             'mask': f'abilitywar:textures/gui/hud/{ab}_mask.png',

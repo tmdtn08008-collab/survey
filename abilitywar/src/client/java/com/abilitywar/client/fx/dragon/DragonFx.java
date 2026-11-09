@@ -148,7 +148,7 @@ public final class DragonFx {
     public static void clear() {
         MarkTracker.clear();
         LAST_POS.clear();
-        Phantom.clear();
+        ElderDragon.clear();
     }
 
     // ================================================================ 돌진
@@ -453,9 +453,12 @@ public final class DragonFx {
         final Vec3d target, fwd, start;
         final float yaw;
         final Vec3d dragonPos;
+        final Vec3d targetLocal;
+        Vec3d mouth;
+        static final float SCALE = 1.0f;
 
         Ult(ClientWorld w, NbtCompound n) {
-            super(90);
+            super(92);
             caster = n.getInt("c");
             target = new Vec3d(n.getDouble("tx"), n.getDouble("ty"), n.getDouble("tz"));
             start = new Vec3d(n.getDouble("x"), n.getDouble("y"), n.getDouble("z"));
@@ -467,45 +470,84 @@ public final class DragonFx {
             }
             fwd = d.normalize();
             yaw = (float) (MathHelper.atan2(fwd.z, fwd.x) * 57.2957795) - 90f;
-            dragonPos = start.subtract(fwd.multiply(6.5)).add(0, 3.0, 0);
+            Vec3d back = start.subtract(fwd.multiply(10));
+            Vec3d g = Effects.ground(w, back.add(0, 3, 0), 8);
+            dragonPos = g != null ? g : new Vec3d(back.x, start.y, back.z);
+            // 목표를 고룡의 로컬 좌표로
+            Vec3d td = target.add(0, 0.6, 0).subtract(dragonPos);
+            double th = Math.toRadians(-yaw), cs = Math.cos(th), sn = Math.sin(th);
+            targetLocal = new Vec3d(td.x * cs - td.z * sn, td.y, td.x * sn + td.z * cs);
         }
 
-        static final float SCALE = 0.7f;
-
-        /** 땅에서 솟아오르는 환영의 위치. */
-        Vec3d dp(float a) {
-            float rise = MathHelper.clamp((a - 6) / 14f, 0, 1);
-            return dragonPos.add(0, -3 * (1 - rise * rise), 0);
-        }
-
-        static final float[][] NECK = {{0, 0.3f}, {22, 0.4f}, {28, 1.0f}, {42, 1.0f}, {50, 0.4f}, {56, -0.3f}, {200, -0.3f}};
-
-        /** 고개: 포효 때 들어 올리고 브레스 때 아래로. */
-        float neck(float a) {
-            for (int i = 0; i < NECK.length - 1; i++) {
-                if (a <= NECK[i + 1][0]) {
-                    float k = (a - NECK[i][0]) / (NECK[i + 1][0] - NECK[i][0]);
-                    k = k * k * (3 - 2 * k);
-                    return NECK[i][1] + (NECK[i + 1][1] - NECK[i][1]) * k;
-                }
-            }
-            return NECK[NECK.length - 1][1];
-        }
-
-        /** 날개/입: 포효와 브레스 동안 입을 크게 벌림. */
-        float wing(float a) {
-            if ((a >= 26 && a < 40) || (a >= 55 && a < 68)) return 0.25f;
-            return (a * 0.035f) % 1f;
-        }
-
-        float dragonAlpha(float a) {
-            float in = MathHelper.clamp((a - 6) / 14f, 0, 1);
-            float out = 1 - MathHelper.clamp((a - 70) / 16f, 0, 1);
+        float alpha(float a) {
+            float in = MathHelper.clamp((a - 5) / 12f, 0, 1);
+            float out = 1 - MathHelper.clamp((a - 72) / 14f, 0, 1);
             return in * out;
         }
 
-        Vec3d mouth(float a) {
-            return Phantom.mouth(dp(a), yaw, SCALE, neck(a));
+        Vec3d pos(float a) {
+            float rise = MathHelper.clamp((a - 4) / 16f, 0, 1);
+            rise = 1 - (1 - rise) * (1 - rise) * (1 - rise);
+            return dragonPos.add(0, -11 * (1 - rise), 0);
+        }
+
+        // t, 머리(x,y,z), 시선(x,y,z), 일으킴, 날개, 날갯짓, 입, 목구멍, 앞발
+        static final float[][] KEYS = {
+                {0, 0, 7.0f, 6.0f, 0, 6.5f, 12, 0, 0.1f, 0.2f, 0, 0, 0},
+                {18, 0, 8.5f, 6.8f, 0, 8.0f, 12, 0, 0.35f, 0, 0.1f, 0, 0},
+                {24, 0, 10.5f, 5.2f, 0, 12.5f, 9, 0.25f, 0.6f, -0.3f, 0.15f, 0.2f, 0.3f},
+                {28, 0, 13.0f, 9.0f, 0, 12.4f, 15, 1.0f, 1.0f, -0.55f, 1.0f, 0.4f, 1},
+                {40, 0, 12.6f, 9.4f, 0, 11.8f, 15, 0.9f, 1.0f, -0.4f, 0.9f, 0.3f, 1},
+                {43, 0, 11.5f, 8.6f, 0, 10.8f, 15, 0.55f, 1.0f, -0.8f, 0.4f, 0.2f, 0.6f},
+                {47, 0, 9.5f, 7.5f, 0, 8.6f, 14, 0.25f, 0.95f, 0.85f, 0.2f, 0.2f, 0.2f},
+                {52, 0, 11.0f, 5.0f, 0, 11.8f, 10, 0.4f, 0.9f, 0, 0.5f, 1.0f, 0.3f},
+                {72, 0, 8.5f, 6.5f, 0, 8.0f, 12, 0.1f, 0.5f, 0.2f, 0.1f, 0, 0},
+                {200, 0, 8.5f, 6.5f, 0, 8.0f, 12, 0, 0.3f, 0.2f, 0, 0, 0},
+        };
+
+        static float sm(float k) {
+            k = MathHelper.clamp(k, 0, 1);
+            return k * k * (3 - 2 * k);
+        }
+
+        ElderDragon.Pose pose(float a) {
+            ElderDragon.Pose p = new ElderDragon.Pose();
+            int i = 0;
+            while (i < KEYS.length - 2 && a > KEYS[i + 1][0]) i++;
+            float[] k0 = KEYS[i], k1 = KEYS[i + 1];
+            float k = sm((a - k0[0]) / (k1[0] - k0[0]));
+            float[] v = new float[k0.length];
+            for (int j = 0; j < v.length; j++) v[j] = k0[j] + (k1[j] - k0[j]) * k;
+            p.head = new Vec3d(v[1], v[2], v[3]);
+            p.look = new Vec3d(v[4], v[5], v[6]);
+            p.rear = v[7];
+            p.wingSpread = v[8];
+            p.wingFlap = v[9] + 0.22f * MathHelper.sin(a * 0.3f) * (a < 40 || a > 50 ? 1 : 0);
+            p.jaw = v[10];
+            p.throat = v[11];
+            p.clawRaise = v[12];
+            p.time = a;
+            p.breathe = 0.5f + 0.5f * MathHelper.sin(a * 0.25f);
+            p.shake = a >= 27 && a < 40 ? 1f - (a - 27) / 13f : 0;
+            // 브레스: 목표를 향해 목을 뻗음
+            float br = sm((a - 53) / 4f) * (1 - sm((a - 68) / 5f));
+            if (br > 0) {
+                Vec3d nb = new Vec3d(0, 7.0, 3.4);
+                Vec3d dir = targetLocal.subtract(nb).normalize();
+                Vec3d hb = nb.add(dir.multiply(7.2)).add(0, 1.4, 0);
+                p.head = ElderDragon.lerp(p.head, hb, br);
+                p.look = ElderDragon.lerp(p.look, targetLocal, br);
+                p.jaw = MathHelper.lerp(br, p.jaw, 1f);
+                p.throat = Math.max(p.throat, br);
+                p.rear = MathHelper.lerp(br, p.rear, 0.3f);
+                p.wingSpread = MathHelper.lerp(br, p.wingSpread, 0.95f);
+                p.wingFlap = MathHelper.lerp(br, p.wingFlap, -0.25f);
+            }
+            return p;
+        }
+
+        boolean breathing(float a) {
+            return a >= 56 && a < 69;
         }
 
         @Override
@@ -523,27 +565,57 @@ public final class DragonFx {
                     }
                 }
             }
-            // 땅에서 솟는 불티
-            if (age < 60 && c != null && age % 2 == 0) {
+            // 땅에서 솟는 불티 + 고룡이 솟아오르는 불구덩이
+            if (age < 60 && age % 2 == 0) {
                 for (int i = 0; i < 4; i++) {
                     double a = R.nextDouble() * Math.PI * 2, d = rf(0.5f, 3.5f);
                     Particles.spawn(Kind.GLOW, start.add(Math.cos(a) * d, 0.1, Math.sin(a) * d), new Vec3d(0, rf(0.08f, 0.2f), 0), rf(18, 30), rf(0.05f, 0.1f)).color(EMBER, 1f);
                 }
             }
-            // 3. 포효
-            if (age == 26) {
-                Vec3d m = mouth(26);
-                for (int i = 0; i < 60; i++)
-                    Particles.spawn(Kind.STREAK, m, randDir().multiply(rf(0.6f, 1.4f)), rf(8, 14), rf(0.1f, 0.18f)).color(i % 2 == 0 ? GOLD : FIRE, 0.9f).drag = 0.88f;
+            if (age >= 3 && age < 24) {
+                for (int i = 0; i < 10; i++) {
+                    double a = R.nextDouble() * Math.PI * 2, d = Math.sqrt(R.nextDouble()) * 7;
+                    Vec3d p0 = dragonPos.add(Math.cos(a) * d, 0.2, Math.sin(a) * d);
+                    Particles.spawn(Kind.FLAME, p0, new Vec3d(0, rf(0.2f, 0.5f), 0), rf(12, 22), rf(0.8f, 1.6f)).color(i % 3 == 0 ? GOLD : FIRE, 0.9f).size1 = 2.2f;
+                }
+                if (age % 2 == 0) for (int i = 0; i < 3; i++)
+                    Particles.spawn(Kind.SMOKE_DARK, dragonPos.add(rf(-5, 5), 0.5, rf(-5, 5)), new Vec3d(0, 0.12, 0), 34, 1.6f).color(0x160A06, 0.5f).size1 = 3f;
+            }
+            // 몸에서 피어오르는 불티 (환영 느낌)
+            if (age >= 6 && age < 84 && !ElderDragon.SAMPLES.isEmpty()) {
+                int n = age < 20 ? 14 : 6;
+                for (int i = 0; i < n; i++) {
+                    Vec3d sp = ElderDragon.SAMPLES.get(R.nextInt(ElderDragon.SAMPLES.size()));
+                    Particles.P pp = Particles.spawn(i % 3 == 0 ? Kind.FLAME : Kind.GLOW, sp.add(rf(-0.4f, 0.4f), rf(-0.4f, 0.4f), rf(-0.4f, 0.4f)), new Vec3d(0, rf(0.04f, 0.14f), 0), rf(14, 26), i % 3 == 0 ? rf(0.3f, 0.6f) : rf(0.06f, 0.12f));
+                    pp.color(i % 2 == 0 ? FIRE : EMBER, 0.9f);
+                }
+            }
+            // 3. 포효: 입에서 터지는 충격
+            if (age == 28 && mouth != null) {
+                for (int i = 0; i < 70; i++)
+                    Particles.spawn(Kind.STREAK, mouth, randDir().multiply(rf(0.7f, 1.6f)), rf(8, 14), rf(0.12f, 0.2f)).color(i % 2 == 0 ? GOLD : FIRE, 0.9f).drag = 0.88f;
+                // 땅의 먼지 고리
+                for (int i = 0; i < 40; i++) {
+                    double a = i / 40.0 * Math.PI * 2;
+                    Vec3d dir = new Vec3d(Math.cos(a), 0, Math.sin(a));
+                    Particles.spawn(Kind.SMOKE_ADD, dragonPos.add(dir.multiply(3)).add(0, 0.3, 0), dir.multiply(rf(0.4f, 0.7f)), rf(16, 26), rf(0.8f, 1.4f)).color(0xC09070, 0.3f).size1 = 2f;
+                }
+            }
+            // 날개를 내려칠 때 바람
+            if (age == 45) {
+                for (int i = 0; i < 50; i++) {
+                    double a = R.nextDouble() * Math.PI * 2;
+                    Vec3d dir = new Vec3d(Math.cos(a), 0, Math.sin(a));
+                    Particles.spawn(Kind.SMOKE_ADD, dragonPos.add(dir.multiply(rf(2, 8))).add(0, 0.3, 0), dir.multiply(rf(0.5f, 1.0f)), rf(14, 24), rf(0.8f, 1.6f)).color(0xB08060, 0.28f).size1 = 2.2f;
+                }
             }
             // 5. 브레스
-            if (age >= 56 && age < 68) {
-                Vec3d m = mouth(age);
-                Vec3d dir = target.add(0, 0.5, 0).subtract(m);
-                for (int i = 0; i < 10; i++) {
+            if (breathing(age) && mouth != null) {
+                Vec3d dir = target.add(0, 0.5, 0).subtract(mouth);
+                for (int i = 0; i < 14; i++) {
                     double k = R.nextDouble();
-                    Vec3d p = m.add(dir.multiply(k)).add(randDir().multiply(0.3 + k * 1.2));
-                    Particles.spawn(Kind.FLAME, p, dir.normalize().multiply(rf(0.5f, 0.9f)), rf(6, 10), rf(0.5f, 1.0f) * (float) (0.6 + k)).color(i % 3 == 0 ? GOLD : FIRE, 0.95f);
+                    Vec3d p = mouth.add(dir.multiply(k)).add(randDir().multiply(0.3 + k * 1.6));
+                    Particles.spawn(Kind.FLAME, p, dir.normalize().multiply(rf(0.5f, 0.9f)), rf(6, 10), rf(0.6f, 1.2f) * (float) (0.6 + k)).color(i % 3 == 0 ? GOLD : FIRE, 0.95f);
                 }
             }
             return super.tick(w);
@@ -552,7 +624,7 @@ public final class DragonFx {
         @Override
         public void render(Ctx c) {
             float a = age + c.tickDelta;
-            // 바닥 룬
+            // 바닥 룬 (용기사 발밑)
             Vec3d g = Effects.ground(c.world, start.add(0, 0.5, 0), 4);
             if (g != null && a < 60) {
                 Vec3d gp = g.add(0, 0.04, 0).subtract(c.cam);
@@ -563,38 +635,52 @@ public final class DragonFx {
                 VertexConsumer mc = c.imm.getBuffer(AWRenderLayers.additive(Tex.MAGIC_CIRCLE2));
                 Draw.flat(mc, c.m, gp.x, gp.y + 0.01, gp.z, 5f * grow, -a * 0.015f, r(GOLD), g(GOLD), b(GOLD), 0.55f * fade);
             }
-            // 2. 고룡의 환영
-            float da = dragonAlpha(a);
+            // 고룡이 솟아오르는 불의 원
+            if (a < 80) {
+                Vec3d dp = dragonPos.add(0, 0.05, 0).subtract(c.cam);
+                float grow = Effects.outBack(Math.min(1, a / 8f));
+                float fade = a > 64 ? Math.max(0, 1 - (a - 64) / 16f) : 1;
+                VertexConsumer rune = c.imm.getBuffer(AWRenderLayers.additive(MarkTracker.RUNE));
+                Draw.flat(rune, c.m, dp.x, dp.y, dp.z, 9f * grow, -a * 0.01f, r(FIRE), g(FIRE), b(FIRE), 0.85f * fade);
+                VertexConsumer cr = c.imm.getBuffer(AWRenderLayers.additive(Tex.CRACK));
+                Draw.flat(cr, c.m, dp.x, dp.y + 0.01, dp.z, 8f * grow, 0.3f, 1f, 0.35f, 0.08f, 0.7f * fade);
+            }
+            // 2. 고룡
+            float da = alpha(a);
+            ElderDragon.Pose pose = pose(a);
+            float glow = 1.0f + 0.4f * pose.throat + (a >= 27 && a < 40 ? 0.35f : 0);
+            ElderDragon.render(c, pos(a), yaw, SCALE, pose, da, glow);
+            mouth = ElderDragon.lastMouth;
             if (da > 0.01f) {
-                Vec3d dp = dp(a);
-                Phantom.render(c, dp, yaw, SCALE, neck(a), wing(a), da);
-                // 환영 주위의 빛
-                Vec3d gl = dp.add(fwd.multiply(2)).add(0, 1.5, 0).subtract(c.cam);
-                VertexConsumer glow = c.imm.getBuffer(AWRenderLayers.additive(Tex.GLOW));
-                Draw.billboard(glow, c.m, c.camRot, gl.x, gl.y, gl.z, 9f, 0, 1f, 0.45f, 0.12f, 0.35f * da * nearFade(gl, 6));
+                // 목구멍 불빛
+                if (pose.throat > 0.05f) {
+                    Vec3d mm = mouth.subtract(c.cam);
+                    VertexConsumer fl = c.imm.getBuffer(AWRenderLayers.additive(Tex.GLOW));
+                    Draw.billboard(fl, c.m, c.camRot, mm.x, mm.y, mm.z, 2.5f * pose.throat, 0, 1f, 0.55f, 0.15f, pose.throat * da * nearFade(mm, 2));
+                }
             }
             // 포효 충격파
-            if (a >= 26 && a < 40) {
-                float k = (a - 26) / 14f;
-                Vec3d m = mouth(a).subtract(c.cam);
+            if (a >= 28 && a < 42 && mouth != null) {
+                float k = (a - 28) / 14f;
+                Vec3d m = mouth.subtract(c.cam);
                 VertexConsumer sw = c.imm.getBuffer(AWRenderLayers.additive(Tex.SHOCKWAVE));
                 for (int i = 0; i < 3; i++) {
                     float kk = Math.min(1, k * 1.3f + i * 0.15f);
-                    Draw.billboard(sw, c.m, c.camRot, m.x, m.y, m.z, 1 + kk * 10, 0, r(GOLD), g(GOLD), b(GOLD), (1 - kk) * 0.6f * nearFade(m, 4));
+                    Draw.billboard(sw, c.m, c.camRot, m.x, m.y, m.z, 2 + kk * 12, 0, r(FIRE), g(FIRE), b(FIRE), (1 - kk) * 0.35f * nearFade(m, 4));
                 }
             }
-            // 5. 브레스 광선
-            if (a >= 55 && a < 70) {
+            // 5. 브레스 광선 (입에서 목표까지)
+            if (a >= 55 && a < 70 && mouth != null) {
                 float k = MathHelper.clamp((a - 55) / 3f, 0, 1) * (1 - MathHelper.clamp((a - 66) / 4f, 0, 1));
-                Vec3d m = mouth(a);
+                Vec3d m = mouth;
                 Vec3d end = target.add(0, 0.6, 0);
-                int n = 16;
+                int n = 18;
                 Vec3d[] pts = new Vec3d[n];
                 float[] wds = new float[n], als = new float[n];
                 for (int i = 0; i < n; i++) {
                     double t = (double) i / (n - 1);
                     pts[i] = m.lerp(end, t).subtract(c.cam);
-                    wds[i] = (float) (0.4 + t * 1.6) * k;
+                    wds[i] = (float) (0.6 + t * 2.2) * k;
                     als[i] = k;
                 }
                 VertexConsumer fs = c.imm.getBuffer(AWRenderLayers.additive(FIRE_STRIP));
@@ -603,9 +689,9 @@ public final class DragonFx {
                 Draw.ribbon(fs, c.m, pts, n, wds, 1, 0.95f, 0.8f, als, 0.4f, -a * 0.6f);
                 Vec3d e = end.subtract(c.cam);
                 VertexConsumer fl = c.imm.getBuffer(AWRenderLayers.additive(Tex.FLARE));
-                Draw.billboard(fl, c.m, c.camRot, e.x, e.y, e.z, 4f * k, a * 0.1f, 1, 0.7f, 0.3f, k * nearFade(e, 3));
+                Draw.billboard(fl, c.m, c.camRot, e.x, e.y, e.z, 5f * k, a * 0.1f, 1, 0.7f, 0.3f, k * nearFade(e, 3));
                 Vec3d mm = m.subtract(c.cam);
-                Draw.billboard(fl, c.m, c.camRot, mm.x, mm.y, mm.z, 2.5f * k, 0, 1, 0.8f, 0.4f, k * nearFade(mm, 2));
+                Draw.billboard(fl, c.m, c.camRot, mm.x, mm.y, mm.z, 3.5f * k, 0, 1, 0.8f, 0.4f, k * nearFade(mm, 2));
             }
         }
     }
