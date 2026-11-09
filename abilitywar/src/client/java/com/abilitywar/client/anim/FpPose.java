@@ -2,13 +2,13 @@ package com.abilitywar.client.anim;
 
 /** 1인칭 포즈: 오른팔, 왼팔 [pos px: 오른쪽,위,앞 / rot 도: pitch(위+), yaw(왼쪽+), roll], 카메라 회전 + fov. */
 public final class FpPose {
-    public final float[][] rot = new float[3][3];
-    public final float[][] pos = new float[3][3];
+    public final float[][] rot = new float[AnimClip.FP_BONES][3];
+    public final float[][] pos = new float[AnimClip.FP_BONES][3];
     public final boolean[] visible = {true, true};
     public float fov;
 
     public void set(FpPose o) {
-        for (int b = 0; b < 3; b++) {
+        for (int b = 0; b < AnimClip.FP_BONES; b++) {
             System.arraycopy(o.rot[b], 0, rot[b], 0, 3);
             System.arraycopy(o.pos[b], 0, pos[b], 0, 3);
         }
@@ -40,8 +40,10 @@ public final class FpPose {
         // 왼팔
         pos[1][0] = -6.5f; pos[1][1] = -13.5f; pos[1][2] = 6.5f;
         rot[1][0] = 34f; rot[1][1] = -6f; rot[1][2] = -50f;
-        rot[2][0] = rot[2][1] = rot[2][2] = 0;
-        pos[2][0] = pos[2][1] = pos[2][2] = 0;
+        for (int b = 2; b < AnimClip.FP_BONES; b++) {
+            rot[b][0] = rot[b][1] = rot[b][2] = 0;
+            pos[b][0] = pos[b][1] = pos[b][2] = 0;
+        }
         visible[0] = visible[1] = true;
         fov = 0;
     }

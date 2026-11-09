@@ -114,6 +114,26 @@ def void():
     save(out, 'ult_title_void.png')
 
 
+HANGUL = '/usr/share/fonts/opentype/unifont/unifont.otf'
+
+
+def blade():
+    """마검사: 한국어 (도트 글꼴을 크게, 마력 보라색)."""
+    W, H = 1024, 260
+    m = text_mask(W, H, '천지개벽', HANGUL, 176, 34, 6)
+    out = compose(W, H, m, (255, 250, 255), (226, 170, 255), (120, 40, 210), (16, 2, 26), (170, 70, 255), 16, 13)
+    # 가로로 가르는 참격선
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    ang = -0.12
+    d = (yy - H / 2) * np.cos(ang) - (xx - W / 2) * np.sin(ang)
+    line = np.exp(-(d / 2.4) ** 2) * np.exp(-((xx - W / 2) / (W * 0.46)) ** 2)
+    for k, c in enumerate((1.0, 0.85, 1.0)):
+        out[..., k] = np.clip(out[..., k] * (1 - line * 0.6) + c * line, 0, 1)
+    out[..., 3] = np.maximum(out[..., 3], line)
+    save(out, 'ult_title_blade.png')
+
+
 if __name__ == '__main__':
     dragon()
     void()
+    blade()

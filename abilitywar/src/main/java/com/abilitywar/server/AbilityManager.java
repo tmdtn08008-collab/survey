@@ -83,7 +83,7 @@ public final class AbilityManager {
             if (slot == SkillSlot.PASSIVE) a.useSkill(player, d, slot, extra);
             return;
         }
-        if (!canAct(player, d) || d.isBusy() || d.blocking) {
+        if (!canAct(player, d) || (d.isBusy() && !a.allowWhileBusy(player, d, slot)) || d.blocking) {
             deny(player);
             return;
         }

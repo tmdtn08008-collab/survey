@@ -17,10 +17,12 @@ public final class CinematicOverlay {
     }
 
     static final Theme VOID = new Theme("void", 0.08f, 0.0f, 0.16f, 0x9B5CFF, 0x9B5CFF, 0xF4EAFF, 0xD9C2FF, 0xD9C2FF, 0xF4EAFF, 24, 46, 46, 44);
+    static final Theme BLADE = new Theme("blade", 0.12f, 0.02f, 0.18f, 0xB44CFF, 0x8A2BE2, 0xF5E8FF, 0xD8B8FF, 0xD8B8FF, 0xF0D8FF, 20, 46, 48, 40);
     static final Theme DRAGON = new Theme("dragon", 0.2f, 0.05f, 0.0f, 0xFF7A2E, 0xFF4A12, 0xFFF1DC, 0xFFD2A0, 0xFFC890, 0xFFE6C0, 26, 56, 58, 42);
 
     static Theme theme() {
-        return CameraController.cinematicType().startsWith("dragon") ? DRAGON : VOID;
+        String ty = CameraController.cinematicType();
+        return ty.startsWith("dragon") ? DRAGON : ty.startsWith("blade") ? BLADE : VOID;
     }
 
     public static void render(DrawContext ctx, float td) {
@@ -59,7 +61,7 @@ public final class CinematicOverlay {
         float flash = 0;
         float c1 = th.cut1(), c2 = th.cut2();
         if (t >= c1 && t < c1 + 4) flash = Math.max(flash, 1 - (t - c1) / 4f) * 0.35f;
-        if (t >= c2 && t < c2 + 6) flash = Math.max(flash, (1 - (t - c2) / 6f) * (th == DRAGON ? 0.55f : 1f));
+        if (t >= c2 && t < c2 + 6) flash = Math.max(flash, (1 - (t - c2) / 6f) * (th == VOID ? 1f : 0.5f));
         if (th == DRAGON && t >= 66 && t < 72) flash = Math.max(flash, (1 - (t - 66) / 6f) * 0.7f);
         if (flash > 0) HudDraw.rect(ctx, 0, 0, sw, sh, HudDraw.argb(flash * 0.85f, th.flash()));
         // 제목
@@ -75,7 +77,7 @@ public final class CinematicOverlay {
             net.minecraft.util.Identifier tex = com.abilitywar.AbilityWar.id("textures/gui/ult_title_" + th.key() + ".png");
             if (MinecraftClient.getInstance().getResourceManager().getResource(tex).isPresent()) {
                 // 능력별 제목 그림 (용기사 = 한자, 공허 = 영어): 크게 들어왔다가 자리 잡음
-                float[] sz = {1024, th == DRAGON ? 300 : 220}; // tools/gen_titles.py 의 그림 크기
+                float[] sz = {1024, th == DRAGON ? 300 : th == BLADE ? 260 : 220}; // tools/gen_titles.py 의 그림 크기
                 float w = Math.min(sw * 0.62f, 380f);
                 float h = w * sz[1] / sz[0];
                 float zoom = 1f + 0.35f * (float) Math.pow(1 - Math.min(1, tt / 7f), 3);
@@ -114,7 +116,7 @@ public final class CinematicOverlay {
             float sa = Math.min(1, Math.max(0, (tt - 3) / 5f)) * out;
             int sw2 = tr.getWidth(sub);
             float lineW = (sw2 * 1.4f + 40) * Math.min(1, tt / 10f);
-            HudDraw.rect(ctx, sw / 2f - lineW, cy + 20, sw / 2f + lineW, cy + 21, HudDraw.argb(sa * 0.8f, th == DRAGON ? 0xFF9A50 : 0xB27BFF));
+            HudDraw.rect(ctx, sw / 2f - lineW, cy + 20, sw / 2f + lineW, cy + 21, HudDraw.argb(sa * 0.8f, th == DRAGON ? 0xFF9A50 : th == BLADE ? 0xC870FF : 0xB27BFF));
             ctx.getMatrices().push();
             ctx.getMatrices().translate(sw / 2f, cy + 27, 0);
             ctx.getMatrices().scale(1.4f, 1.4f, 1);

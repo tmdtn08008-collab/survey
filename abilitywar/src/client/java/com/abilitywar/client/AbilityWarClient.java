@@ -54,6 +54,7 @@ public class AbilityWarClient implements ClientModInitializer {
             if (renderer instanceof PlayerEntityRenderer pr) {
                 helper.register(new HandTracker.Feature(pr));
                 helper.register(new com.abilitywar.client.fx.dragon.DragonParts.Feature(pr));
+                helper.register(new com.abilitywar.client.fx.blade.BladeParts.Feature(pr));
             }
         });
 

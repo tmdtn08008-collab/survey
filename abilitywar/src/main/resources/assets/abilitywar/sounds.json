@@ -592,5 +592,187 @@
     "type": "event"
    }
   ]
+ },
+ "blade.slash": {
+  "subtitle": "subtitles.abilitywar.blade.slash",
+  "sounds": [
+   {
+    "name": "minecraft:entity.player.attack.sweep",
+    "type": "event",
+    "pitch": 1.35,
+    "volume": 1.0
+   },
+   {
+    "name": "minecraft:entity.player.attack.sweep",
+    "type": "event",
+    "pitch": 1.5,
+    "volume": 1.0
+   }
+  ]
+ },
+ "blade.slash_heavy": {
+  "subtitle": "subtitles.abilitywar.blade.slash_heavy",
+  "sounds": [
+   {
+    "name": "minecraft:item.trident.hit",
+    "type": "event",
+    "pitch": 0.8,
+    "volume": 1.0
+   },
+   {
+    "name": "minecraft:entity.player.attack.strong",
+    "type": "event",
+    "pitch": 0.7,
+    "volume": 1.0
+   }
+  ]
+ },
+ "blade.draw": {
+  "subtitle": "subtitles.abilitywar.blade.draw",
+  "sounds": [
+   {
+    "name": "minecraft:item.armor.equip_chain",
+    "type": "event",
+    "pitch": 1.6,
+    "volume": 1.0
+   },
+   {
+    "name": "minecraft:item.trident.return",
+    "type": "event",
+    "pitch": 1.4,
+    "volume": 1.0
+   }
+  ]
+ },
+ "blade.charge": {
+  "subtitle": "subtitles.abilitywar.blade.charge",
+  "sounds": [
+   {
+    "name": "minecraft:block.respawn_anchor.charge",
+    "type": "event",
+    "pitch": 1.5,
+    "volume": 0.8
+   }
+  ]
+ },
+ "blade.crescent": {
+  "subtitle": "subtitles.abilitywar.blade.crescent",
+  "sounds": [
+   {
+    "name": "minecraft:item.trident.riptide_1",
+    "type": "event",
+    "pitch": 1.3,
+    "volume": 1.0
+   }
+  ]
+ },
+ "blade.rift": {
+  "subtitle": "subtitles.abilitywar.blade.rift",
+  "sounds": [
+   {
+    "name": "minecraft:entity.enderman.teleport",
+    "type": "event",
+    "pitch": 0.55,
+    "volume": 1.0
+   },
+   {
+    "name": "minecraft:block.end_portal_frame.fill",
+    "type": "event",
+    "pitch": 0.6,
+    "volume": 1.0
+   }
+  ]
+ },
+ "blade.teleport": {
+  "subtitle": "subtitles.abilitywar.blade.teleport",
+  "sounds": [
+   {
+    "name": "minecraft:entity.illusioner.mirror_move",
+    "type": "event",
+    "pitch": 1.3,
+    "volume": 1.0
+   }
+  ]
+ },
+ "blade.parry": {
+  "subtitle": "subtitles.abilitywar.blade.parry",
+  "sounds": [
+   {
+    "name": "minecraft:block.anvil.place",
+    "type": "event",
+    "pitch": 1.7,
+    "volume": 0.7
+   },
+   {
+    "name": "minecraft:item.shield.block",
+    "type": "event",
+    "pitch": 1.2,
+    "volume": 1.0
+   }
+  ]
+ },
+ "blade.explode": {
+  "subtitle": "subtitles.abilitywar.blade.explode",
+  "sounds": [
+   {
+    "name": "minecraft:entity.generic.explode",
+    "type": "event",
+    "pitch": 1.2,
+    "volume": 1.0
+   }
+  ]
+ },
+ "blade.grow": {
+  "subtitle": "subtitles.abilitywar.blade.grow",
+  "sounds": [
+   {
+    "name": "minecraft:block.beacon.power_select",
+    "type": "event",
+    "pitch": 0.7,
+    "volume": 1.0,
+    "attenuation_distance": 48
+   },
+   {
+    "name": "minecraft:block.conduit.activate",
+    "type": "event",
+    "pitch": 0.8,
+    "volume": 1.0,
+    "attenuation_distance": 48
+   }
+  ]
+ },
+ "blade.wave": {
+  "subtitle": "subtitles.abilitywar.blade.wave",
+  "sounds": [
+   {
+    "name": "minecraft:item.trident.thunder",
+    "type": "event",
+    "pitch": 0.9,
+    "volume": 1.0,
+    "attenuation_distance": 64
+   }
+  ]
+ },
+ "blade.phantom": {
+  "subtitle": "subtitles.abilitywar.blade.phantom",
+  "sounds": [
+   {
+    "name": "minecraft:entity.illusioner.cast_spell",
+    "type": "event",
+    "pitch": 1.2,
+    "volume": 1.0
+   }
+  ]
+ },
+ "blade.mark": {
+  "subtitle": "subtitles.abilitywar.blade.mark",
+  "sounds": [
+   {
+    "name": "minecraft:block.amethyst_block.chime",
+    "type": "event",
+    "pitch": 0.7,
+    "volume": 1.0
+   }
+  ]
  }
 }

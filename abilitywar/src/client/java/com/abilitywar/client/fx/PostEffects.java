@@ -22,6 +22,7 @@ public final class PostEffects {
     // 색조 (기본: 공허 보라)
     static final float[] VOID_DARK = {0.01f, 0f, 0.035f}, VOID_LIGHT = {0.42f, 0.22f, 0.78f};
     static final float[] FIRE_DARK = {0.05f, 0.012f, 0f}, FIRE_LIGHT = {1.0f, 0.52f, 0.2f};
+    static final float[] BLADE_DARK = {0.03f, 0f, 0.045f}, BLADE_LIGHT = {0.8f, 0.45f, 1.0f};
     private static final float[] dark = VOID_DARK.clone(), light = VOID_LIGHT.clone();
 
     public static void tick() {
@@ -38,12 +39,13 @@ public final class PostEffects {
             if (ClientState.shadowForm) targetV = 0.7f;
             targetV = Math.max(targetV, BlackHoleFx.proximity(mc.world, mc.gameRenderer.getCamera().getPos()) * 0.7f);
             for (Effects.UltCast u : VfxManager.find(Effects.UltCast.class)) targetV = Math.max(targetV, u.darkness(0) * 0.6f);
-            boolean fire = false;
+            boolean fire = false, blade = false;
             if (CameraController.isCinematic()) {
                 fire = CameraController.cinematicType().startsWith("dragon");
-                targetV = Math.max(targetV, fire ? 0.32f : 0.45f);
+                blade = CameraController.cinematicType().startsWith("blade");
+                targetV = Math.max(targetV, fire ? 0.32f : blade ? 0.3f : 0.45f);
             }
-            float[] td = fire ? FIRE_DARK : VOID_DARK, tl = fire ? FIRE_LIGHT : VOID_LIGHT;
+            float[] td = fire ? FIRE_DARK : blade ? BLADE_DARK : VOID_DARK, tl = fire ? FIRE_LIGHT : blade ? BLADE_LIGHT : VOID_LIGHT;
             for (int i = 0; i < 3; i++) {
                 dark[i] += (td[i] - dark[i]) * 0.2f;
                 light[i] += (tl[i] - light[i]) * 0.2f;

@@ -5,10 +5,13 @@ import org.jetbrains.annotations.Nullable;
 /** 플레이어 애니메이션 클립 (3인칭 본 + 1인칭 팔/카메라). 시간 단위는 틱. */
 public final class AnimClip {
     public static final int HEAD = 0, BODY = 1, RIGHT_ARM = 2, LEFT_ARM = 3, RIGHT_LEG = 4, LEFT_LEG = 5, ROOT = 6;
-    public static final int BONES = 7;
-    public static final String[] BONE_NAMES = {"head", "body", "right_arm", "left_arm", "right_leg", "left_leg", "root"};
-    public static final int FP_RIGHT = 0, FP_LEFT = 1, FP_CAMERA = 2;
-    public static final String[] FP_NAMES = {"right_arm", "left_arm", "camera"};
+    /** 손에 든 무기의 손 기준 회전 [pitch, yaw, roll] 도 / 위치 px (무기를 쓰는 능력용). */
+    public static final int ITEM = 7;
+    public static final int BONES = 8;
+    public static final String[] BONE_NAMES = {"head", "body", "right_arm", "left_arm", "right_leg", "left_leg", "root", "item"};
+    public static final int FP_RIGHT = 0, FP_LEFT = 1, FP_CAMERA = 2, FP_ITEM = 3;
+    public static final int FP_BONES = 4;
+    public static final String[] FP_NAMES = {"right_arm", "left_arm", "camera", "item"};
 
     public final String id;
     public float length = 20;
@@ -23,8 +26,8 @@ public final class AnimClip {
 
     public final AnimChannel[] rot = new AnimChannel[BONES];
     public final AnimChannel[] pos = new AnimChannel[BONES];
-    public final AnimChannel[] fpRot = new AnimChannel[3];
-    public final AnimChannel[] fpPos = new AnimChannel[3];
+    public final AnimChannel[] fpRot = new AnimChannel[FP_BONES];
+    public final AnimChannel[] fpPos = new AnimChannel[FP_BONES];
     @Nullable
     public AnimChannel fov;
     /** fp 팔 보이기 여부 채널 (x 값 >0.5 보임). */

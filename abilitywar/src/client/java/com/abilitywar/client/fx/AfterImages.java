@@ -25,6 +25,8 @@ import java.util.Map;
 public final class AfterImages {
     private static final class Req {
         int remaining, interval, cooldown, color, life;
+        /** 이 자리(월드)에 찍기 — 순간이동하기 전 자리에 잔상을 남길 때. */
+        Vec3d at;
     }
 
     private static final class Snap {
@@ -49,6 +51,16 @@ public final class AfterImages {
         REQ.put(entityId, r);
     }
 
+    private record AtReq(int id, Vec3d at, int color, int life) {
+    }
+
+    private static final List<AtReq> AT = new ArrayList<>();
+
+    /** 지정한 자리에 잔상 하나 (다음 렌더의 자세를 그 자리로 옮겨 찍음). 여러 개 쌓을 수 있음. */
+    public static void requestAt(int entityId, Vec3d at, int color, int life) {
+        AT.add(new AtReq(entityId, at, color, life));
+    }
+
     public static void tick() {
         SNAPS.removeIf(s -> ++s.age >= s.life);
         REQ.values().removeIf(r -> {
@@ -60,6 +72,7 @@ public final class AfterImages {
     public static void clear() {
         SNAPS.clear();
         REQ.clear();
+        AT.clear();
     }
 
     private static ModelPart[] parts(PlayerEntityModel<?> m) {
@@ -68,10 +81,26 @@ public final class AfterImages {
 
     /** 플레이어 렌더 중(모델 공간 행렬) 호출. */
     static void capture(AbstractClientPlayerEntity e, MatrixStack ms, PlayerEntityModel<?> model) {
+        if (!AT.isEmpty()) {
+            for (java.util.Iterator<AtReq> it = AT.iterator(); it.hasNext(); ) {
+                AtReq a = it.next();
+                if (a.id() != e.getId()) continue;
+                it.remove();
+                Req r = new Req();
+                r.color = a.color();
+                r.life = a.life();
+                r.at = a.at();
+                snap(e, ms, model, r);
+            }
+        }
         Req r = REQ.get(e.getId());
         if (r == null || r.cooldown > 0 || r.remaining <= 0) return;
         r.remaining--;
         r.cooldown = r.interval;
+        snap(e, ms, model, r);
+    }
+
+    private static void snap(AbstractClientPlayerEntity e, MatrixStack ms, PlayerEntityModel<?> model, Req r) {
         Snap s = new Snap();
         s.renderer = (PlayerEntityRenderer) MinecraftClient.getInstance().getEntityRenderDispatcher().getRenderer(e);
         s.skin = e.getSkinTexture();
@@ -81,6 +110,10 @@ public final class AfterImages {
             s.vis[i] = ps[i].visible;
         }
         s.mw = new Matrix4f(HandTracker.invView()).mul(ms.peek().getPositionMatrix());
+        if (r.at != null) {
+            Vec3d off = r.at.subtract(e.getLerpedPos(MinecraftClient.getInstance().getTickDelta()));
+            s.mw = new Matrix4f().translation((float) off.x, (float) off.y, (float) off.z).mul(s.mw);
+        }
         s.cam = HandTracker.cameraPos();
         s.life = r.life;
         s.color = r.color;

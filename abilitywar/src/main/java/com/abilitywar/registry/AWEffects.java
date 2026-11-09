@@ -20,6 +20,10 @@ public final class AWEffects {
     public static final StatusEffect DRAGON_MARK = Registry.register(Registries.STATUS_EFFECT, AbilityWar.id("dragon_mark"),
             new AWStatusEffect(StatusEffectCategory.HARMFUL, 0xFF5A1E, false));
 
+    /** 마력 표식 (마검사): 무형검무 추가 참격, 파공참/천지개벽 추가 피해. */
+    public static final StatusEffect MANA_MARK = Registry.register(Registries.STATUS_EFFECT, AbilityWar.id("mana_mark"),
+            new AWStatusEffect(StatusEffectCategory.HARMFUL, 0xB44CFF, false));
+
     public static void init() {
     }
 

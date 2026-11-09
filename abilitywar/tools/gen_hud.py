@@ -34,6 +34,8 @@ LAYOUTS = {
         'accent': [0.75, 0.55, 1.0], 'accent2': [0.45, 0.2, 0.85],
     },
 }
+# 마검사: tools/gen_blade_hud.py 로 그린 그림 (공허와 같은 배치)
+LAYOUTS['blade'] = dict(LAYOUTS['void'], accent=[0.78, 0.5, 1.0], accent2=[0.45, 0.15, 0.85], card=(1450, 380, 1790, 593))
 # 용기사: 사용자가 준 그림 (tools/import_hud_art.py 로 체크무늬 배경 제거). Q 대시 칸이 그림에 들어 있음.
 # 모서리깎기 값이 음수면 원형 슬롯.
 LAYOUTS['dragon'] = {

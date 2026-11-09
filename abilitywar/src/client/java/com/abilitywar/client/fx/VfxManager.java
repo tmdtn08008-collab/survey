@@ -74,7 +74,8 @@ public final class VfxManager {
                     add(new Effects.DashTrail(w, id, color, n.getString("ab"), new Vec3d(n.getFloat("dx"), 0, n.getFloat("dz")), p));
                 }
                 default -> {
-                    if (!com.abilitywar.client.fx.dragon.DragonFx.spawn(type, n, w, p)) AbilityWar.LOG.debug("Unknown fx {}", type);
+                    if (!com.abilitywar.client.fx.dragon.DragonFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.blade.BladeFx.spawn(type, n, w, p))
+                        AbilityWar.LOG.debug("Unknown fx {}", type);
                 }
             }
         } catch (Exception ex) {
@@ -82,8 +83,13 @@ public final class VfxManager {
         }
     }
 
+    private static final List<Fx> PENDING = new ArrayList<>();
+    private static boolean ticking;
+
     public static void add(Fx f) {
-        EFFECTS.add(f);
+        // 이펙트의 tick 안에서 새 이펙트를 만들면 다음에 합침 (목록을 도는 중이라서)
+        if (ticking) PENDING.add(f);
+        else EFFECTS.add(f);
     }
 
     static void shieldBreak(ClientWorld w, int caster) {
@@ -119,7 +125,16 @@ public final class VfxManager {
             return;
         }
         if (mc.isPaused()) return;
-        EFFECTS.removeIf(f -> f.tick(w));
+        ticking = true;
+        try {
+            EFFECTS.removeIf(f -> f.tick(w));
+        } finally {
+            ticking = false;
+        }
+        if (!PENDING.isEmpty()) {
+            EFFECTS.addAll(PENDING);
+            PENDING.clear();
+        }
         // 막기 방패 (F) 유지
         Set<Integer> shielded = new HashSet<>();
         for (Fx f : EFFECTS) if (f instanceof Effects.BlockShield bs && bs.fadeAge < 0) shielded.add(bs.caster());
@@ -136,6 +151,7 @@ public final class VfxManager {
         }
         BlackHoleFx.tick(w);
         com.abilitywar.client.fx.dragon.DragonFx.tick(w);
+        com.abilitywar.client.fx.blade.BladeFx.tick(w);
         AfterImages.tick();
         Particles.tick();
         Debris.tick();
@@ -145,6 +161,7 @@ public final class VfxManager {
     public static void clear() {
         AfterImages.clear();
         com.abilitywar.client.fx.dragon.DragonFx.clear();
+        com.abilitywar.client.fx.blade.BladeFx.clear();
         EFFECTS.clear();
         Particles.clear();
         Debris.clear();
@@ -174,6 +191,7 @@ public final class VfxManager {
             AfterImages.render(c);
             ShadowView.render(c);
             com.abilitywar.client.fx.dragon.DragonFx.render(c);
+            com.abilitywar.client.fx.blade.BladeFx.render(c);
             Particles.render(c.imm, c.m, c.camRot, c.cam, c.tickDelta);
             c.imm.draw();
             DamageNumbers.renderWorld(c);

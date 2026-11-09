@@ -94,6 +94,7 @@ public final class FirstPersonRenderer {
         m.transformPosition(fist);
         FIST_VIEW[arm].set(fist);
         com.abilitywar.client.fx.dragon.DragonParts.fpClaws(matrices, consumers, player, arm);
+        if (arm == 0) com.abilitywar.client.fx.blade.BladeParts.fpSword(matrices, consumers, light, player, pose.rot[AnimClip.FP_ITEM], pose.pos[AnimClip.FP_ITEM]);
         // 팔 모델 방향 맞추기: 모델 +Y(손 방향) -> -Z, 모델 앞면 -> 위
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90f));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180f));

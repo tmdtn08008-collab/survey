@@ -47,6 +47,19 @@ public final class AWSounds {
     public static final SoundEvent UI_DENY = reg("ui.deny");
     public static final SoundEvent UI_ULT_READY = reg("ui.ult_ready");
     public static final SoundEvent UI_CHARGE = reg("ui.charge");
+    public static final SoundEvent BLADE_SLASH = reg("blade.slash");
+    public static final SoundEvent BLADE_SLASH_HEAVY = reg("blade.slash_heavy");
+    public static final SoundEvent BLADE_DRAW = reg("blade.draw");
+    public static final SoundEvent BLADE_CHARGE = reg("blade.charge");
+    public static final SoundEvent BLADE_CRESCENT = reg("blade.crescent");
+    public static final SoundEvent BLADE_RIFT = reg("blade.rift");
+    public static final SoundEvent BLADE_TELEPORT = reg("blade.teleport");
+    public static final SoundEvent BLADE_PARRY = reg("blade.parry");
+    public static final SoundEvent BLADE_EXPLODE = reg("blade.explode");
+    public static final SoundEvent BLADE_GROW = reg("blade.grow");
+    public static final SoundEvent BLADE_WAVE = reg("blade.wave");
+    public static final SoundEvent BLADE_PHANTOM = reg("blade.phantom");
+    public static final SoundEvent BLADE_MARK = reg("blade.mark");
 
     private static SoundEvent reg(String path) {
         Identifier id = AbilityWar.id(path);

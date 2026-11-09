@@ -14,7 +14,7 @@ public final class Pose {
 
     // 기본 피벗 (플레이어 모델)
     static final float[][] DEFAULT_PIVOT = {
-            {0, 0, 0}, {0, 0, 0}, {-5, 2, 0}, {5, 2, 0}, {-1.9f, 12, 0}, {1.9f, 12, 0}, {0, 0, 0}
+            {0, 0, 0}, {0, 0, 0}, {-5, 2, 0}, {5, 2, 0}, {-1.9f, 12, 0}, {1.9f, 12, 0}, {0, 0, 0}, {0, 0, 0}
     };
 
     public void clear() {
@@ -40,6 +40,8 @@ public final class Pose {
         cap(AnimClip.LEFT_LEG, m.leftLeg);
         rot[AnimClip.ROOT][0] = rot[AnimClip.ROOT][1] = rot[AnimClip.ROOT][2] = 0;
         pos[AnimClip.ROOT][0] = pos[AnimClip.ROOT][1] = pos[AnimClip.ROOT][2] = 0;
+        rot[AnimClip.ITEM][0] = rot[AnimClip.ITEM][1] = rot[AnimClip.ITEM][2] = 0;
+        pos[AnimClip.ITEM][0] = pos[AnimClip.ITEM][1] = pos[AnimClip.ITEM][2] = 0;
     }
 
     private void cap(int b, ModelPart p) {

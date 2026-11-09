@@ -185,8 +185,15 @@ public final class PlayerAnimator {
 
     // ------------------------------------------------------------------ apply (3인칭)
 
+    /** 마지막으로 포즈를 계산한 플레이어의 무기(item 본) 회전/위치 — 무기 피처 렌더러가 읽음. */
+    public static final float[] ITEM_ROT = new float[3], ITEM_POS = new float[3];
+    public static int itemOwner = -1;
+
     public static void apply(PlayerEntityModel<?> model, AbstractClientPlayerEntity p, float limbAngle, float limbDistance, float headYaw, float headPitch) {
         if (renderingFirstPersonArms) return;
+        itemOwner = p.getId();
+        ITEM_ROT[0] = ITEM_ROT[1] = ITEM_ROT[2] = 0;
+        ITEM_POS[0] = ITEM_POS[1] = ITEM_POS[2] = 0;
         AnimState st = state(p);
         float now = ClientClock.now();
         st.prune(now);
@@ -204,11 +211,13 @@ public final class PlayerAnimator {
                 if (!armsFree && (b == AnimClip.RIGHT_ARM || b == AnimClip.LEFT_ARM)) continue;
                 OUT.blendBone(LOCO, b, 1f);
             }
+            OUT.blendBone(LOCO, AnimClip.ITEM, 1f);
             if (st.blockW > 0.01f) {
                 AnimClip block = clip(key, "block");
                 if (block != null) {
                     eval(block, block.localTime(now), T1, headYaw, headPitch);
                     for (int b = 0; b < 6; b++) if (block.hasBone(b)) OUT.blendBone(T1, b, st.blockW);
+                    if (block.hasBone(AnimClip.ITEM)) OUT.blendBone(T1, AnimClip.ITEM, st.blockW);
                 }
             }
         }
@@ -217,8 +226,12 @@ public final class PlayerAnimator {
             if (w <= 0) continue;
             eval(a.clip, a.clip.localTime(a.time(now)), T2, headYaw, headPitch);
             for (int b = 0; b < 6; b++) if (a.clip.hasBone(b)) OUT.blendBone(T2, b, w);
+            if (a.clip.hasBone(AnimClip.ITEM)) OUT.blendBone(T2, AnimClip.ITEM, w);
         }
         OUT.applyTo(model);
+        System.arraycopy(OUT.rot[AnimClip.ITEM], 0, ITEM_ROT, 0, 3);
+        System.arraycopy(OUT.pos[AnimClip.ITEM], 0, ITEM_POS, 0, 3);
+        itemOwner = p.getId();
     }
 
     // ------------------------------------------------------------------ root (setupTransforms)
@@ -270,7 +283,7 @@ public final class PlayerAnimator {
 
     static void evalFp(AnimClip c, float t, FpPose out) {
         out.setDefaultGuard();
-        for (int b = 0; b < 3; b++) {
+        for (int b = 0; b < AnimClip.FP_BONES; b++) {
             if (c.fpRot[b] != null) {
                 c.fpRot[b].sample(t, V);
                 System.arraycopy(V, 0, out.rot[b], 0, 3);
@@ -295,7 +308,7 @@ public final class PlayerAnimator {
     }
 
     static void blendFpAll(FpPose a, FpPose b, float w) {
-        for (int i = 0; i < 3; i++) a.blendBone(b, i, w);
+        for (int i = 0; i < AnimClip.FP_BONES; i++) a.blendBone(b, i, w);
         a.fov += (b.fov - a.fov) * w;
     }
 
@@ -350,6 +363,7 @@ public final class PlayerAnimator {
                 if (a.clip.hasFpArm(b) || a.clip.fpHideMissing || a.clip.fpVis[b] != null) FP_OUT.blendBone(FP_T2, b, w);
             }
             if (a.clip.fpRot[2] != null) FP_OUT.blendBone(FP_T2, 2, w);
+            if (a.clip.fpRot[AnimClip.FP_ITEM] != null || a.clip.fpPos[AnimClip.FP_ITEM] != null) FP_OUT.blendBone(FP_T2, AnimClip.FP_ITEM, w);
             if (a.clip.fov != null) FP_OUT.fov += (FP_T2.fov - FP_OUT.fov) * w;
         }
         return FP_OUT;

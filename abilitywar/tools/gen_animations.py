@@ -1045,6 +1045,403 @@ D['dragon.select'] = clip(26, blend_in=2, blend_out=5, bones=seq([
 write('dragon', D)
 
 # =====================================================================================
+#                                  마검사 (blade)
+# =====================================================================================
+# item 본 = 손 기준 검 각도 [pitch, yaw, roll]. 0 = 팔에 수직(팔을 내리면 칼끝이 앞), -85 = 팔의 연장선.
+B = {}
+IG = [-35, 0, 0]       # 가드: 칼끝이 앞-위
+IX = [-85, 0, 0]       # 팔의 연장선 (크게 휘두를 때)
+IR = [10, 180, 0]      # 칼집 쪽으로 뒤를 향함 (발도 자세)
+# 1인칭 item: 0 = 칼끝이 위-앞, -70 = 팔의 연장선
+FIG = [0, 0, 0]
+FIX = [-70, 0, 0]
+FIR = [60, 180, 0]
+
+BGR = ([6.5, -13.5, 7.5], [34, 4, 56])        # 1인칭 가드 (검을 든 오른손)
+BGL = ([-7, -15.5, 5], [20, -6, -60])          # 왼손은 낮게
+B_SW_R0 = ([13, -10, 6], [30, -45, 85])        # 오른쪽으로 크게 벌림
+B_SW_R1 = ([-4, -11, 11], [18, 50, 30])        # 왼쪽으로 쓸어냄
+B_LOW_L = ([-5, -18, 6], [0, 30, 40])          # 왼쪽 아래 (역수)
+B_UP = ([3, -3, 7], [80, 8, 40])               # 머리 위
+B_DOWN = ([1, -12, 12], [-10, 6, 40])          # 내려침
+
+
+def BP(**kw):
+    d = {
+        'body': [6, -14, 0], 'head': [-2, 12, 0],
+        'right_arm': [-55, -8, 8], 'left_arm': [-22, 12, -16],
+        'right_leg': [-10, 6, 4], 'left_leg': [12, -6, -4],
+        'root': {'pos': [0, -0.6, 0], 'rot': [0, 0, 0]},
+        'item': IG,
+    }
+    for k, v in kw.items():
+        if k == 'root':
+            d['root'] = dict(d['root'], **v)
+        else:
+            d[k] = v
+    return d
+
+
+BK = BP()
+
+
+def BF(R=BGR, L=BGL, I=FIG, cam=(0, 0, 0), fov=0):
+    return {'R': R, 'L': L, 'I': I, 'cam': list(cam), 'fov': fov}
+
+
+def bfp(frames):
+    """fpseq + 1인칭 item 채널."""
+    out = fpseq([(t, {k: v for k, v in f.items() if k != 'I'}, *e) for t, f, *e in frames])
+    keys, last = {}, [0, 0, 0]
+    for t, f, *e in frames:
+        last = f.get('I', last)
+        keys[str(round(t, 3))] = rnd(last) + [e[0] if e else 'inOutSine']
+    out['item'] = {'rot': keys}
+    return out
+
+
+BFG = BF()
+
+# ================================================================ 이동
+B['blade.idle'] = clip(60, loop=True, bones={
+    'body': {'rot': cyc(60, [6, -14, 0], [1.2, 0, 0])},
+    'head': {'rot': cyc(60, [-2, 12, 0], [1, 0, 0], phase=1)},
+    'right_arm': {'rot': cyc(60, [-55, -8, 8], [2.5, 0, 0], phase=0.3)},
+    'left_arm': {'rot': cyc(60, [-22, 12, -16], [2, 0, 0], phase=0.8)},
+    'right_leg': {'rot': {'0': [-10, 6, 4]}},
+    'left_leg': {'rot': {'0': [12, -6, -4]}},
+    'root': {'pos': cyc(60, [0, -0.6, 0], [0, -0.25, 0])},
+    'item': {'rot': cyc(60, IG, [2, 0, 1], phase=0.5)},
+}, fp=bfp([(0, BFG), (30, BF(R=([6.5, -13.2, 7.6], [35, 4, 56]))), (60, BFG)]))
+B['blade.idle']['loop'] = True
+
+B['blade.walk'] = clip(20, loop=True, stride=9.42, bones={
+    'body': {'rot': cyc(20, [6, -10, 0], [0, 5, 0], phase=math.pi)},
+    'head': {'rot': {'0': [-2, 10, 0]}},
+    'right_arm': {'rot': cyc(20, [-50, -8, 8], [10, 0, 0], phase=math.pi)},
+    'left_arm': {'rot': cyc(20, [-18, 10, -14], [16, 0, 0])},
+    'right_leg': {'rot': cyc(20, [0, 0, 2], [32, 0, 0])},
+    'left_leg': {'rot': cyc(20, [0, 0, -2], [32, 0, 0], phase=math.pi)},
+    'root': {'pos': cyc(20, [0, -0.4, 0], [0, 0, 0], harm=([0, 0.45, 0], -math.pi / 2))},
+    'item': {'rot': {'0': IG}},
+}, fp=bfp([(0, BFG), (10, BF(R=([6.8, -13, 8], [37, 4, 56]))), (20, BFG)]))
+
+# 질주: 검을 뒤로 늘어뜨림
+B['blade.run'] = clip(20, loop=True, stride=9.42, bones={
+    'body': {'rot': cyc(20, [24, 0, 0], [0, 8, 0], phase=math.pi, harm=([1.5, 0, 0], 0))},
+    'head': {'rot': {'0': [-20, 0, 0]}},
+    'right_arm': {'rot': cyc(20, [32, 4, 16], [12, 0, 0], phase=math.pi)},
+    'left_arm': {'rot': cyc(20, [-30, 6, -10], [50, 0, 0])},
+    'right_leg': {'rot': cyc(20, [-6, 0, 2], [54, 0, 0], harm=([-8, 0, 0], 0))},
+    'left_leg': {'rot': cyc(20, [-6, 0, -2], [54, 0, 0], phase=math.pi, harm=([-8, 0, 0], 0))},
+    'root': {'pos': cyc(20, [0, 0.3, 0], [0, 0, 0], harm=([0, 1.1, 0], -math.pi / 2)), 'rot': {'0': [5, 0, 0]}},
+    'item': {'rot': {'0': [-75, 0, 0]}},
+}, fp=bfp([(0, BF(R=([9, -19, 3], [5, 0, 70]), L=([-7, -15, 5.5], [26, -4, -52]), I=FIX, fov=4)), (10, BF(R=([9, -18, 3.5], [8, 0, 70]), L=([-7, -13, 7], [30, -4, -52]), I=FIX, fov=4)),
+                (20, BF(R=([9, -19, 3], [5, 0, 70]), L=([-7, -15, 5.5], [26, -4, -52]), I=FIX, fov=4))]))
+
+B['blade.sneak'] = clip(50, loop=True, bones={
+    'body': {'rot': cyc(50, [26, -14, 0], [1.5, 0, 0])},
+    'head': {'rot': {'0': [-16, 12, 0]}},
+    'right_arm': {'rot': cyc(50, [-62, -8, 10], [2, 0, 0], phase=0.4)},
+    'left_arm': {'rot': cyc(50, [-30, 12, -16], [2, 0, 0], phase=0.9)},
+    'right_leg': {'rot': {'0': [6, 6, 6]}, 'pos': {'0': [0, 0, -1]}},
+    'left_leg': {'rot': {'0': [-20, -6, -5]}, 'pos': {'0': [0, 0, 1]}},
+    'root': {'pos': {'0': [0, -1.5, 0]}},
+    'item': {'rot': {'0': IG}},
+}, fp=bfp([(0, BF(fov=-3)), (50, BF(fov=-3))]))
+
+B['blade.sneak_walk'] = clip(20, loop=True, stride=9.42, bones={
+    'body': {'rot': cyc(20, [26, -10, 0], [0, 4, 0])},
+    'head': {'rot': {'0': [-16, 10, 0]}},
+    'right_arm': {'rot': cyc(20, [-60, -8, 10], [6, 0, 0], phase=math.pi)},
+    'left_arm': {'rot': cyc(20, [-28, 10, -16], [8, 0, 0])},
+    'right_leg': {'rot': cyc(20, [4, 6, 6], [24, 0, 0])},
+    'left_leg': {'rot': cyc(20, [-4, -6, -5], [24, 0, 0], phase=math.pi)},
+    'root': {'pos': cyc(20, [0, -1.5, 0], [0, 0, 0], harm=([0, 0.3, 0], -math.pi / 2))},
+    'item': {'rot': {'0': IG}},
+}, fp=bfp([(0, BF(fov=-3)), (20, BF(fov=-3))]))
+
+B['blade.air'] = clip(24, loop=True, bones={
+    'body': {'rot': cyc(24, [8, -6, 0], [2, 0, 0])},
+    'right_arm': {'rot': cyc(24, [-40, 10, 40], [5, 0, 3])},
+    'left_arm': {'rot': cyc(24, [-50, -10, -40], [5, 0, -3], phase=1)},
+    'right_leg': {'rot': {'0': [22, 4, 6]}},
+    'left_leg': {'rot': {'0': [-34, -4, -4]}},
+    'item': {'rot': {'0': [-60, 0, 0]}},
+}, fp=bfp([(0, BF(R=([9, -13, 6], [40, -10, 70]), I=[-30, 0, 0])), (24, BF(R=([9, -13, 6], [40, -10, 70]), I=[-30, 0, 0]))]))
+
+# 막기: 검을 가로로 눕혀 앞을 막음
+B['blade.block'] = clip(40, loop=True, blend_in=2, bones={
+    'body': {'rot': cyc(40, [10, 0, 0], [1, 0, 0])},
+    'head': {'rot': {'0': [6, 0, 0]}},
+    'right_arm': {'rot': cyc(40, [-100, -38, 0], [2, 0, 0])},
+    'left_arm': {'rot': cyc(40, [-95, 40, 0], [2, 0, 0], phase=0.5)},
+    'right_leg': {'rot': {'0': [10, 4, 4]}},
+    'left_leg': {'rot': {'0': [-12, -4, -4]}},
+    'root': {'pos': {'0': [0, -0.8, 0]}},
+    'item': {'rot': {'0': [0, -90, 0]}},
+}, fp=bfp([(0, BF(R=([6, -10, 10], [50, 30, 60]), L=([-6, -10.5, 10], [48, -30, -60]), I=[0, -80, 0], fov=-4)),
+           (40, BF(R=([6, -10, 10], [50, 30, 60]), L=([-6, -10.5, 10], [48, -30, -60]), I=[0, -80, 0], fov=-4))]))
+B['blade.block_hit'] = clip(7, blend_in=0.5, blend_out=3, bones=seq([
+    (0, {'body': [10, 0, 0], 'right_arm': [-100, -38, 0], 'left_arm': [-95, 40, 0], 'item': [0, -90, 0], 'root': {'pos': [0, -0.8, 0], 'rot': [0, 0, 0]}}),
+    (1.5, {'body': [-4, 0, 0], 'right_arm': [-108, -32, 0], 'left_arm': [-103, 34, 0], 'item': [0, -90, 0], 'root': {'pos': [0, -0.8, -1.6], 'rot': [-4, 0, 0]}}, 'outExpo'),
+    (7, {'body': [10, 0, 0], 'right_arm': [-100, -38, 0], 'left_arm': [-95, 40, 0], 'item': [0, -90, 0], 'root': {'pos': [0, -0.8, 0], 'rot': [0, 0, 0]}}, 'outCubic'),
+]), fp=bfp([
+    (0, BF(R=([6, -10, 10], [50, 30, 60]), L=([-6, -10.5, 10], [48, -30, -60]), I=[0, -80, 0])),
+    (1.5, BF(R=([6, -9, 7.5], [56, 30, 60]), L=([-6, -9.5, 7.5], [54, -30, -60]), I=[0, -80, 0], cam=(-2.5, 0, 1.2)), 'outExpo'),
+    (7, BF(R=([6, -10, 10], [50, 30, 60]), L=([-6, -10.5, 10], [48, -30, -60]), I=[0, -80, 0]), 'outCubic'),
+]))
+
+
+# ================================================================ 평타 (검 3연격)
+def bswing(length, hit, wind, strike, body_w, body_h, item=IX, fp_w=B_SW_R0, fp_s=B_SW_R1, cam=(0.6, -1.4, -1.6), lunge=1.6, fov=-2, root_rot=(0, 0, 0)):
+    bones = seq([
+        (0, BK),
+        (hit * 0.45, BP(body=body_w, right_arm=wind, item=item, root={'pos': [0, -0.8, -0.5]}), 'outQuad'),
+        (hit, BP(body=body_h, right_arm=strike, item=item, left_arm=[-30, 20, -30], root={'pos': [0, -1.1, lunge], 'rot': list(root_rot)}), 'outExpo'),
+        (hit + (length - hit) * 0.45, BP(body=[body_h[0] - 1, body_h[1] * 0.9, 0], right_arm=[strike[0] + 3, strike[1] * 0.95, strike[2]], item=item, left_arm=[-30, 20, -30], root={'pos': [0, -1.0, lunge * 0.8]})),
+        (length, BK, 'inOutSine'),
+    ])
+    fp = bfp([
+        (0, dict(BFG)),
+        (hit * 0.45, BF(R=fp_w, I=FIX, cam=(-0.4, -cam[1] * 0.5, -cam[2] * 0.5), fov=1), 'outQuad'),
+        (hit, BF(R=fp_s, I=FIX, cam=cam, fov=fov), 'outExpo'),
+        (hit + (length - hit) * 0.45, BF(R=(fp_s[0], [fp_s[1][0] - 2, fp_s[1][1] * 0.95, fp_s[1][2]]), I=FIX, cam=[x * 0.5 for x in cam], fov=fov * 0.5)),
+        (length, dict(BFG), 'inOutSine'),
+    ])
+    return clip(length, bones=bones, fp=fp, blend_in=0.5, blend_out=2.5)
+
+
+# 1타: 오른쪽 → 왼쪽 가로베기
+B['blade.attack1'] = bswing(8, 2.5, [-88, 55, 10], [-86, -55, -6], [6, 28, 0], [10, -34, 0])
+# 2타: 왼쪽 아래 → 오른쪽 위 올려베기 (역수)
+B['blade.attack2'] = bswing(8, 2.5, [-35, -45, -20], [-150, 45, 20], [8, -26, 0], [-6, 30, 0],
+                            fp_w=B_LOW_L, fp_s=([12, -4, 7], [75, -40, 70]), cam=(-0.8, 1.4, 1.6))
+# 3타: 머리 위에서 내려찍기
+B['blade.attack3'] = clip(13, blend_in=0.5, blend_out=3, bones=seq([
+    (0, BK),
+    (3, BP(body=[-14, -6, 0], head=[-16, 6, 0], right_arm=[-175, -6, 6], left_arm=[-165, 16, -8], item=IX, root={'pos': [0, 0.4, -0.5], 'rot': [-4, 0, 0]}), 'outCubic'),
+    (4.5, BP(body=[34, -10, 0], head=[8, 6, 0], right_arm=[-50, -8, 4], left_arm=[-50, 10, -6], item=[-50, 0, 0], root={'pos': [0, -2.4, 2.6], 'rot': [6, 0, 0]}, right_leg=[-24, 6, 6], left_leg=[18, -4, -4]), 'outExpo'),
+    (8, BP(body=[30, -8, 0], head=[6, 6, 0], right_arm=[-48, -8, 4], left_arm=[-48, 10, -6], item=[-45, 0, 0], root={'pos': [0, -2.2, 2.2], 'rot': [5, 0, 0]}, right_leg=[-24, 6, 6], left_leg=[18, -4, -4])),
+    (13, BK, 'inOutSine'),
+]), fp=bfp([
+    (0, dict(BFG)),
+    (3, BF(R=B_UP, I=FIX, cam=(-2, 0, 0), fov=2), 'outCubic'),
+    (4.5, BF(R=B_DOWN, I=FIX, cam=(4.5, 0, 0), fov=-6), 'outExpo'),
+    (8, BF(R=([1, -12, 11.6], [-8, 6, 40]), I=FIX, cam=(2, 0, 0), fov=-3)),
+    (13, dict(BFG), 'inOutSine'),
+]))
+
+# ================================================================ 1. 마검 발도
+STANCE1 = BP(body=[22, 30, 0], head=[-14, -24, 0], right_arm=[-30, -62, 0], left_arm=[-18, 28, -6], item=IR,
+             right_leg=[16, 10, 10], left_leg=[-30, -8, -6], root={'pos': [0, -2.8, 0], 'rot': [0, 0, 0]})
+DRAWN = BP(body=[16, -38, 0], head=[-8, 30, 0], right_arm=[-92, 78, 0], left_arm=[-28, -20, -30], item=IX,
+           right_leg=[-30, 8, 8], left_leg=[26, -6, -6], root={'pos': [0, -2.2, 3], 'rot': [4, 0, 0]})
+
+
+def draw_clip(air):
+    legs = {'right_leg': [24, 6, 8], 'left_leg': [-34, -6, -6]} if air else {}
+    def Q(p):
+        d = dict(p)
+        d.update(legs)
+        return d
+    bones = seq([
+        (0, BK),
+        (2.5, Q(STANCE1), 'outCubic'),
+        (5.5, Q(dict(STANCE1, root={'pos': [0, -3.0, -0.3], 'rot': [0, 0, 0]})), 'inOutSine'),
+        (6.3, Q(DRAWN), 'outExpo'),
+        (9, Q(dict(DRAWN, root={'pos': [0, -2.1, 2.6], 'rot': [3, 0, 0]}))),
+        (11, Q(BP(body=[10, -20, 0], head=[-4, 10, 0], right_arm=[-40, 40, 26], left_arm=[-26, 12, -20], item=[-60, 0, 0], root={'pos': [0, -1.2, 1]})), 'outCubic'),
+        (18, BK, 'inOutSine'),
+    ])
+    fp = bfp([
+        (0, dict(BFG)),
+        (2.5, BF(R=([-1, -17, 6], [6, 40, 50]), L=([-6, -18, 5], [6, -8, -50]), I=FIR, cam=(1.5, 2, 0), fov=-4), 'outCubic'),
+        (5.5, BF(R=([-1.5, -17.5, 5.5], [5, 42, 50]), L=([-6, -18, 5], [6, -8, -50]), I=FIR, cam=(2, 2.5, 0), fov=-7), 'inOutSine'),
+        (6.3, BF(R=([14, -10, 8], [22, -62, 85]), L=([-9, -18, 4], [10, 10, -60]), I=FIX, cam=(0, -4, -3), fov=14), 'outExpo'),
+        (9, BF(R=([14, -10.5, 7.5], [20, -60, 85]), L=([-9, -18, 4], [10, 10, -60]), I=FIX, cam=(0, -2, -1.5), fov=6)),
+        (11, BF(R=([10, -14, 7], [24, -20, 70]), I=[-40, 0, 0], cam=(0, 0, 0), fov=2), 'outCubic'),
+        (18, dict(BFG), 'inOutSine'),
+    ])
+    return clip(18, blend_in=1, blend_out=4, root_pivot=12 if air else 12, bones=bones, fp=fp)
+
+
+B['blade.skill1'] = draw_clip(False)
+B['blade.skill1_air'] = draw_clip(True)
+
+# ================================================================ 2. 파공참
+LOW2 = BP(body=[24, 30, 0], head=[-10, -16, 0], right_arm=[30, 30, 16], left_arm=[-40, 20, -20], item=IX,
+          right_leg=[14, 8, 6], left_leg=[-24, -6, -6], root={'pos': [0, -2.6, -0.4]})
+UP2 = BP(body=[-18, -20, 0], head=[-26, 12, 0], right_arm=[-172, -14, 8], left_arm=[-50, 10, -40], item=IX,
+         right_leg=[-6, 6, 4], left_leg=[10, -6, -4], root={'pos': [0, 0.8, 1.4], 'rot': [-6, 0, 0]})
+
+
+def breaker_clip(windup, length):
+    bones = seq([
+        (0, BK),
+        (windup * 0.7, LOW2, 'outCubic'),
+        (windup, LOW2),
+        (windup + 1.4, UP2, 'outExpo'),
+        (windup + 4.5, dict(UP2, root={'pos': [0, 0.6, 1.2], 'rot': [-5, 0, 0]})),
+        (length, BK, 'inOutSine'),
+    ])
+    fp = bfp([
+        (0, dict(BFG)),
+        (windup * 0.7, BF(R=([10, -20, 4], [-10, -10, 75]), L=([-7, -15, 5], [24, -6, -56]), I=FIX, cam=(2, -1, 0), fov=-3), 'outCubic'),
+        (windup, BF(R=([10, -20.5, 3.6], [-12, -10, 75]), L=([-7, -15, 5], [24, -6, -56]), I=FIX, cam=(2.4, -1, 0), fov=-4)),
+        (windup + 1.4, BF(R=([4, -3, 9], [86, 10, 45]), I=FIX, cam=(-6, 0.5, 1), fov=8), 'outExpo'),
+        (windup + 4.5, BF(R=([4, -3.5, 8.6], [84, 10, 45]), I=FIX, cam=(-3, 0, 0), fov=4)),
+        (length, dict(BFG), 'inOutSine'),
+    ])
+    return clip(length, blend_in=1, blend_out=4, bones=bones, fp=fp)
+
+
+B['blade.skill2'] = breaker_clip(6, 16)
+B['blade.skill2_fast'] = breaker_clip(2, 11)
+
+# ================================================================ 3. 무형검무
+VANISH = BP(body=[30, 0, 0], head=[-20, 0, 0], right_arm=[40, 10, 30], left_arm=[30, -10, -20], item=IX,
+            right_leg=[20, 6, 6], left_leg=[-24, -6, -6], root={'pos': [0, -2.4, 0.5]})
+B['blade.skill3_dash'] = clip(3, blend_in=0.5, blend_out=1, bones=seq([(0, BK), (1.5, VANISH, 'outExpo'), (3, VANISH)]),
+                              fp=bfp([(0, dict(BFG)), (1.5, BF(R=([9, -21, 2], [-6, 0, 64]), L=([-9, -21, 2], [-6, 0, -64]), I=FIX, fov=10), 'outExpo'), (3, BF(R=([9, -21, 2], [-6, 0, 64]), L=([-9, -21, 2], [-6, 0, -64]), I=FIX, fov=10))]))
+
+# 4방향 참격 (클립 t 2, 6, 10, 14 에 맞음)
+S3_SWINGS = [
+    # (준비 팔, 친 팔, 몸 준비, 몸 친, fp 준비, fp 친, cam)
+    ([-88, 55, 10], [-86, -55, -6], [6, 28, 0], [10, -34, 0], B_SW_R0, B_SW_R1, (0.6, -1.4, -1.6)),
+    ([-80, -50, -10], [-84, 55, 6], [6, -28, 0], [10, 34, 0], ([-10, -11, 7], [32, 40, -10]), ([12, -10, 10], [20, -50, 80]), (0.6, 1.4, 1.6)),
+    ([-160, 40, 10], [-40, -40, 0], [-6, 20, 0], [24, -24, 0], ([12, -2, 6], [86, -20, 70]), ([-4, -15, 10], [-4, 30, 20]), (2.5, -1.2, -1.4)),
+    ([-30, 10, 10], [-155, -10, 0], [20, 10, 0], [-10, -10, 0], ([8, -19, 5], [-6, -6, 70]), ([3, -3, 9], [84, 8, 42]), (-3, 0, 0)),
+]
+
+
+def dance_frames(start, swings):
+    bf, ff = [], []
+    for i, (w0, w1, b0, b1, f0, f1, cam) in enumerate(swings):
+        t = start + i * 4
+        bf += [(t - 1.6, BP(body=b0, right_arm=w0, item=IX, root={'pos': [0, -0.8, 0]}), 'inQuad'),
+               (t, BP(body=b1, right_arm=w1, item=IX, left_arm=[-30, 20, -30], root={'pos': [0, -1.1, 1.2]}), 'outExpo')]
+        ff += [(t - 1.6, BF(R=f0, I=FIX, cam=(0, 0, 0), fov=0), 'inQuad'),
+               (t, BF(R=f1, I=FIX, cam=cam, fov=-3), 'outExpo')]
+    return bf, ff
+
+
+bf, ff = dance_frames(2, S3_SWINGS)
+B['blade.skill3'] = clip(17, blend_in=0.5, blend_out=2, bones=seq([(0, VANISH)] + bf + [(17, BP(body=[10, -20, 0], right_arm=[-60, 20, 10], item=IX, root={'pos': [0, -1.0, 0.5]}), 'inOutSine')]),
+                         fp=bfp([(0, BF(R=([9, -21, 2], [-6, 0, 64]), L=([-9, -21, 2], [-6, 0, -64]), I=FIX, fov=10))] + ff + [(17, BF(I=FIX), 'inOutSine')]))
+bf, ff = dance_frames(2, [S3_SWINGS[2], S3_SWINGS[1]])
+B['blade.skill3_cont'] = clip(9, blend_in=0.5, blend_out=2, bones=seq([(0, BP(body=[10, -20, 0], right_arm=[-60, 20, 10], item=IX))] + bf + [(9, BP(body=[10, -20, 0], right_arm=[-60, 20, 10], item=IX), 'inOutSine')]),
+                              fp=bfp([(0, BF(I=FIX))] + ff + [(9, BF(I=FIX), 'inOutSine')]))
+# 마무리: 위에서 내려찍기 (클립 t3 에 맞음)
+B['blade.skill3_final'] = clip(12, blend_in=0.5, blend_out=4, root_pivot=12, bones=seq([
+    (0, BP(body=[10, -20, 0], right_arm=[-60, 20, 10], item=IX, root={'pos': [0, -1.0, 0.5]})),
+    (1.8, BP(body=[-18, 0, 0], head=[-22, 0, 0], right_arm=[-178, -4, 6], left_arm=[-170, 8, -6], item=IX, right_leg=[24, 4, 6], left_leg=[-10, -4, -4], root={'pos': [0, 1, 0], 'rot': [-8, 0, 0]}), 'outCubic'),
+    (3, BP(body=[44, 0, 0], head=[10, 0, 0], right_arm=[-52, -4, 4], left_arm=[-48, 6, -4], item=IX, right_leg=[-20, 6, 6], left_leg=[22, -4, -4], root={'pos': [0, -2.8, 2.5], 'rot': [10, 0, 0]}), 'outExpo'),
+    (7, BP(body=[40, 0, 0], head=[8, 0, 0], right_arm=[-50, -4, 4], left_arm=[-46, 6, -4], item=IX, right_leg=[-20, 6, 6], left_leg=[22, -4, -4], root={'pos': [0, -2.6, 2.2], 'rot': [8, 0, 0]})),
+    (12, BK, 'inOutSine'),
+]), fp=bfp([
+    (0, BF(I=FIX)),
+    (1.8, BF(R=B_UP, L=([-4, -4, 6.5], [82, -12, -50]), I=FIX, cam=(-3, 0, 0), fov=3), 'outCubic'),
+    (3, BF(R=B_DOWN, L=([-3.5, -12, 11], [-12, -10, -50]), I=FIX, cam=(7, 0, 0), fov=-9), 'outExpo'),
+    (7, BF(R=([1, -12, 11.5], [-8, 6, 40]), L=([-3.5, -12, 11], [-10, -10, -50]), I=FIX, cam=(3, 0, 0), fov=-4)),
+    (12, dict(BFG), 'inOutSine'),
+]))
+B['blade.skill3_extra'] = bswing(9, 2.5, [-30, 10, 10], [-160, 30, 10], [20, 10, 0], [-14, -14, 0],
+                                 fp_w=([8, -19, 5], [-6, -6, 70]), fp_s=([5, -2, 9], [86, -10, 50]), cam=(-4, -1, -1), fov=-5)
+
+# ================================================================ 4. 마검 반격
+GUARD4 = BP(body=[8, 10, 0], head=[4, -6, 0], right_arm=[-112, -28, 0], left_arm=[-100, 34, 0], item=[18, 0, 0],
+            right_leg=[14, 8, 6], left_leg=[-16, -6, -5], root={'pos': [0, -1.4, 0]})
+B['blade.skill4'] = clip(17, blend_in=1, blend_out=3, bones=seq([
+    (0, BK), (2.5, GUARD4, 'outBack'), (9, dict(GUARD4, item=[20, 0, 0], root={'pos': [0, -1.6, 0], 'rot': [0, 0, 0]})), (14, GUARD4), (17, BK, 'inOutSine'),
+]), fp=bfp([
+    (0, dict(BFG)),
+    (2.5, BF(R=([3, -9, 10], [62, 18, 20]), L=([-3, -10, 10], [58, -18, -20]), I=[20, 0, 0], cam=(0.5, 0, 0), fov=-3), 'outBack'),
+    (9, BF(R=([3, -8.8, 10.2], [63, 18, 20]), L=([-3, -9.8, 10.2], [59, -18, -20]), I=[20, 0, 0], fov=-4)),
+    (14, BF(R=([3, -9, 10], [62, 18, 20]), L=([-3, -10, 10], [58, -18, -20]), I=[20, 0, 0], fov=-3)),
+    (17, dict(BFG), 'inOutSine'),
+]))
+B['blade.skill4_success'] = clip(13, blend_in=0.3, blend_out=4, bones=seq([
+    (0, GUARD4),
+    (1.2, BP(body=[0, -30, 0], head=[-4, 20, 0], right_arm=[-110, 60, 0], left_arm=[-60, 20, -20], item=[0, 0, 0], root={'pos': [0, -1, -1.2]}), 'outExpo'),
+    (3, VANISH, 'inQuad'),
+    (4.2, BP(body=[26, 24, 0], head=[-10, -14, 0], right_arm=[26, 24, 16], left_arm=[-40, 16, -20], item=IX, root={'pos': [0, -2.6, 0]}), 'outCubic'),
+    (6, BP(body=[-20, -24, 0], head=[-24, 14, 0], right_arm=[-176, -10, 8], left_arm=[-40, 10, -40], item=IX, root={'pos': [0, 0.8, 1.6], 'rot': [-6, 0, 0]}), 'outExpo'),
+    (9, BP(body=[-16, -20, 0], head=[-20, 12, 0], right_arm=[-172, -10, 8], left_arm=[-44, 10, -38], item=IX, root={'pos': [0, 0.6, 1.4], 'rot': [-5, 0, 0]})),
+    (13, BK, 'inOutSine'),
+]), fp=bfp([
+    (0, BF(R=([3, -9, 10], [62, 18, 20]), L=([-3, -10, 10], [58, -18, -20]), I=[20, 0, 0])),
+    (1.2, BF(R=([12, -8, 8], [50, -50, 80]), L=([-7, -15, 5], [24, -6, -56]), I=[0, 0, 0], cam=(-2.5, -2, -2), fov=4), 'outExpo'),
+    (3, BF(R=([9, -21, 2], [-6, 0, 64]), L=([-9, -21, 2], [-6, 0, -64]), I=FIX, fov=10), 'inQuad'),
+    (4.2, BF(R=([10, -20, 4], [-10, -10, 75]), I=FIX, cam=(2, 0, 0), fov=-2), 'outCubic'),
+    (6, BF(R=([4, -3, 9], [86, 10, 45]), I=FIX, cam=(-6, 0.5, 1), fov=6), 'outExpo'),
+    (13, dict(BFG), 'inOutSine'),
+]))
+B['blade.skill4_fail'] = clip(12, blend_in=0.5, blend_out=4, bones=seq([
+    (0, GUARD4),
+    (3, BP(body=[4, 10, 0], head=[12, 0, 0], right_arm=[-40, -10, 10], left_arm=[-20, 10, -10], item=[-20, 0, 0], root={'pos': [0, -0.6, -0.5]}), 'outCubic'),
+    (6, BP(body=[6, 10, 0], head=[10, 10, 0], right_arm=[-38, -10, 10], left_arm=[-18, 10, -10], item=[-20, 0, 0], root={'pos': [0, -0.6, -0.4]})),
+    (12, BK, 'inOutSine'),
+]), fp=bfp([
+    (0, BF(R=([3, -9, 10], [62, 18, 20]), L=([-3, -10, 10], [58, -18, -20]), I=[20, 0, 0])),
+    (3, BF(R=([7, -17, 6], [12, 4, 60]), L=([-7, -18, 5], [10, -4, -60]), I=[-20, 0, 0], cam=(2, 0, 0)), 'outCubic'),
+    (6, BF(R=([7, -17, 6], [12, 4, 60]), L=([-7, -18, 5], [10, -4, -60]), I=[-20, 0, 0], cam=(1.5, 2, 0))),
+    (12, dict(BFG), 'inOutSine'),
+]))
+
+# ================================================================ R. 천지개벽 (72틱: 18~27 거대화, 32 도약, 46~50 내려베기)
+RAISE = BP(body=[-14, 0, 0], head=[-34, 0, 0], right_arm=[-178, -6, 4], left_arm=[-176, 12, -4], item=IX,
+           right_leg=[-6, 6, 6], left_leg=[8, -6, -6], root={'pos': [0, 0.3, 0], 'rot': [-4, 0, 0]})
+B['blade.ult'] = clip(72, blend_in=2, blend_out=5, root_pivot=12, bones=seq([
+    (0, BK),
+    (8, RAISE, 'outCubic'),
+    (18, dict(RAISE, body=[-18, 0, 0], head=[-40, 0, 0])),
+    (26, dict(RAISE, body=[-10, 0, 0], head=[-30, 0, 0], root={'pos': [0, -0.6, 0], 'rot': [-2, 0, 0]}), 'outBack'),
+    (31, dict(RAISE, body=[20, 0, 0], head=[-10, 0, 0], right_leg=[20, 6, 8], left_leg=[-20, -6, -8], root={'pos': [0, -2.6, 0], 'rot': [4, 0, 0]}), 'inQuad'),
+    (33, dict(RAISE, right_leg=[30, 6, 8], left_leg=[10, -6, -8], root={'pos': [0, 1.5, 0], 'rot': [-6, 0, 0]}), 'outExpo'),
+    (44, BP(body=[-26, 0, 0], head=[-30, 0, 0], right_arm=[-205, -6, 4], left_arm=[-200, 12, -4], item=IX, right_leg=[34, 6, 8], left_leg=[14, -6, -8], root={'pos': [0, 1, 0], 'rot': [-12, 0, 0]}), 'inOutSine'),
+    (48, BP(body=[40, 0, 0], head=[14, 0, 0], right_arm=[-40, -4, 4], left_arm=[-40, 8, -4], item=IX, right_leg=[20, 6, 8], left_leg=[-30, -6, -8], root={'pos': [0, -1, 2], 'rot': [14, 0, 0]}), 'outExpo'),
+    (58, BP(body=[36, 0, 0], head=[12, 0, 0], right_arm=[-40, -4, 4], left_arm=[-40, 8, -4], item=IX, right_leg=[20, 6, 8], left_leg=[-30, -6, -8], root={'pos': [0, -1.5, 2], 'rot': [12, 0, 0]})),
+    (64, BP(body=[30, -10, 0], head=[8, 6, 0], right_arm=[-46, -6, 4], left_arm=[-30, 8, -10], item=IX, right_leg=[-20, 6, 6], left_leg=[20, -6, -6], root={'pos': [0, -2.6, 1], 'rot': [6, 0, 0]}), 'outBounce'),
+    (72, BK, 'inOutSine'),
+]), fp=bfp([
+    (0, dict(BFG)),
+    (8, BF(R=([4, -2, 6], [88, 4, 30]), L=([-4, -2, 5.5], [88, -4, -30]), I=FIX, cam=(-6, 0, 0), fov=6), 'outCubic'),
+    (31, BF(R=([4, -2, 6], [88, 4, 30]), L=([-4, -2, 5.5], [88, -4, -30]), I=FIX, cam=(-4, 0, 0), fov=6)),
+    (44, BF(R=([4, 0, 3], [100, 4, 30]), L=([-4, 0, 2.5], [100, -4, -30]), I=FIX, cam=(-8, 0, 0), fov=10), 'inOutSine'),
+    (48, BF(R=B_DOWN, L=([-3.5, -12, 11], [-12, -10, -50]), I=FIX, cam=(10, 0, 0), fov=-8), 'outExpo'),
+    (58, BF(R=([1, -12, 11.5], [-8, 6, 40]), L=([-3.5, -12, 11], [-10, -10, -50]), I=FIX, cam=(4, 0, 0), fov=-4)),
+    (72, dict(BFG), 'inOutSine'),
+]))
+
+# ================================================================ T. 잔영보
+B['blade.phantom_step'] = clip(9, blend_in=0.3, blend_out=3, bones=seq([
+    (0, VANISH), (2, BP(body=[16, 20, 0], head=[-8, -10, 0], right_arm=[-30, 30, 30], left_arm=[-30, -10, -30], item=IX, root={'pos': [0, -1.8, -0.6]}), 'outExpo'),
+    (9, BK, 'inOutSine'),
+]), fp=bfp([
+    (0, BF(R=([9, -21, 2], [-6, 0, 64]), L=([-9, -21, 2], [-6, 0, -64]), I=FIX, fov=12)),
+    (2, BF(R=([10, -16, 5], [14, -10, 70]), I=FIX, cam=(0, 0, 3), fov=6), 'outExpo'),
+    (9, dict(BFG), 'inOutSine'),
+]))
+
+B['blade.select'] = clip(28, blend_in=2, blend_out=5, bones=seq([
+    (0, BP(body=[0, 0, 0], head=[0, 0, 0], right_arm=[0, 0, 0], left_arm=[0, 0, 0], right_leg=[0, 0, 0], left_leg=[0, 0, 0], item=[0, 0, 0], root={'pos': [0, 0, 0]})),
+    (6, BP(right_arm=[-90, 40, 0], item=[-85, 0, 0]), 'outCubic'),
+    (10, BP(right_arm=[-90, 40, 0], item=[-85, 180, 0]), 'linear'),
+    (14, BP(right_arm=[-90, 40, 0], item=[-85, 360, 0]), 'linear'),
+    (18, BP(body=[10, -30, 0], right_arm=[-60, -40, 20], item=[-60, 360, 0], root={'pos': [0, -1, 0.5]}), 'outExpo'),
+    (28, BP(item=[-35, 360, 0]), 'inOutSine'),
+]), fp=bfp([
+    (0, BF(R=([6, -17, 6], [12, 4, 50]))),
+    (6, BF(R=([10, -10, 9], [30, -30, 70]), I=FIX), 'outCubic'),
+    (14, BF(R=([10, -10, 9], [30, -30, 70]), I=[-70, 360, 0]), 'linear'),
+    (28, dict(BFG), 'inOutSine'),
+]))
+B['blade.select']['blend_out'] = 0.1
+
+write('blade', B)
+
+# =====================================================================================
 #                        공통 피격 반응 (능력 없는 플레이어 포함)
 # =====================================================================================
 C = {}

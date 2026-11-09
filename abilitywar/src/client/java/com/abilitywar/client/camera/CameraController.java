@@ -205,7 +205,36 @@ public final class CameraController {
         Vec3d T = cin.target;
         Vec3d cam, look;
         double fov;
-        if (cin.type.equals("dragon_ult")) {
+        if (cin.type.equals("blade_ult")) {
+            Vec3d S = cin.start;
+            if (t < 20) {
+                // 검을 하늘로 드는 모습: 낮은 앵글에서 올려다보며 돌아감
+                float k = smooth(t / 20f);
+                double th = Math.toRadians(40 - 30 * k);
+                double rad = 3.2 + 1.5 * k;
+                cam = C.add(F.multiply(Math.cos(th) * rad)).add(R.multiply(Math.sin(th) * rad)).add(0, 0.3, 0);
+                look = C.add(0, 1.6 + 2.5 * k, 0);
+                fov = 62 + 10 * k;
+            } else if (t < 32) {
+                // 거대해지는 검과 마력 균열: 와이드
+                float k = smooth((t - 20) / 12f);
+                cam = S.add(F.multiply(8 + 2 * k)).add(R.multiply(5)).add(0, 1.2, 0);
+                look = S.add(0, 5.5 + 1.5 * k, 0);
+                fov = 80;
+            } else if (t < 46) {
+                // 도약: 아래에서 올려다봄
+                float k = smooth((t - 32) / 14f);
+                cam = S.subtract(F.multiply(3.5)).add(R.multiply(3.5)).add(0, 0.6, 0);
+                look = C.add(0, 2.0 + 3 * k, 0);
+                fov = 82;
+            } else {
+                // 초대형 참격: 길을 옆에서 넓게
+                float k = smooth((t - 46) / 26f);
+                cam = S.add(F.multiply(9 + 3 * k)).add(R.multiply(17)).add(0, 4.5 - k, 0);
+                look = S.add(F.multiply(11 + 4 * k)).add(0, 2.0, 0);
+                fov = 80 - 3 * k;
+            }
+        } else if (cin.type.equals("dragon_ult")) {
             // 고룡은 용기사 뒤 10칸에 있고 머리는 높이 9~13칸
             Vec3d S = cin.start;
             Vec3d head = S.subtract(F.multiply(1.5)).add(0, 11.5, 0);

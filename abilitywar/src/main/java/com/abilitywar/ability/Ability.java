@@ -80,6 +80,16 @@ public abstract class Ability {
         return cooldownReady;
     }
 
+    /** 다른 스킬 사용 중(busy)에도 이 스킬을 받아줄지 (서버). */
+    public boolean allowWhileBusy(ServerPlayerEntity player, AbilityData data, SkillSlot slot) {
+        return false;
+    }
+
+    /** 클라이언트 사전 판정: busy 중에도 이 키를 서버로 보낼지. */
+    public boolean clientAllowWhileBusy(net.minecraft.entity.player.PlayerEntity player, SkillSlot slot) {
+        return false;
+    }
+
     public boolean passiveGauge() {
         return true;
     }

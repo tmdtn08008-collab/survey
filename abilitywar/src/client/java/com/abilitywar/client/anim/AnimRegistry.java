@@ -78,14 +78,14 @@ public final class AnimRegistry implements SimpleSynchronousResourceReloadListen
                 JsonObject bo = bones.getAsJsonObject(AnimClip.BONE_NAMES[b]);
                 if (bo.has("rot")) c.rot[b] = parseChannel(bo.get("rot"), 1, 1, 1);
                 if (bo.has("pos")) {
-                    if (b == AnimClip.ROOT) c.pos[b] = parseChannel(bo.get("pos"), 1, 1, 1);
+                    if (b == AnimClip.ROOT || b == AnimClip.ITEM) c.pos[b] = parseChannel(bo.get("pos"), 1, 1, 1);
                     else c.pos[b] = parseChannel(bo.get("pos"), -1, -1, -1); // [오른쪽,위,앞] -> 모델공간
                 }
             }
         }
         if (o.has("fp")) {
             JsonObject fp = o.getAsJsonObject("fp");
-            for (int b = 0; b < 3; b++) {
+            for (int b = 0; b < AnimClip.FP_BONES; b++) {
                 if (!fp.has(AnimClip.FP_NAMES[b])) continue;
                 JsonObject bo = fp.getAsJsonObject(AnimClip.FP_NAMES[b]);
                 if (bo.has("rot")) c.fpRot[b] = parseChannel(bo.get("rot"), 1, 1, 1);
