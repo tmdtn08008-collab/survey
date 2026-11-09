@@ -60,6 +60,17 @@ public final class AWSounds {
     public static final SoundEvent BLADE_WAVE = reg("blade.wave");
     public static final SoundEvent BLADE_PHANTOM = reg("blade.phantom");
     public static final SoundEvent BLADE_MARK = reg("blade.mark");
+    public static final SoundEvent BLOOD_SLASH = reg("blood.slash");
+    public static final SoundEvent BLOOD_THREAD = reg("blood.thread");
+    public static final SoundEvent BLOOD_SPIKE = reg("blood.spike");
+    public static final SoundEvent BLOOD_DRAIN = reg("blood.drain");
+    public static final SoundEvent BLOOD_HEART = reg("blood.heart");
+    public static final SoundEvent BLOOD_BURST = reg("blood.burst");
+    public static final SoundEvent BLOOD_VEIL = reg("blood.veil");
+    public static final SoundEvent BLOOD_BATS = reg("blood.bats");
+    public static final SoundEvent BLOOD_MOON = reg("blood.moon");
+    public static final SoundEvent BLOOD_ROAR = reg("blood.roar");
+    public static final SoundEvent BLOOD_CHAIN = reg("blood.chain");
 
     private static SoundEvent reg(String path) {
         Identifier id = AbilityWar.id(path);

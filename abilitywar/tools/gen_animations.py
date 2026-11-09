@@ -1442,6 +1442,524 @@ B['blade.select']['blend_out'] = 0.1
 write('blade', B)
 
 # =====================================================================================
+#                                  혈귀 (blood)
+# =====================================================================================
+H = {}
+
+# ---- 1인칭 기준 자세: 발톱을 앞으로 세운 낮은 손 ----------------------------------------
+HGR = ([7.5, -14.5, 7], [30, 4, 60])
+HGL = ([-7.5, -15, 6.5], [28, -4, -60])
+H_SELF_L = ([-2.5, -12.5, 9.5], [36, 30, -20])    # 왼팔을 앞으로 내밀어 손목을 보임 (자해)
+H_SELF_R0 = ([9, -9, 6], [56, -30, 80])           # 오른손 발톱을 치켜듦
+H_SELF_R1 = ([1, -12, 10], [30, 36, 30])          # 손목을 긋고 지나감
+H_THROW_R = ([3, -9.5, 15.5], [16, 6, 30])        # 손을 쭉 뻗음 (피의 실)
+H_REEL_R = ([6, -11, 12], [24, 2, 46])            # 실을 쥔 채 끌려감
+H_COCK_L = ([-11, -12, 3], [40, 30, -86])         # 왼손을 뒤로 젖혀 준비
+H_X_R0 = ([8, -4, 6], [80, -26, 66])              # 교차 할퀴기 준비 (머리 위 바깥)
+H_X_L0 = ([-8, -4, 5.5], [80, 26, -66])
+H_X_R1 = ([-2, -13, 11], [0, 34, 24])             # 교차해 내려옴
+H_X_L1 = ([2, -13, 11], [0, -34, -24])
+H_PALM_R = ([4, -15, 13], [-14, 4, 40])           # 손바닥으로 땅을 짚음
+H_PALM_L = ([-4, -15, 12.5], [-14, -4, -40])
+H_RISE_R = ([4, -5, 12], [70, 4, 30])             # 손을 들어 올림 (피의 창을 끌어올림)
+H_GRIP_L = ([-2, -10.5, 15], [20, -6, -30])       # 적의 멱살을 움켜쥠
+H_CROSS_R = ([3.5, -10, 9.5], [48, 44, 56])       # 팔을 X자로 교차
+H_CROSS_L = ([-3.5, -10.5, 9], [46, -44, -56])
+H_CLUTCH_R = ([2, -15, 7], [26, 50, 30])          # 가슴을 움켜쥠
+H_OPEN_R = ([14, -9, 5], [48, -50, 88])           # 두 팔을 활짝 (손바닥 위)
+H_OPEN_L = ([-14, -9, 4.5], [48, 50, -88])
+
+
+def HP(**kw):
+    """혈귀 기본 자세: 몸을 숙인 포식자, 두 팔은 발톱을 세워 앞으로 늘어뜨림."""
+    d = {
+        'body': [14, 6, 0], 'head': [-12, -4, 0],
+        'right_arm': [-30, -10, 22], 'left_arm': [-38, 14, -22],
+        'right_leg': [8, 8, 6], 'left_leg': [-12, -6, -5],
+        'root': {'pos': [0, -1.0, 0], 'rot': [0, 0, 0]},
+    }
+    for k, v in kw.items():
+        if k == 'root':
+            d['root'] = dict(d['root'], **v)
+        else:
+            d[k] = v
+    return d
+
+
+HK = HP()
+
+
+def HF(R=HGR, L=HGL, cam=(0, 0, 0), fov=0):
+    return {'R': R, 'L': L, 'cam': list(cam), 'fov': fov}
+
+
+HFG = HF()
+
+# ================================================================ 이동
+H['blood.idle'] = clip(56, loop=True, bones={
+    'body': {'rot': cyc(56, [14, 6, 0], [2.2, 0, 0])},
+    'head': {'rot': cyc(56, [-12, -4, 0], [1.8, 3, 0], phase=1.0)},
+    'right_arm': {'rot': cyc(56, [-30, -10, 22], [4, 0, 3], phase=0.3, harm=([2, 0, 1], 0.5))},
+    'left_arm': {'rot': cyc(56, [-38, 14, -22], [4, 0, -3], phase=0.9, harm=([2, 0, -1], 0.5))},
+    'right_leg': {'rot': {'0': [8, 8, 6]}},
+    'left_leg': {'rot': {'0': [-12, -6, -5]}},
+    'root': {'pos': cyc(56, [0, -1.0, 0], [0, -0.4, 0])},
+}, fp={
+    'right_arm': {'pos': cyc(56, HGR[0], [0, 0.5, 0.1]), 'rot': cyc(56, HGR[1], [2, 0, 2], harm=([1.5, 0, 0], 0.4))},
+    'left_arm': {'pos': cyc(56, HGL[0], [0, 0.5, 0.1], phase=0.9), 'rot': cyc(56, HGL[1], [2, 0, -2], phase=0.9, harm=([1.5, 0, 0], 0.4))},
+})
+
+H['blood.walk'] = clip(20, loop=True, stride=9.42, bones={
+    'body': {'rot': cyc(20, [16, 4, 0], [0, 7, 0], phase=math.pi)},
+    'head': {'rot': {'0': [-14, -2, 0]}},
+    'right_arm': {'rot': cyc(20, [-26, -8, 22], [20, 0, 0], phase=math.pi)},
+    'left_arm': {'rot': cyc(20, [-32, 10, -22], [20, 0, 0])},
+    'right_leg': {'rot': cyc(20, [0, 0, 3], [34, 0, 0])},
+    'left_leg': {'rot': cyc(20, [0, 0, -3], [34, 0, 0], phase=math.pi)},
+    'root': {'pos': cyc(20, [0, -0.8, 0], [0, 0, 0], harm=([0, 0.5, 0], -math.pi / 2))},
+}, fp={
+    'right_arm': {'pos': cyc(20, HGR[0], [0.3, 0.8, 1.0], phase=math.pi), 'rot': cyc(20, HGR[1], [4, 0, 0], phase=math.pi)},
+    'left_arm': {'pos': cyc(20, HGL[0], [0.3, 0.8, 1.0]), 'rot': cyc(20, HGL[1], [4, 0, 0])},
+})
+
+# 질주: 상체를 깊게 숙이고 두 팔을 뒤로 늘어뜨린 채 내달림
+H['blood.run'] = clip(18, loop=True, stride=9.42, bones={
+    'body': {'rot': cyc(18, [38, 0, 0], [0, 7, 0], phase=math.pi, harm=([2.5, 0, 0], 0))},
+    'head': {'rot': {'0': [-34, 0, 0]}},
+    'right_arm': {'rot': cyc(18, [40, 6, 18], [12, 0, 4], phase=math.pi)},
+    'left_arm': {'rot': cyc(18, [40, -6, -18], [12, 0, -4])},
+    'right_leg': {'rot': cyc(18, [-10, 0, 2], [58, 0, 0], harm=([-8, 0, 0], 0))},
+    'left_leg': {'rot': cyc(18, [-10, 0, -2], [58, 0, 0], phase=math.pi, harm=([-8, 0, 0], 0))},
+    'root': {'pos': cyc(18, [0, -0.6, 0], [0, 0, 0], harm=([0, 1.2, 0], -math.pi / 2)), 'rot': {'0': [8, 0, 0]}},
+}, fp={
+    'right_arm': {'pos': cyc(18, [9, -19.5, 3.5], [0.4, 1.4, 1.2], phase=math.pi), 'rot': cyc(18, [4, 0, 66], [8, 0, 0], phase=math.pi)},
+    'left_arm': {'pos': cyc(18, [-9, -19.5, 3], [0.4, 1.4, 1.2]), 'rot': cyc(18, [4, 0, -66], [8, 0, 0])},
+    'camera': {'rot': cyc(18, [0, 0, 0], [0, 0, 0.8], harm=([0.7, 0, 0], 0))},
+    'fov': {'0': [6, 0, 0]},
+})
+
+H['blood.sneak'] = clip(50, loop=True, bones={
+    'body': {'rot': cyc(50, [34, 6, 0], [1.5, 0, 0])},
+    'head': {'rot': {'0': [-26, -4, 0]}},
+    'right_arm': {'rot': cyc(50, [-36, -10, 26], [3, 0, 0], phase=0.4)},
+    'left_arm': {'rot': cyc(50, [-44, 14, -26], [3, 0, 0], phase=0.9)},
+    'right_leg': {'rot': {'0': [16, 8, 7]}, 'pos': {'0': [0, 0, -1]}},
+    'left_leg': {'rot': {'0': [-22, -6, -6]}, 'pos': {'0': [0, 0, 1]}},
+    'root': {'pos': {'0': [0, -1.6, 0]}},
+}, fp={
+    'right_arm': {'pos': cyc(50, [7, -15.5, 8], [0, 0.3, 0]), 'rot': cyc(50, [26, 4, 62], [1.5, 0, 0])},
+    'left_arm': {'pos': cyc(50, [-7, -16, 7.5], [0, 0.3, 0], phase=0.6), 'rot': cyc(50, [24, -4, -62], [1.5, 0, 0], phase=0.6)},
+    'fov': {'0': [-3, 0, 0]},
+})
+
+H['blood.sneak_walk'] = clip(20, loop=True, stride=9.42, bones={
+    'body': {'rot': cyc(20, [34, 4, 0], [0, 5, 0])},
+    'head': {'rot': {'0': [-26, -2, 0]}},
+    'right_arm': {'rot': cyc(20, [-36, -8, 26], [10, 0, 0], phase=math.pi)},
+    'left_arm': {'rot': cyc(20, [-44, 12, -26], [10, 0, 0])},
+    'right_leg': {'rot': cyc(20, [4, 6, 7], [26, 0, 0])},
+    'left_leg': {'rot': cyc(20, [-4, -6, -6], [26, 0, 0], phase=math.pi)},
+    'root': {'pos': cyc(20, [0, -1.6, 0], [0, 0, 0], harm=([0, 0.3, 0], -math.pi / 2))},
+}, fp={
+    'right_arm': {'pos': cyc(20, [7, -15.5, 8], [0.2, 0.4, 0.6], phase=math.pi), 'rot': cyc(20, [26, 4, 62], [2, 0, 0], phase=math.pi)},
+    'left_arm': {'pos': cyc(20, [-7, -16, 7.5], [0.2, 0.4, 0.6]), 'rot': cyc(20, [24, -4, -62], [2, 0, 0])},
+    'fov': {'0': [-3, 0, 0]},
+})
+
+H['blood.air'] = clip(24, loop=True, bones={
+    'body': {'rot': cyc(24, [12, 0, 0], [2, 0, 0])},
+    'head': {'rot': {'0': [-10, 0, 0]}},
+    'right_arm': {'rot': cyc(24, [-50, 10, 50], [8, 0, 6])},
+    'left_arm': {'rot': cyc(24, [-50, -10, -50], [8, 0, -6], phase=0.6)},
+    'right_leg': {'rot': {'0': [28, 4, 6]}},
+    'left_leg': {'rot': {'0': [-30, -4, -5]}},
+}, fp={
+    'right_arm': {'pos': cyc(24, [10, -13, 6], [0, 0.6, 0]), 'rot': cyc(24, [40, -14, 72], [3, 0, 0])},
+    'left_arm': {'pos': cyc(24, [-10, -13, 5.5], [0, 0.6, 0], phase=0.6), 'rot': cyc(24, [38, 14, -72], [3, 0, 0], phase=0.6)},
+})
+
+# 막기: 두 팔을 X자로 교차 (발톱이 바깥으로)
+H_BLOCK = {'body': [18, 0, 0], 'head': [8, 0, 0], 'right_arm': [-112, -46, 8], 'left_arm': [-104, 48, -8], 'right_leg': [12, 6, 6], 'left_leg': [-14, -6, -5], 'root': {'pos': [0, -1.2, 0], 'rot': [0, 0, 0]}}
+H['blood.block'] = clip(40, loop=True, blend_in=2, bones={
+    'body': {'rot': cyc(40, [18, 0, 0], [1.2, 0, 0])},
+    'head': {'rot': {'0': [8, 0, 0]}},
+    'right_arm': {'rot': cyc(40, [-112, -46, 8], [2, 0, 0])},
+    'left_arm': {'rot': cyc(40, [-104, 48, -8], [2, 0, 0], phase=0.5)},
+    'right_leg': {'rot': {'0': [12, 6, 6]}},
+    'left_leg': {'rot': {'0': [-14, -6, -5]}},
+    'root': {'pos': {'0': [0, -1.2, 0]}},
+}, fp={
+    'right_arm': {'pos': cyc(40, H_CROSS_R[0], [0, 0.2, 0]), 'rot': cyc(40, H_CROSS_R[1], [1, 0, 0])},
+    'left_arm': {'pos': cyc(40, H_CROSS_L[0], [0, 0.2, 0], phase=0.5), 'rot': cyc(40, H_CROSS_L[1], [1, 0, 0], phase=0.5)},
+    'fov': {'0': [-4, 0, 0]},
+})
+H['blood.block_hit'] = clip(7, blend_in=0.5, blend_out=3, bones=seq([
+    (0, H_BLOCK),
+    (1.5, dict(H_BLOCK, body=[2, 0, 0], right_arm=[-120, -40, 8], left_arm=[-112, 42, -8], root={'pos': [0, -1.2, -1.8], 'rot': [-4, 0, 0]}), 'outExpo'),
+    (7, H_BLOCK, 'outCubic'),
+]), fp=fpseq([
+    (0, {'R': H_CROSS_R, 'L': H_CROSS_L, 'cam': [0, 0, 0]}),
+    (1.5, {'R': (add(H_CROSS_R[0], [0, 1, -2.5]), add(H_CROSS_R[1], [6, 0, 0])), 'L': (add(H_CROSS_L[0], [0, 1, -2.5]), add(H_CROSS_L[1], [6, 0, 0])), 'cam': [-2.5, 0, 1.2]}, 'outExpo'),
+    (7, {'R': H_CROSS_R, 'L': H_CROSS_L, 'cam': [0, 0, 0]}, 'outCubic'),
+]))
+
+
+# ================================================================ 평타 (피의 발톱 3연격)
+def hswipe(length, hit, right, wind, strike, body_w, body_h, fp_from, fp_to, cam, lunge=1.6, fov=-2):
+    sgn = 1 if right else -1
+    arm, other = ('right_arm', 'left_arm') if right else ('left_arm', 'right_arm')
+    oth = [-30, 18 * sgn, -26 * sgn]
+    bones = seq([
+        (0, HK),
+        (hit * 0.45, HP(body=body_w, **{arm: wind, other: oth}, root={'pos': [0, -1.1, -0.5]}), 'outQuad'),
+        (hit, HP(body=body_h, head=[-8, 10 * sgn, 0], **{arm: strike, other: oth}, root={'pos': [0, -1.4, lunge]}), 'outExpo'),
+        (hit + (length - hit) * 0.45, HP(body=[body_h[0] - 1, body_h[1] * 0.85, 0], head=[-8, 8 * sgn, 0], **{arm: add(strike, [4, -strike[1] * 0.1, 0]), other: oth}, root={'pos': [0, -1.3, lunge * 0.8]})),
+        (length, HK, 'inOutSine'),
+    ])
+    a, o = ('R', 'L') if right else ('L', 'R')
+    oth_fp = HGL if right else HGR
+    fp = fpseq([
+        (0, dict(HFG)),
+        (hit * 0.45, {a: fp_from, o: oth_fp, 'cam': [-0.4, 0.8 * sgn, 0.8 * sgn], 'fov': 1}, 'outQuad'),
+        (hit, {a: fp_to, 'cam': list(cam), 'fov': fov}, 'outExpo'),
+        (hit + (length - hit) * 0.45, {a: (fp_to[0], [fp_to[1][0] - 2, fp_to[1][1] * 0.95, fp_to[1][2]]), 'cam': [c * 0.5 for c in cam], 'fov': fov * 0.5}),
+        (length, dict(HFG), 'inOutSine'),
+    ])
+    return clip(length, bones=bones, fp=fp, blend_in=0.5, blend_out=2.5)
+
+
+# 1타: 오른발톱 비스듬히 내려 할큄 / 2타: 왼발톱 반대로 / 3타: 두 손 내려찍기 (출혈)
+H['blood.attack1'] = hswipe(7, 2.5, True, [-150, 36, 24], [-44, -42, -6], [2, 28, 0], [22, -34, 0], DI_R0, DI_R1, (1.0, -1.4, -2.0), lunge=2)
+H['blood.attack2'] = hswipe(7, 2.5, False, [-150, -36, -24], [-44, 42, 6], [2, -28, 0], [22, 34, 0], DI_L0, DI_L1, (1.0, 1.4, 2.0), lunge=2)
+H['blood.attack3'] = clip(12, blend_in=0.5, blend_out=3, bones=seq([
+    (0, HK),
+    (3, HP(body=[-14, 0, 0], head=[-22, 0, 0], right_arm=[-166, 26, 24], left_arm=[-166, -26, -24], root={'pos': [0, 0.8, -0.8], 'rot': [-5, 0, 0]}, right_leg=[4, 6, 5], left_leg=[-10, -6, -4]), 'outCubic'),
+    (4.5, HP(body=[42, 0, 0], head=[8, 0, 0], right_arm=[-36, -36, 4], left_arm=[-36, 36, -4], root={'pos': [0, -2.8, 3.2], 'rot': [8, 0, 0]}, right_leg=[20, 6, 6], left_leg=[-30, -4, -4]), 'outExpo'),
+    (8, HP(body=[38, 0, 0], head=[6, 0, 0], right_arm=[-34, -32, 6], left_arm=[-34, 32, -6], root={'pos': [0, -2.6, 3.0], 'rot': [7, 0, 0]}, right_leg=[20, 6, 6], left_leg=[-30, -4, -4])),
+    (12, HK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(HFG)),
+    (3, {'R': DI_R0, 'L': DI_L0, 'cam': [-2.5, 0, 0], 'fov': 3}, 'outCubic'),
+    (4.5, {'R': DI_R1, 'L': DI_L1, 'cam': [5.5, 0, 0], 'fov': -8}, 'outExpo'),
+    (8, {'R': (DI_R1[0], [8, 28, 30]), 'L': (DI_L1[0], [8, -28, -30]), 'cam': [2.5, 0, 0], 'fov': -4}),
+    (12, dict(HFG), 'inOutSine'),
+]))
+
+# ================================================================ 1. 혈사포박
+# 손을 뻗어 피의 실을 쏨 (서버 tt2 에 박힘) → 끌려감. 할퀴기는 서버가 닿는 순간 skill1_rip 을 보냄.
+THROW = HP(body=[6, -24, 0], head=[-10, 18, 0], right_arm=[-94, -10, 4], left_arm=[-20, 20, -40], root={'pos': [0, -0.6, 1.2]}, right_leg=[-12, 6, 5], left_leg=[14, -6, -4])
+REEL = HP(body=[30, -10, 0], head=[-24, 8, 0], right_arm=[-100, -6, 6], left_arm=[30, 30, -50], root={'pos': [0, -1.6, 1.5], 'rot': [10, 0, 0]}, right_leg=[34, 4, 6], left_leg=[-40, -4, -5])
+REEL_AIR = HP(body=[0, -10, 0], head=[-40, 8, 0], right_arm=[-150, -6, 6], left_arm=[20, 30, -50], root={'pos': [0, 0, 1.5], 'rot': [-24, 0, 0]}, right_leg=[40, 4, 6], left_leg=[10, -4, -5])
+
+
+def thread_clip(air):
+    pull = REEL_AIR if air else REEL
+    return clip(18, blend_in=0.5, blend_out=3, root_pivot=12 if air else 0, bones=seq([
+        (0, HK),
+        (1, HP(body=[10, 20, 0], head=[-10, -10, 0], right_arm=[-60, 40, 40], left_arm=[-30, 18, -26], root={'pos': [0, -1.2, -0.6]}), 'outQuad'),
+        (2, THROW, 'outExpo'),
+        (3.5, THROW),
+        (5, pull, 'inOutCubic'),
+        (12, pull),
+        (18, HK, 'inOutSine'),
+    ]), fp=fpseq([
+        (0, dict(HFG)),
+        (1, {'R': ([8, -10, 5], [50, -30, 70]), 'L': HGL, 'cam': [0, 1, 0.5], 'fov': 1}, 'outQuad'),
+        (2, {'R': H_THROW_R, 'cam': [-1, -1, -1], 'fov': -3}, 'outExpo'),
+        (3.5, {'R': H_THROW_R, 'cam': [0, 0, 0], 'fov': -2}),
+        (5, {'R': H_REEL_R, 'L': H_COCK_L, 'cam': [-2 if air else 1, 0, 0], 'fov': 14}, 'inOutCubic'),
+        (12, {'R': H_REEL_R, 'L': H_COCK_L, 'fov': 14}),
+        (18, dict(HFG), 'inOutSine'),
+    ]))
+
+
+H['blood.skill1'] = thread_clip(False)
+H['blood.skill1_air'] = thread_clip(True)
+H['blood.skill1_miss'] = clip(10, blend_in=0.5, blend_out=3, bones=seq([
+    (0, HK),
+    (1, HP(body=[10, 20, 0], head=[-10, -10, 0], right_arm=[-60, 40, 40], root={'pos': [0, -1.2, -0.6]}), 'outQuad'),
+    (2, THROW, 'outExpo'),
+    (5, THROW),
+    (7, HP(body=[4, 10, 0], right_arm=[-60, 10, 30], root={'pos': [0, -1, -0.4]}), 'inOutCubic'),
+    (10, HK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(HFG)),
+    (1, {'R': ([8, -10, 5], [50, -30, 70]), 'cam': [0, 1, 0.5]}, 'outQuad'),
+    (2, {'R': H_THROW_R, 'cam': [-1, -1, -1], 'fov': -3}, 'outExpo'),
+    (5, {'R': H_THROW_R, 'cam': [0, 0, 0], 'fov': -2}),
+    (7, {'R': ([7, -12, 7], [40, 0, 60]), 'cam': [0.6, 0, 0], 'fov': 0}, 'inOutCubic'),
+    (10, dict(HFG), 'inOutSine'),
+]))
+
+
+def rip_clip(air):
+    """닿는 순간 (t0) 두 발톱 교차로 찢고 (t1.5) 적을 띄움."""
+    lift = [-10, 0, 0] if air else [0, 0, 0]
+    end = HP(body=[-10, 0, 0], head=[-24, 0, 0], right_arm=[-170, -10, 14], left_arm=[-40, 20, -40], root={'pos': [0, 1.5, 0.5], 'rot': lift}) if air else \
+        HP(body=[36, 0, 0], head=[4, 0, 0], right_arm=[-30, -40, 4], left_arm=[-30, 40, -4], root={'pos': [0, -2.4, 2.2], 'rot': [6, 0, 0]}, right_leg=[20, 6, 6], left_leg=[-28, -4, -4])
+    return clip(14, blend_in=0.6, blend_out=3, root_pivot=12 if air else 0, bones=seq([
+        (0, HP(body=[-10, 0, 0], head=[-24, 0, 0], right_arm=[-160, 32, 26], left_arm=[-160, -32, -26], root={'pos': [0, 0.6, 0.4], 'rot': lift}), 'outCubic'),
+        (1.5, HP(body=[40, 0, 0], head=[8, 0, 0], right_arm=[-34, -50, 0], left_arm=[-34, 50, 0], root={'pos': [0, -2.6, 2.6], 'rot': add([8, 0, 0], lift)}, right_leg=[20, 6, 6], left_leg=[-28, -4, -4]), 'outExpo'),
+        (3.5, HP(body=[36, 0, 0], head=[6, 0, 0], right_arm=[-36, -46, 2], left_arm=[-36, 46, -2], root={'pos': [0, -2.4, 2.4], 'rot': add([6, 0, 0], lift)}, right_leg=[20, 6, 6], left_leg=[-28, -4, -4])),
+        (6, end, 'outExpo' if air else 'inOutSine'),
+        (14, HK, 'inOutSine'),
+    ]), fp=fpseq([
+        (0, {'R': H_X_R0, 'L': H_X_L0, 'cam': [-2.5, 0, 0], 'fov': 4}, 'outCubic'),
+        (1.5, {'R': H_X_R1, 'L': H_X_L1, 'cam': [5, 0, 0], 'fov': -9}, 'outExpo'),
+        (3.5, {'R': (H_X_R1[0], [4, 30, 26]), 'L': (H_X_L1[0], [4, -30, -26]), 'cam': [2.5, 0, 0], 'fov': -4}),
+        (6, {'R': UPC_R, 'L': HGL, 'cam': [-5, 0, 0], 'fov': -4} if air else {'R': HGR, 'L': HGL, 'cam': [1, 0, 0], 'fov': -2}, 'outExpo' if air else 'inOutSine'),
+        (14, dict(HFG), 'inOutSine'),
+    ]))
+
+
+H['blood.skill1_rip'] = rip_clip(False)
+H['blood.skill1_rip_air'] = rip_clip(True)
+
+# ================================================================ 2. 혈창분출
+# 오른발톱으로 왼손목을 그어 피를 내고 (t3) 두 손바닥으로 땅을 침 (t5) → 서버 tt6/8/10 에 창이 앞으로 솟음
+SELF0 = HP(body=[8, 16, 0], head=[14, -10, 0], left_arm=[-70, -20, 0], right_arm=[-140, -30, 40], root={'pos': [0, -0.8, -0.3]})
+SELF1 = HP(body=[12, -14, 0], head=[16, 4, 0], left_arm=[-66, -24, 0], right_arm=[-66, 44, -10], root={'pos': [0, -1, 0]})
+SLAM = HP(body=[54, 0, 0], head=[0, 0, 0], right_arm=[-62, -10, 10], left_arm=[-62, 10, -10], root={'pos': [0, -4.2, 1.5], 'rot': [6, 0, 0]}, right_leg=[-30, 10, 10], left_leg=[40, -10, -10])
+H['blood.skill2'] = clip(16, blend_in=0.6, blend_out=4, bones=seq([
+    (0, HK),
+    (1.5, SELF0, 'outCubic'),
+    (2.8, SELF1, 'outExpo'),
+    (3.6, HP(body=[-6, 0, 0], head=[-20, 0, 0], right_arm=[-160, 10, 20], left_arm=[-160, -10, -20], root={'pos': [0, 0.4, 0]}), 'outCubic'),
+    (5, SLAM, 'outExpo'),
+    (11, dict(SLAM, body=[52, 0, 0], root={'pos': [0, -4.0, 1.4], 'rot': [6, 0, 0]})),
+    (16, HK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(HFG)),
+    (1.5, {'R': H_SELF_R0, 'L': H_SELF_L, 'cam': [2, 0.5, 0], 'fov': -3}, 'outCubic'),
+    (2.8, {'R': H_SELF_R1, 'cam': [2.5, -1.5, -1.5], 'fov': -5}, 'outExpo'),
+    (3.6, {'R': UP_R, 'L': UP_L, 'cam': [-3, 0, 0], 'fov': 3}, 'outCubic'),
+    (5, {'R': H_PALM_R, 'L': H_PALM_L, 'cam': [12, 0, 0], 'fov': -6}, 'outExpo'),
+    (11, {'R': H_PALM_R, 'L': H_PALM_L, 'cam': [9, 0, 0], 'fov': -4}),
+    (16, dict(HFG), 'inOutSine'),
+]))
+# 1번 직후: 손목을 긋자마자 (t1.2) 한 손으로 땅을 치고 (t2.2) 들어 올리며 적 밑에서 솟구침 (서버 tt3)
+H['blood.skill2_fast'] = clip(12, blend_in=0.5, blend_out=3, bones=seq([
+    (0, SELF0),
+    (1.2, SELF1, 'outExpo'),
+    (2.2, HP(body=[46, 10, 0], head=[-4, -6, 0], right_arm=[-40, -8, 10], left_arm=[-50, 10, -20], root={'pos': [0, -3.4, 1.0], 'rot': [4, 0, 0]}, right_leg=[-24, 8, 8], left_leg=[30, -8, -8]), 'outExpo'),
+    (3.4, HP(body=[-14, -10, 0], head=[-26, 6, 0], right_arm=[-176, -16, 14], left_arm=[-40, 16, -30], root={'pos': [0, 0.6, 0.6], 'rot': [-4, 0, 0]}), 'outExpo'),
+    (7, HP(body=[-10, -8, 0], head=[-22, 4, 0], right_arm=[-170, -14, 14], left_arm=[-44, 16, -28], root={'pos': [0, 0.4, 0.5], 'rot': [-3, 0, 0]})),
+    (12, HK, 'inOutSine'),
+]), fp=fpseq([
+    (0, {'R': H_SELF_R0, 'L': H_SELF_L, 'cam': [2, 0.5, 0], 'fov': -3}),
+    (1.2, {'R': H_SELF_R1, 'cam': [2.5, -1.5, -1.5], 'fov': -5}, 'outExpo'),
+    (2.2, {'R': H_PALM_R, 'L': HGL, 'cam': [9, 0, 0], 'fov': -4}, 'outExpo'),
+    (3.4, {'R': H_RISE_R, 'cam': [-8, 0, 0], 'fov': 8}, 'outExpo'),
+    (7, {'R': (H_RISE_R[0], [66, 4, 30]), 'cam': [-4, 0, 0], 'fov': 4}),
+    (12, dict(HFG), 'inOutSine'),
+]))
+
+# ================================================================ 3. 흡혈난무
+H_DASH = HP(body=[40, 0, 0], head=[-30, 0, 0], right_arm=[40, 6, 24], left_arm=[40, -6, -24], right_leg=[40, 0, 4], left_leg=[-44, 0, -4], root={'pos': [0, -2, 2], 'rot': [14, 0, 0]})
+H['blood.skill3_dash'] = clip(4, blend_in=0.5, blend_out=1, bones=seq([
+    (0, HK),
+    (1.5, H_DASH, 'outExpo'),
+    (4, H_DASH),
+]), fp=fpseq([
+    (0, dict(HFG)),
+    (1.5, {'R': TRAIL_R, 'L': TRAIL_L, 'cam': [2, 0, 0], 'fov': 14}, 'outExpo'),
+    (4, {'R': TRAIL_R, 'L': TRAIL_L, 'fov': 14}),
+]))
+
+
+def frenzy_frames():
+    """서버 tt1 에 시작 → 할퀴기 tt3/6/9/12 = 클립 t2/5/8/11 (오, 왼, 오, 왼)."""
+    f = [(0, H_DASH)]
+    fp = [(0, {'R': TRAIL_R, 'L': TRAIL_L, 'cam': [0, 0, 0], 'fov': 10})]
+    for i, t in enumerate((2, 5, 8, 11)):
+        right = i % 2 == 0
+        s = 1 if right else -1
+        arm, oth = ('right_arm', 'left_arm') if right else ('left_arm', 'right_arm')
+        f += [
+            (t - 1.2, HP(body=[10, 32 * s, 0], head=[-8, -10 * s, 0], **{arm: [-160, 44 * s, 26 * s], oth: [-50, 20 * s, -20 * s]}, root={'pos': [0, -1, 0.5]}), 'outCubic'),
+            (t, HP(body=[20, -34 * s, 0], head=[-6, 12 * s, 0], **{arm: [-34, -46 * s, -6 * s], oth: [-56, 22 * s, -20 * s]}, root={'pos': [0, -1.5, 1.8]}), 'outExpo'),
+        ]
+        a, o = ('R', 'L') if right else ('L', 'R')
+        fp += [
+            (t - 1.2, {a: DI_R0 if right else DI_L0, o: HGL if right else HGR, 'cam': [-0.5, 1 * s, 1 * s], 'fov': 2}, 'outCubic'),
+            (t, {a: DI_R1 if right else DI_L1, 'cam': [1.4, -1.8 * s, -2.4 * s], 'fov': -3}, 'outExpo'),
+        ]
+    return f, fp
+
+
+_f, _fp = frenzy_frames()
+GRAB = HP(body=[24, -10, 0], head=[-14, 6, 0], left_arm=[-96, 18, 0], right_arm=[-30, -20, 40], root={'pos': [0, -1.6, 1.4]})
+H['blood.skill3'] = clip(13, blend_in=0.5, blend_out=2, bones=seq(_f + [(13, GRAB, 'inOutCubic')]),
+                         fp=fpseq(_fp + [(13, {'R': HGR, 'L': H_GRIP_L, 'cam': [0, 0, 0], 'fov': -2}, 'inOutCubic')]))
+
+# 물어뜯어 흡혈: 왼손으로 멱살을 잡고 목덜미에 이빨을 박음 (서버 tt15~30 3틱마다 흡혈)
+BITE = HP(body=[44, -16, 0], head=[22, 14, 0], left_arm=[-96, 30, 0], right_arm=[-60, -40, 30], root={'pos': [0, -2.4, 3.2], 'rot': [4, 0, 0]})
+_bite = [(0, GRAB), (1.6, BITE, 'outExpo')]
+_bite_fp = [(0, {'R': HGR, 'L': H_GRIP_L, 'cam': [0, 0, 0], 'fov': -2}), (1.6, {'R': ([10, -12, 8], [40, -30, 80]), 'L': ([-1, -11, 13], [20, -10, -30]), 'cam': [6, -3, -3], 'fov': -8}, 'outExpo')]
+for k in range(5):
+    t = 3.5 + k * 3
+    _bite.append((t, dict(BITE, body=[48, -16, 0], head=[26, 14, 0], root={'pos': [0, -2.6, 3.4], 'rot': [5, 0, 0]}), 'outQuad'))
+    _bite.append((t + 1.5, BITE, 'inOutSine'))
+    _bite_fp.append((t, {'cam': [7.5, -3, -3.5], 'fov': -9}, 'outQuad'))
+    _bite_fp.append((t + 1.5, {'cam': [6, -3, -3], 'fov': -8}, 'inOutSine'))
+H['blood.skill3_drain'] = clip(17, blend_in=0.6, blend_out=2, bones=seq(_bite + [(17, BITE)]), fp=fpseq(_bite_fp + [(17, {'cam': [6, -3, -3], 'fov': -8})]))
+
+# 들어 올려 내리찍기 (서버 tt31 에 시작, tt34 = 클립 t3 에 찍음)
+H['blood.skill3_throw'] = clip(14, blend_in=0.8, blend_out=4, bones=seq([
+    (0, BITE),
+    (2, HP(body=[-20, 0, 0], head=[-30, 0, 0], right_arm=[-176, 20, 16], left_arm=[-176, -20, -16], root={'pos': [0, 1.2, 0], 'rot': [-6, 0, 0]}, right_leg=[6, 6, 5], left_leg=[-10, -6, -4]), 'outCubic'),
+    (3, HP(body=[48, 0, 0], head=[10, 0, 0], right_arm=[-40, -24, 4], left_arm=[-40, 24, -4], root={'pos': [0, -3.2, 3], 'rot': [10, 0, 0]}, right_leg=[22, 6, 6], left_leg=[-30, -4, -4]), 'outExpo'),
+    (8, HP(body=[44, 0, 0], head=[8, 0, 0], right_arm=[-38, -22, 6], left_arm=[-38, 22, -6], root={'pos': [0, -3, 2.8], 'rot': [8, 0, 0]}, right_leg=[22, 6, 6], left_leg=[-30, -4, -4])),
+    (14, HK, 'inOutSine'),
+]), fp=fpseq([
+    (0, {'R': ([10, -12, 8], [40, -30, 80]), 'L': ([-1, -11, 13], [20, -10, -30]), 'cam': [6, -3, -3], 'fov': -8}),
+    (2, {'R': UP_R, 'L': UP_L, 'cam': [-6, 0, 0], 'fov': 6}, 'outCubic'),
+    (3, {'R': DOWN_R, 'L': DOWN_L, 'cam': [9, 0, 0], 'fov': -10}, 'outExpo'),
+    (8, {'R': (DOWN_R[0], [-8, 10, 50]), 'L': (DOWN_L[0], [-8, -10, -50]), 'cam': [3, 0, 0], 'fov': -4}),
+    (14, dict(HFG), 'inOutSine'),
+]))
+
+# ================================================================ 4. 혈막반격
+VEIL = HP(body=[24, 0, 0], head=[12, 0, 0], right_arm=[-104, -50, 10], left_arm=[-98, 52, -10], root={'pos': [0, -2, 0]}, right_leg=[14, 10, 8], left_leg=[-16, -10, -8])
+H['blood.skill4'] = clip(17, blend_in=1, blend_out=3, bones=seq([
+    (0, HK),
+    (2.5, VEIL, 'outBack'),
+    (9, dict(VEIL, body=[26, 0, 0], root={'pos': [0, -2.2, 0], 'rot': [0, 0, 0]})),
+    (14, VEIL),
+    (17, HK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(HFG)),
+    (2.5, {'R': H_CROSS_R, 'L': H_CROSS_L, 'cam': [1, 0, 0], 'fov': -4}, 'outBack'),
+    (9, {'R': (H_CROSS_R[0], [50, 44, 56]), 'L': (H_CROSS_L[0], [48, -44, -56]), 'fov': -5}),
+    (14, {'R': H_CROSS_R, 'L': H_CROSS_L, 'cam': [0, 0, 0], 'fov': -4}),
+    (17, dict(HFG), 'inOutSine'),
+]))
+# 반격: 막이 터지며 팔을 활짝 (t1) → 공격자를 가리켜 움켜쥠 = 발밑에서 창 (t3) → 피를 끌어당김
+BURST = HP(body=[-16, 0, 0], head=[-24, 0, 0], right_arm=[-40, 20, 100], left_arm=[-40, -20, -100], root={'pos': [0, 0.2, -0.8], 'rot': [-6, 0, 0]}, right_leg=[6, 10, 10], left_leg=[-6, -10, -10])
+H['blood.skill4_success'] = clip(16, blend_in=0.4, blend_out=4, bones=seq([
+    (0, VEIL),
+    (1, BURST, 'outExpo'),
+    (2.2, HP(body=[10, 24, 0], head=[-8, -14, 0], right_arm=[-40, 30, 50], left_arm=[-30, -10, -50], root={'pos': [0, -1, 0]}), 'inQuad'),
+    (3, HP(body=[18, -30, 0], head=[-10, 14, 0], right_arm=[-100, -30, 0], left_arm=[-30, 10, -60], root={'pos': [0, -1.4, 1.8]}, right_leg=[-14, 6, 5], left_leg=[18, -6, -4]), 'outExpo'),
+    (5, HP(body=[12, -24, 0], head=[-10, 10, 0], right_arm=[-120, -20, 0], left_arm=[-30, 10, -60], root={'pos': [0, -1.2, 1.4]}, right_leg=[-14, 6, 5], left_leg=[18, -6, -4])),
+    (7, HP(body=[-4, -10, 0], head=[-16, 6, 0], right_arm=[-70, -10, 10], left_arm=[-80, 20, -10], root={'pos': [0, -0.8, 0]}), 'inOutCubic'),
+    (12, HP(body=[-6, -10, 0], head=[-18, 6, 0], right_arm=[-66, -10, 12], left_arm=[-76, 20, -12], root={'pos': [0, -0.8, 0]})),
+    (16, HK, 'inOutSine'),
+]), fp=fpseq([
+    (0, {'R': H_CROSS_R, 'L': H_CROSS_L, 'cam': [0, 0, 0], 'fov': -4}),
+    (1, {'R': H_OPEN_R, 'L': H_OPEN_L, 'cam': [-4, 0, 0], 'fov': 10}, 'outExpo'),
+    (2.2, {'R': ([7, -10, 6], [50, -20, 70]), 'L': HGL, 'cam': [-1, 0, 0], 'fov': 4}, 'inQuad'),
+    (3, {'R': ([3, -8, 15], [40, 6, 20]), 'cam': [3, -1, -2], 'fov': -6}, 'outExpo'),
+    (5, {'R': ([3, -6, 14], [56, 6, 20]), 'cam': [-1, 0, 0], 'fov': -3}),
+    (7, {'R': ([4, -11, 11], [20, 10, 30]), 'L': ([-4, -11, 11], [20, -10, -30]), 'cam': [0, 0, 0], 'fov': 0}, 'inOutCubic'),
+    (12, {'R': ([4, -11.4, 11], [22, 10, 30]), 'L': ([-4, -11.4, 11], [22, -10, -30])}),
+    (16, dict(HFG), 'inOutSine'),
+]))
+H['blood.skill4_fail'] = clip(12, blend_in=0.5, blend_out=4, bones=seq([
+    (0, VEIL),
+    (2.5, HP(body=[4, 10, 0], head=[16, 0, 0], left_arm=[-30, 10, -16], right_arm=[-24, -8, 22], root={'pos': [0, -0.6, -0.6], 'rot': [-2, 0, 0]}), 'outCubic'),
+    (5, HP(body=[6, 10, 0], head=[12, 10, 0], left_arm=[-28, 10, -16], right_arm=[-24, -8, 22], root={'pos': [0, -0.6, -0.4]})),
+    (7, HP(body=[6, 10, 0], head=[12, -10, 0], left_arm=[-28, 10, -16], right_arm=[-24, -8, 22], root={'pos': [0, -0.6, -0.4]})),
+    (12, HK, 'inOutSine'),
+]), fp=fpseq([
+    (0, {'R': H_CROSS_R, 'L': H_CROSS_L, 'cam': [0, 0, 0], 'fov': -4}),
+    (2.5, {'R': LOW_R, 'L': LOW_L, 'cam': [2, 0, 0], 'fov': 0}, 'outCubic'),
+    (5, {'cam': [1.5, 2, 0]}),
+    (7, {'cam': [1.5, -2, 0]}),
+    (12, dict(HFG), 'inOutSine'),
+]))
+
+# ================================================================ R. 혈월만개 (78틱)
+# 0~10 심장을 움켜쥠 / 10 포효 / 12~28 날개로 떠오름 / 16 사슬 / 18~30 끌어당김 / 30~56 공중에서 흡혈 / 58 폭발 / 60 하강
+CLUTCH = HP(body=[36, 0, 0], head=[30, 0, 0], right_arm=[-70, 40, 10], left_arm=[-50, -30, -10], root={'pos': [0, -2.6, 0]}, right_leg=[16, 10, 10], left_leg=[-16, -10, -10])
+H_ROAR = HP(body=[-26, 0, 0], head=[-44, 0, 0], right_arm=[-30, 20, 100], left_arm=[-30, -20, -100], root={'pos': [0, 0.4, 0], 'rot': [-6, 0, 0]}, right_leg=[6, 10, 12], left_leg=[-6, -10, -12])
+HOVER = HP(body=[-8, 0, 0], head=[-14, 0, 0], right_arm=[-40, 30, 70], left_arm=[-40, -30, -70], root={'pos': [0, 0, 0], 'rot': [-4, 0, 0]}, right_leg=[24, 4, 4], left_leg=[-6, -4, -4])
+CHAIN = HP(body=[10, 0, 0], head=[-6, 0, 0], right_arm=[-90, -24, 30], left_arm=[-90, 24, -30], root={'pos': [0, 0, 1], 'rot': [2, 0, 0]}, right_leg=[24, 4, 4], left_leg=[-6, -4, -4])
+PULLB = HP(body=[-14, 0, 0], head=[-10, 0, 0], right_arm=[-40, 30, 20], left_arm=[-40, -30, -20], root={'pos': [0, 0, -1], 'rot': [-6, 0, 0]}, right_leg=[20, 4, 4], left_leg=[-10, -4, -4])
+FEAST = HP(body=[-24, 0, 0], head=[-40, 0, 0], right_arm=[-60, 20, 90], left_arm=[-60, -20, -90], root={'pos': [0, 0, 0], 'rot': [-10, 0, 0]}, right_leg=[26, 4, 4], left_leg=[-4, -4, -4])
+GATHER = HP(body=[40, 0, 0], head=[24, 0, 0], right_arm=[-70, 50, 10], left_arm=[-70, -50, -10], root={'pos': [0, -1, 0], 'rot': [10, 0, 0]}, right_leg=[40, 8, 8], left_leg=[30, -8, -8])
+NOVA = HP(body=[-30, 0, 0], head=[-40, 0, 0], right_arm=[-20, 30, 120], left_arm=[-20, -30, -120], root={'pos': [0, 0.5, 0], 'rot': [-10, 0, 0]}, right_leg=[10, 10, 12], left_leg=[-10, -10, -12])
+LAND = HP(body=[36, 0, 0], head=[6, 0, 0], right_arm=[-30, -20, 40], left_arm=[-30, 20, -40], root={'pos': [0, -3, 0.5], 'rot': [4, 0, 0]}, right_leg=[20, 10, 10], left_leg=[-26, -8, -8])
+_ult = [
+    (0, HK),
+    (5, CLUTCH, 'outCubic'),
+    (9, dict(CLUTCH, body=[40, 0, 0], head=[34, 0, 0], root={'pos': [0, -2.9, 0], 'rot': [0, 0, 0]})),
+    (11, H_ROAR, 'outExpo'),
+    (15, dict(H_ROAR, body=[-20, 0, 0], head=[-36, 0, 0])),
+    (16.5, CHAIN, 'outExpo'),
+    (20, dict(CHAIN, right_arm=[-94, -20, 30], left_arm=[-94, 20, -30])),
+    (24, PULLB, 'inOutCubic'),
+    (29, dict(PULLB, body=[-12, 0, 0], right_arm=[-36, 34, 16], left_arm=[-36, -34, -16])),
+    (33, FEAST, 'inOutCubic'),
+]
+for k in range(7):
+    t = 36 + k * 3
+    _ult.append((t, dict(FEAST, head=[-44, 0, 0], body=[-27, 0, 0]), 'outQuad'))
+    _ult.append((t + 1.5, FEAST, 'inOutSine'))
+_ult += [
+    (57, GATHER, 'inCubic'),
+    (58.5, NOVA, 'outExpo'),
+    (62, dict(NOVA, body=[-24, 0, 0], head=[-32, 0, 0])),
+    (67, LAND, 'outBounce'),
+    (72, dict(LAND, body=[30, 0, 0], root={'pos': [0, -2.6, 0.4], 'rot': [3, 0, 0]})),
+    (78, HK, 'inOutSine'),
+]
+_ult_fp = [
+    (0, dict(HFG)),
+    (5, {'R': H_CLUTCH_R, 'L': LOW_L, 'cam': [8, 0, 0], 'fov': -6}, 'outCubic'),
+    (9, {'R': (H_CLUTCH_R[0], [28, 50, 30]), 'cam': [9, 0, 0], 'fov': -7}),
+    (11, {'R': H_OPEN_R, 'L': H_OPEN_L, 'cam': [-10, 0, 0], 'fov': 12}, 'outExpo'),
+    (15, {'cam': [-8, 0, 0], 'fov': 10}),
+    (16.5, {'R': ([4, -9, 15], [20, 10, 24]), 'L': ([-4, -9, 14.5], [20, -10, -24]), 'cam': [0, 0, 0], 'fov': -4}, 'outExpo'),
+    (20, {'cam': [1, 0, 0], 'fov': -4}),
+    (24, {'R': PULL_R, 'L': PULL_L, 'cam': [-3, 0, 0], 'fov': 6}, 'inOutCubic'),
+    (29, {'cam': [-2, 0, 0], 'fov': 5}),
+    (33, {'R': H_OPEN_R, 'L': H_OPEN_L, 'cam': [-14, 0, 0], 'fov': 10}, 'inOutCubic'),
+]
+for k in range(7):
+    t = 36 + k * 3
+    _ult_fp.append((t, {'cam': [-15, 0, 0], 'fov': 11}, 'outQuad'))
+    _ult_fp.append((t + 1.5, {'cam': [-14, 0, 0], 'fov': 10}, 'inOutSine'))
+_ult_fp += [
+    (57, {'R': ([3, -12, 8], [30, 40, 40]), 'L': ([-3, -12, 7.5], [30, -40, -40]), 'cam': [6, 0, 0], 'fov': -8}, 'inCubic'),
+    (58.5, {'R': H_OPEN_R, 'L': H_OPEN_L, 'cam': [-8, 0, 0], 'fov': 16}, 'outExpo'),
+    (62, {'cam': [-5, 0, 0], 'fov': 10}),
+    (67, {'R': LOW_R, 'L': LOW_L, 'cam': [5, 0, 0], 'fov': -3}, 'outBounce'),
+    (78, dict(HFG), 'inOutSine'),
+]
+H['blood.ult'] = clip(78, blend_in=2, blend_out=5, root_pivot=12, bones=seq(_ult), fp=fpseq(_ult_fp))
+
+# ================================================================ T. 박쥐산개 (0~8 박쥐 떼 = 몸 안 보임, 8 에 나타나며 일어섬)
+H['blood.swarm'] = clip(16, blend_in=0.5, blend_out=4, bones=seq([
+    (0, LAND),
+    (8, LAND),
+    (11, HP(body=[20, 0, 0], head=[-14, 0, 0], right_arm=[-20, -10, 40], left_arm=[-20, 10, -40], root={'pos': [0, -1.6, 0], 'rot': [0, 0, 0]}), 'outCubic'),
+    (16, HK, 'inOutSine'),
+]), fp=fpseq([
+    (0, {'R': HIDE_R, 'L': HIDE_L, 'cam': [0, 0, 0], 'fov': 18}),
+    (8, {'R': HIDE_R, 'L': HIDE_L, 'cam': [3, 0, 0], 'fov': 14}),
+    (11, {'R': ([9, -13, 6], [40, -30, 80]), 'L': ([-9, -13, 5.5], [40, 30, -80]), 'cam': [-1, 0, 0], 'fov': 4}, 'outCubic'),
+    (16, dict(HFG), 'inOutSine'),
+]))
+
+H['blood.select'] = clip(26, blend_in=2, blend_out=5, bones=seq([
+    (0, HP(body=[0, 0, 0], head=[0, 0, 0], right_arm=[0, 0, 0], left_arm=[0, 0, 0], right_leg=[0, 0, 0], left_leg=[0, 0, 0], root={'pos': [0, 0, 0]})),
+    (6, CLUTCH, 'outCubic'),
+    (10, dict(CLUTCH, body=[40, 0, 0], head=[34, 0, 0], root={'pos': [0, -2.9, 0], 'rot': [0, 0, 0]})),
+    (13, H_ROAR, 'outExpo'),
+    (20, dict(H_ROAR, body=[-20, 0, 0], head=[-34, 0, 0])),
+    (26, HK, 'inOutSine'),
+]), fp=fpseq([
+    (0, {'R': LOW_R, 'L': LOW_L, 'cam': [0, 0, 0]}),
+    (6, {'R': H_CLUTCH_R, 'L': LOW_L}, 'outCubic'),
+    (13, {'R': H_OPEN_R, 'L': H_OPEN_L, 'cam': [-2, 0, 0]}, 'outExpo'),
+    (26, dict(HFG), 'inOutSine'),
+]))
+
+write('blood', H)
+
+
+# =====================================================================================
 #                        공통 피격 반응 (능력 없는 플레이어 포함)
 # =====================================================================================
 C = {}

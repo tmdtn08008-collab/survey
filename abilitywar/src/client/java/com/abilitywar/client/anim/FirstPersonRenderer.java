@@ -29,12 +29,13 @@ public final class FirstPersonRenderer {
         if (p == null) return false;
         String key = ((AWPlayer) p).aw$getAbilityKey();
         if (key.isEmpty()) return false;
-        if (((AWPlayer) p).aw$hasFlag(AWPlayer.FLAG_SHADOW)) return true;
+        if (((AWPlayer) p).aw$hasFlag(AWPlayer.FLAG_SHADOW) || ((AWPlayer) p).aw$hasFlag(AWPlayer.FLAG_SWARM)) return true;
         return p.getMainHandStack().isEmpty() && !p.isUsingItem();
     }
 
     public static void render(float tickDelta, MatrixStack matrices, VertexConsumerProvider.Immediate consumers, ClientPlayerEntity player, int light) {
         // 그림자 상태에서는 팔이 보이지 않음
+        if (((AWPlayer) player).aw$hasFlag(AWPlayer.FLAG_SWARM)) return;
         if (((AWPlayer) player).aw$hasFlag(AWPlayer.FLAG_SHADOW)) {
             FpEffects.renderHandless(tickDelta, matrices, consumers, player, light);
             consumers.draw();
@@ -94,6 +95,7 @@ public final class FirstPersonRenderer {
         m.transformPosition(fist);
         FIST_VIEW[arm].set(fist);
         com.abilitywar.client.fx.dragon.DragonParts.fpClaws(matrices, consumers, player, arm);
+        com.abilitywar.client.fx.blood.BloodParts.fpClaws(matrices, consumers, player, arm);
         if (arm == 0) com.abilitywar.client.fx.blade.BladeParts.fpSword(matrices, consumers, light, player, pose.rot[AnimClip.FP_ITEM], pose.pos[AnimClip.FP_ITEM]);
         // 팔 모델 방향 맞추기: 모델 +Y(손 방향) -> -Z, 모델 앞면 -> 위
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90f));
@@ -105,6 +107,7 @@ public final class FirstPersonRenderer {
             sleeve.render(matrices, consumers.getBuffer(RenderLayer.getEntityTranslucent(player.getSkinTexture())), light, OverlayTexture.DEFAULT_UV);
         }
         com.abilitywar.client.fx.dragon.DragonParts.fpArmOverlay(matrices, consumers, light, player, part);
+        com.abilitywar.client.fx.blood.BloodParts.fpArmOverlay(matrices, consumers, light, player, part);
         matrices.pop();
 
         restore(part, savedA);

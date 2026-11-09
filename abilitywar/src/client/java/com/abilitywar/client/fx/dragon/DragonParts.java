@@ -44,12 +44,12 @@ public final class DragonParts {
         return ((AWPlayer) p).aw$hasFlag(AWPlayer.FLAG_TRANSFORMED);
     }
 
-    static float smooth(float x) {
+    public static float smooth(float x) {
         x = MathHelper.clamp(x, 0, 1);
         return x * x * (3 - 2 * x);
     }
 
-    static float env(float t, float in0, float in1, float out0, float out1) {
+    public static float env(float t, float in0, float in1, float out0, float out1) {
         return smooth((t - in0) / Math.max(0.01f, in1 - in0)) * (1 - smooth((t - out0) / Math.max(0.01f, out1 - out0)));
     }
 
@@ -193,7 +193,7 @@ public final class DragonParts {
      * 날개 하나 (wing 공간: 바깥 +X, 위 -Y). 안쪽 판과 바깥 판 두 장으로 나눠서
      * 바깥 판을 뒤로 꺾는다 (평평한 판처럼 보이지 않게).
      */
-    static void wingQuad(MatrixStack ms, VertexConsumer vc, int light, float size, float r, float g, float b, float alpha, boolean mirror, float bendDeg) {
+    public static void wingQuad(MatrixStack ms, VertexConsumer vc, int light, float size, float r, float g, float b, float alpha, boolean mirror, float bendDeg) {
         Matrix4f m = ms.peek().getPositionMatrix();
         Matrix3f n = ms.peek().getNormalMatrix();
         float y0 = -0.88f * size, y1 = 0.12f * size;

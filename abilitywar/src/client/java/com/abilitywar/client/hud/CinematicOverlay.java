@@ -19,10 +19,11 @@ public final class CinematicOverlay {
     static final Theme VOID = new Theme("void", 0.08f, 0.0f, 0.16f, 0x9B5CFF, 0x9B5CFF, 0xF4EAFF, 0xD9C2FF, 0xD9C2FF, 0xF4EAFF, 24, 46, 46, 44);
     static final Theme BLADE = new Theme("blade", 0.12f, 0.02f, 0.18f, 0xB44CFF, 0x8A2BE2, 0xF5E8FF, 0xD8B8FF, 0xD8B8FF, 0xF0D8FF, 20, 46, 48, 40);
     static final Theme DRAGON = new Theme("dragon", 0.2f, 0.05f, 0.0f, 0xFF7A2E, 0xFF4A12, 0xFFF1DC, 0xFFD2A0, 0xFFC890, 0xFFE6C0, 26, 56, 58, 42);
+    static final Theme BLOOD = new Theme("blood", 0.24f, 0.0f, 0.02f, 0xFF2A3A, 0xD0102A, 0xFFE4E4, 0xFFB4B4, 0xFFB0B0, 0xFFD8D8, 16, 58, 36, 34);
 
     static Theme theme() {
         String ty = CameraController.cinematicType();
-        return ty.startsWith("dragon") ? DRAGON : ty.startsWith("blade") ? BLADE : VOID;
+        return ty.startsWith("dragon") ? DRAGON : ty.startsWith("blade") ? BLADE : ty.startsWith("blood") ? BLOOD : VOID;
     }
 
     public static void render(DrawContext ctx, float td) {
@@ -36,6 +37,11 @@ public final class CinematicOverlay {
         float out = Math.min(1, Math.max(0, (dur - t) / 6f));
         float k = Math.min(in, out);
         k = k * k * (3 - 2 * k);
+        // 혈월만개: 하늘과 땅을 핏빛으로 (곱하기 합성)
+        if (th == BLOOD) {
+            float red = k * Math.min(1, t / 14f);
+            multiply(ctx, sw, sh, 1f, 1f - 0.62f * red, 1f - 0.58f * red);
+        }
         // 비네트
         RenderSystem.enableBlend();
         RenderSystem.setShaderColor(th.vr(), th.vg(), th.vb(), 0.95f * k);
@@ -77,7 +83,7 @@ public final class CinematicOverlay {
             net.minecraft.util.Identifier tex = com.abilitywar.AbilityWar.id("textures/gui/ult_title_" + th.key() + ".png");
             if (MinecraftClient.getInstance().getResourceManager().getResource(tex).isPresent()) {
                 // 능력별 제목 그림 (용기사 = 한자, 공허 = 영어): 크게 들어왔다가 자리 잡음
-                float[] sz = {1024, th == DRAGON ? 300 : th == BLADE ? 260 : 220}; // tools/gen_titles.py 의 그림 크기
+                float[] sz = {1024, th == DRAGON || th == BLOOD ? 300 : th == BLADE ? 260 : 220}; // tools/gen_titles.py 의 그림 크기
                 float w = Math.min(sw * 0.62f, 380f);
                 float h = w * sz[1] / sz[0];
                 float zoom = 1f + 0.35f * (float) Math.pow(1 - Math.min(1, tt / 7f), 3);
@@ -116,13 +122,29 @@ public final class CinematicOverlay {
             float sa = Math.min(1, Math.max(0, (tt - 3) / 5f)) * out;
             int sw2 = tr.getWidth(sub);
             float lineW = (sw2 * 1.4f + 40) * Math.min(1, tt / 10f);
-            HudDraw.rect(ctx, sw / 2f - lineW, cy + 20, sw / 2f + lineW, cy + 21, HudDraw.argb(sa * 0.8f, th == DRAGON ? 0xFF9A50 : th == BLADE ? 0xC870FF : 0xB27BFF));
+            HudDraw.rect(ctx, sw / 2f - lineW, cy + 20, sw / 2f + lineW, cy + 21, HudDraw.argb(sa * 0.8f, th == DRAGON ? 0xFF9A50 : th == BLADE ? 0xC870FF : th == BLOOD ? 0xFF3A4A : 0xB27BFF));
             ctx.getMatrices().push();
             ctx.getMatrices().translate(sw / 2f, cy + 27, 0);
             ctx.getMatrices().scale(1.4f, 1.4f, 1);
             ctx.drawTextWithShadow(tr, sub, -sw2 / 2, 0, ((int) (sa * 255) << 24) | th.sub());
             ctx.getMatrices().pop();
         }
+    }
+
+    /** 화면 전체에 색을 곱함. */
+    static void multiply(DrawContext ctx, float w, float h, float r, float g, float b) {
+        org.joml.Matrix4f m = ctx.getMatrices().peek().getPositionMatrix();
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(org.lwjgl.opengl.GL11.GL_DST_COLOR, org.lwjgl.opengl.GL11.GL_ZERO);
+        RenderSystem.setShader(net.minecraft.client.render.GameRenderer::getPositionColorProgram);
+        net.minecraft.client.render.BufferBuilder bb = net.minecraft.client.render.Tessellator.getInstance().getBuffer();
+        bb.begin(net.minecraft.client.render.VertexFormat.DrawMode.QUADS, net.minecraft.client.render.VertexFormats.POSITION_COLOR);
+        bb.vertex(m, 0, h, 0).color(r, g, b, 1).next();
+        bb.vertex(m, w, h, 0).color(r, g, b, 1).next();
+        bb.vertex(m, w, 0, 0).color(r, g, b, 1).next();
+        bb.vertex(m, 0, 0, 0).color(r, g, b, 1).next();
+        net.minecraft.client.render.Tessellator.getInstance().draw();
+        RenderSystem.defaultBlendFunc();
     }
 
     private CinematicOverlay() {

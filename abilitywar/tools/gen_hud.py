@@ -83,6 +83,15 @@ LAYOUTS['dragon'] = {
     'card': (1478, 335, 1818, 548),
 }
 
+# 혈귀: tools/gen_blood_hud.py 가 만든 임시 그림 (공허와 같은 배치). 사용자 그림이 오면 교체.
+LAYOUTS['blood'] = {
+    'slots': dict(LAYOUTS['void']['slots']),
+    'labels': dict(LAYOUTS['void']['labels']),
+    'accent': [1.0, 0.28, 0.32], 'accent2': [0.75, 0.04, 0.1],
+    'trail': [300, 120, 1150, 266],
+    'emblem': [90, 193, 70],
+}
+
 
 def octagon(x0, y0, x1, y1, c):
     return [(x0 + c, y0), (x1 - c, y0), (x1, y0 + c), (x1, y1 - c), (x1 - c, y1), (x0 + c, y1), (x0, y1 - c), (x0, y0 + c)]

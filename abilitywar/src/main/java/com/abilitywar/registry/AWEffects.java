@@ -24,6 +24,25 @@ public final class AWEffects {
     public static final StatusEffect MANA_MARK = Registry.register(Registries.STATUS_EFFECT, AbilityWar.id("mana_mark"),
             new AWStatusEffect(StatusEffectCategory.HARMFUL, 0xB44CFF, false));
 
+    /** 출혈 (혈귀): 단계(=증폭+1, 최대 5)마다 1초에 0.4 피해. */
+    public static final StatusEffect BLEED = Registry.register(Registries.STATUS_EFFECT, AbilityWar.id("bleed"), new BleedEffect());
+
+    public static class BleedEffect extends StatusEffect {
+        public BleedEffect() {
+            super(StatusEffectCategory.HARMFUL, 0xB0101C);
+        }
+
+        @Override
+        public boolean canApplyUpdateEffect(int duration, int amplifier) {
+            return duration % 20 == 0;
+        }
+
+        @Override
+        public void applyUpdateEffect(LivingEntity entity, int amplifier) {
+            if (entity.getHealth() > 1f) entity.damage(entity.getDamageSources().magic(), 0.4f * (amplifier + 1));
+        }
+    }
+
     public static void init() {
     }
 

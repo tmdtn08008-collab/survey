@@ -25,6 +25,8 @@ public class PlayerEntityRendererMixin {
         if (((AWPlayer) player).aw$hasFlag(AWPlayer.FLAG_SHADOW)) {
             VfxManager.renderShadowForm(player, tickDelta, matrices, consumers, light);
             ci.cancel();
+        } else if (((AWPlayer) player).aw$hasFlag(AWPlayer.FLAG_SWARM)) {
+            ci.cancel();
         }
     }
 }

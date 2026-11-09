@@ -133,7 +133,53 @@ def blade():
     save(out, 'ult_title_blade.png')
 
 
+def blood():
+    """혈귀: 한자 血月滿開, 핏빛 + 아래로 흘러내리는 핏방울."""
+    W, H = 1024, 300
+    m = text_mask(W, H, '血月滿開', KANJI, 190, 34, 4, yoff=-26)
+    # 글자 아랫면에서 흘러내리는 핏줄기
+    r = random.Random(11)
+    drip = Image.new('L', (W, H), 0)
+    d = ImageDraw.Draw(drip)
+    below = np.zeros_like(m)
+    below[:-3] = m[3:]
+    bottom = (m > 0.5) & (np.roll(m, -6, axis=0) < 0.5)
+    ys, xs = np.where(bottom)
+    idx = list(range(len(xs)))
+    r.shuffle(idx)
+    used = []
+    for i in idx:
+        x, y = int(xs[i]), int(ys[i])
+        if any(abs(x - u) < 22 for u in used) or y > H - 70 or m[y + 8:y + 60, x].max() > 0.3:
+            continue
+        used.append(x)
+        L = r.uniform(18, 70)
+        w0 = r.uniform(3.5, 6.5)
+        steps = 24
+        for k in range(steps):
+            t = k / (steps - 1)
+            ww = w0 * (1 - 0.55 * t)
+            yy = y + t * L
+            d.ellipse([x - ww, yy - ww, x + ww, yy + ww], fill=255)
+        bw = w0 * 1.25
+        d.ellipse([x - bw, y + L - bw * 0.6, x + bw, y + L + bw * 1.4], fill=255)
+        if len(used) > 26:
+            break
+    da = np.asarray(drip.filter(ImageFilter.GaussianBlur(0.8)), np.float32) / 255
+    m = np.maximum(m, da)
+    out = compose(W, H, m, (255, 170, 170), (200, 16, 36), (90, 0, 10), (18, 0, 2), (230, 20, 40), 18, 21, rough=0.25)
+    # 뒤에 걸린 핏빛 달
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    rr = np.sqrt((xx - W / 2) ** 2 + (yy - H / 2 + 24) ** 2)
+    moon = np.clip((150 - rr) / 3, 0, 1) * 0.0 + np.exp(-((rr - 140) / 6.0) ** 2) * 0.55
+    for k, c in enumerate((1.0, 0.25, 0.3)):
+        out[..., k] = out[..., k] * (1 - moon * (1 - out[..., 3])) + c * moon * (1 - out[..., 3])
+    out[..., 3] = np.maximum(out[..., 3], moon)
+    save(out, 'ult_title_blood.png')
+
+
 if __name__ == '__main__':
+    blood()
     dragon()
     void()
     blade()

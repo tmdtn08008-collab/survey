@@ -234,6 +234,39 @@ public final class CameraController {
                 look = S.add(F.multiply(11 + 4 * k)).add(0, 2.0, 0);
                 fov = 80 - 3 * k;
             }
+        } else if (cin.type.equals("blood_ult")) {
+            // 핏빛 달은 시전자 뒤쪽 하늘 (BloodFx.Ult: start - F*46 + 30)
+            Vec3d S = cin.start;
+            Vec3d moon = S.subtract(F.multiply(46)).add(0, 30, 0);
+            if (t < 16) {
+                // 정면 로우앵글: 고개를 드는 혈귀 → 뒤로 떠오르는 달
+                float k = smooth(t / 16f);
+                double th = Math.toRadians(28 - 16 * k);
+                double rad = 2.6 + 2.4 * k;
+                cam = C.add(F.multiply(Math.cos(th) * rad)).add(R.multiply(Math.sin(th) * rad)).add(0, 0.35, 0);
+                look = C.add(0, 1.5, 0).lerp(moon, 0.06 + 0.1 * k);
+                fov = 60 + 14 * k;
+            } else if (t < 34) {
+                // 사슬이 뻗고 적이 끌려옴: 높은 측면 와이드
+                float k = smooth((t - 16) / 18f);
+                cam = S.add(R.multiply(10 - 1.5 * k)).add(F.multiply(7 - 2 * k)).add(0, 7 - 1.5 * k, 0);
+                look = S.add(0, 1.8 + 1.2 * k, 0);
+                fov = 84 - 4 * k;
+            } else if (t < 58) {
+                // 흡혈: 공중의 혈귀를 아래에서 올려다보며 천천히 돎 (뒤로 달)
+                float k = smooth((t - 34) / 24f);
+                double th = Math.toRadians(-25 + 50 * k);
+                double rad = 6.5;
+                cam = S.add(F.multiply(Math.cos(th) * rad)).add(R.multiply(Math.sin(th) * rad)).add(0, 0.6, 0);
+                look = C.add(0, 1.0, 0);
+                fov = 78;
+            } else {
+                // 피의 폭발: 높은 부감
+                float k = smooth((t - 58) / 20f);
+                cam = S.add(F.multiply(9 + 3 * k)).add(R.multiply(6)).add(0, 9 + 3 * k, 0);
+                look = S.add(0, 1.0, 0);
+                fov = 80;
+            }
         } else if (cin.type.equals("dragon_ult")) {
             // 고룡은 용기사 뒤 10칸에 있고 머리는 높이 9~13칸
             Vec3d S = cin.start;
