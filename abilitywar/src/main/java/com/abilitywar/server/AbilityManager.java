@@ -74,6 +74,10 @@ public final class AbilityManager {
         Ability a = d.ability();
         if (a == null) return;
         d.setNow(player.getServer().getTicks());
+        if (slot == SkillSlot.DASH) {
+            handleDash(player, d, a, extra);
+            return;
+        }
         // 그림자 상태에서 T = 탈출 (쿨타임 무관)
         if (d.shadowForm) {
             if (slot == SkillSlot.PASSIVE) a.useSkill(player, d, slot, extra);
@@ -94,6 +98,47 @@ public final class AbilityManager {
         if (a.useSkill(player, d, slot, extra)) {
             d.dirty = true;
         }
+    }
+
+    public static final int DASH_COOLDOWN = 60;
+
+    /**
+     * 공통 대시 (Q). 이동 자체는 대시한 클라이언트가 바로 처리하고, 서버는 쿨타임 확인 + 주변에 연출을 알린다.
+     * extra: [방향 x(float), 방향 z(float), 방향 종류(byte: 0 앞, 1 뒤, 2 왼쪽, 3 오른쪽)]
+     */
+    static void handleDash(ServerPlayerEntity player, AbilityData d, Ability a, PacketByteBuf extra) {
+        if (!canAct(player, d) || d.isBusy() || d.shadowForm || d.isOnCooldown(SkillSlot.DASH)) {
+            deny(player);
+            return;
+        }
+        float dx = 0, dz = 1;
+        int kind = 0;
+        try {
+            dx = extra.readFloat();
+            dz = extra.readFloat();
+            kind = extra.readByte();
+        } catch (Exception ignored) {
+        }
+        double len = Math.sqrt(dx * dx + dz * dz);
+        if (len < 1e-3 || !Double.isFinite(len)) return;
+        dx /= len;
+        dz /= len;
+        kind = Math.max(0, Math.min(3, kind));
+        setBlocking(player, false);
+        d.startCooldown(SkillSlot.DASH, DASH_COOLDOWN);
+        d.setBusy(4);
+        player.fallDistance = 0;
+        String[] dirs = {"forward", "back", "left", "right"};
+        AWNet.animOthers(player, a.key + ".dash_" + dirs[kind]);
+        NbtCompound n = new NbtCompound();
+        n.putInt("e", player.getId());
+        n.putString("ab", a.key);
+        n.putInt("c", a.color);
+        n.putFloat("dx", dx);
+        n.putFloat("dz", dz);
+        AWNet.fx(player.getServerWorld(), player.getPos(), "dash", n);
+        player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), AWSounds.DASH, SoundCategory.PLAYERS, 0.9f, 0.9f + player.getRandom().nextFloat() * 0.2f);
+        d.dirty = true;
     }
 
     public static void handleAttack(ServerPlayerEntity player, int targetId) {

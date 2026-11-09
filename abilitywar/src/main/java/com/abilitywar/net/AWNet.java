@@ -127,6 +127,16 @@ public final class AWNet {
         buf.release();
     }
 
+    /** 본인을 제외한 주변 플레이어에게만 애니메이션 (본인은 클라이언트에서 미리 재생). */
+    public static void animOthers(ServerPlayerEntity p, String anim) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeVarInt(p.getId());
+        buf.writeString(anim);
+        buf.writeFloat(1f);
+        for (ServerPlayerEntity o : PlayerLookup.tracking(p)) if (o != p) send(o, S2C_ANIM, buf);
+        buf.release();
+    }
+
     /** 범위 내 플레이어에게 이펙트 생성. */
     public static void fx(ServerWorld world, Vec3d pos, String type, NbtCompound data) {
         data.putDouble("x", pos.x);

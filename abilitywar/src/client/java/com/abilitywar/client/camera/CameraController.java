@@ -87,6 +87,7 @@ public final class CameraController {
             FpPose p = FirstPersonRenderer.lastPose;
             if (p != null && mc.player != null && mc.options.getPerspective().isFirstPerson() && FirstPersonRenderer.shouldTakeOver(mc.player)) f += p.fov;
             f -= fovPunch * 4;
+            f += com.abilitywar.client.input.DashController.fov(tickDelta);
         }
         return f;
     }

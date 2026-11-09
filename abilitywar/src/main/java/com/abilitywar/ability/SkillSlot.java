@@ -7,7 +7,9 @@ public enum SkillSlot {
     SKILL3("3"),
     SKILL4("4"),
     ULTIMATE("R"),
-    PASSIVE("T");
+    PASSIVE("T"),
+    /** 모든 능력 공통 대시. */
+    DASH("Q");
 
     public static final SkillSlot[] VALUES = values();
     public final String keyLabel;

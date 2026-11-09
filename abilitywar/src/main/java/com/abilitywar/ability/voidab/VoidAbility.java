@@ -86,6 +86,7 @@ public class VoidAbility extends Ability {
             case SKILL4 -> counterStance(p, d);
             case ULTIMATE -> ultimate(p, d);
             case PASSIVE -> d.shadowForm ? shadowExit(p, d, extra) : shadowEnter(p, d);
+            case DASH -> false; // 공통 대시는 AbilityManager 가 처리
         };
     }
 

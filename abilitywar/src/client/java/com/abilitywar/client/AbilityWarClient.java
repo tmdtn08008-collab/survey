@@ -54,6 +54,7 @@ public class AbilityWarClient implements ClientModInitializer {
             if (renderer instanceof PlayerEntityRenderer pr) helper.register(new HandTracker.Feature(pr));
         });
 
+        ClientTickEvents.START_CLIENT_TICK.register(com.abilitywar.client.input.DashController::tick);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.world != null && !client.isPaused()) {
                 ClientClock.tick();
@@ -86,5 +87,6 @@ public class AbilityWarClient implements ClientModInitializer {
         VfxManager.clear();
         DamageNumbers.clear();
         CameraController.reset();
+        com.abilitywar.client.input.DashController.reset();
     }
 }

@@ -39,7 +39,7 @@ import java.util.Map;
  */
 public final class InputHandler {
     public static final String CATEGORY = "key.categories.abilitywar";
-    public static KeyBinding SKILL1, SKILL2, SKILL3, SKILL4, ULTIMATE, PASSIVE, BLOCK, SELECT;
+    public static KeyBinding SKILL1, SKILL2, SKILL3, SKILL4, ULTIMATE, PASSIVE, BLOCK, SELECT, DASH;
     private static KeyBinding[] SLOT_KEYS;
 
     private static boolean blockHeld;
@@ -56,6 +56,7 @@ public final class InputHandler {
         PASSIVE = reg("key.abilitywar.passive", GLFW.GLFW_KEY_T);
         BLOCK = reg("key.abilitywar.block", GLFW.GLFW_KEY_F);
         SELECT = reg("key.abilitywar.select", GLFW.GLFW_KEY_B);
+        DASH = reg("key.abilitywar.dash", GLFW.GLFW_KEY_Q);
         SLOT_KEYS = new KeyBinding[]{SKILL1, SKILL2, SKILL3, SKILL4, ULTIMATE, PASSIVE};
     }
 
@@ -107,6 +108,10 @@ public final class InputHandler {
             else if (action == GLFW.GLFW_RELEASE) setBlock(false);
             return true;
         }
+        if (DASH.matchesKey(key, scancode)) {
+            if (action == GLFW.GLFW_PRESS) DashController.tryDash();
+            return true;
+        }
         return false;
     }
 
@@ -122,6 +127,10 @@ public final class InputHandler {
         if (BLOCK.matchesMouse(button)) {
             if (action == GLFW.GLFW_PRESS) setBlock(true);
             else if (action == GLFW.GLFW_RELEASE) setBlock(false);
+            return true;
+        }
+        if (DASH.matchesMouse(button)) {
+            if (action == GLFW.GLFW_PRESS) DashController.tryDash();
             return true;
         }
         return false;
@@ -140,7 +149,7 @@ public final class InputHandler {
 
     // ------------------------------------------------------------------ actions
 
-    static boolean locked(ClientPlayerEntity p) {
+    public static boolean locked(ClientPlayerEntity p) {
         AWPlayer awp = (AWPlayer) p;
         return p.hasStatusEffect(AWEffects.STUN) || awp.aw$hasFlag(AWPlayer.FLAG_CINEMATIC);
     }
@@ -166,7 +175,7 @@ public final class InputHandler {
         ClientPlayNetworking.send(AWNet.C2S_SKILL, buf);
     }
 
-    static void deny() {
+    public static void deny() {
         MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(AWSounds.UI_DENY, 1.0f, 0.5f));
     }
 

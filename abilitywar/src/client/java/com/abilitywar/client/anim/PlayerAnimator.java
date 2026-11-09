@@ -45,6 +45,10 @@ public final class PlayerAnimator {
 
     public static void play(int entityId, String clipId, float speed) {
         AnimClip c = AnimRegistry.get(clipId);
+        if (c == null && clipId.indexOf('.') > 0 && !clipId.startsWith("common.")) {
+            // 능력 전용 동작이 없으면 공통 동작 (예: void.dash_left -> common.dash_left)
+            c = AnimRegistry.get("common" + clipId.substring(clipId.indexOf('.')));
+        }
         if (c == null) {
             if (MISSING.add(clipId)) AbilityWar.LOG.warn("Missing animation clip: {}", clipId);
             return;

@@ -755,6 +755,64 @@ public final class Effects {
         }
     }
 
+    // ================================================================ DASH (공통 대시)
+    public static final class DashTrail extends Fx {
+        final int entity, color;
+        final boolean dark;
+        final Vec3d dir, start;
+        final float rot = R.nextFloat() * 6.28f;
+
+        DashTrail(ClientWorld w, int entity, int color, String ability, Vec3d dir, Vec3d start) {
+            super(10);
+            this.entity = entity;
+            this.color = color;
+            this.dark = "void".equals(ability);
+            this.dir = dir.lengthSquared() < 1e-6 ? new Vec3d(0, 0, 1) : dir.normalize();
+            Vec3d g = ground(w, start.add(0, 0.4, 0), 3);
+            this.start = g != null ? g.add(0, 0.03, 0) : start;
+            // 출발 지점: 바람 고리 + 먼지
+            for (int i = 0; i < 14; i++) {
+                double a = R.nextDouble() * Math.PI * 2;
+                Vec3d out = new Vec3d(Math.cos(a), 0, Math.sin(a)).multiply(rf(0.08f, 0.2f)).subtract(this.dir.multiply(0.12));
+                spawn(dark ? Kind.SMOKE_DARK : Kind.SMOKE_ADD, this.start.add(0, 0.15, 0), out.add(0, 0.02, 0), rf(10, 16), rf(0.25f, 0.45f))
+                        .color(dark ? 0x0A0414 : 0xDDDDEE, dark ? 0.5f : 0.25f).size1 = 0.8f;
+            }
+        }
+
+        @Override
+        public boolean tick(ClientWorld w) {
+            Entity e = w.getEntityById(entity);
+            if (e != null && age < 6) {
+                Vec3d back = dir.multiply(-1);
+                // 1인칭 본인은 카메라에 붙지 않게 뒤쪽 아래에서만
+                Vec3d c = isLocalFp(e) ? e.getPos().add(back.multiply(1.6)).add(0, 0.5, 0) : e.getPos().add(0, e.getHeight() * 0.5, 0);
+                for (int i = 0; i < 6; i++) {
+                    Vec3d off = new Vec3d(rf(-0.35f, 0.35f), rf(-0.8f, 0.8f), rf(-0.35f, 0.35f));
+                    Particles.P p = spawn(Kind.STREAK, c.add(off), back.multiply(rf(0.3f, 0.7f)), rf(5, 9), rf(0.05f, 0.1f));
+                    p.color(i % 2 == 0 ? color : PALE, 0.9f);
+                    p.drag = 0.8f;
+                }
+                if (dark) {
+                    spawn(Kind.SMOKE_DARK, c.add(rf(-0.3f, 0.3f), rf(-0.6f, 0.4f), rf(-0.3f, 0.3f)), back.multiply(0.05), 14, 0.45f).color(0x07000E, 0.55f).size1 = 0.9f;
+                    spawn(Kind.WISP_DARK, e.getPos().add(0, 0.05, 0), new Vec3d(0, 0.06, 0), 12, 0.35f).color(0x050008, 0.6f);
+                }
+            }
+            return super.tick(w);
+        }
+
+        @Override
+        public void render(Ctx c) {
+            float t = t(c);
+            Vec3d rp = start.subtract(c.cam);
+            VertexConsumer ring = c.imm.getBuffer(AWRenderLayers.additive(Tex.SHOCKWAVE));
+            Draw.flat(ring, c.m, rp.x, rp.y, rp.z, 0.4f + t * 1.8f, rot, r(color), g(color), b(color), (1 - t) * 0.7f);
+            if (dark) {
+                VertexConsumer pool = c.imm.getBuffer(AWRenderLayers.translucent(Tex.SHADOW_POOL));
+                Draw.flat(pool, c.m, rp.x, rp.y - 0.005, rp.z, 0.9f * (1 - t * 0.5f), rot, 1, 1, 1, (1 - t) * 0.8f);
+            }
+        }
+    }
+
     // ================================================================ CAPTURE / COLLAPSE / BLOCK HIT
     public static final class Flash extends Fx {
         final Vec3d p;

@@ -80,6 +80,12 @@ public final class TestDriver {
                 case "cmd" -> mc.player.networkHandler.sendChatCommand(arg.startsWith("/") ? arg.substring(1) : arg);
                 case "skill" -> InputHandler.useSkill(SkillSlot.VALUES[Integer.parseInt(arg)]);
                 case "attack" -> InputHandler.onAttack();
+                case "dash" -> {
+                    // dash forward|back|left|right : 이동키를 누른 채로 대시
+                    mc.player.input.movementForward = arg.equals("forward") ? 1 : arg.equals("back") ? -1 : 0;
+                    mc.player.input.movementSideways = arg.equals("left") ? 1 : arg.equals("right") ? -1 : 0;
+                    com.abilitywar.client.input.DashController.tryDash();
+                }
                 case "block" -> InputHandler.testBlock(arg.equals("on"));
                 case "persp" -> mc.options.setPerspective(Perspective.values()[Integer.parseInt(arg)]);
                 case "look" -> {

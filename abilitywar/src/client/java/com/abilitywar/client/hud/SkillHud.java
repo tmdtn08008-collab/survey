@@ -50,6 +50,7 @@ public final class SkillHud {
             int y = yRow + (ultSize - size);
             slot(ctx, tr, td, ab, SkillSlot.VALUES[i], x, y, size, keys[i], locked);
         }
+        DashBadge.render(ctx, td, x0 - 14, yRow + (ultSize - size) + size / 2f, 18);
         int ux = x0 + 4 * (size + gap) + 6 - gap;
         ultSlot(ctx, tr, td, ab, ux, yRow, ultSize, keys[4], locked);
         // 패시브 (작게, 위쪽)
@@ -205,6 +206,7 @@ public final class SkillHud {
             case SKILL4 -> "skill4";
             case ULTIMATE -> "ultimate";
             case PASSIVE -> "passive";
+            case DASH -> "dash";
         };
     }
 

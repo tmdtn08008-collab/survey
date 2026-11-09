@@ -56,6 +56,12 @@ public final class ArtSkillBar {
         RenderSystem.defaultBlendFunc();
         TextRenderer tr = mc.textRenderer;
         for (int i = 0; i < 6; i++) relabel(ctx, tr, NAMES[i], keys[i]);
+        // 공통 대시(Q): 스킬 줄 왼쪽
+        float[] s1 = L.slots.get("skill1");
+        if (s1 != null) {
+            float size = Math.max(14, (s1[3] - s1[1]) * sc * 0.8f);
+            DashBadge.render(ctx, td, bx + s1[0] * sc - size / 2f - 7, by + (s1[1] + s1[3]) / 2f * sc, size);
+        }
         isAdditive = false;
         RenderSystem.setShaderColor(1, 1, 1, 1);
         RenderSystem.defaultBlendFunc();

@@ -1,28 +1,318 @@
 {
-  "void.whoosh": {"subtitle": "subtitles.abilitywar.void.whoosh", "sounds": [{"name": "abilitywar:void_whoosh"}]},
-  "void.swing": {"subtitle": "subtitles.abilitywar.void.whoosh", "sounds": [{"name": "abilitywar:void_swing"}]},
-  "void.grab": {"subtitle": "subtitles.abilitywar.void.grab", "sounds": [{"name": "item/trident/throw1", "pitch": 0.6}, {"name": "item/trident/throw2", "pitch": 0.6}]},
-  "void.pull": {"subtitle": "subtitles.abilitywar.void.pull", "sounds": [{"name": "mob/endermen/portal", "pitch": 0.6}]},
-  "void.crit": {"subtitle": "subtitles.abilitywar.void.crit", "sounds": [{"name": "entity/player/attack/crit1", "pitch": 0.8}, {"name": "entity/player/attack/crit2", "pitch": 0.8}, {"name": "entity/player/attack/crit3", "pitch": 0.8}]},
-  "void.punch": {"subtitle": "subtitles.abilitywar.void.punch", "sounds": [{"name": "entity/player/attack/strong1", "pitch": 1.1}, {"name": "entity/player/attack/strong2", "pitch": 1.1}, {"name": "entity/player/attack/strong3", "pitch": 1.1}, {"name": "entity/player/attack/strong4", "pitch": 1.1}]},
-  "void.punch_heavy": {"subtitle": "subtitles.abilitywar.void.punch", "sounds": [{"name": "entity/player/attack/knockback1", "pitch": 0.75}, {"name": "entity/player/attack/knockback2", "pitch": 0.75}, {"name": "entity/player/attack/knockback3", "pitch": 0.75}, {"name": "entity/player/attack/knockback4", "pitch": 0.75}]},
-  "void.charge": {"subtitle": "subtitles.abilitywar.void.charge", "sounds": [{"name": "block/respawn_anchor/charge1", "pitch": 1.4}, {"name": "block/respawn_anchor/charge2", "pitch": 1.4}, {"name": "block/respawn_anchor/charge3", "pitch": 1.4}]},
-  "void.blast": {"subtitle": "subtitles.abilitywar.void.blast", "sounds": [{"name": "mob/warden/sonic_boom1", "pitch": 1.25}, {"name": "mob/warden/sonic_boom2", "pitch": 1.25}, {"name": "mob/warden/sonic_boom3", "pitch": 1.25}]},
-  "void.impact": {"subtitle": "subtitles.abilitywar.void.impact", "sounds": [{"name": "abilitywar:void_impact"}]},
-  "void.slam": {"subtitle": "subtitles.abilitywar.void.slam", "sounds": [{"name": "random/explode1", "pitch": 1.3, "volume": 0.9}, {"name": "random/explode2", "pitch": 1.3, "volume": 0.9}, {"name": "random/explode3", "pitch": 1.3, "volume": 0.9}]},
-  "void.teleport": {"subtitle": "subtitles.abilitywar.void.teleport", "sounds": [{"name": "mob/endermen/portal2", "pitch": 0.8}]},
-  "void.counter_stance": {"subtitle": "subtitles.abilitywar.void.counter", "sounds": [{"name": "block/beacon/activate", "pitch": 1.8}]},
-  "void.counter_success": {"subtitle": "subtitles.abilitywar.void.counter", "sounds": [{"name": "item/shield/block1", "pitch": 0.7}, {"name": "item/shield/block2", "pitch": 0.7}, {"name": "item/shield/block3", "pitch": 0.7}]},
-  "void.counter_fail": {"subtitle": "subtitles.abilitywar.void.counter", "sounds": [{"name": "block/beacon/deactivate", "pitch": 1.6}]},
-  "void.ult_cast": {"subtitle": "subtitles.abilitywar.void.ult", "sounds": [{"name": "mob/wither/spawn", "pitch": 0.7, "attenuation_distance": 48}]},
-  "void.ult_rise": {"subtitle": "subtitles.abilitywar.void.ult", "sounds": [{"name": "abilitywar:void_ult_rise", "attenuation_distance": 48}]},
-  "void.blackhole": {"subtitle": "subtitles.abilitywar.void.blackhole", "sounds": [{"name": "abilitywar:void_hum", "attenuation_distance": 40}]},
-  "void.collapse": {"subtitle": "subtitles.abilitywar.void.collapse", "sounds": [{"name": "mob/warden/sonic_boom1", "pitch": 0.55, "attenuation_distance": 64}]},
-  "void.shadow_enter": {"subtitle": "subtitles.abilitywar.void.shadow", "sounds": [{"name": "mob/warden/dig", "pitch": 1.8}]},
-  "void.shadow_exit": {"subtitle": "subtitles.abilitywar.void.shadow", "sounds": [{"name": "mob/endermen/portal2", "pitch": 1.5}]},
-  "void.block": {"subtitle": "subtitles.abilitywar.block", "sounds": [{"name": "item/shield/block1", "pitch": 1.3, "volume": 0.6}, {"name": "item/shield/block4", "pitch": 1.3, "volume": 0.6}]},
-  "concussion.ring": {"subtitle": "subtitles.abilitywar.concussion", "sounds": [{"name": "abilitywar:concussion_ring"}]},
-  "ui.ready": {"sounds": [{"name": "abilitywar:ui_ready"}]},
-  "ui.deny": {"sounds": [{"name": "abilitywar:ui_deny"}]},
-  "ui.ult_ready": {"sounds": [{"name": "abilitywar:ui_ult_ready"}]}
+ "void.whoosh": {
+  "subtitle": "subtitles.abilitywar.void.whoosh",
+  "sounds": [
+   {
+    "name": "abilitywar:void_whoosh"
+   }
+  ]
+ },
+ "void.swing": {
+  "subtitle": "subtitles.abilitywar.void.whoosh",
+  "sounds": [
+   {
+    "name": "abilitywar:void_swing"
+   }
+  ]
+ },
+ "void.grab": {
+  "subtitle": "subtitles.abilitywar.void.grab",
+  "sounds": [
+   {
+    "name": "item/trident/throw1",
+    "pitch": 0.6
+   },
+   {
+    "name": "item/trident/throw2",
+    "pitch": 0.6
+   }
+  ]
+ },
+ "void.pull": {
+  "subtitle": "subtitles.abilitywar.void.pull",
+  "sounds": [
+   {
+    "name": "mob/endermen/portal",
+    "pitch": 0.6
+   }
+  ]
+ },
+ "void.crit": {
+  "subtitle": "subtitles.abilitywar.void.crit",
+  "sounds": [
+   {
+    "name": "entity/player/attack/crit1",
+    "pitch": 0.8
+   },
+   {
+    "name": "entity/player/attack/crit2",
+    "pitch": 0.8
+   },
+   {
+    "name": "entity/player/attack/crit3",
+    "pitch": 0.8
+   }
+  ]
+ },
+ "void.punch": {
+  "subtitle": "subtitles.abilitywar.void.punch",
+  "sounds": [
+   {
+    "name": "entity/player/attack/strong1",
+    "pitch": 1.1
+   },
+   {
+    "name": "entity/player/attack/strong2",
+    "pitch": 1.1
+   },
+   {
+    "name": "entity/player/attack/strong3",
+    "pitch": 1.1
+   },
+   {
+    "name": "entity/player/attack/strong4",
+    "pitch": 1.1
+   }
+  ]
+ },
+ "void.punch_heavy": {
+  "subtitle": "subtitles.abilitywar.void.punch",
+  "sounds": [
+   {
+    "name": "entity/player/attack/knockback1",
+    "pitch": 0.75
+   },
+   {
+    "name": "entity/player/attack/knockback2",
+    "pitch": 0.75
+   },
+   {
+    "name": "entity/player/attack/knockback3",
+    "pitch": 0.75
+   },
+   {
+    "name": "entity/player/attack/knockback4",
+    "pitch": 0.75
+   }
+  ]
+ },
+ "void.charge": {
+  "subtitle": "subtitles.abilitywar.void.charge",
+  "sounds": [
+   {
+    "name": "block/respawn_anchor/charge1",
+    "pitch": 1.4
+   },
+   {
+    "name": "block/respawn_anchor/charge2",
+    "pitch": 1.4
+   },
+   {
+    "name": "block/respawn_anchor/charge3",
+    "pitch": 1.4
+   }
+  ]
+ },
+ "void.blast": {
+  "subtitle": "subtitles.abilitywar.void.blast",
+  "sounds": [
+   {
+    "name": "mob/warden/sonic_boom1",
+    "pitch": 1.25
+   },
+   {
+    "name": "mob/warden/sonic_boom2",
+    "pitch": 1.25
+   },
+   {
+    "name": "mob/warden/sonic_boom3",
+    "pitch": 1.25
+   }
+  ]
+ },
+ "void.impact": {
+  "subtitle": "subtitles.abilitywar.void.impact",
+  "sounds": [
+   {
+    "name": "abilitywar:void_impact"
+   }
+  ]
+ },
+ "void.slam": {
+  "subtitle": "subtitles.abilitywar.void.slam",
+  "sounds": [
+   {
+    "name": "random/explode1",
+    "pitch": 1.3,
+    "volume": 0.9
+   },
+   {
+    "name": "random/explode2",
+    "pitch": 1.3,
+    "volume": 0.9
+   },
+   {
+    "name": "random/explode3",
+    "pitch": 1.3,
+    "volume": 0.9
+   }
+  ]
+ },
+ "void.teleport": {
+  "subtitle": "subtitles.abilitywar.void.teleport",
+  "sounds": [
+   {
+    "name": "mob/endermen/portal2",
+    "pitch": 0.8
+   }
+  ]
+ },
+ "void.counter_stance": {
+  "subtitle": "subtitles.abilitywar.void.counter",
+  "sounds": [
+   {
+    "name": "block/beacon/activate",
+    "pitch": 1.8
+   }
+  ]
+ },
+ "void.counter_success": {
+  "subtitle": "subtitles.abilitywar.void.counter",
+  "sounds": [
+   {
+    "name": "item/shield/block1",
+    "pitch": 0.7
+   },
+   {
+    "name": "item/shield/block2",
+    "pitch": 0.7
+   },
+   {
+    "name": "item/shield/block3",
+    "pitch": 0.7
+   }
+  ]
+ },
+ "void.counter_fail": {
+  "subtitle": "subtitles.abilitywar.void.counter",
+  "sounds": [
+   {
+    "name": "block/beacon/deactivate",
+    "pitch": 1.6
+   }
+  ]
+ },
+ "void.ult_cast": {
+  "subtitle": "subtitles.abilitywar.void.ult",
+  "sounds": [
+   {
+    "name": "mob/wither/spawn",
+    "pitch": 0.7,
+    "attenuation_distance": 48
+   }
+  ]
+ },
+ "void.ult_rise": {
+  "subtitle": "subtitles.abilitywar.void.ult",
+  "sounds": [
+   {
+    "name": "abilitywar:void_ult_rise",
+    "attenuation_distance": 48
+   }
+  ]
+ },
+ "void.blackhole": {
+  "subtitle": "subtitles.abilitywar.void.blackhole",
+  "sounds": [
+   {
+    "name": "abilitywar:void_hum",
+    "attenuation_distance": 40
+   }
+  ]
+ },
+ "void.collapse": {
+  "subtitle": "subtitles.abilitywar.void.collapse",
+  "sounds": [
+   {
+    "name": "mob/warden/sonic_boom1",
+    "pitch": 0.55,
+    "attenuation_distance": 64
+   }
+  ]
+ },
+ "void.shadow_enter": {
+  "subtitle": "subtitles.abilitywar.void.shadow",
+  "sounds": [
+   {
+    "name": "mob/warden/dig",
+    "pitch": 1.8
+   }
+  ]
+ },
+ "void.shadow_exit": {
+  "subtitle": "subtitles.abilitywar.void.shadow",
+  "sounds": [
+   {
+    "name": "mob/endermen/portal2",
+    "pitch": 1.5
+   }
+  ]
+ },
+ "void.block": {
+  "subtitle": "subtitles.abilitywar.block",
+  "sounds": [
+   {
+    "name": "item/shield/block1",
+    "pitch": 1.3,
+    "volume": 0.6
+   },
+   {
+    "name": "item/shield/block4",
+    "pitch": 1.3,
+    "volume": 0.6
+   }
+  ]
+ },
+ "concussion.ring": {
+  "subtitle": "subtitles.abilitywar.concussion",
+  "sounds": [
+   {
+    "name": "abilitywar:concussion_ring"
+   }
+  ]
+ },
+ "ui.ready": {
+  "sounds": [
+   {
+    "name": "abilitywar:ui_ready"
+   }
+  ]
+ },
+ "ui.deny": {
+  "sounds": [
+   {
+    "name": "abilitywar:ui_deny"
+   }
+  ]
+ },
+ "ui.ult_ready": {
+  "sounds": [
+   {
+    "name": "abilitywar:ui_ult_ready"
+   }
+  ]
+ },
+ "dash": {
+  "subtitle": "subtitles.abilitywar.dash",
+  "sounds": [
+   {
+    "name": "abilitywar:void_whoosh",
+    "pitch": 1.15
+   },
+   {
+    "name": "abilitywar:void_whoosh",
+    "pitch": 1.3
+   }
+  ]
+ }
 }

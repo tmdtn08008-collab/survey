@@ -29,6 +29,7 @@ public final class AWSounds {
     public static final SoundEvent VOID_SHADOW_EXIT = reg("void.shadow_exit");
     public static final SoundEvent VOID_BLOCK = reg("void.block");
     public static final SoundEvent VOID_SWING = reg("void.swing");
+    public static final SoundEvent DASH = reg("dash");
     public static final SoundEvent CONCUSSION_RING = reg("concussion.ring");
     public static final SoundEvent UI_READY = reg("ui.ready");
     public static final SoundEvent UI_DENY = reg("ui.deny");

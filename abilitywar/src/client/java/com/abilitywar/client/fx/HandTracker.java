@@ -28,6 +28,14 @@ public final class HandTracker {
     private static Vec3d camPos = Vec3d.ZERO;
     private static long frame;
 
+    static Matrix4f invView() {
+        return INV_VIEW;
+    }
+
+    static Vec3d cameraPos() {
+        return camPos;
+    }
+
     public static void beginFrame(Matrix4f view, Vec3d cam) {
         INV_VIEW.set(view).invert();
         camPos = cam;
@@ -80,6 +88,7 @@ public final class HandTracker {
         @Override
         public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, AbstractClientPlayerEntity entity,
                            float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
+            AfterImages.capture(entity, matrices, this.getContextModel());
             for (int arm = 0; arm < 2; arm++) {
                 matrices.push();
                 this.getContextModel().setArmAngle(arm == 0 ? Arm.RIGHT : Arm.LEFT, matrices);

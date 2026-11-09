@@ -67,6 +67,12 @@ public final class VfxManager {
                     }
                 }
                 case "shake" -> CameraController.addShake(n.getFloat("i"), n.getInt("d"));
+                case "dash" -> {
+                    int id = n.getInt("e");
+                    int color = n.getInt("c") & 0xFFFFFF;
+                    AfterImages.request(id, 5, 1, color, 9);
+                    add(new Effects.DashTrail(w, id, color, n.getString("ab"), new Vec3d(n.getFloat("dx"), 0, n.getFloat("dz")), p));
+                }
                 default -> AbilityWar.LOG.debug("Unknown fx {}", type);
             }
         } catch (Exception ex) {
@@ -127,12 +133,14 @@ public final class VfxManager {
             }
         }
         BlackHoleFx.tick(w);
+        AfterImages.tick();
         Particles.tick();
         Debris.tick();
         HandTracker.cleanup();
     }
 
     public static void clear() {
+        AfterImages.clear();
         EFFECTS.clear();
         Particles.clear();
         Debris.clear();
@@ -159,6 +167,7 @@ public final class VfxManager {
             for (Fx f : EFFECTS) f.render(c);
             Debris.render(c);
             c.imm.draw();
+            AfterImages.render(c);
             ShadowView.render(c);
             Particles.render(c.imm, c.m, c.camRot, c.cam, c.tickDelta);
             c.imm.draw();

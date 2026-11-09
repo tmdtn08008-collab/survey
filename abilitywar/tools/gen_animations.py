@@ -594,4 +594,51 @@ C['common.captured'] = clip(170, blend_in=3, blend_out=6, root_pivot=12, bones=s
     [(6 + i * 10, dict(cap, root={'pos': [0, 0, 0], 'rot': [20 + 10 * math.sin(i), 90 * i, 12 * math.cos(i * 1.3)]}), 'linear') for i in range(1, 16)] +
     [(170, dict(REST, right_leg=[0, 0, 0], left_leg=[0, 0, 0]), 'inOutSine')]
 ))
+
+# ---------------------------------------------------------------- 공통 대시 (Q) — 모든 능력
+def dash_clip(tp_peak, fp_peak, cam_peak):
+    rest = {'body': [0, 0, 0], 'head': [0, 0, 0], 'right_arm': [-30, 0, 8], 'left_arm': [-30, 0, -8],
+            'right_leg': [0, 0, 0], 'left_leg': [0, 0, 0], 'root': {'pos': [0, 0, 0], 'rot': [0, 0, 0]}}
+    hold = {}
+    for k, v in tp_peak.items():
+        if isinstance(v, dict):
+            hold[k] = {ck: [x * 0.9 for x in cv] for ck, cv in v.items()}
+        else:
+            hold[k] = [x * 0.9 for x in v]
+    bones = seq([
+        (0, rest),
+        (1.5, tp_peak, 'outExpo'),
+        (5.5, hold, 'linear'),
+        (10, rest, 'inOutSine'),
+    ], rest=rest)
+    fp = fpseq([
+        (0, {'R': GR, 'L': GL, 'cam': [0, 0, 0]}),
+        (1.5, dict(fp_peak, cam=cam_peak), 'outExpo'),
+        (5.5, dict({k: (v[0], v[1]) for k, v in fp_peak.items()}, cam=[c * 0.6 for c in cam_peak]), 'linear'),
+        (10, {'R': GR, 'L': GL, 'cam': [0, 0, 0]}, 'inOutSine'),
+    ])
+    return clip(10, bones=bones, fp=fp, blend_in=0.5, blend_out=3, root_pivot=10)
+
+
+C['common.dash_forward'] = dash_clip(
+    {'body': [26, 0, 0], 'head': [-24, 0, 0], 'right_arm': [58, 0, 22], 'left_arm': [58, 0, -22],
+     'right_leg': [42, 0, 4], 'left_leg': [-46, 0, -4], 'root': {'pos': [0, -1.5, 2], 'rot': [14, 0, 0]}},
+    {'R': ([9, -21, 2], [-8, 0, 62]), 'L': ([-9, -21, 2], [-8, 0, -62])},
+    [2.5, 0, 0])
+C['common.dash_back'] = dash_clip(
+    {'body': [-14, 0, 0], 'head': [12, 0, 0], 'right_arm': [-82, -22, 10], 'left_arm': [-92, 22, -10],
+     'right_leg': [-28, 0, 4], 'left_leg': [16, 0, -4], 'root': {'pos': [0, 0.5, -2], 'rot': [-10, 0, 0]}},
+    {'R': ([5, -10, 9], [42, 12, 42]), 'L': ([-5, -10.5, 8.5], [40, -12, -42])},
+    [-2.5, 0, 0])
+C['common.dash_left'] = dash_clip(
+    {'body': [6, 0, -10], 'head': [0, 0, 8], 'right_arm': [-24, 0, 72], 'left_arm': [-40, 10, -18],
+     'right_leg': [0, 0, 26], 'left_leg': [0, 0, -8], 'root': {'pos': [-2, -0.5, 0], 'rot': [4, 6, -18]}},
+    {'R': ([9.5, -13, 6], [34, -12, 70]), 'L': ([-3.5, -12.5, 8], [30, -14, -40])},
+    [0, 1.2, 5])
+C['common.dash_right'] = dash_clip(
+    {'body': [6, 0, 10], 'head': [0, 0, -8], 'right_arm': [-40, -10, 18], 'left_arm': [-24, 0, -72],
+     'right_leg': [0, 0, 8], 'left_leg': [0, 0, -26], 'root': {'pos': [2, -0.5, 0], 'rot': [4, -6, 18]}},
+    {'R': ([3.5, -12.5, 8], [30, 14, 40]), 'L': ([-9.5, -13, 6], [34, 12, -70])},
+    [0, -1.2, -5])
+
 write('common', C)

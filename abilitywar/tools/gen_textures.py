@@ -512,6 +512,42 @@ def card_art():
     save(out, os.path.join(GUI, 'card_void.png'))
 
 
+def dash_icon():
+    # 원형 대시 아이콘 (모든 능력 공통)
+    S = 256
+    x, y = grid(S)
+    r = np.sqrt(x * x + y * y)
+    out = np.zeros((S, S, 4), np.float32)
+    inside = r < 0.86
+    out[..., 0] = 0.09 + 0.18 * np.clip(1 - r, 0, 1) ** 2
+    out[..., 1] = 0.04 + 0.05 * np.clip(1 - r, 0, 1) ** 2
+    out[..., 2] = 0.17 + 0.32 * np.clip(1 - r, 0, 1) ** 2
+    out[..., 3] = inside
+    ring = np.exp(-((r - 0.9) / 0.05) ** 2)
+    ring2 = np.exp(-((r - 0.84) / 0.02) ** 2)
+    out[..., 0] += ring * 0.75 + ring2 * 0.3
+    out[..., 1] += ring * 0.55 + ring2 * 0.15
+    out[..., 2] += ring * 1.0 + ring2 * 0.5
+    out[..., 3] = np.maximum(out[..., 3], np.clip(ring * 1.2, 0, 1))
+    mask = Image.new('L', (S * 2, S * 2), 0)
+    d = ImageDraw.Draw(mask)
+    c = S
+    # 속도선
+    for i, (yy, l) in enumerate([(-0.28, 0.42), (0, 0.55), (0.28, 0.42)]):
+        y0 = c + yy * S * 0.9
+        d.line([(c - S * 0.62, y0), (c - S * 0.62 + l * S, y0)], fill=170 + 30 * (i == 1), width=int(S * 0.07))
+    # 화살표(갈매기)
+    d.polygon([(c + S * 0.02, c - S * 0.42), (c + S * 0.55, c), (c + S * 0.02, c + S * 0.42), (c + S * 0.18, c)], fill=255)
+    mask = mask.filter(ImageFilter.GaussianBlur(3)).resize((S, S), Image.LANCZOS)
+    m = np.asarray(mask, np.float32) / 255
+    g = np.asarray(mask.filter(ImageFilter.GaussianBlur(10)), np.float32) / 255
+    for k, col in enumerate((0.75, 0.55, 1.0)):
+        out[..., k] = out[..., k] * (1 - g * 0.4) + col * g * 0.8
+        out[..., k] = out[..., k] * (1 - m) + (0.97 if k != 1 else 0.92) * m
+    img = Image.fromarray((np.clip(out, 0, 1) * 255).astype(np.uint8), 'RGBA').resize((64, 64), Image.LANCZOS)
+    img.save(os.path.join(GUI, 'dash.png'))
+
+
 if __name__ == '__main__':
     glow(); ring('ring.png', 0.035, 1.0); ring('ring_soft.png', 0.12, 1.0); shockwave(); spark(); flare(); smoke(); streak(); impact()
     wisp(); shadow_pool(); tendril(); swirl(); rift(); crack()
@@ -519,4 +555,5 @@ if __name__ == '__main__':
     vignette(); card_art()
     # 공허 아이콘은 이제 tools/gen_hud.py 가 스킬바 그림에서 잘라 만든다 (아래 함수는 그림이 없는 능력용 예시)
     icon('void_block.png', draw_block)
+    dash_icon()
     print('done')
