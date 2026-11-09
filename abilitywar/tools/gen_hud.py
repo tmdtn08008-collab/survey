@@ -110,6 +110,15 @@ LAYOUTS['blood'] = {
     'emblem': [281, 149, 60],
 }
 
+# 성가사(버퍼): tools/gen_cantor_hud.py 가 만든 임시 그림 (공허와 같은 배치). 사용자 그림이 오면 교체.
+LAYOUTS['cantor'] = {
+    'slots': dict(LAYOUTS['void']['slots']),
+    'labels': dict(LAYOUTS['void']['labels']),
+    'accent': [1.0, 0.85, 0.42], 'accent2': [0.75, 0.55, 0.15],
+    'trail': [300, 120, 1150, 266],
+    'emblem': [90, 193, 70],
+}
+
 
 def octagon(x0, y0, x1, y1, c):
     return [(x0 + c, y0), (x1 - c, y0), (x1, y0 + c), (x1, y1 - c), (x1 - c, y1), (x0 + c, y1), (x0, y1 - c), (x0, y0 + c)]

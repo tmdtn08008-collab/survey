@@ -17,12 +17,14 @@ public final class Abilities {
     public static Ability DRAGON;
     public static Ability BLADE;
     public static Ability BLOOD;
+    public static Ability CANTOR;
 
     public static void init() {
         VOID = register(new VoidAbility());
         DRAGON = register(new com.abilitywar.ability.dragon.DragonAbility());
         BLADE = register(new com.abilitywar.ability.blade.BladeAbility());
         BLOOD = register(new com.abilitywar.ability.blood.BloodAbility());
+        CANTOR = register(new com.abilitywar.ability.cantor.CantorAbility());
     }
 
     public static <T extends Ability> T register(T ability) {

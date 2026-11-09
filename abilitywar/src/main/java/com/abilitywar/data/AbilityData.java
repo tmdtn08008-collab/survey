@@ -37,6 +37,8 @@ public class AbilityData {
     public long lastArmorText;
     public long frozenUntil;
 
+    /** 능력마다 쓰는 작은 상태값 (HUD 로 보냄). 성가사: 선율(0~2) + 음표 수 * 4. */
+    public int extra;
     public boolean shadowForm;
     public long shadowUntil;
     @Nullable

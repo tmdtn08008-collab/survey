@@ -1960,6 +1960,358 @@ write('blood', H)
 
 
 # =====================================================================================
+#                              성가사 (cantor) — 버퍼
+# =====================================================================================
+C = {}
+# ---- 1인칭: 오른손 지휘봉 (앞으로), 왼손은 아래 -----------------------------------------
+CGR = ([7.5, -13.5, 8], [30, 6, 55])
+CGL = ([-7.5, -16, 6], [16, -4, -50])
+C_UP_R = ([5, -3, 7], [86, 6, 40])          # 지휘봉을 하늘로
+C_HI_R = ([10, -7, 6], [62, -30, 70])        # 오른쪽 위 (지휘 준비)
+C_FL_R = ([1, -12, 13], [18, 34, 30])        # 앞으로 휘두름 (음표 발사)
+C_LO_R = ([2, -16, 12], [-8, 20, 30])        # 아래로 쓸어내림
+C_PT_R = ([3, -9, 15], [26, 4, 30])          # 앞을 가리킴
+C_BOOK_L = ([-4, -11, 12], [36, -20, -30])   # 왼손을 앞으로 (책 쪽)
+C_OPEN_R = ([14, -9, 5], [48, -50, 88])
+C_OPEN_L = ([-14, -9, 4.5], [48, 50, -88])
+C_CROSS_R = ([3, -10, 10], [44, 40, 50])
+
+
+def CP(**kw):
+    """성가사 기본 자세: 곧게 선 지휘자. 오른손은 지휘봉을 살짝 들고, 왼손은 편안히."""
+    d = {
+        'body': [2, 0, 0], 'head': [-4, 0, 0],
+        'right_arm': [-34, -8, 10], 'left_arm': [-14, 8, -10],
+        'right_leg': [3, 3, 2], 'left_leg': [-3, -3, -2],
+        'root': {'pos': [0, 0, 0], 'rot': [0, 0, 0]},
+    }
+    for k, v in kw.items():
+        if k == 'root':
+            d['root'] = dict(d['root'], **v)
+        else:
+            d[k] = v
+    return d
+
+
+CK = CP()
+
+
+def CF(R=CGR, L=CGL, cam=(0, 0, 0), fov=0):
+    return {'R': R, 'L': L, 'cam': list(cam), 'fov': fov}
+
+
+CFG = CF()
+
+# ================================================================ 이동
+C['cantor.idle'] = clip(64, loop=True, bones={
+    'body': {'rot': cyc(64, [2, 0, 0], [1, 0, 0])},
+    'head': {'rot': cyc(64, [-4, 0, 0], [1.5, 4, 0], phase=1.0)},
+    # 지휘봉으로 박자를 젓는 듯한 작은 움직임
+    'right_arm': {'rot': cyc(64, [-34, -8, 10], [5, 6, 3], phase=0.3, harm=([3, 0, 0], 0.5))},
+    'left_arm': {'rot': cyc(64, [-14, 8, -10], [2, 0, -2], phase=0.9)},
+    'right_leg': {'rot': {'0': [3, 3, 2]}},
+    'left_leg': {'rot': {'0': [-3, -3, -2]}},
+    'root': {'pos': cyc(64, [0, 0, 0], [0, -0.25, 0])},
+}, fp={
+    'right_arm': {'pos': cyc(64, CGR[0], [0.3, 0.5, 0.1]), 'rot': cyc(64, CGR[1], [4, 4, 2], harm=([2, 0, 0], 0.4))},
+    'left_arm': {'pos': cyc(64, CGL[0], [0, 0.4, 0.1], phase=0.9), 'rot': cyc(64, CGL[1], [1.5, 0, -1.5], phase=0.9)},
+})
+
+C['cantor.walk'] = clip(20, loop=True, stride=9.42, bones={
+    'body': {'rot': cyc(20, [3, 0, 0], [0, 5, 0], phase=math.pi)},
+    'head': {'rot': {'0': [-4, 0, 0]}},
+    'right_arm': {'rot': cyc(20, [-30, -8, 10], [14, 0, 0], phase=math.pi)},
+    'left_arm': {'rot': cyc(20, [-6, 6, -10], [24, 0, 0])},
+    'right_leg': {'rot': cyc(20, [0, 0, 2], [32, 0, 0])},
+    'left_leg': {'rot': cyc(20, [0, 0, -2], [32, 0, 0], phase=math.pi)},
+    'root': {'pos': cyc(20, [0, 0, 0], [0, 0, 0], harm=([0, 0.45, 0], -math.pi / 2))},
+}, fp={
+    'right_arm': {'pos': cyc(20, CGR[0], [0.3, 0.7, 0.9], phase=math.pi), 'rot': cyc(20, CGR[1], [3, 0, 0], phase=math.pi)},
+    'left_arm': {'pos': cyc(20, CGL[0], [0.3, 0.7, 0.9]), 'rot': cyc(20, CGL[1], [3, 0, 0])},
+})
+
+C['cantor.run'] = clip(18, loop=True, stride=9.42, bones={
+    'body': {'rot': cyc(18, [16, 0, 0], [0, 7, 0], phase=math.pi, harm=([1.5, 0, 0], 0))},
+    'head': {'rot': {'0': [-14, 0, 0]}},
+    'right_arm': {'rot': cyc(18, [-10, 0, 14], [44, 0, 0], phase=math.pi)},
+    'left_arm': {'rot': cyc(18, [-10, 0, -14], [44, 0, 0])},
+    'right_leg': {'rot': cyc(18, [-6, 0, 2], [54, 0, 0], harm=([-8, 0, 0], 0))},
+    'left_leg': {'rot': cyc(18, [-6, 0, -2], [54, 0, 0], phase=math.pi, harm=([-8, 0, 0], 0))},
+    'root': {'pos': cyc(18, [0, 0.3, 0], [0, 0, 0], harm=([0, 1.0, 0], -math.pi / 2)), 'rot': {'0': [4, 0, 0]}},
+}, fp={
+    'right_arm': {'pos': cyc(18, [8.5, -17, 4.5], [0.4, 1.4, 1.2], phase=math.pi), 'rot': cyc(18, [14, 0, 64], [8, 0, 0], phase=math.pi)},
+    'left_arm': {'pos': cyc(18, [-8.5, -17.5, 4], [0.4, 1.4, 1.2]), 'rot': cyc(18, [12, 0, -64], [8, 0, 0])},
+    'camera': {'rot': cyc(18, [0, 0, 0], [0, 0, 0.6], harm=([0.5, 0, 0], 0))},
+    'fov': {'0': [5, 0, 0]},
+})
+
+C['cantor.sneak'] = clip(50, loop=True, bones={
+    'body': {'rot': cyc(50, [24, 0, 0], [1.2, 0, 0])},
+    'head': {'rot': {'0': [-18, 0, 0]}},
+    'right_arm': {'rot': cyc(50, [-40, -8, 12], [3, 0, 0], phase=0.4)},
+    'left_arm': {'rot': cyc(50, [-22, 8, -12], [3, 0, 0], phase=0.9)},
+    'right_leg': {'rot': {'0': [10, 4, 4]}, 'pos': {'0': [0, 0, -1]}},
+    'left_leg': {'rot': {'0': [-16, -4, -4]}, 'pos': {'0': [0, 0, 1]}},
+    'root': {'pos': {'0': [0, -1.4, 0]}},
+}, fp={
+    'right_arm': {'pos': cyc(50, [7, -14.5, 8], [0, 0.3, 0]), 'rot': cyc(50, [30, 6, 55], [1.5, 0, 0])},
+    'left_arm': {'pos': cyc(50, [-7, -16.5, 6], [0, 0.3, 0], phase=0.6), 'rot': cyc(50, [14, -4, -50], [1.5, 0, 0], phase=0.6)},
+    'fov': {'0': [-3, 0, 0]},
+})
+
+C['cantor.sneak_walk'] = clip(20, loop=True, stride=9.42, bones={
+    'body': {'rot': cyc(20, [24, 0, 0], [0, 4, 0])},
+    'head': {'rot': {'0': [-18, 0, 0]}},
+    'right_arm': {'rot': cyc(20, [-40, -8, 12], [8, 0, 0], phase=math.pi)},
+    'left_arm': {'rot': cyc(20, [-22, 8, -12], [10, 0, 0])},
+    'right_leg': {'rot': cyc(20, [4, 4, 4], [24, 0, 0])},
+    'left_leg': {'rot': cyc(20, [-4, -4, -4], [24, 0, 0], phase=math.pi)},
+    'root': {'pos': cyc(20, [0, -1.4, 0], [0, 0, 0], harm=([0, 0.3, 0], -math.pi / 2))},
+}, fp={
+    'right_arm': {'pos': cyc(20, [7, -14.5, 8], [0.2, 0.4, 0.6], phase=math.pi), 'rot': cyc(20, [30, 6, 55], [2, 0, 0], phase=math.pi)},
+    'left_arm': {'pos': cyc(20, [-7, -16.5, 6], [0.2, 0.4, 0.6]), 'rot': cyc(20, [14, -4, -50], [2, 0, 0])},
+    'fov': {'0': [-3, 0, 0]},
+})
+
+C['cantor.air'] = clip(24, loop=True, bones={
+    'body': {'rot': cyc(24, [4, 0, 0], [2, 0, 0])},
+    'head': {'rot': {'0': [-8, 0, 0]}},
+    'right_arm': {'rot': cyc(24, [-50, 10, 40], [6, 0, 6])},
+    'left_arm': {'rot': cyc(24, [-40, -10, -44], [6, 0, -6], phase=0.6)},
+    'right_leg': {'rot': {'0': [18, 4, 6]}},
+    'left_leg': {'rot': {'0': [-22, -4, -5]}},
+}, fp={
+    'right_arm': {'pos': cyc(24, [10, -12, 6], [0, 0.6, 0]), 'rot': cyc(24, [44, -14, 70], [3, 0, 0])},
+    'left_arm': {'pos': cyc(24, [-10, -14, 5.5], [0, 0.6, 0], phase=0.6), 'rot': cyc(24, [30, 14, -70], [3, 0, 0], phase=0.6)},
+})
+
+# 막기: 지휘봉과 팔을 가슴 앞에서 교차
+C_BLK = {'body': [8, 0, 0], 'head': [6, 0, 0], 'right_arm': [-100, -40, 6], 'left_arm': [-94, 42, -6], 'right_leg': [8, 4, 4], 'left_leg': [-10, -4, -4], 'root': {'pos': [0, -0.8, 0], 'rot': [0, 0, 0]}}
+C['cantor.block'] = clip(40, loop=True, blend_in=2, bones={
+    'body': {'rot': cyc(40, [8, 0, 0], [1, 0, 0])},
+    'head': {'rot': {'0': [6, 0, 0]}},
+    'right_arm': {'rot': cyc(40, [-100, -40, 6], [2, 0, 0])},
+    'left_arm': {'rot': cyc(40, [-94, 42, -6], [2, 0, 0], phase=0.5)},
+    'right_leg': {'rot': {'0': [8, 4, 4]}},
+    'left_leg': {'rot': {'0': [-10, -4, -4]}},
+    'root': {'pos': {'0': [0, -0.8, 0]}},
+}, fp={
+    'right_arm': {'pos': cyc(40, C_CROSS_R[0], [0, 0.2, 0]), 'rot': cyc(40, C_CROSS_R[1], [1, 0, 0])},
+    'left_arm': {'pos': cyc(40, ([-3, -10.5, 9.5]), [0, 0.2, 0], phase=0.5), 'rot': cyc(40, [42, -40, -50], [1, 0, 0], phase=0.5)},
+    'fov': {'0': [-4, 0, 0]},
+})
+C['cantor.block_hit'] = clip(7, blend_in=0.5, blend_out=3, bones=seq([
+    (0, C_BLK),
+    (1.5, dict(C_BLK, body=[-6, 0, 0], right_arm=[-108, -34, 6], left_arm=[-102, 36, -6], root={'pos': [0, -0.8, -1.6], 'rot': [-4, 0, 0]}), 'outExpo'),
+    (7, C_BLK, 'outCubic'),
+]), fp=fpseq([
+    (0, {'R': C_CROSS_R, 'L': ([-3, -10.5, 9.5], [42, -40, -50]), 'cam': [0, 0, 0]}),
+    (1.5, {'R': (add(C_CROSS_R[0], [0, 1, -2.5]), add(C_CROSS_R[1], [6, 0, 0])), 'L': ([-3, -9.5, 7], [48, -40, -50]), 'cam': [-2.5, 0, 1.2]}, 'outExpo'),
+    (7, {'R': C_CROSS_R, 'L': ([-3, -10.5, 9.5], [42, -40, -50]), 'cam': [0, 0, 0]}, 'outCubic'),
+]))
+
+
+# ================================================================ 평타: 지휘봉으로 음표를 날림 (2.5틱에 발사)
+def conduct(length, hit, arm_w, arm_h, body_w, body_h, fp_w, fp_h, cam, fov=-1, lunge=0.6):
+    bones = seq([
+        (0, CK),
+        (hit * 0.5, CP(body=body_w, right_arm=arm_w, left_arm=[-20, 10, -14], root={'pos': [0, 0, -0.3]}), 'outQuad'),
+        (hit, CP(body=body_h, head=[-2, 6, 0], right_arm=arm_h, left_arm=[-24, 10, -14], root={'pos': [0, -0.2, lunge]}), 'outExpo'),
+        (hit + (length - hit) * 0.5, CP(body=[body_h[0], body_h[1] * 0.8, 0], right_arm=add(arm_h, [4, 0, 0]), root={'pos': [0, -0.1, lunge * 0.6]})),
+        (length, CK, 'inOutSine'),
+    ])
+    fp = fpseq([
+        (0, dict(CFG)),
+        (hit * 0.5, {'R': fp_w, 'cam': [-0.3, 0.5, 0.4], 'fov': 1}, 'outQuad'),
+        (hit, {'R': fp_h, 'cam': list(cam), 'fov': fov}, 'outExpo'),
+        (hit + (length - hit) * 0.5, {'R': (fp_h[0], add(fp_h[1], [-3, 0, 0])), 'cam': [x * 0.4 for x in cam], 'fov': fov * 0.4}),
+        (length, dict(CFG), 'inOutSine'),
+    ])
+    return clip(length, bones=bones, fp=fp, blend_in=0.5, blend_out=2.5)
+
+
+C['cantor.attack1'] = conduct(8, 2.5, [-150, 30, 30], [-70, -30, -4], [0, 18, 0], [6, -18, 0], C_HI_R, C_FL_R, (0.6, -1.0, -1.0))
+C['cantor.attack2'] = conduct(8, 2.5, [-40, -40, -10], [-130, 20, 24], [4, -14, 0], [-2, 16, 0], C_LO_R, C_HI_R, (-0.8, 1.0, 1.0))
+C['cantor.attack3'] = clip(14, blend_in=0.5, blend_out=3, bones=seq([
+    (0, CK),
+    (3, CP(body=[-10, 0, 0], head=[-20, 0, 0], right_arm=[-170, -10, 20], left_arm=[-160, 10, -20], root={'pos': [0, 0.6, -0.5], 'rot': [-4, 0, 0]}), 'outCubic'),
+    (5, CP(body=[18, 0, 0], head=[0, 0, 0], right_arm=[-70, -20, 4], left_arm=[-70, 20, -4], root={'pos': [0, -0.8, 1.6], 'rot': [4, 0, 0]}, right_leg=[-12, 4, 4], left_leg=[14, -4, -4]), 'outExpo'),
+    (9, CP(body=[14, 0, 0], head=[-2, 0, 0], right_arm=[-72, -18, 6], left_arm=[-72, 18, -6], root={'pos': [0, -0.6, 1.2], 'rot': [3, 0, 0]}, right_leg=[-10, 4, 4], left_leg=[12, -4, -4])),
+    (14, CK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(CFG)),
+    (3, {'R': C_UP_R, 'L': ([-5, -3, 6.5], [86, -6, -40]), 'cam': [-2, 0, 0], 'fov': 3}, 'outCubic'),
+    (5, {'R': C_PT_R, 'L': ([-3, -9, 14.5], [26, -4, -30]), 'cam': [3.5, 0, 0], 'fov': -6}, 'outExpo'),
+    (9, {'R': (C_PT_R[0], [22, 4, 30]), 'L': ([-3, -9.5, 14], [22, -4, -30]), 'cam': [1.5, 0, 0], 'fov': -3}),
+    (14, dict(CFG), 'inOutSine'),
+]))
+
+# ================================================================ 1. 용맹의 찬가 (6틱에 파동)
+C_RAISE = CP(body=[-12, 0, 0], head=[-28, 0, 0], right_arm=[-176, -10, 14], left_arm=[-90, 30, -20], root={'pos': [0, 0.4, 0], 'rot': [-4, 0, 0]})
+C['cantor.skill1'] = clip(14, blend_in=0.8, blend_out=3, bones=seq([
+    (0, CK),
+    (4, C_RAISE, 'outCubic'),
+    (5.2, dict(C_RAISE, right_arm=[-180, -10, 14], root={'pos': [0, 0.6, 0], 'rot': [-5, 0, 0]})),
+    (6.2, CP(body=[20, 0, 0], head=[4, 0, 0], right_arm=[-30, -30, 30], left_arm=[-60, 40, -50], root={'pos': [0, -1.2, 1.0], 'rot': [4, 0, 0]}, right_leg=[-14, 6, 6], left_leg=[16, -6, -6]), 'outExpo'),
+    (10, CP(body=[16, 0, 0], head=[0, 0, 0], right_arm=[-34, -26, 30], left_arm=[-58, 38, -48], root={'pos': [0, -1.0, 0.8], 'rot': [3, 0, 0]}, right_leg=[-12, 6, 6], left_leg=[14, -6, -6])),
+    (14, CK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(CFG)),
+    (4, {'R': C_UP_R, 'L': C_BOOK_L, 'cam': [-4, 0, 0], 'fov': 4}, 'outCubic'),
+    (5.2, {'R': (add(C_UP_R[0], [0, 0.5, 0]), C_UP_R[1]), 'cam': [-5, 0, 0], 'fov': 5}),
+    (6.2, {'R': C_LO_R, 'L': C_OPEN_L, 'cam': [5, 0, 0], 'fov': -8}, 'outExpo'),
+    (10, {'R': (C_LO_R[0], add(C_LO_R[1], [4, 0, 0])), 'cam': [2, 0, 0], 'fov': -4}),
+    (14, dict(CFG), 'inOutSine'),
+]))
+
+# ================================================================ 2. 수호의 성역 (6틱에 지휘봉을 땅에 꽂음)
+C_KNEEL = CP(body=[30, 0, 0], head=[10, 0, 0], right_arm=[-40, -10, 6], left_arm=[-70, 30, -10], root={'pos': [0, -4.0, 0.8], 'rot': [2, 0, 0]}, right_leg=[-70, 6, 4], left_leg=[40, -4, -4])
+C['cantor.skill2'] = clip(14, blend_in=0.8, blend_out=4, bones=seq([
+    (0, CK),
+    (3.5, CP(body=[-8, 0, 0], head=[-14, 0, 0], right_arm=[-150, -6, 10], left_arm=[-60, 20, -20], root={'pos': [0, 0.4, 0]}), 'outCubic'),
+    (6, C_KNEEL, 'outExpo'),
+    (10, dict(C_KNEEL, body=[28, 0, 0], root={'pos': [0, -3.8, 0.7], 'rot': [2, 0, 0]})),
+    (14, CK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(CFG)),
+    (3.5, {'R': C_UP_R, 'L': C_BOOK_L, 'cam': [-3, 0, 0], 'fov': 3}, 'outCubic'),
+    (6, {'R': ([2, -14, 14], [-30, 10, 30]), 'L': ([-4, -12, 11], [20, -20, -30]), 'cam': [12, 0, 0], 'fov': -6}, 'outExpo'),
+    (10, {'R': ([2, -14, 14], [-28, 10, 30]), 'cam': [10, 0, 0], 'fov': -4}),
+    (14, dict(CFG), 'inOutSine'),
+]))
+
+# ================================================================ 3. 천상의 종 (3틱 하늘을 가리킴 → 6틱 대상에게 내림)
+C['cantor.skill3'] = clip(12, blend_in=0.6, blend_out=3, bones=seq([
+    (0, CK),
+    (3, CP(body=[-14, 0, 0], head=[-34, 0, 0], right_arm=[-178, -4, 6], left_arm=[-30, 10, -30], root={'pos': [0, 0.5, 0], 'rot': [-5, 0, 0]}), 'outCubic'),
+    (6, CP(body=[14, -10, 0], head=[-4, 6, 0], right_arm=[-86, -6, 4], left_arm=[-30, 16, -30], root={'pos': [0, -0.6, 1.2], 'rot': [3, 0, 0]}, right_leg=[-12, 4, 4], left_leg=[14, -4, -4]), 'outExpo'),
+    (9, CP(body=[12, -8, 0], head=[-4, 6, 0], right_arm=[-84, -6, 4], left_arm=[-30, 16, -30], root={'pos': [0, -0.5, 1.0], 'rot': [2, 0, 0]})),
+    (12, CK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(CFG)),
+    (3, {'R': C_UP_R, 'cam': [-6, 0, 0], 'fov': 4}, 'outCubic'),
+    (6, {'R': C_PT_R, 'cam': [3, 0, 0], 'fov': -4}, 'outExpo'),
+    (9, {'R': (C_PT_R[0], [24, 4, 30]), 'cam': [1, 0, 0], 'fov': -2}),
+    (12, dict(CFG), 'inOutSine'),
+]))
+
+# ================================================================ 4. 응답송 (반격 자세 16틱)
+C_WARD = CP(body=[-4, 0, 0], head=[2, 0, 0], right_arm=[-110, -36, 10], left_arm=[-86, 30, -6], root={'pos': [0, -0.6, 0]}, right_leg=[8, 6, 6], left_leg=[-10, -6, -6])
+C['cantor.skill4'] = clip(17, blend_in=1, blend_out=3, bones=seq([
+    (0, CK),
+    (2.5, C_WARD, 'outBack'),
+    (9, dict(C_WARD, body=[-5, 0, 0], root={'pos': [0, -0.7, 0], 'rot': [0, 0, 0]})),
+    (14, C_WARD),
+    (17, CK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(CFG)),
+    (2.5, {'R': C_CROSS_R, 'L': ([-4, -10.5, 13], [30, -14, -30]), 'cam': [0.5, 0, 0], 'fov': -4}, 'outBack'),
+    (9, {'R': (C_CROSS_R[0], [46, 40, 50]), 'fov': -5}),
+    (14, {'R': C_CROSS_R, 'cam': [0, 0, 0], 'fov': -4}),
+    (17, dict(CFG), 'inOutSine'),
+]))
+C['cantor.skill4_success'] = clip(14, blend_in=0.4, blend_out=4, bones=seq([
+    (0, C_WARD),
+    (1.2, CP(body=[-16, 0, 0], head=[-20, 0, 0], right_arm=[-40, 20, 90], left_arm=[-40, -20, -90], root={'pos': [0, 0.2, -0.8], 'rot': [-5, 0, 0]}), 'outExpo'),
+    (3, CP(body=[-10, 10, 0], head=[-30, -4, 0], right_arm=[-178, -10, 10], left_arm=[-50, 20, -40], root={'pos': [0, 0.4, 0], 'rot': [-4, 0, 0]}), 'outExpo'),
+    (6, CP(body=[-8, 8, 0], head=[-26, -4, 0], right_arm=[-172, -10, 10], left_arm=[-50, 20, -40], root={'pos': [0, 0.3, 0]})),
+    (9, CP(body=[4, 0, 0], head=[-4, 0, 0], right_arm=[-60, -20, 10], left_arm=[-60, 20, -10], root={'pos': [0, 0, 0]}), 'inOutCubic'),
+    (14, CK, 'inOutSine'),
+]), fp=fpseq([
+    (0, {'R': C_CROSS_R, 'L': ([-4, -10.5, 13], [30, -14, -30]), 'cam': [0, 0, 0], 'fov': -4}),
+    (1.2, {'R': C_OPEN_R, 'L': C_OPEN_L, 'cam': [-4, 0, 0], 'fov': 10}, 'outExpo'),
+    (3, {'R': C_UP_R, 'L': CGL, 'cam': [-6, 0, 0], 'fov': 4}, 'outExpo'),
+    (6, {'R': (C_UP_R[0], [82, 6, 40]), 'cam': [-4, 0, 0], 'fov': 3}),
+    (9, {'R': ([4, -11, 11], [20, 10, 30]), 'L': ([-4, -11, 11], [20, -10, -30]), 'cam': [0, 0, 0], 'fov': 0}, 'inOutCubic'),
+    (14, dict(CFG), 'inOutSine'),
+]))
+C['cantor.skill4_fail'] = clip(12, blend_in=0.5, blend_out=4, bones=seq([
+    (0, C_WARD),
+    (2.5, CP(body=[4, 0, 0], head=[14, 0, 0], left_arm=[-10, 8, -14], right_arm=[-16, -8, 14], root={'pos': [0, -0.3, -0.4], 'rot': [-2, 0, 0]}), 'outCubic'),
+    (5, CP(body=[4, 0, 0], head=[10, 10, 0], left_arm=[-10, 8, -14], right_arm=[-16, -8, 14], root={'pos': [0, -0.2, -0.3]})),
+    (7, CP(body=[4, 0, 0], head=[10, -10, 0], left_arm=[-10, 8, -14], right_arm=[-16, -8, 14], root={'pos': [0, -0.2, -0.3]})),
+    (12, CK, 'inOutSine'),
+]), fp=fpseq([
+    (0, {'R': C_CROSS_R, 'L': ([-4, -10.5, 13], [30, -14, -30]), 'cam': [0, 0, 0], 'fov': -4}),
+    (2.5, {'R': LOW_R, 'L': LOW_L, 'cam': [2, 0, 0], 'fov': 0}, 'outCubic'),
+    (5, {'cam': [1.5, 2, 0]}),
+    (7, {'cam': [1.5, -2, 0]}),
+    (12, dict(CFG), 'inOutSine'),
+]))
+
+# ================================================================ R. GLORIA (76틱: 12~28 떠오름, 48 합창 폭발, 60 내려옴)
+C_PRAY = CP(body=[10, 0, 0], head=[16, 0, 0], right_arm=[-80, 30, 0], left_arm=[-80, -30, 0], root={'pos': [0, -0.6, 0]})
+C_SPREAD = CP(body=[-14, 0, 0], head=[-30, 0, 0], right_arm=[-60, 20, 96], left_arm=[-60, -20, -96], root={'pos': [0, 0.2, 0], 'rot': [-5, 0, 0]}, right_leg=[14, 2, 4], left_leg=[-4, -2, -4])
+C_CONDUCT = CP(body=[-6, 0, 0], head=[-16, 0, 0], right_arm=[-140, -10, 30], left_arm=[-100, 20, -40], root={'pos': [0, 0, 0], 'rot': [-2, 0, 0]}, right_leg=[16, 2, 4], left_leg=[-6, -2, -4])
+C_GATHER = CP(body=[20, 0, 0], head=[14, 0, 0], right_arm=[-80, 40, 10], left_arm=[-80, -40, -10], root={'pos': [0, -0.6, 0], 'rot': [6, 0, 0]}, right_leg=[30, 6, 6], left_leg=[20, -6, -6])
+C_GLORIA = CP(body=[-26, 0, 0], head=[-40, 0, 0], right_arm=[-160, 10, 40], left_arm=[-160, -10, -40], root={'pos': [0, 0.6, 0], 'rot': [-8, 0, 0]}, right_leg=[10, 6, 8], left_leg=[-8, -6, -8])
+C_LAND = CP(body=[26, 0, 0], head=[4, 0, 0], right_arm=[-30, -10, 30], left_arm=[-30, 10, -30], root={'pos': [0, -2.6, 0.4], 'rot': [3, 0, 0]}, right_leg=[16, 8, 8], left_leg=[-22, -6, -6])
+_cu = [
+    (0, CK),
+    (6, C_PRAY, 'outCubic'),
+    (11, dict(C_PRAY, head=[18, 0, 0], root={'pos': [0, -0.7, 0], 'rot': [0, 0, 0]})),
+    (16, C_SPREAD, 'outExpo'),
+    (26, dict(C_SPREAD, body=[-16, 0, 0], head=[-32, 0, 0])),
+]
+for k in range(5):
+    t0 = 28 + k * 4
+    _cu.append((t0, C_CONDUCT if k % 2 == 0 else dict(C_CONDUCT, right_arm=[-110, -30, 10], left_arm=[-120, 30, -30]), 'inOutSine'))
+_cu += [
+    (46, C_GATHER, 'inCubic'),
+    (48.5, C_GLORIA, 'outExpo'),
+    (58, dict(C_GLORIA, body=[-22, 0, 0], head=[-34, 0, 0])),
+    (66, C_LAND, 'outBounce'),
+    (71, dict(C_LAND, body=[20, 0, 0], root={'pos': [0, -2.0, 0.3], 'rot': [2, 0, 0]})),
+    (76, CK, 'inOutSine'),
+]
+_cf = [
+    (0, dict(CFG)),
+    (6, {'R': ([3, -11, 9], [40, 40, 40]), 'L': ([-3, -11, 8.5], [40, -40, -40]), 'cam': [4, 0, 0], 'fov': -4}, 'outCubic'),
+    (16, {'R': C_OPEN_R, 'L': C_OPEN_L, 'cam': [-10, 0, 0], 'fov': 12}, 'outExpo'),
+    (26, {'cam': [-9, 0, 0], 'fov': 10}),
+]
+for k in range(5):
+    t0 = 28 + k * 4
+    _cf.append((t0, {'R': C_UP_R if k % 2 == 0 else C_HI_R, 'L': C_BOOK_L, 'cam': [-8, 0, 0], 'fov': 8}, 'inOutSine'))
+_cf += [
+    (46, {'R': ([3, -12, 8], [30, 40, 40]), 'L': ([-3, -12, 7.5], [30, -40, -40]), 'cam': [4, 0, 0], 'fov': -6}, 'inCubic'),
+    (48.5, {'R': C_UP_R, 'L': ([-5, -3, 6.5], [86, -6, -40]), 'cam': [-12, 0, 0], 'fov': 16}, 'outExpo'),
+    (58, {'cam': [-8, 0, 0], 'fov': 10}),
+    (66, {'R': LOW_R, 'L': LOW_L, 'cam': [5, 0, 0], 'fov': -3}, 'outBounce'),
+    (76, dict(CFG), 'inOutSine'),
+]
+C['cantor.ult'] = clip(76, blend_in=2, blend_out=5, root_pivot=12, bones=seq(_cu), fp=fpseq(_cf))
+
+# ================================================================ T. 선율 전환 (지휘봉을 빙그르 돌림)
+C['cantor.switch'] = clip(10, blend_in=0.5, blend_out=3, bones=seq([
+    (0, CK),
+    (2.5, CP(body=[-4, 10, 0], head=[-8, -6, 0], right_arm=[-150, 30, 30], left_arm=[-20, 10, -14], root={'pos': [0, 0.3, 0]}), 'outCubic'),
+    (5, CP(body=[4, -10, 0], head=[-4, 6, 0], right_arm=[-90, -40, 10], left_arm=[-24, 10, -14], root={'pos': [0, 0, 0.3]}), 'inOutCubic'),
+    (10, CK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(CFG)),
+    (2.5, {'R': C_HI_R, 'cam': [-1, 0.6, 0.6], 'fov': 2}, 'outCubic'),
+    (5, {'R': C_FL_R, 'cam': [0.6, -0.6, -0.6], 'fov': -1}, 'inOutCubic'),
+    (10, dict(CFG), 'inOutSine'),
+]))
+
+C['cantor.select'] = clip(26, blend_in=2, blend_out=5, bones=seq([
+    (0, CP(body=[0, 0, 0], head=[0, 0, 0], right_arm=[0, 0, 0], left_arm=[0, 0, 0], right_leg=[0, 0, 0], left_leg=[0, 0, 0], root={'pos': [0, 0, 0]})),
+    (6, CP(body=[30, 0, 0], head=[20, 0, 0], right_arm=[-60, 40, 0], left_arm=[-20, 0, -20], root={'pos': [0, -0.5, 0]}), 'outCubic'),
+    (12, CP(body=[32, 0, 0], head=[22, 0, 0], right_arm=[-62, 40, 0], left_arm=[-20, 0, -20], root={'pos': [0, -0.6, 0]})),
+    (16, C_SPREAD, 'outExpo'),
+    (26, CK, 'inOutSine'),
+]), fp=fpseq([
+    (0, {'R': LOW_R, 'L': LOW_L, 'cam': [0, 0, 0]}),
+    (6, {'R': ([3, -11, 9], [40, 40, 40]), 'L': LOW_L}, 'outCubic'),
+    (16, {'R': C_OPEN_R, 'L': C_OPEN_L, 'cam': [-2, 0, 0]}, 'outExpo'),
+    (26, dict(CFG), 'inOutSine'),
+]))
+
+write('cantor', C)
+
+
+# =====================================================================================
 #                        공통 피격 반응 (능력 없는 플레이어 포함)
 # =====================================================================================
 C = {}

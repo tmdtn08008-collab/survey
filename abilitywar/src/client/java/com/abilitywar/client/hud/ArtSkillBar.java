@@ -54,13 +54,15 @@ public final class ArtSkillBar {
         texQuad(ctx, layout.texture, bx, by, bx + bw, by + bh, 0, 0, 1, 1, 1, 1, 1, 1);
         decorations(ctx, mc.player.age + td);
 
-        boolean locked = mc.player.hasStatusEffect(AWEffects.STUN) || ((AWPlayer) mc.player).aw$hasFlag(AWPlayer.FLAG_CINEMATIC) || ClientState.busy > 0;
+        boolean locked = mc.player.hasStatusEffect(AWEffects.STUN) || mc.player.hasStatusEffect(AWEffects.SILENCE)
+                || ((AWPlayer) mc.player).aw$hasFlag(AWPlayer.FLAG_CINEMATIC) || ClientState.busy > 0;
         float time = mc.player.age + td;
         KeyBinding[] keys = {InputHandler.SKILL1, InputHandler.SKILL2, InputHandler.SKILL3, InputHandler.SKILL4, InputHandler.ULTIMATE, InputHandler.PASSIVE};
 
         for (int i = 0; i < 4; i++) skill(i, td, locked);
         ultimate(td, time, locked);
         passive(td, time);
+        if ("cantor".equals(ClientState.ability)) cantor(ctx, time);
         isAdditive = false;
         RenderSystem.defaultBlendFunc();
         TextRenderer tr = mc.textRenderer;
@@ -203,6 +205,34 @@ public final class ArtSkillBar {
         }
     }
 
+    /** 성가사: T 칸에 지금 선율의 색 + 아래쪽에 화음 음표 3개. */
+    static final float[][] CANTOR_MODE = {{1f, 0.62f, 0.25f}, {0.5f, 0.83f, 1f}, {0.55f, 1f, 0.55f}};
+    static final Identifier NOTE = com.abilitywar.client.fx.Tex.fx("cantor_note");
+
+    private static void cantor(DrawContext ctx, float time) {
+        float[] s = L.slots.get("passive");
+        if (s == null) return;
+        int mode = Math.min(2, ClientState.extra & 3), notes = (ClientState.extra >> 2) & 3;
+        float[] c = CANTOR_MODE[mode];
+        additive(true);
+        maskRect(s, 0, 1, c[0], c[1], c[2], 0.2f + 0.08f * (float) Math.sin(time * 0.15));
+        additive(false);
+        float x0 = bx + s[0] * sc, x1 = bx + s[2] * sc, y1 = by + s[3] * sc;
+        float w = x1 - x0, size = w * 0.3f;
+        boolean full = notes >= 3;
+        float pulse = full ? 0.75f + 0.25f * (float) Math.sin(time * 0.5) : 1f;
+        setFilter(MinecraftClient.getInstance(), NOTE);
+        for (int i = 0; i < 3; i++) {
+            float cx = x0 + w * (0.2f + 0.3f * i), cy = y1 - size * 0.62f;
+            boolean on = i < notes;
+            float a = on ? 0.95f * pulse : 0.22f;
+            float r = on ? 1f : 0.6f, g = on ? (full ? 0.95f : 0.82f) : 0.55f, b = on ? (full ? 0.75f : 0.4f) : 0.5f;
+            texQuadAdd(ctx, NOTE, cx - size / 2, cy - size / 2, cx + size / 2, cy + size / 2, 0, 0, 0.5f, 1, r, g, b, a);
+        }
+        isAdditive = false;
+        RenderSystem.defaultBlendFunc();
+    }
+
     private static void passive(float td, float time) {
         float[] s = L.slots.get("passive");
         if (s == null) return;
@@ -295,10 +325,20 @@ public final class ArtSkillBar {
         else RenderSystem.defaultBlendFunc();
     }
 
+    private static void texQuadAdd(DrawContext ctx, Identifier tex, float x0, float y0, float x1, float y1,
+                                   float u0, float v0, float u1, float v1, float r, float g, float b, float a) {
+        texQuad(ctx, tex, x0, y0, x1, y1, u0, v0, u1, v1, r, g, b, a, true);
+    }
+
     private static void texQuad(DrawContext ctx, Identifier tex, float x0, float y0, float x1, float y1,
                                 float u0, float v0, float u1, float v1, float r, float g, float b, float a) {
+        texQuad(ctx, tex, x0, y0, x1, y1, u0, v0, u1, v1, r, g, b, a, false);
+    }
+
+    private static void texQuad(DrawContext ctx, Identifier tex, float x0, float y0, float x1, float y1,
+                                float u0, float v0, float u1, float v1, float r, float g, float b, float a, boolean add) {
         M = new Matrix4f(ctx.getMatrices().peek().getPositionMatrix());
-        isAdditive = false;
+        isAdditive = add;
         applyBlend();
         RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
         RenderSystem.setShaderTexture(0, tex);

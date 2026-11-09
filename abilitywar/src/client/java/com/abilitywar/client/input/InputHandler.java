@@ -229,7 +229,8 @@ public final class InputHandler {
         }
         com.abilitywar.ability.Ability ab = com.abilitywar.ability.Abilities.byString(ClientState.ability);
         boolean busyOk = ab != null && ab.clientAllowWhileBusy(p, slot);
-        if (locked(p) || blockHeld || !ClientState.ready(slot) || (ClientState.busy > 0 && !busyOk)) {
+        if (locked(p) || blockHeld || !ClientState.ready(slot) || (ClientState.busy > 0 && !busyOk)
+                || (slot != SkillSlot.DASH && p.hasStatusEffect(AWEffects.SILENCE))) {
             deny();
             return;
         }

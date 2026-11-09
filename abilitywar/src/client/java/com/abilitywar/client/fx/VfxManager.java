@@ -74,7 +74,7 @@ public final class VfxManager {
                     add(new Effects.DashTrail(w, id, color, n.getString("ab"), new Vec3d(n.getFloat("dx"), 0, n.getFloat("dz")), p));
                 }
                 default -> {
-                    if (!com.abilitywar.client.fx.dragon.DragonFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.blade.BladeFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.blood.BloodFx.spawn(type, n, w, p))
+                    if (!com.abilitywar.client.fx.dragon.DragonFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.blade.BladeFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.blood.BloodFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.cantor.CantorFx.spawn(type, n, w, p))
                         AbilityWar.LOG.debug("Unknown fx {}", type);
                 }
             }
@@ -153,6 +153,7 @@ public final class VfxManager {
         com.abilitywar.client.fx.dragon.DragonFx.tick(w);
         com.abilitywar.client.fx.blade.BladeFx.tick(w);
         com.abilitywar.client.fx.blood.BloodFx.tick(w);
+        com.abilitywar.client.fx.cantor.CantorFx.tick(w);
         AfterImages.tick();
         Particles.tick();
         Debris.tick();
@@ -164,6 +165,7 @@ public final class VfxManager {
         com.abilitywar.client.fx.dragon.DragonFx.clear();
         com.abilitywar.client.fx.blade.BladeFx.clear();
         com.abilitywar.client.fx.blood.BloodFx.clear();
+        com.abilitywar.client.fx.cantor.CantorFx.clear();
         EFFECTS.clear();
         Particles.clear();
         Debris.clear();
@@ -195,6 +197,7 @@ public final class VfxManager {
             com.abilitywar.client.fx.dragon.DragonFx.render(c);
             com.abilitywar.client.fx.blade.BladeFx.render(c);
             com.abilitywar.client.fx.blood.BloodFx.render(c);
+            com.abilitywar.client.fx.cantor.CantorFx.render(c);
             Particles.render(c.imm, c.m, c.camRot, c.cam, c.tickDelta);
             c.imm.draw();
             DamageNumbers.renderWorld(c);

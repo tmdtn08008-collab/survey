@@ -19,6 +19,8 @@ public final class ClientState {
     public static boolean shadowForm;
     public static float shadowRemaining;
     public static float busy;
+    /** 능력별 작은 상태값 (AbilityData.extra). */
+    public static int extra;
     private static boolean ultWasReady;
 
     public static void read(PacketByteBuf buf) {
@@ -40,6 +42,7 @@ public final class ClientState {
         shadowForm = buf.readBoolean();
         shadowRemaining = buf.readVarInt();
         busy = buf.readVarInt();
+        extra = buf.isReadable() ? buf.readVarInt() : 0;
     }
 
     public static void tick() {

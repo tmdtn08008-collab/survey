@@ -91,6 +91,11 @@ public final class AbilityManager {
             deny(player);
             return;
         }
+        if (player.hasStatusEffect(AWEffects.SILENCE)) {
+            // 침묵: 스킬 사용 불가
+            deny(player);
+            return;
+        }
         if (slot == SkillSlot.ULTIMATE && !a.canUseUltimate(player, d)) {
             deny(player);
             return;
@@ -220,6 +225,15 @@ public final class AbilityManager {
         ((AWPlayer) player).aw$setFlag(AWPlayer.FLAG_ULT_READY, ready);
         ((AWPlayer) player).aw$setFlag(AWPlayer.FLAG_CINEMATIC, d.isFrozen());
         a.tick(player, d);
+        // 신속: 쿨타임이 더 빨리 돎 (궁극기 제외)
+        net.minecraft.entity.effect.StatusEffectInstance haste = player.getStatusEffect(AWEffects.HASTE);
+        if (haste != null && now % (haste.getAmplifier() >= 1 ? 2 : 4) == 0) {
+            for (SkillSlot s : SkillSlot.VALUES) {
+                if (s == SkillSlot.ULTIMATE) continue;
+                if (d.cdEnd[s.ordinal()] > now) d.cdEnd[s.ordinal()]--;
+            }
+            if (now % 10 == 0) d.dirty = true;
+        }
         if (d.dirty || now % 20 == 0) {
             AWNet.sendState(player);
             d.dirty = false;
@@ -254,9 +268,21 @@ public final class AbilityManager {
         return true;
     }
 
-    /** 막기(F) 피해 감소. */
+    /** 버프/디버프 배율 (용맹·불협화음·수호) + 막기(F) 피해 감소. */
     public static float modifyDamage(LivingEntity victim, DamageSource source, float amount) {
-        if (victim.getWorld().isClient || !(victim instanceof ServerPlayerEntity sp)) return amount;
+        if (victim.getWorld().isClient) return amount;
+        if (!source.isOf(net.minecraft.entity.damage.DamageTypes.GENERIC_KILL) && !source.isOf(net.minecraft.entity.damage.DamageTypes.OUT_OF_WORLD)) {
+            float mult = 1f;
+            if (source.getAttacker() instanceof LivingEntity la && la != victim) {
+                net.minecraft.entity.effect.StatusEffectInstance v = la.getStatusEffect(AWEffects.VALOR);
+                if (v != null) mult *= 1f + 0.15f * (v.getAmplifier() + 1);
+                if (la.hasStatusEffect(AWEffects.DISSONANCE)) mult *= 0.8f;
+            }
+            net.minecraft.entity.effect.StatusEffectInstance ag = victim.getStatusEffect(AWEffects.AEGIS);
+            if (ag != null) mult *= Math.max(0.4f, 1f - 0.15f * (ag.getAmplifier() + 1));
+            amount *= mult;
+        }
+        if (!(victim instanceof ServerPlayerEntity sp)) return amount;
         AbilityData d = data(sp);
         if (!d.blocking || source.isIn(AWDamage.TAG_UNBLOCKABLE)) return amount;
         Entity src = source.getSource() != null ? source.getSource() : source.getAttacker();

@@ -940,5 +940,192 @@
     "volume": 1.0
    }
   ]
+ },
+ "cantor.note": {
+  "subtitle": "subtitles.abilitywar.cantor.note",
+  "sounds": [
+   {
+    "name": "minecraft:block.note_block.bell",
+    "type": "event",
+    "pitch": 1.2,
+    "volume": 0.8
+   },
+   {
+    "name": "minecraft:block.amethyst_block.chime",
+    "type": "event",
+    "pitch": 1.4,
+    "volume": 0.8
+   }
+  ]
+ },
+ "cantor.hymn": {
+  "subtitle": "subtitles.abilitywar.cantor.hymn",
+  "sounds": [
+   {
+    "name": "minecraft:block.beacon.power_select",
+    "type": "event",
+    "pitch": 1.3,
+    "volume": 1.0
+   },
+   {
+    "name": "minecraft:block.note_block.chime",
+    "type": "event",
+    "pitch": 0.9,
+    "volume": 1.0
+   }
+  ]
+ },
+ "cantor.sanctuary": {
+  "subtitle": "subtitles.abilitywar.cantor.sanctuary",
+  "sounds": [
+   {
+    "name": "minecraft:block.beacon.activate",
+    "type": "event",
+    "pitch": 1.2,
+    "volume": 1.0
+   },
+   {
+    "name": "minecraft:block.respawn_anchor.charge",
+    "type": "event",
+    "pitch": 1.4,
+    "volume": 0.8
+   }
+  ]
+ },
+ "cantor.bell": {
+  "subtitle": "subtitles.abilitywar.cantor.bell",
+  "sounds": [
+   {
+    "name": "minecraft:block.anvil.land",
+    "type": "event",
+    "pitch": 0.6,
+    "volume": 1.0
+   },
+   {
+    "name": "minecraft:block.bell.use",
+    "type": "event",
+    "pitch": 0.5,
+    "volume": 1.0
+   }
+  ]
+ },
+ "cantor.bell_ring": {
+  "subtitle": "subtitles.abilitywar.cantor.bell_ring",
+  "sounds": [
+   {
+    "name": "minecraft:block.bell.use",
+    "type": "event",
+    "pitch": 0.7,
+    "volume": 1.0
+   },
+   {
+    "name": "minecraft:block.bell.resonate",
+    "type": "event",
+    "pitch": 0.8,
+    "volume": 1.0
+   }
+  ]
+ },
+ "cantor.pillar": {
+  "subtitle": "subtitles.abilitywar.cantor.pillar",
+  "sounds": [
+   {
+    "name": "minecraft:item.trident.thunder",
+    "type": "event",
+    "pitch": 1.6,
+    "volume": 0.6
+   },
+   {
+    "name": "minecraft:block.beacon.deactivate",
+    "type": "event",
+    "pitch": 1.5,
+    "volume": 1.0
+   }
+  ]
+ },
+ "cantor.chime": {
+  "subtitle": "subtitles.abilitywar.cantor.chime",
+  "sounds": [
+   {
+    "name": "minecraft:block.amethyst_block.resonate",
+    "type": "event",
+    "pitch": 1.2,
+    "volume": 1.0
+   },
+   {
+    "name": "minecraft:block.note_block.chime",
+    "type": "event",
+    "pitch": 1.5,
+    "volume": 1.0
+   }
+  ]
+ },
+ "cantor.switch": {
+  "subtitle": "subtitles.abilitywar.cantor.switch",
+  "sounds": [
+   {
+    "name": "minecraft:block.note_block.harp",
+    "type": "event",
+    "pitch": 1.5,
+    "volume": 0.8
+   },
+   {
+    "name": "minecraft:block.note_block.pling",
+    "type": "event",
+    "pitch": 1.2,
+    "volume": 0.8
+   }
+  ]
+ },
+ "cantor.buff": {
+  "subtitle": "subtitles.abilitywar.cantor.buff",
+  "sounds": [
+   {
+    "name": "minecraft:entity.player.levelup",
+    "type": "event",
+    "pitch": 1.6,
+    "volume": 0.6
+   },
+   {
+    "name": "minecraft:block.amethyst_block.chime",
+    "type": "event",
+    "pitch": 1.0,
+    "volume": 0.8
+   }
+  ]
+ },
+ "cantor.gloria": {
+  "subtitle": "subtitles.abilitywar.cantor.gloria",
+  "sounds": [
+   {
+    "name": "minecraft:ui.toast.challenge_complete",
+    "type": "event",
+    "pitch": 0.9,
+    "volume": 1.0
+   },
+   {
+    "name": "minecraft:block.beacon.power_select",
+    "type": "event",
+    "pitch": 0.7,
+    "volume": 1.0
+   }
+  ]
+ },
+ "cantor.choir": {
+  "subtitle": "subtitles.abilitywar.cantor.choir",
+  "sounds": [
+   {
+    "name": "minecraft:block.beacon.ambient",
+    "type": "event",
+    "pitch": 1.5,
+    "volume": 1.0
+   },
+   {
+    "name": "minecraft:entity.allay.item_given",
+    "type": "event",
+    "pitch": 0.8,
+    "volume": 1.0
+   }
+  ]
  }
 }

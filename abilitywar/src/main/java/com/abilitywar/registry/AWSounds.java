@@ -61,6 +61,17 @@ public final class AWSounds {
     public static final SoundEvent BLADE_PHANTOM = reg("blade.phantom");
     public static final SoundEvent BLADE_MARK = reg("blade.mark");
     public static final SoundEvent BLOOD_SLASH = reg("blood.slash");
+    public static final SoundEvent CANTOR_NOTE = reg("cantor.note");
+    public static final SoundEvent CANTOR_HYMN = reg("cantor.hymn");
+    public static final SoundEvent CANTOR_SANCTUARY = reg("cantor.sanctuary");
+    public static final SoundEvent CANTOR_BELL = reg("cantor.bell");
+    public static final SoundEvent CANTOR_BELL_RING = reg("cantor.bell_ring");
+    public static final SoundEvent CANTOR_PILLAR = reg("cantor.pillar");
+    public static final SoundEvent CANTOR_CHIME = reg("cantor.chime");
+    public static final SoundEvent CANTOR_SWITCH = reg("cantor.switch");
+    public static final SoundEvent CANTOR_BUFF = reg("cantor.buff");
+    public static final SoundEvent CANTOR_GLORIA = reg("cantor.gloria");
+    public static final SoundEvent CANTOR_CHOIR = reg("cantor.choir");
     public static final SoundEvent BLOOD_THREAD = reg("blood.thread");
     public static final SoundEvent BLOOD_SPIKE = reg("blood.spike");
     public static final SoundEvent BLOOD_DRAIN = reg("blood.drain");

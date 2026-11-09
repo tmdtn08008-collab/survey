@@ -234,6 +234,35 @@ public final class CameraController {
                 look = S.add(F.multiply(11 + 4 * k)).add(0, 2.0, 0);
                 fov = 80 - 3 * k;
             }
+        } else if (cin.type.equals("cantor_ult")) {
+            Vec3d S = cin.start;
+            if (t < 16) {
+                // 정면 로우앵글: 성가집을 펼치는 성가사 → 하늘의 빛을 올려다봄
+                float k = smooth(t / 16f);
+                double th = Math.toRadians(30 - 14 * k);
+                double rad = 2.8 + 2.0 * k;
+                cam = C.add(F.multiply(Math.cos(th) * rad)).add(R.multiply(Math.sin(th) * rad)).add(0, 0.4, 0);
+                look = C.add(0, 1.5 + 1.6 * k, 0);
+                fov = 60 + 12 * k;
+            } else if (t < 34) {
+                // 빛의 날개로 떠오름: 옆 아래에서 넓게 (합창의 빛기둥이 솟음)
+                float k = smooth((t - 16) / 18f);
+                cam = S.add(R.multiply(8.5 - 1.5 * k)).add(F.multiply(5.5)).add(0, 0.8 + 1.2 * k, 0);
+                look = C.add(0, 1.6, 0);
+                fov = 82;
+            } else if (t < 48) {
+                // 거대한 광륜: 정면 아래에서 올려다봄
+                float k = smooth((t - 34) / 14f);
+                cam = S.add(F.multiply(6.5 - 1 * k)).add(R.multiply(1.5)).add(0, 0.5, 0);
+                look = C.add(0, 1.9, 0);
+                fov = 74 - 4 * k;
+            } else {
+                // GLORIA: 높은 부감으로 퍼지는 빛
+                float k = smooth((t - 48) / 28f);
+                cam = S.add(F.multiply(10 + 2 * k)).add(R.multiply(7)).add(0, 9 + 2 * k, 0);
+                look = S.add(0, 1.0, 0);
+                fov = 80;
+            }
         } else if (cin.type.equals("blood_ult")) {
             // 핏빛 달은 시전자 뒤쪽 하늘 (BloodFx.Ult: start - F*46 + 30)
             Vec3d S = cin.start;

@@ -111,6 +111,7 @@ public final class AWNet {
         buf.writeBoolean(d.shadowForm);
         buf.writeVarInt((int) Math.max(0, d.shadowUntil - d.now()));
         buf.writeVarInt((int) Math.max(0, d.busyUntil - d.now()));
+        buf.writeVarInt(d.extra);
         send(player, S2C_STATE, buf);
         buf.release();
     }

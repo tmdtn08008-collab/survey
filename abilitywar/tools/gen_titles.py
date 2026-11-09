@@ -178,7 +178,27 @@ def blood():
     save(out, 'ult_title_blood.png')
 
 
+def cantor():
+    """성가사: 라틴어 GLORIA (세리프, 금빛) + 뒤로 퍼지는 빛줄기와 광륜."""
+    W, H = 1024, 260
+    SERIF = '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf'
+    m = text_mask(W, H, 'GLORIA', SERIF, 150, 26, 2, yoff=6)
+    out = compose(W, H, m, (255, 255, 240), (255, 220, 120), (200, 130, 30), (40, 24, 4), (255, 210, 110), 16, 31)
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    cx, cy = W / 2, H / 2 + 4
+    ang = np.arctan2(yy - cy, xx - cx)
+    rr = np.sqrt(((xx - cx) / 1.0) ** 2 + ((yy - cy) * 2.2) ** 2)
+    rays = (0.5 + 0.5 * np.cos(ang * 18)) ** 6 * np.exp(-rr / 420) * 0.75
+    halo = np.exp(-((np.sqrt((xx - cx) ** 2 + ((yy - cy + 4) * 3.2) ** 2) - 360) / 10) ** 2) * 0.6
+    light = np.clip(rays + halo, 0, 1) * (1 - out[..., 3])
+    for k, c in enumerate((1.0, 0.86, 0.5)):
+        out[..., k] = out[..., k] * (1 - light) + c * light
+    out[..., 3] = np.maximum(out[..., 3], light)
+    save(out, 'ult_title_cantor.png')
+
+
 if __name__ == '__main__':
+    cantor()
     blood()
     dragon()
     void()

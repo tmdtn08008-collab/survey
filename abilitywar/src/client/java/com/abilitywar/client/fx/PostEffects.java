@@ -23,6 +23,7 @@ public final class PostEffects {
     static final float[] VOID_DARK = {0.01f, 0f, 0.035f}, VOID_LIGHT = {0.42f, 0.22f, 0.78f};
     static final float[] FIRE_DARK = {0.05f, 0.012f, 0f}, FIRE_LIGHT = {1.0f, 0.52f, 0.2f};
     static final float[] BLADE_DARK = {0.03f, 0f, 0.045f}, BLADE_LIGHT = {0.8f, 0.45f, 1.0f};
+    static final float[] CANTOR_DARK = {0.07f, 0.05f, 0.01f}, CANTOR_LIGHT = {1.0f, 0.93f, 0.7f};
     static final float[] BLOOD_DARK = {0.06f, 0f, 0.008f}, BLOOD_LIGHT = {1.0f, 0.26f, 0.24f};
     private static final float[] dark = VOID_DARK.clone(), light = VOID_LIGHT.clone();
 
@@ -40,14 +41,15 @@ public final class PostEffects {
             if (ClientState.shadowForm) targetV = 0.7f;
             targetV = Math.max(targetV, BlackHoleFx.proximity(mc.world, mc.gameRenderer.getCamera().getPos()) * 0.7f);
             for (Effects.UltCast u : VfxManager.find(Effects.UltCast.class)) targetV = Math.max(targetV, u.darkness(0) * 0.6f);
-            boolean fire = false, blade = false, blood = false;
+            boolean fire = false, blade = false, blood = false, holy = false;
             if (CameraController.isCinematic()) {
                 fire = CameraController.cinematicType().startsWith("dragon");
                 blade = CameraController.cinematicType().startsWith("blade");
                 blood = CameraController.cinematicType().startsWith("blood");
-                targetV = Math.max(targetV, fire ? 0.32f : blade ? 0.3f : blood ? 0.42f : 0.45f);
+                holy = CameraController.cinematicType().startsWith("cantor");
+                targetV = Math.max(targetV, fire ? 0.32f : blade ? 0.3f : blood ? 0.42f : holy ? 0.22f : 0.45f);
             }
-            float[] td = fire ? FIRE_DARK : blade ? BLADE_DARK : blood ? BLOOD_DARK : VOID_DARK, tl = fire ? FIRE_LIGHT : blade ? BLADE_LIGHT : blood ? BLOOD_LIGHT : VOID_LIGHT;
+            float[] td = fire ? FIRE_DARK : blade ? BLADE_DARK : blood ? BLOOD_DARK : holy ? CANTOR_DARK : VOID_DARK, tl = fire ? FIRE_LIGHT : blade ? BLADE_LIGHT : blood ? BLOOD_LIGHT : holy ? CANTOR_LIGHT : VOID_LIGHT;
             for (int i = 0; i < 3; i++) {
                 dark[i] += (td[i] - dark[i]) * 0.2f;
                 light[i] += (tl[i] - light[i]) * 0.2f;

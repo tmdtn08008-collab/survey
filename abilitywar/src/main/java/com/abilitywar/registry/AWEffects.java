@@ -27,6 +27,43 @@ public final class AWEffects {
     /** 출혈 (혈귀): 단계(=증폭+1, 최대 5)마다 1초에 0.4 피해. */
     public static final StatusEffect BLEED = Registry.register(Registries.STATUS_EFFECT, AbilityWar.id("bleed"), new BleedEffect());
 
+    // ---- 성가사(버퍼) 버프 / 디버프
+    /** 용맹: 주는 피해 +15%/단계. */
+    public static final StatusEffect VALOR = Registry.register(Registries.STATUS_EFFECT, AbilityWar.id("valor"),
+            new AWStatusEffect(StatusEffectCategory.BENEFICIAL, 0xFF7A3A, false));
+    /** 수호: 받는 피해 -15%/단계. */
+    public static final StatusEffect AEGIS = Registry.register(Registries.STATUS_EFFECT, AbilityWar.id("aegis"),
+            new AWStatusEffect(StatusEffectCategory.BENEFICIAL, 0x6AC8FF, false));
+    /** 신속: 이동 속도 +15%/단계, 쿨타임 회복 +25%/단계 (AbilityManager). */
+    public static final StatusEffect HASTE = Registry.register(Registries.STATUS_EFFECT, AbilityWar.id("haste"),
+            new AWStatusEffect(StatusEffectCategory.BENEFICIAL, 0x7CFF8A, false)
+                    .addAttributeModifier(net.minecraft.entity.attribute.EntityAttributes.GENERIC_MOVEMENT_SPEED,
+                            "6f1c2a4e-3b7d-4c55-9a0e-5d1b8c2f7a31", 0.15, net.minecraft.entity.attribute.EntityAttributeModifier.Operation.MULTIPLY_TOTAL));
+    /** 은총: 1초마다 체력 0.5/단계 회복. */
+    public static final StatusEffect GRACE = Registry.register(Registries.STATUS_EFFECT, AbilityWar.id("grace"), new GraceEffect());
+    /** 침묵: 스킬 사용 불가 (평타·대시는 가능). */
+    public static final StatusEffect SILENCE = Registry.register(Registries.STATUS_EFFECT, AbilityWar.id("silence"),
+            new AWStatusEffect(StatusEffectCategory.HARMFUL, 0xC8C8FF, false));
+    /** 불협화음: 주는 피해 -20%. */
+    public static final StatusEffect DISSONANCE = Registry.register(Registries.STATUS_EFFECT, AbilityWar.id("dissonance"),
+            new AWStatusEffect(StatusEffectCategory.HARMFUL, 0x8A7A5A, false));
+
+    public static class GraceEffect extends StatusEffect {
+        public GraceEffect() {
+            super(StatusEffectCategory.BENEFICIAL, 0xFFE89A);
+        }
+
+        @Override
+        public boolean canApplyUpdateEffect(int duration, int amplifier) {
+            return duration % 20 == 0;
+        }
+
+        @Override
+        public void applyUpdateEffect(LivingEntity entity, int amplifier) {
+            if (entity.getHealth() < entity.getMaxHealth()) entity.heal(0.5f * (amplifier + 1));
+        }
+    }
+
     public static class BleedEffect extends StatusEffect {
         public BleedEffect() {
             super(StatusEffectCategory.HARMFUL, 0xB0101C);
