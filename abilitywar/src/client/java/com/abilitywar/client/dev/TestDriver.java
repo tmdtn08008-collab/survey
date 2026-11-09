@@ -111,6 +111,16 @@ public final class TestDriver {
                 }
                 case "say" -> mc.player.networkHandler.sendChatMessage(arg);
                 case "clearchat" -> mc.inGameHud.getChatHud().clear(false);
+                case "bind" -> {
+                    String[] p = arg.split("\\s+");
+                    net.minecraft.client.option.KeyBinding kb = switch (p[0]) {
+                        case "skill1" -> InputHandler.SKILL1;
+                        case "ultimate" -> InputHandler.ULTIMATE;
+                        default -> InputHandler.PASSIVE;
+                    };
+                    mc.options.setKeyCode(kb, net.minecraft.client.util.InputUtil.fromTranslationKey(p[1]));
+                    net.minecraft.client.option.KeyBinding.updateKeysByCode();
+                }
                 case "quit" -> mc.scheduleStop();
                 default -> AbilityWar.LOG.warn("[TestDriver] unknown {}", line);
             }

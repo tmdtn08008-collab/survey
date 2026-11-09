@@ -21,6 +21,7 @@ public final class HudDraw {
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         BufferBuilder bb = Tessellator.getInstance().getBuffer();
+        RenderSystem.disableCull();
         bb.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
         bb.vertex(m, cx, cy, 0).color(r, g, b, a).next();
         int steps = Math.max(2, (int) ((toFrac - fromFrac) * 64));
@@ -32,6 +33,7 @@ public final class HudDraw {
             bb.vertex(m, cx + dx * k, cy + dy * k, 0).color(r, g, b, a).next();
         }
         Tessellator.getInstance().draw();
+        RenderSystem.enableCull();
         RenderSystem.disableBlend();
     }
 

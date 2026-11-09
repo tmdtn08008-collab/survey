@@ -36,6 +36,7 @@ public class AbilityWarClient implements ClientModInitializer {
         com.abilitywar.client.dev.TestDriver.init();
         ClientNet.init();
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new AnimRegistry());
+        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new com.abilitywar.client.hud.HudLayouts());
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
             @Override
             public Identifier getFabricId() {

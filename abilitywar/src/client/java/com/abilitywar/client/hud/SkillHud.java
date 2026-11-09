@@ -26,6 +26,11 @@ public final class SkillHud {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.player == null || mc.options.hudHidden || ClientState.ability.isEmpty()) return;
         String ab = ClientState.ability;
+        HudLayouts.Layout art = HudLayouts.get(ab);
+        if (art != null) {
+            ArtSkillBar.render(ctx, td, art);
+            return;
+        }
         int sw = ctx.getScaledWindowWidth(), sh = ctx.getScaledWindowHeight();
         int size = 22, gap = 3, ultSize = 30;
         int totalW = size * 4 + gap * 3 + 6 + ultSize;

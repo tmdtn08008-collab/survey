@@ -517,6 +517,6 @@ if __name__ == '__main__':
     wisp(); shadow_pool(); tendril(); swirl(); rift(); crack()
     magic_circle('magic_circle.png', 0); magic_circle('magic_circle2.png', 1); rune_shield()
     vignette(); card_art()
-    icon('void_skill1.png', draw_s1); icon('void_skill2.png', draw_s2); icon('void_skill3.png', draw_s3); icon('void_skill4.png', draw_s4)
-    icon('void_ultimate.png', draw_ult, (0.85, 0.35, 1.0)); icon('void_passive.png', draw_passive, (0.55, 0.4, 0.95)); icon('void_block.png', draw_block)
+    # 공허 아이콘은 이제 tools/gen_hud.py 가 스킬바 그림에서 잘라 만든다 (아래 함수는 그림이 없는 능력용 예시)
+    icon('void_block.png', draw_block)
     print('done')

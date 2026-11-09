@@ -1,0 +1,73 @@
+package com.abilitywar.client.hud;
+
+import com.abilitywar.AbilityWar;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
+import net.minecraft.resource.Resource;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.Reader;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * assets/&lt;ns&gt;/hud/&lt;능력키&gt;.json : 능력 전용 스킬바 그림과 슬롯 위치.
+ * (tools/gen_hud.py 로 생성)
+ */
+public final class HudLayouts implements SimpleSynchronousResourceReloadListener {
+    public static final class Layout {
+        public Identifier texture, mask;
+        public float width, height;
+        public final Map<String, float[]> slots = new HashMap<>();
+        public final Map<String, float[]> labels = new HashMap<>();
+    }
+
+    private static final Map<String, Layout> LAYOUTS = new HashMap<>();
+
+    @Nullable
+    public static Layout get(String ability) {
+        return LAYOUTS.get(ability);
+    }
+
+    @Override
+    public Identifier getFabricId() {
+        return AbilityWar.id("hud_layouts");
+    }
+
+    @Override
+    public void reload(ResourceManager manager) {
+        LAYOUTS.clear();
+        Map<Identifier, Resource> found = manager.findResources("hud", id -> id.getPath().endsWith(".json"));
+        for (Map.Entry<Identifier, Resource> e : found.entrySet()) {
+            try (Reader r = e.getValue().getReader()) {
+                JsonObject o = JsonParser.parseReader(r).getAsJsonObject();
+                Layout l = new Layout();
+                l.texture = new Identifier(o.get("texture").getAsString());
+                l.mask = new Identifier(o.get("mask").getAsString());
+                l.width = o.get("width").getAsFloat();
+                l.height = o.get("height").getAsFloat();
+                readMap(o.getAsJsonObject("slots"), l.slots);
+                if (o.has("labels")) readMap(o.getAsJsonObject("labels"), l.labels);
+                String path = e.getKey().getPath();
+                String key = path.substring(path.lastIndexOf('/') + 1, path.length() - 5);
+                LAYOUTS.put(key, l);
+            } catch (Exception ex) {
+                AbilityWar.LOG.error("Bad HUD layout {}", e.getKey(), ex);
+            }
+        }
+    }
+
+    private static void readMap(JsonObject o, Map<String, float[]> out) {
+        for (Map.Entry<String, JsonElement> s : o.entrySet()) {
+            JsonArray a = s.getValue().getAsJsonArray();
+            float[] v = new float[a.size()];
+            for (int i = 0; i < v.length; i++) v[i] = a.get(i).getAsFloat();
+            out.put(s.getKey(), v);
+        }
+    }
+}
