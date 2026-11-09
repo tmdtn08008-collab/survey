@@ -46,7 +46,7 @@ import static com.abilitywar.ability.AbilityFx.*;
  * 마검사 — 마력이 깃든 검을 쓰는 연계형 검사.
  * <pre>
  * 1  마검 발도   : 발도 자세 → 마력 집중 → 순간 돌진 베기 (지나간 자리에 잔상) → 마지막 일격으로 살짝 띄움. 마력 표식.
- *                  공중의 적은 따라가서 벰. T 직후면 강화 발도.
+ *                  표식이 있는 적을 다시 베면 추가 참격. 공중의 적은 따라가서 벰. T 직후면 강화 발도.
  * 2  파공참     : 아래에서 위로 올려베어 초승달 참격 발사 → 높이 띄움 → 공중에 마력 균열 추가 피해.
  *                  1번 직후면 빨라짐, 공중의 적은 한 번 더 띄움, 표식이 있으면 추가 피해.
  * 3  무형검무   : 순간이동하며 오른쪽 → 왼쪽 → 뒤 → 정면 참격 → 내려찍기 (5타). 공중 추격/강제 내리꽂기.
@@ -256,6 +256,8 @@ public class BladeAbility extends Ability {
         final LivingEntity t;
         final boolean air, enh;
         final Set<LivingEntity> hits = new HashSet<>();
+        /** 이미 표식이 있던 적: 발도를 다시 맞으면 추가 참격. */
+        final Set<LivingEntity> premarked = new HashSet<>();
 
         DrawAction(ServerPlayerEntity c, AbilityData d, @Nullable LivingEntity t, boolean air, boolean enh) {
             super(c);
@@ -309,6 +311,7 @@ public class BladeAbility extends Ability {
                     Combat.stun(e, 8, c);
                     Combat.setVelocity(e, Vec3d.ZERO);
                     if (e instanceof ServerPlayerEntity) AWNet.anim(e, "common.flinch");
+                    if (marked(e)) premarked.add(e);
                     mark(w, e, c);
                 }
                 if (enh) AWNet.damageNumber(c, 0, AWNet.DMG_TEXT_CHAIN, c);
@@ -352,6 +355,21 @@ public class BladeAbility extends Ability {
                         Combat.teleport(c, c.getPos(), rot[0], rot[1]);
                     }
                 }
+            }
+            if (tt == 12 && !premarked.isEmpty()) {
+                // 표식이 있던 적에게 다시 발도: 추가 참격
+                boolean any = false;
+                for (LivingEntity e : premarked) {
+                    if (!e.isAlive()) continue;
+                    any = true;
+                    hit(w, c, e, enh ? 3.5f : 2.5f, AWNet.DMG_CRIT, true);
+                    NbtCompound n = nbt();
+                    n.putInt("e", e.getId());
+                    n.putBoolean("enh", true);
+                    AWNet.fx(w, chest(e), "blade_cut", n);
+                    sound(e, AWSounds.BLADE_SLASH, 1.2f, 1.4f);
+                }
+                if (any) AWNet.damageNumber(c, 0, AWNet.DMG_TEXT_CHAIN, c);
             }
             if (tt == 12 && air && t != null && hits.contains(t) && t.isAlive()) {
                 hit(w, c, t, 2f, AWNet.DMG_CRIT, false);

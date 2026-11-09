@@ -27,6 +27,10 @@ public final class HudLayouts implements SimpleSynchronousResourceReloadListener
         public final Map<String, float[]> labels = new HashMap<>();
         /** 빛 색 (쿨타임 바늘, 궁극기 경계선 등) / 진한 색 (차오른 게이지). */
         public float[] accent = {0.75f, 0.55f, 1f}, accent2 = {0.45f, 0.2f, 0.85f};
+        /** 위쪽 띠에 흐르는 마력 잔상 [x0, y0, x1, y1] (그림 좌표), 없으면 null. */
+        public float[] trail;
+        /** 빛나는 문양 [x, y, 반지름] (그림 좌표), 없으면 null. */
+        public float[] emblem;
     }
 
     private static final Map<String, Layout> LAYOUTS = new HashMap<>();
@@ -57,6 +61,8 @@ public final class HudLayouts implements SimpleSynchronousResourceReloadListener
                 if (o.has("labels")) readMap(o.getAsJsonObject("labels"), l.labels);
                 if (o.has("accent")) l.accent = readVec(o.getAsJsonArray("accent"));
                 if (o.has("accent2")) l.accent2 = readVec(o.getAsJsonArray("accent2"));
+                if (o.has("trail")) l.trail = readVec(o.getAsJsonArray("trail"));
+                if (o.has("emblem")) l.emblem = readVec(o.getAsJsonArray("emblem"));
                 String path = e.getKey().getPath();
                 String key = path.substring(path.lastIndexOf('/') + 1, path.length() - 5);
                 LAYOUTS.put(key, l);

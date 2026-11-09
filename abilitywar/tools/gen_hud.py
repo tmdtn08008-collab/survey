@@ -34,8 +34,29 @@ LAYOUTS = {
         'accent': [0.75, 0.55, 1.0], 'accent2': [0.45, 0.2, 0.85],
     },
 }
-# 마검사: tools/gen_blade_hud.py 로 그린 그림 (공허와 같은 배치)
-LAYOUTS['blade'] = dict(LAYOUTS['void'], accent=[0.78, 0.5, 1.0], accent2=[0.45, 0.15, 0.85], card=(1450, 380, 1790, 593))
+# 마검사: 사용자가 준 그림 (까만 배경, tools/import_hud_art.py --black)
+LAYOUTS['blade'] = {
+    'slots': {
+        'skill1': (80, 382, 374, 688, 10),
+        'skill2': (424, 382, 708, 688, 10),
+        'skill3': (768, 382, 1054, 688, 10),
+        'skill4': (1100, 382, 1396, 690, 10),
+        'ultimate': (1458, 362, 1848, 700, 14),
+        'passive': (1200, 60, 1410, 262, 10),
+    },
+    'labels': {
+        'skill1': (300, 600, 356, 688),
+        'skill2': (642, 600, 702, 688),
+        'skill3': (982, 600, 1042, 688),
+        'skill4': (1318, 604, 1382, 688),
+        'ultimate': (1772, 608, 1842, 702),
+        'passive': (1078, 122, 1142, 206),
+    },
+    'accent': [0.78, 0.5, 1.0], 'accent2': [0.45, 0.15, 0.85],
+    'card': (1460, 365, 1770, 559),
+    'trail': [230, 110, 1160, 245],
+    'emblem': [118, 165, 120],
+}
 # 용기사: 사용자가 준 그림 (tools/import_hud_art.py 로 체크무늬 배경 제거). Q 대시 칸이 그림에 들어 있음.
 # 모서리깎기 값이 음수면 원형 슬롯.
 LAYOUTS['dragon'] = {
@@ -114,6 +135,9 @@ def main():
             'labels': {k: list(v) for k, v in lay['labels'].items()},
             'accent': lay['accent'], 'accent2': lay['accent2'],
         }
+        for k in ('trail', 'emblem'):
+            if k in lay:
+                layout[k] = list(lay[k])
         os.makedirs(os.path.join(ASSETS, 'hud'), exist_ok=True)
         with open(os.path.join(ASSETS, 'hud', ab + '.json'), 'w') as f:
             json.dump(layout, f, indent=1)

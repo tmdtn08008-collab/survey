@@ -52,6 +52,7 @@ public final class ArtSkillBar {
         setFilter(mc, layout.texture);
         setFilter(mc, layout.mask);
         texQuad(ctx, layout.texture, bx, by, bx + bw, by + bh, 0, 0, 1, 1, 1, 1, 1, 1);
+        decorations(ctx, mc.player.age + td);
 
         boolean locked = mc.player.hasStatusEffect(AWEffects.STUN) || ((AWPlayer) mc.player).aw$hasFlag(AWPlayer.FLAG_CINEMATIC) || ClientState.busy > 0;
         float time = mc.player.age + td;
@@ -111,6 +112,47 @@ public final class ArtSkillBar {
     /** 빛 색을 하얗게 섞음. */
     private static float mix(float c) {
         return c + (1 - c) * 0.45f;
+    }
+
+    /** 위쪽 띠의 마력 잔상 + 문양 빛 (레이아웃에 있을 때만). */
+    private static void decorations(DrawContext ctx, float time) {
+        if (L.trail == null && L.emblem == null) return;
+        Identifier glow = com.abilitywar.client.fx.Tex.GLOW;
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+        if (L.trail != null) {
+            float x0 = bx + L.trail[0] * sc, y0 = by + L.trail[1] * sc, x1 = bx + L.trail[2] * sc, y1 = by + L.trail[3] * sc;
+            float w = x1 - x0, h = y1 - y0;
+            // 두 줄기가 서로 다른 속도로 흐름
+            for (int i = 0; i < 2; i++) {
+                float period = i == 0 ? 70f : 110f;
+                float k = ((time + i * 37) % period) / period;
+                float cx = x0 + w * (k * 1.3f - 0.15f);
+                float len = w * (i == 0 ? 0.28f : 0.18f);
+                float fade = (float) Math.sin(Math.PI * Math.min(1, Math.max(0, k * 1.15f)));
+                float cy = y0 + h * (i == 0 ? 0.5f : 0.35f);
+                glowQuad(glow, cx - len / 2, cy - h * 0.32f, cx + len / 2, cy + h * 0.32f, ar, ag, ab, 0.32f * fade);
+                glowQuad(glow, cx - len * 0.2f, cy - h * 0.1f, cx + len * 0.2f, cy + h * 0.1f, 1, 1, 1, 0.22f * fade);
+            }
+        }
+        if (L.emblem != null) {
+            float ex = bx + L.emblem[0] * sc, ey = by + L.emblem[1] * sc, r = L.emblem[2] * sc;
+            float pulse = 0.5f + 0.5f * (float) Math.sin(time * 0.12f);
+            glowQuad(glow, ex - r, ey - r, ex + r, ey + r, ar, ag, ab, 0.18f + 0.22f * pulse);
+        }
+        RenderSystem.defaultBlendFunc();
+    }
+
+    private static void glowQuad(Identifier tex, float x0, float y0, float x1, float y1, float r, float g, float b, float a) {
+        RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+        RenderSystem.setShaderTexture(0, tex);
+        BufferBuilder bb = Tessellator.getInstance().getBuffer();
+        bb.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+        bb.vertex(M, x0, y1, 0).texture(0, 1).color(r, g, b, a).next();
+        bb.vertex(M, x1, y1, 0).texture(1, 1).color(r, g, b, a).next();
+        bb.vertex(M, x1, y0, 0).texture(1, 0).color(r, g, b, a).next();
+        bb.vertex(M, x0, y0, 0).texture(0, 0).color(r, g, b, a).next();
+        Tessellator.getInstance().draw();
     }
 
     private static void dash(float td) {

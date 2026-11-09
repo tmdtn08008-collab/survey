@@ -78,7 +78,14 @@ public final class BladeFx {
                 if (e != null) VfxManager.add(new Parry(e));
                 if (e == MinecraftClient.getInstance().player) com.abilitywar.client.fx.FpEffects.counterFlash();
             }
-            case "blade_phantom" -> VfxManager.add(new PhantomSword(w, n.getInt("e"), p, n.getFloat("yaw"), new Vec3d(n.getDouble("tx"), n.getDouble("ty"), n.getDouble("tz"))));
+            case "blade_phantom" -> {
+                Vec3d to = new Vec3d(n.getDouble("tx"), n.getDouble("ty"), n.getDouble("tz"));
+                VfxManager.add(new PhantomSword(w, n.getInt("e"), p, n.getFloat("yaw"), to));
+                // 차원 포털: 들어가는 곳과 나오는 곳
+                Vec3d dir = to.subtract(p);
+                VfxManager.add(new Portal(p, dir, 16));
+                VfxManager.add(new Portal(to, dir, 14));
+            }
             case "blade_ult" -> VfxManager.add(new Ult(w, n, p));
             default -> {
                 return false;
@@ -591,6 +598,46 @@ public final class BladeFx {
             Draw.billboard(g, c.m, c.camRot, rp.x, rp.y, rp.z, 1.6f * pulse, 0, 0.6f, 0.25f, 1f, 0.5f * nearFade(rp, 1.5f));
             Vec3d fp = at.add(0, 0.03, 0).subtract(c.cam);
             Draw.flat(c.imm.getBuffer(AWRenderLayers.additive(Tex.MAGIC_CIRCLE)), c.m, fp.x, fp.y, fp.z, 1.4f, a * 0.05f, 0.6f, 0.25f, 1f, 0.7f * pulse);
+        }
+    }
+
+    // ================================================================ T. 잔영보: 차원 포털
+    static final class Portal extends Fx {
+        final Vec3d p, right;
+
+        Portal(Vec3d at, Vec3d dir, int life) {
+            super(life);
+            this.p = at.add(0, 1.0, 0);
+            Vec3d h = new Vec3d(dir.x, 0, dir.z);
+            if (h.lengthSquared() < 1e-4) h = new Vec3d(0, 0, 1);
+            h = h.normalize();
+            this.right = new Vec3d(-h.z, 0, h.x);
+            for (int i = 0; i < 18; i++) {
+                double a = R.nextDouble() * Math.PI * 2;
+                Vec3d off = right.multiply(Math.cos(a) * 1.1).add(0, Math.sin(a) * 1.4, 0);
+                Particles.P pp = Particles.spawn(Kind.GLOW, p.add(off), off.multiply(-0.08), rf(8, 14), 0.07f);
+                pp.color(i % 2 == 0 ? VIOLET : PINK, 1f);
+            }
+        }
+
+        @Override
+        public void render(Ctx c) {
+            float a = age + c.tickDelta;
+            float open = Math.min(1, a / 3f) * Math.min(1, (life - a) / 5f);
+            if (open <= 0) return;
+            Vec3d rp = p.subtract(c.cam);
+            Vec3d ax = right.multiply(1.05 * open), ay = new Vec3d(0, 1.4 * open, 0);
+            VertexConsumer dk = c.imm.getBuffer(AWRenderLayers.translucent(Tex.GLOW));
+            Draw.quad(dk, c.m, rp, ax.multiply(0.9), ay.multiply(0.9), 0.02f, 0f, 0.05f, 0.85f * open);
+            double rot = a * 0.35;
+            Vec3d sx = ax.multiply(Math.cos(rot)).add(ay.multiply(Math.sin(rot) * 0.75));
+            Vec3d sy = ay.multiply(Math.cos(rot)).subtract(ax.multiply(Math.sin(rot) * 1.3));
+            VertexConsumer sw = c.imm.getBuffer(AWRenderLayers.additive(Tex.SWIRL));
+            Draw.quad(sw, c.m, rp, sx, sy, r(VIOLET), g(VIOLET), b(VIOLET), 0.95f * open);
+            VertexConsumer ring = c.imm.getBuffer(AWRenderLayers.additive(Tex.RING));
+            Draw.quad(ring, c.m, rp, ax.multiply(1.08), ay.multiply(1.08), r(PINK), g(PINK), b(PINK), 0.8f * open);
+            Vec3d gp = p.add(0, -0.97, 0).subtract(c.cam);
+            Draw.flat(c.imm.getBuffer(AWRenderLayers.additive(Tex.MAGIC_CIRCLE)), c.m, gp.x, gp.y, gp.z, 1.3f * open, a * 0.05f, r(VIOLET), g(VIOLET), b(VIOLET), 0.7f * open);
         }
     }
 
