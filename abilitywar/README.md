@@ -81,12 +81,12 @@
 | R 혈월만개: 마지막 피의 폭발 | 1인칭 (핏줄 팔 + 발톱) |
 | ![](screenshots/50_blood_ult_nova.jpg) | ![](screenshots/51_blood_first_person.jpg) |
 
-혈귀 스킬 바 (임시 그림 — 그림을 보내주시면 바꿔 끼웁니다): ![](screenshots/52_blood_hud.jpg)
+혈귀 스킬 바 (보내주신 그림 · 대시 칸에 Q 글자 추가, 이름 글자를 '혈귀'로 고침): ![](screenshots/52_blood_hud.jpg)
 
 ## 설치
 
 1. Fabric Loader(1.20.1)를 설치합니다.
-2. `mods` 폴더에 **Fabric API** 와 **`dist/abilitywar-1.4.0.jar`** 를 넣습니다.
+2. `mods` 폴더에 **Fabric API** 와 **`dist/abilitywar-1.4.1.jar`** 를 넣습니다.
 3. 게임 실행 → 월드 접속 → **B 키**(능력 선택 화면)에서 능력을 고르거나 `/aw set void` / `dragon` / `blade` / `blood`
 
 ## 조작
@@ -175,7 +175,7 @@
 - **흡혈**: 평타 15%, 스킬 20~30%, 흡혈난무 60%의 피해만큼 체력 회복 (회복할 때 피가 몸으로 스며드는 이펙트).
 - 평타: 발톱 할퀴기 2.5 / 2.5 / 4 (3타는 두 손 내려찍기 + 출혈 1).
 - 연계: **1 → 2 → 3** (흡혈난무 강화), **T → 1** (강화 혈사포박), **1 → T** (적의 뒤로), **4 성공 → 3** (쿨타임 초기화). 연계가 들어가면 **"연계!"** 가 뜹니다.
-- 스킬바는 아직 임시 그림입니다. 혈귀 스킬바 그림을 보내주시면 다른 능력처럼 그대로 넣습니다.
+- 스킬바는 보내주신 그림입니다 (투명 배경 그대로). 이름 칸 글자가 '펄커'로 그려져 있어서 `tools/import_blood_art.py` 가 '혈귀'로 다시 쓰고, 대시 칸에 Q 를 넣습니다. 위쪽 띠에 핏빛 잔상이 흐르고 문양이 맥박처럼 빛납니다.
 
 ## 화면 표시
 
@@ -222,7 +222,7 @@
 ## 개발자용
 
 ```
-./gradlew build          # build/libs/abilitywar-1.4.0.jar
+./gradlew build          # build/libs/abilitywar-1.4.1.jar
 ./gradlew runClient      # 개발 클라이언트
 python3 tools/gen_textures.py     # 이펙트/아이콘 텍스처 다시 생성
 python3 tools/gen_animations.py   # 애니메이션 JSON 다시 생성
@@ -232,7 +232,7 @@ python3 tools/gen_hud.py dragon   # 스킬바 텍스처/마스크/아이콘/카�
 python3 tools/gen_titles.py       # 궁극기 제목 그림 (용기사 = 한자, 공허 = 영어, 마검사 = 한국어)
 python3 tools/gen_blade_textures.py && python3 tools/gen_hud.py blade   # 마검사 검 텍스처 / 스킬바
 python3 tools/gen_blood_textures.py   # 혈귀 핏줄/날개/박쥐/달/창/사슬 텍스처, 출혈 아이콘
-python3 tools/gen_blood_hud.py && python3 tools/gen_hud.py blood   # 혈귀 임시 스킬바
+python3 tools/import_blood_art.py && python3 tools/gen_hud.py blood   # 혈귀 스킬바 (보내주신 그림)
 bash tools/gen_sounds.sh          # 합성 효과음 다시 생성
 ```
 
