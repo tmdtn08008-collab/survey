@@ -7,3 +7,4 @@ run/
 classes/
 run_*/
 *.log
+__pycache__/

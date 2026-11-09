@@ -6,7 +6,7 @@
 슬롯 좌표는 원본 그림 기준 안쪽 아이콘 영역 (x0, y0, x1, y1, 모서리깎기).
 labels 는 그림에 박혀 있는 키 글자 위치 (키를 바꾸면 이 위에 새 글자를 덮어 그림).
 """
-import json, os
+import json, os, sys
 from PIL import Image, ImageDraw
 
 ROOT = os.path.join(os.path.dirname(__file__), '..')
@@ -31,8 +31,11 @@ LAYOUTS = {
             'ultimate': (1786, 622, 1856, 702),
             'passive': (1078, 135, 1140, 225),
         },
+        'accent': [0.75, 0.55, 1.0], 'accent2': [0.45, 0.2, 0.85],
     },
 }
+# 용기사: tools/gen_dragon_hud.py 로 그린 그림, 공허와 같은 배치
+LAYOUTS['dragon'] = dict(LAYOUTS['void'], accent=[1.0, 0.62, 0.28], accent2=[0.9, 0.3, 0.08])
 
 
 def octagon(x0, y0, x1, y1, c):
@@ -40,7 +43,10 @@ def octagon(x0, y0, x1, y1, c):
 
 
 def main():
+    only = sys.argv[1:]
     for ab, lay in LAYOUTS.items():
+        if only and ab not in only:
+            continue
         src = Image.open(os.path.join(ROOT, 'tools', 'art', ab + '_hud_source.png')).convert('RGBA')
         W, H = src.size
         hud_h = round(H * HUD_W / W)
@@ -70,6 +76,7 @@ def main():
             'width': W, 'height': H,
             'slots': {k: list(v) for k, v in lay['slots'].items()},
             'labels': {k: list(v) for k, v in lay['labels'].items()},
+            'accent': lay['accent'], 'accent2': lay['accent2'],
         }
         os.makedirs(os.path.join(ASSETS, 'hud'), exist_ok=True)
         with open(os.path.join(ASSETS, 'hud', ab + '.json'), 'w') as f:

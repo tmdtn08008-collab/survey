@@ -28,10 +28,18 @@ public final class ArtSkillBar {
     // 현재 프레임의 배치 (화면 좌표)
     private static float bx, by, bw, bh, sc;
     private static HudLayouts.Layout L;
+    // 빛 색 (A) / 진한 색 (D)
+    private static float ar, ag, ab, dr, dg, db;
 
     public static void render(DrawContext ctx, float td, HudLayouts.Layout layout) {
         MinecraftClient mc = MinecraftClient.getInstance();
         L = layout;
+        ar = layout.accent[0];
+        ag = layout.accent[1];
+        ab = layout.accent[2];
+        dr = layout.accent2[0];
+        dg = layout.accent2[1];
+        db = layout.accent2[2];
         int sw = ctx.getScaledWindowWidth(), sh = ctx.getScaledWindowHeight();
         // 단축바와 겹치지 않는 크기 (오른쪽 아래)
         float room = sw / 2f - 91 - 10;
@@ -82,36 +90,49 @@ public final class ArtSkillBar {
         float flash = ClientState.readyFlash[i];
         if (flash > 0) {
             additive(true);
-            maskRect(s, 0, 1, 0.85f, 0.7f, 1f, flash * 0.8f);
+            maskRect(s, 0, 1, mix(ar), mix(ag), mix(ab), flash * 0.8f);
             additive(false);
         }
+    }
+
+    private static boolean holdable(net.minecraft.client.MinecraftClient mc) {
+        com.abilitywar.ability.Ability a = com.abilitywar.ability.Abilities.byString(ClientState.ability);
+        return a != null && mc.player != null && a.passiveHoldTicks(mc.player) > 0;
+    }
+
+    /** 빛 색을 하얗게 섞음. */
+    private static float mix(float c) {
+        return c + (1 - c) * 0.45f;
     }
 
     private static void ultimate(float td, float time, boolean locked) {
         float[] s = L.slots.get("ultimate");
         if (s == null) return;
         float charge = Math.min(1f, ClientState.ultDisplay / 100f);
-        boolean ready = ClientState.ult >= 99.99f;
-        if (!ready) {
+        boolean full = ClientState.ult >= 99.99f;
+        boolean ready = ClientState.ready(SkillSlot.ULTIMATE);
+        if (!full) {
             // 아직 안 찬 부분(위쪽)을 어둡게, 경계선은 빛나게
             float level = 1 - charge;
-            maskRect(s, 0, level, 0, 0, 0, 0.62f);
+            maskRect(s, 0, level, 0, 0, 0, ready ? 0.45f : 0.62f);
             float wave = (float) Math.sin(time * 0.25) * 0.012f;
             additive(true);
-            maskRect(s, Math.max(0, level - 0.035f + wave), Math.min(1, level + 0.01f + wave), 0.75f, 0.55f, 1f, 0.9f);
-            maskRect(s, level, 1, 0.45f, 0.2f, 0.85f, 0.12f);
+            maskRect(s, Math.max(0, level - 0.035f + wave), Math.min(1, level + 0.01f + wave), ar, ag, ab, 0.9f);
+            maskRect(s, level, 1, dr, dg, db, 0.12f);
             additive(false);
-        } else {
-            float pulse = 0.5f + 0.5f * (float) Math.sin(time * 0.3);
+        }
+        if (ready) {
+            // 사용 가능 (용화 중에는 게이지가 남아 있으면 마무리로 사용 가능)
+            float pulse = 0.5f + 0.5f * (float) Math.sin(time * (full ? 0.3f : 0.55f));
             additive(true);
-            maskRect(s, 0, 1, 0.7f, 0.45f, 1f, 0.12f + 0.22f * pulse);
+            maskRect(s, 0, 1, ar, ag, ab, 0.12f + 0.22f * pulse);
             additive(false);
         }
         if (locked) maskRect(s, 0, 1, 0.12f, 0.1f, 0.14f, 0.4f);
         float flash = ClientState.readyFlash[SkillSlot.ULTIMATE.ordinal()];
         if (flash > 0) {
             additive(true);
-            maskRect(s, 0, 1, 1, 0.9f, 1, flash);
+            maskRect(s, 0, 1, mix(mix(ar)), mix(mix(ag)), mix(mix(ab)), flash);
             additive(false);
         }
     }
@@ -125,20 +146,49 @@ public final class ArtSkillBar {
             // 그림자 속: 남은 시간만큼 밝은 부채꼴 + 바늘
             maskPie(s, k, 1f, 0, 0, 0, 0.55f);
             additive(true);
-            maskPie(s, 0, k, 0.6f, 0.4f, 1f, 0.55f + 0.2f * (float) Math.sin(time * 0.5));
+            maskPie(s, 0, k, dr, dg, db, 0.55f + 0.2f * (float) Math.sin(time * 0.5));
             additive(false);
             sweepLine(s, k, 1f);
+            return;
+        }
+        net.minecraft.client.MinecraftClient mc = net.minecraft.client.MinecraftClient.getInstance();
+        if (mc.player != null && ((AWPlayer) mc.player).aw$hasFlag(AWPlayer.FLAG_TRANSFORMED)) {
+            // 용화 중: 남은 용혈 = 밝은 부채꼴
+            float k = Math.min(1f, ClientState.ultDisplay / 100f);
+            maskPie(s, k, 1f, 0, 0, 0, 0.55f);
+            additive(true);
+            maskPie(s, 0, k, ar, ag * 0.8f, ab * 0.6f, 0.45f + 0.2f * (float) Math.sin(time * 0.6));
+            additive(false);
+            sweepLine(s, k, 1f);
+            return;
+        }
+        float hold = com.abilitywar.client.input.InputHandler.holdProgress(SkillSlot.PASSIVE, td);
+        if (hold > 0) {
+            // 꾹 누르는 중: 차오르는 빛
+            additive(true);
+            maskPie(s, 0, hold, ar, ag, ab, 0.6f);
+            maskRect(s, 0, 1, ar, ag, ab, hold * 0.25f);
+            additive(false);
+            sweepLine(s, hold, 1f);
             return;
         }
         float frac = ClientState.cooldownFraction(i, td);
         if (frac > 0) {
             maskPie(s, 1 - frac, 1f, 0, 0, 0, 0.66f);
             sweepLine(s, 1 - frac, 0.85f);
+        } else if (!ClientState.ready(SkillSlot.PASSIVE)) {
+            // 쿨타임은 없지만 조건 미충족 (용화: 용혈 게이지가 가득 차야 함)
+            maskRect(s, 0, 1, 0, 0, 0, 0.55f);
+        } else if (holdable(mc)) {
+            // 사용 가능 표시 (은은하게 맥동)
+            additive(true);
+            maskRect(s, 0, 1, ar, ag, ab, 0.08f + 0.1f * (float) Math.sin(time * 0.35));
+            additive(false);
         }
         float flash = ClientState.readyFlash[i];
         if (flash > 0) {
             additive(true);
-            maskRect(s, 0, 1, 0.85f, 0.7f, 1f, flash * 0.8f);
+            maskRect(s, 0, 1, mix(ar), mix(ag), mix(ab), flash * 0.8f);
             additive(false);
         }
     }
@@ -240,7 +290,7 @@ public final class ArtSkillBar {
     /** 부채꼴 경계의 밝은 선 (시계 바늘). */
     private static void sweepLine(float[] s, float f, float a) {
         additive(true);
-        maskPie(s, Math.max(0, f - 0.012f), Math.min(1, f + 0.004f), 0.8f, 0.6f, 1f, a);
+        maskPie(s, Math.max(0, f - 0.012f), Math.min(1, f + 0.004f), mix(ar), mix(ag), mix(ab), a);
         additive(false);
     }
 

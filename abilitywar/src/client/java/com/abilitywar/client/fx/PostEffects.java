@@ -19,6 +19,10 @@ public final class PostEffects {
     private static boolean failed;
     private static float concussion, voidAmt;
     private static boolean hadConcussion;
+    // 색조 (기본: 공허 보라)
+    static final float[] VOID_DARK = {0.01f, 0f, 0.035f}, VOID_LIGHT = {0.42f, 0.22f, 0.78f};
+    static final float[] FIRE_DARK = {0.05f, 0.012f, 0f}, FIRE_LIGHT = {1.0f, 0.52f, 0.2f};
+    private static final float[] dark = VOID_DARK.clone(), light = VOID_LIGHT.clone();
 
     public static void tick() {
         MinecraftClient mc = MinecraftClient.getInstance();
@@ -34,7 +38,16 @@ public final class PostEffects {
             if (ClientState.shadowForm) targetV = 0.7f;
             targetV = Math.max(targetV, BlackHoleFx.proximity(mc.world, mc.gameRenderer.getCamera().getPos()) * 0.7f);
             for (Effects.UltCast u : VfxManager.find(Effects.UltCast.class)) targetV = Math.max(targetV, u.darkness(0) * 0.6f);
-            if (CameraController.isCinematic()) targetV = Math.max(targetV, 0.45f);
+            boolean fire = false;
+            if (CameraController.isCinematic()) {
+                fire = CameraController.cinematicType().startsWith("dragon");
+                targetV = Math.max(targetV, fire ? 0.32f : 0.45f);
+            }
+            float[] td = fire ? FIRE_DARK : VOID_DARK, tl = fire ? FIRE_LIGHT : VOID_LIGHT;
+            for (int i = 0; i < 3; i++) {
+                dark[i] += (td[i] - dark[i]) * 0.2f;
+                light[i] += (tl[i] - light[i]) * 0.2f;
+            }
         }
         concussion += (targetC - concussion) * (targetC > concussion ? 0.5f : 0.12f);
         voidAmt += (targetV - voidAmt) * 0.15f;
@@ -66,6 +79,8 @@ public final class PostEffects {
                 prog.getUniformByNameOrDummy("Strength").set(concussion);
                 prog.getUniformByNameOrDummy("VoidAmount").set(voidAmt);
                 prog.getUniformByNameOrDummy("Time").set(time / 20f);
+                prog.getUniformByNameOrDummy("TintDark").set(dark[0], dark[1], dark[2]);
+                prog.getUniformByNameOrDummy("TintLight").set(light[0], light[1], light[2]);
             }
             RenderSystem.disableBlend();
             RenderSystem.disableDepthTest();

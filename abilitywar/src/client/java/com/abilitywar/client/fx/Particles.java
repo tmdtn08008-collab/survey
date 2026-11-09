@@ -19,7 +19,7 @@ public final class Particles {
     public enum Kind {
         GLOW(Tex.GLOW, true), SPARK(Tex.SPARK, true), FLARE(Tex.FLARE, true), STREAK(Tex.STREAK, true),
         SMOKE_DARK(Tex.SMOKE, false), SMOKE_ADD(Tex.SMOKE, true), WISP_DARK(Tex.WISP, false), WISP_ADD(Tex.WISP, true),
-        RING(Tex.RING_SOFT, true);
+        RING(Tex.RING_SOFT, true), FLAME(Tex.fx("flame"), true);
         final Identifier tex;
         final boolean additive;
 

@@ -91,7 +91,7 @@ public final class AbilityManager {
             deny(player);
             return;
         }
-        if (slot == SkillSlot.ULTIMATE && !d.ultReady()) {
+        if (slot == SkillSlot.ULTIMATE && !a.canUseUltimate(player, d)) {
             deny(player);
             return;
         }
@@ -195,7 +195,7 @@ public final class AbilityManager {
         d.dirty = true;
     }
 
-    private static void deny(ServerPlayerEntity player) {
+    public static void deny(ServerPlayerEntity player) {
         player.playSound(AWSounds.UI_DENY, SoundCategory.MASTER, 0.5f, 1.0f);
     }
 
@@ -215,7 +215,7 @@ public final class AbilityManager {
         if (!player.isAlive()) return;
         if (d.blocking && (!canAct(player, d) || d.isBusy())) setBlocking(player, false);
         // 시간에 따른 궁 게이지 (2초에 1)
-        if (now % 40 == 0) d.addUlt(1f);
+        if (now % 40 == 0 && a.passiveGauge()) d.addUlt(1f);
         boolean ready = d.ultReady();
         ((AWPlayer) player).aw$setFlag(AWPlayer.FLAG_ULT_READY, ready);
         ((AWPlayer) player).aw$setFlag(AWPlayer.FLAG_CINEMATIC, d.isFrozen());
@@ -292,11 +292,11 @@ public final class AbilityManager {
         boolean ult = source.isIn(AWDamage.TAG_ULTIMATE);
         if (attacker instanceof ServerPlayerEntity ap && ap != victim && !ult) {
             AbilityData ad = data(ap);
-            if (ad.ability() != null) ad.addUlt(lost * 4f);
+            if (ad.ability() != null) ad.ability().onDealtDamage(ap, ad, lost);
         }
         if (victim instanceof ServerPlayerEntity vp) {
             AbilityData vd = data(vp);
-            if (vd.ability() != null) vd.addUlt(lost * 2.5f);
+            if (vd.ability() != null) vd.ability().onDamaged(vp, vd, lost);
         }
     }
 

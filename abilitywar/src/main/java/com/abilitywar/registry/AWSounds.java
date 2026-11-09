@@ -30,10 +30,23 @@ public final class AWSounds {
     public static final SoundEvent VOID_BLOCK = reg("void.block");
     public static final SoundEvent VOID_SWING = reg("void.swing");
     public static final SoundEvent DASH = reg("dash");
+    public static final SoundEvent DRAGON_CLAW = reg("dragon.claw");
+    public static final SoundEvent DRAGON_CLAW_HEAVY = reg("dragon.claw_heavy");
+    public static final SoundEvent DRAGON_DASH = reg("dragon.dash");
+    public static final SoundEvent DRAGON_WING = reg("dragon.wing");
+    public static final SoundEvent DRAGON_TAIL = reg("dragon.tail");
+    public static final SoundEvent DRAGON_ROAR = reg("dragon.roar");
+    public static final SoundEvent DRAGON_BREATH = reg("dragon.breath");
+    public static final SoundEvent DRAGON_EXPLOSION = reg("dragon.explosion");
+    public static final SoundEvent DRAGON_SCALES = reg("dragon.scales");
+    public static final SoundEvent DRAGON_MARK = reg("dragon.mark");
+    public static final SoundEvent DRAGON_TRANSFORM = reg("dragon.transform");
+    public static final SoundEvent DRAGON_FIRE = reg("dragon.fire");
     public static final SoundEvent CONCUSSION_RING = reg("concussion.ring");
     public static final SoundEvent UI_READY = reg("ui.ready");
     public static final SoundEvent UI_DENY = reg("ui.deny");
     public static final SoundEvent UI_ULT_READY = reg("ui.ult_ready");
+    public static final SoundEvent UI_CHARGE = reg("ui.charge");
 
     private static SoundEvent reg(String path) {
         Identifier id = AbilityWar.id(path);

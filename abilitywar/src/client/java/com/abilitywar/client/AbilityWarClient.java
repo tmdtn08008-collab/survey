@@ -51,7 +51,10 @@ public class AbilityWarClient implements ClientModInitializer {
 
         EntityRendererRegistry.register(AWEntities.VOID_SINGULARITY, EmptyRenderer::new);
         LivingEntityFeatureRendererRegistrationCallback.EVENT.register((type, renderer, helper, ctx) -> {
-            if (renderer instanceof PlayerEntityRenderer pr) helper.register(new HandTracker.Feature(pr));
+            if (renderer instanceof PlayerEntityRenderer pr) {
+                helper.register(new HandTracker.Feature(pr));
+                helper.register(new com.abilitywar.client.fx.dragon.DragonParts.Feature(pr));
+            }
         });
 
         ClientTickEvents.START_CLIENT_TICK.register(com.abilitywar.client.input.DashController::tick);

@@ -16,6 +16,10 @@ public final class AWEffects {
     public static final StatusEffect STUN = Registry.register(Registries.STATUS_EFFECT, AbilityWar.id("stun"),
             new AWStatusEffect(StatusEffectCategory.HARMFUL, 0x22113A, true));
 
+    /** 용혈 표식 (용기사): 다음 용조 마지막 타격 / 궁극기가 강화된다. */
+    public static final StatusEffect DRAGON_MARK = Registry.register(Registries.STATUS_EFFECT, AbilityWar.id("dragon_mark"),
+            new AWStatusEffect(StatusEffectCategory.HARMFUL, 0xFF5A1E, false));
+
     public static void init() {
     }
 

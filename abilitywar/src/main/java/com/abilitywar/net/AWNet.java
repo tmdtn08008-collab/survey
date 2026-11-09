@@ -48,6 +48,8 @@ public final class AWNet {
     public static final byte DMG_TEXT_COUNTER = 10;
     public static final byte DMG_TEXT_BLOCK = 11;
     public static final byte DMG_TEXT_IMMUNE = 12;
+    public static final byte DMG_TEXT_CHAIN = 13;
+    public static final byte DMG_TEXT_ARMOR = 14;
 
     public static void initServer() {
         ServerPlayNetworking.registerGlobalReceiver(C2S_SKILL, (server, player, handler, buf, sender) -> {

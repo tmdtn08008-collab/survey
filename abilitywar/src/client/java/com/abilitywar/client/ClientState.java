@@ -75,8 +75,15 @@ public final class ClientState {
     }
 
     public static boolean ready(SkillSlot s) {
+        net.minecraft.client.MinecraftClient mc = net.minecraft.client.MinecraftClient.getInstance();
+        com.abilitywar.ability.Ability a = com.abilitywar.ability.Abilities.byString(ability);
+        boolean cd = remaining[s.ordinal()] <= 0;
+        if (a != null && mc.player != null) {
+            if (s == SkillSlot.ULTIMATE) return a.clientUltReady(mc.player, ult);
+            if (s == SkillSlot.PASSIVE) return a.clientPassiveReady(mc.player, ult, cd);
+        }
         if (s == SkillSlot.ULTIMATE) return ult >= 99.99f;
-        return remaining[s.ordinal()] <= 0;
+        return cd;
     }
 
     public static void reset() {

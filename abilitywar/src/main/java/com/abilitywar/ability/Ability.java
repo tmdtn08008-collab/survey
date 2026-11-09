@@ -53,4 +53,44 @@ public abstract class Ability {
     public String translationKey() {
         return "ability.abilitywar." + key;
     }
+
+    /** 평타 애니메이션 이름 (클라이언트 예측과 서버 모두 사용). */
+    public String attackAnim(net.minecraft.entity.player.PlayerEntity player, int combo) {
+        return key + ".attack" + (combo + 1);
+    }
+
+    /** T 를 길게 눌러야 하는 패시브면 필요한 틱 수 (0 = 바로 발동). */
+    public int passiveHoldTicks(net.minecraft.entity.player.PlayerEntity player) {
+        return 0;
+    }
+
+    /** 궁극기 사용 가능 여부. */
+    public boolean canUseUltimate(ServerPlayerEntity player, AbilityData data) {
+        return data.ultReady();
+    }
+
+    /** 시간에 따라 궁극기 게이지가 차는지. */
+    /** 클라이언트 사전 판정 (최종 판정은 서버): 궁극기 키를 눌러도 되는가. */
+    public boolean clientUltReady(net.minecraft.entity.player.PlayerEntity player, float ult) {
+        return ult >= 99.99f;
+    }
+
+    /** 클라이언트 사전 판정: 패시브(T) 키를 눌러도 되는가. */
+    public boolean clientPassiveReady(net.minecraft.entity.player.PlayerEntity player, float ult, boolean cooldownReady) {
+        return cooldownReady;
+    }
+
+    public boolean passiveGauge() {
+        return true;
+    }
+
+    /** 이 능력의 플레이어가 피해를 줬을 때 (궁극기 피해 제외). */
+    public void onDealtDamage(ServerPlayerEntity player, AbilityData data, float lost) {
+        data.addUlt(lost * 4f);
+    }
+
+    /** 이 능력의 플레이어가 피해를 받았을 때. */
+    public void onDamaged(ServerPlayerEntity player, AbilityData data, float lost) {
+        data.addUlt(lost * 2.5f);
+    }
 }

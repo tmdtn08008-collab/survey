@@ -14,9 +14,11 @@ public final class Abilities {
     private static final Map<String, Ability> BY_KEY = new LinkedHashMap<>();
 
     public static Ability VOID;
+    public static Ability DRAGON;
 
     public static void init() {
         VOID = register(new VoidAbility());
+        DRAGON = register(new com.abilitywar.ability.dragon.DragonAbility());
     }
 
     public static <T extends Ability> T register(T ability) {

@@ -100,6 +100,7 @@ public final class CameraController {
         int age;
         Vec3d target;
         Vec3d fwd;
+        Vec3d start;
     }
 
     @Nullable
@@ -115,6 +116,7 @@ public final class CameraController {
         c.type = type;
         c.duration = duration;
         c.target = target;
+        c.start = caster.getPos();
         Vec3d d = target.subtract(caster.getPos());
         d = new Vec3d(d.x, 0, d.z);
         if (d.lengthSquared() < 1) {
@@ -135,6 +137,10 @@ public final class CameraController {
 
     public static float cinematicTime(float td) {
         return cin == null ? -1 : cin.age + td;
+    }
+
+    public static String cinematicType() {
+        return cin == null ? "" : cin.type;
     }
 
     public static int cinematicDuration() {
@@ -197,7 +203,39 @@ public final class CameraController {
         Vec3d T = cin.target;
         Vec3d cam, look;
         double fov;
-        if (t < 24) {
+        if (cin.type.equals("dragon_ult")) {
+            Vec3d S = cin.start;
+            Vec3d head = S.subtract(F.multiply(1.8)).add(0, 5.8, 0);
+            if (t < 22) {
+                // 웅크려 힘을 모으는 클로즈업 → 뒤로 빠지며 고룡을 드러냄
+                float k = smooth(t / 22f);
+                double th = Math.toRadians(34 - 14 * k);
+                double rad = 2.5 + 3.4 * k;
+                cam = C.add(F.multiply(Math.cos(th) * rad)).add(R.multiply(Math.sin(th) * rad)).add(0, 0.45 + 0.35 * k, 0);
+                look = C.add(0, 1.0 + 2.2 * k, 0);
+                fov = 58 + 12 * k;
+            } else if (t < 42) {
+                // 포효: 정면 로우앵글 (용기사 + 고룡)
+                float k = smooth((t - 22) / 20f);
+                cam = S.add(F.multiply(7.2 + 1.2 * k)).add(R.multiply(2.6 - 1.4 * k)).add(0, 0.5, 0);
+                look = S.add(0, 3.6 + 0.4 * k, 0).subtract(F.multiply(1.5));
+                fov = 74 + 4 * k;
+            } else if (t < 56) {
+                // 도약: 지면에서 올려다보며 추적
+                float k = smooth((t - 42) / 14f);
+                cam = S.add(R.multiply(4.2)).add(F.multiply(3.0 + k)).add(0, 0.35, 0);
+                look = C.add(0, 1.0, 0).lerp(head, 0.25 * k);
+                fov = 76;
+            } else {
+                // 브레스 → 폭발: 측면 와이드
+                float k = smooth((t - 56) / 18f);
+                Vec3d M = head.lerp(T, 0.55);
+                double dist = new Vec3d(T.x - S.x, 0, T.z - S.z).length();
+                cam = M.add(R.multiply((dist * 0.6 + 7.5) * (1 - 0.08 * k))).add(0, 1.0 + 0.6 * k, 0).subtract(F.multiply(1.5));
+                look = head.lerp(T, 0.62 + 0.25 * k);
+                fov = 78 - 4 * k;
+            }
+        } else if (t < 24) {
             float k = smooth(t / 24f);
             double th = Math.toRadians(42 - 30 * k);
             double rad = 3.4 - 0.7 * k;

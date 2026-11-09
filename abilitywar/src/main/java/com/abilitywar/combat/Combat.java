@@ -144,6 +144,12 @@ public final class Combat {
     }
 
     public static void setVelocity(Entity e, Vec3d v) {
+        if (e instanceof ServerPlayerEntity sp && com.abilitywar.server.AbilityManager.data(sp).hasSuperArmor()) return;
+        setVelocitySelf(e, v);
+    }
+
+    /** 자기 자신의 이동 (슈퍼아머 무시). */
+    public static void setVelocitySelf(Entity e, Vec3d v) {
         e.setVelocity(v);
         e.velocityModified = true;
         if (e instanceof LivingEntity le) le.fallDistance = 0;

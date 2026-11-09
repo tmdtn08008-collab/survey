@@ -74,6 +74,18 @@ public final class DamageNumbers {
                 e.color = 0x8FB8FF;
                 e.scale = 0.9f;
             }
+            case AWNet.DMG_TEXT_CHAIN -> {
+                e.text = Text.translatable("abilitywar.dmg.chain");
+                e.color = 0xFF9A3C;
+                e.scale = 1.4f;
+                e.life = 30;
+            }
+            case AWNet.DMG_TEXT_ARMOR -> {
+                e.text = Text.translatable("abilitywar.dmg.armor");
+                e.color = 0xFFC060;
+                e.scale = 1.0f;
+                e.life = 20;
+            }
             case AWNet.DMG_TEXT_IMMUNE -> {
                 e.text = Text.translatable("abilitywar.dmg.immune");
                 e.color = 0xCFCFCF;

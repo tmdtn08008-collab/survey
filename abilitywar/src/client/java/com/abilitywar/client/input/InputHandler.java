@@ -46,6 +46,11 @@ public final class InputHandler {
     private static long nextAttack;
     private static long lastAttack = -100;
     private static int combo;
+    // 꾹 누르기 (용기사 T)
+    private static SkillSlot holdSlot;
+    private static long holdStart;
+    private static int holdTicks;
+    private static boolean holdTest;
 
     public static void init() {
         SKILL1 = reg("key.abilitywar.skill1", GLFW.GLFW_KEY_1);
@@ -99,7 +104,8 @@ public final class InputHandler {
         if (!active()) return false;
         for (int i = 0; i < SLOT_KEYS.length; i++) {
             if (SLOT_KEYS[i].matchesKey(key, scancode)) {
-                if (action == GLFW.GLFW_PRESS) useSkill(SkillSlot.VALUES[i]);
+                if (action == GLFW.GLFW_PRESS) pressSlot(SkillSlot.VALUES[i]);
+                else if (action == GLFW.GLFW_RELEASE) releaseSlot(SkillSlot.VALUES[i]);
                 return true;
             }
         }
@@ -120,7 +126,8 @@ public final class InputHandler {
         if (!active()) return false;
         for (int i = 0; i < SLOT_KEYS.length; i++) {
             if (SLOT_KEYS[i].matchesMouse(button)) {
-                if (action == GLFW.GLFW_PRESS) useSkill(SkillSlot.VALUES[i]);
+                if (action == GLFW.GLFW_PRESS) pressSlot(SkillSlot.VALUES[i]);
+                else if (action == GLFW.GLFW_RELEASE) releaseSlot(SkillSlot.VALUES[i]);
                 return true;
             }
         }
@@ -138,6 +145,23 @@ public final class InputHandler {
 
     public static void tick() {
         MinecraftClient mc = MinecraftClient.getInstance();
+        if (holdSlot != null) {
+            ClientPlayerEntity p = mc.player;
+            if (p == null || !active() || locked(p) || !ClientState.ready(holdSlot)) {
+                holdSlot = null;
+            } else {
+                long t = ClientClock.ticks() - holdStart;
+                if (t % 4 == 0) {
+                    float pitch = 0.6f + 0.8f * Math.min(1, t / (float) holdTicks);
+                    mc.getSoundManager().play(PositionedSoundInstance.master(AWSounds.UI_CHARGE, pitch, 0.35f));
+                }
+                if (t >= holdTicks) {
+                    SkillSlot s = holdSlot;
+                    holdSlot = null;
+                    useSkill(s);
+                }
+            }
+        }
         if (blockHeld && !com.abilitywar.client.dev.TestDriver.active()) {
             boolean still = active();
             if (still && BLOCK.boundKey.getCategory() == InputUtil.Type.KEYSYM) {
@@ -154,7 +178,43 @@ public final class InputHandler {
         return p.hasStatusEffect(AWEffects.STUN) || awp.aw$hasFlag(AWPlayer.FLAG_CINEMATIC);
     }
 
+    /** 키 누름: 꾹 눌러야 하는 스킬이면 충전 시작. */
+    public static void pressSlot(SkillSlot slot) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        com.abilitywar.ability.Ability a = com.abilitywar.ability.Abilities.byString(ClientState.ability);
+        int hold = slot == SkillSlot.PASSIVE && a != null && mc.player != null && !ClientState.shadowForm ? a.passiveHoldTicks(mc.player) : 0;
+        if (hold <= 0) {
+            useSkill(slot);
+            return;
+        }
+        if (mc.player == null || locked(mc.player) || blockHeld || !ClientState.ready(slot) || ClientState.busy > 0) {
+            deny();
+            return;
+        }
+        holdSlot = slot;
+        holdStart = ClientClock.ticks();
+        holdTicks = hold;
+        ClientState.pressFlash[slot.ordinal()] = 1f;
+    }
+
+    public static void releaseSlot(SkillSlot slot) {
+        if (holdSlot == slot && !holdTest) holdSlot = null;
+    }
+
+    /** 테스트: 키를 계속 누르고 있는 것처럼 (충전이 끝날 때까지). */
+    public static void testHold(SkillSlot slot) {
+        holdTest = true;
+        pressSlot(slot);
+    }
+
+    /** 0..1 꾹 누르기 진행도 (HUD). */
+    public static float holdProgress(SkillSlot slot, float td) {
+        if (holdSlot != slot || holdTicks <= 0) return 0;
+        return Math.min(1, (ClientClock.ticks() - holdStart + td) / holdTicks);
+    }
+
     public static void useSkill(SkillSlot slot) {
+        holdTest = false;
         MinecraftClient mc = MinecraftClient.getInstance();
         ClientPlayerEntity p = mc.player;
         if (p == null) return;
@@ -210,11 +270,13 @@ public final class InputHandler {
         if (now < nextAttack) return true;
         if (now - lastAttack > 24) combo = 0;
         Entity target = hit instanceof EntityHitResult ehr ? ehr.getEntity() : aimAssist(p, 4.0);
-        PlayerAnimator.play(p.getId(), ClientState.ability + ".attack" + (combo + 1), 1f);
+        com.abilitywar.ability.Ability ab = com.abilitywar.ability.Abilities.byString(ClientState.ability);
+        String anim = ab != null ? ab.attackAnim(p, combo) : ClientState.ability + ".attack" + (combo + 1);
+        PlayerAnimator.play(p.getId(), anim, 1f);
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeVarInt(target instanceof LivingEntity ? target.getId() : -1);
         ClientPlayNetworking.send(AWNet.C2S_ATTACK, buf);
-        nextAttack = now + (combo == 2 ? 13 : 7);
+        nextAttack = now + (ab != null ? ab.attackInterval(combo) : (combo == 2 ? 13 : 7));
         lastAttack = now;
         combo = (combo + 1) % 3;
         p.resetLastAttackedTicks();

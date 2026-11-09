@@ -32,6 +32,9 @@ public class AbilityData {
 
     public long counterUntil;
     public long invulnUntil;
+    /** 슈퍼아머: 다른 사람의 스킬로 밀려나지 않음. */
+    public long superArmorUntil;
+    public long lastArmorText;
     public long frozenUntil;
 
     public boolean shadowForm;
@@ -100,6 +103,10 @@ public class AbilityData {
         busyUntil = Math.max(busyUntil, now + ticks);
     }
 
+    public boolean hasSuperArmor() {
+        return superArmorUntil > now;
+    }
+
     public boolean isInvulnerable() {
         return invulnUntil > now || shadowForm;
     }
@@ -133,6 +140,7 @@ public class AbilityData {
         counterUntil = 0;
         invulnUntil = 0;
         frozenUntil = 0;
+        superArmorUntil = 0;
         shadowForm = false;
         shadowStart = null;
         combo = 0;
@@ -142,6 +150,7 @@ public class AbilityData {
         p.aw$setFlag(AWPlayer.FLAG_COUNTER, false);
         p.aw$setFlag(AWPlayer.FLAG_SHADOW, false);
         p.aw$setFlag(AWPlayer.FLAG_CINEMATIC, false);
+        p.aw$setFlag(AWPlayer.FLAG_TRANSFORMED, false);
     }
 
     public void writeNbt(NbtCompound nbt) {

@@ -38,12 +38,12 @@ public final class VfxManager {
         try {
             switch (type) {
                 case "tendril" -> add(new Effects.Tendril(n));
-                case "impact" -> add(new Effects.Impact(p, n.getString("k"), n.getFloat("s")));
+                case "impact" -> add(new Effects.Impact(p, n.getString("k"), n.getFloat("s"), n.contains("col") ? n.getInt("col") & 0xFFFFFF : -1));
                 case "charge" -> add(new Effects.Charge(n));
                 case "burst" -> add(new Effects.Burst(p, new Vec3d(n.getDouble("dx"), n.getDouble("dy"), n.getDouble("dz"))));
                 case "trail" -> add(new Effects.Trail(n));
                 case "rift" -> add(new Effects.Rift(p, n.contains("s") ? n.getFloat("s") : 1f));
-                case "crater" -> add(new Effects.Crater(w, p, n.getFloat("r")));
+                case "crater" -> add(new Effects.Crater(w, p, n.getFloat("r"), n.contains("col") ? n.getInt("col") & 0xFFFFFF : -1));
                 case "shield" -> add(new Effects.Shield(n.getInt("c"), n.getInt("d"), n.getInt("k")));
                 case "shield_break" -> shieldBreak(w, n.getInt("c"));
                 case "shield_fade" -> shieldFade(n.getInt("c"));
@@ -73,14 +73,16 @@ public final class VfxManager {
                     AfterImages.request(id, 5, 1, color, 9);
                     add(new Effects.DashTrail(w, id, color, n.getString("ab"), new Vec3d(n.getFloat("dx"), 0, n.getFloat("dz")), p));
                 }
-                default -> AbilityWar.LOG.debug("Unknown fx {}", type);
+                default -> {
+                    if (!com.abilitywar.client.fx.dragon.DragonFx.spawn(type, n, w, p)) AbilityWar.LOG.debug("Unknown fx {}", type);
+                }
             }
         } catch (Exception ex) {
             AbilityWar.LOG.error("FX {} failed", type, ex);
         }
     }
 
-    static void add(Fx f) {
+    public static void add(Fx f) {
         EFFECTS.add(f);
     }
 
@@ -133,6 +135,7 @@ public final class VfxManager {
             }
         }
         BlackHoleFx.tick(w);
+        com.abilitywar.client.fx.dragon.DragonFx.tick(w);
         AfterImages.tick();
         Particles.tick();
         Debris.tick();
@@ -141,6 +144,7 @@ public final class VfxManager {
 
     public static void clear() {
         AfterImages.clear();
+        com.abilitywar.client.fx.dragon.DragonFx.clear();
         EFFECTS.clear();
         Particles.clear();
         Debris.clear();
@@ -169,6 +173,7 @@ public final class VfxManager {
             c.imm.draw();
             AfterImages.render(c);
             ShadowView.render(c);
+            com.abilitywar.client.fx.dragon.DragonFx.render(c);
             Particles.render(c.imm, c.m, c.camRot, c.cam, c.tickDelta);
             c.imm.draw();
             DamageNumbers.renderWorld(c);

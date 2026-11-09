@@ -26,12 +26,13 @@ public final class FpEffects {
         float time = p.age + td;
         Vector3f fr = FirstPersonRenderer.FIST_VIEW[0], fl = FirstPersonRenderer.FIST_VIEW[1];
         VertexConsumer g = consumers.getBuffer(AWRenderLayers.additive(Tex.GLOW));
-        // 주먹 주변 은은한 공허 기운
+        int col = Effects.abilityColor(p), col2 = col == Fx.PURPLE ? Fx.PINK : Effects.mixWhite(col, 0.4f);
+        // 주먹 주변 은은한 기운 (능력 색)
         for (int arm = 0; arm < 2; arm++) {
             if (!pose.visible[arm]) continue;
             Vector3f f = FirstPersonRenderer.FIST_VIEW[arm];
             float flick = 0.75f + 0.25f * (float) Math.sin(time * 0.35 + arm * 2);
-            Draw.billboard(g, ID, NO_ROT, f.x, f.y, f.z, 0.09f * flick, 0, Fx.r(Fx.PURPLE), Fx.g(Fx.PURPLE), Fx.b(Fx.PURPLE), 0.35f);
+            Draw.billboard(g, ID, NO_ROT, f.x, f.y, f.z, 0.09f * flick, 0, Fx.r(col), Fx.g(col), Fx.b(col), 0.35f);
         }
         // 충전 (공허 파동)
         for (Effects.Charge c : VfxManager.find(Effects.Charge.class)) {
@@ -63,9 +64,21 @@ public final class FpEffects {
             Draw.quad(dk, ID, c, new Vec3d(size * 1.1, 0, 0), new Vec3d(0, size * 1.1, 0), 0.02f, 0, 0.05f, 0.45f * vis);
             VertexConsumer rs = consumers.getBuffer(AWRenderLayers.additive(Tex.RUNE_SHIELD));
             float pulse = counter ? 0.75f + 0.25f * (float) Math.sin(time * 1.2) : 0.55f;
-            Draw.quad(rs, ID, c, ax, ay, Fx.r(Fx.PURPLE), Fx.g(Fx.PURPLE), Fx.b(Fx.PURPLE), vis * pulse);
+            Draw.quad(rs, ID, c, ax, ay, Fx.r(col), Fx.g(col), Fx.b(col), vis * pulse);
             VertexConsumer ring = consumers.getBuffer(AWRenderLayers.additive(Tex.RING));
-            Draw.quad(ring, ID, c, new Vec3d(size * 1.15, 0, 0), new Vec3d(0, size * 1.15, 0), Fx.r(Fx.PINK), Fx.g(Fx.PINK), Fx.b(Fx.PINK), vis * 0.6f);
+            Draw.quad(ring, ID, c, new Vec3d(size * 1.15, 0, 0), new Vec3d(0, size * 1.15, 0), Fx.r(col2), Fx.g(col2), Fx.b(col2), vis * 0.6f);
+        }
+        // 용기사 역린 반격 자세: 왼팔 앞의 비늘 방패
+        float sh = com.abilitywar.client.fx.dragon.DragonParts.fpShieldAmount(p, com.abilitywar.client.anim.ClientClock.now());
+        if (sh > 0.01f) {
+            Vec3d c = new Vec3d(fl.x * 0.6 + fr.x * 0.4, fl.y + 0.12, fl.z - 0.2);
+            float size = 0.36f * (0.7f + 0.3f * sh);
+            double ang = time * 0.05;
+            Vec3d ax = new Vec3d(Math.cos(ang), Math.sin(ang), 0).multiply(size);
+            Vec3d ay = new Vec3d(-Math.sin(ang), Math.cos(ang), 0).multiply(size);
+            VertexConsumer v = consumers.getBuffer(AWRenderLayers.additive(com.abilitywar.client.fx.dragon.DragonParts.SHIELD));
+            float a = sh * (0.7f + 0.3f * (float) Math.sin(time * 0.8));
+            Draw.quad(v, ID, c, ax, ay, 1f, 0.5f, 0.15f, a);
         }
         if (counterFlash > 0) {
             VertexConsumer fx = consumers.getBuffer(AWRenderLayers.additive(Tex.FLARE));

@@ -27,22 +27,33 @@ public final class DashBadge {
         int i = SkillSlot.DASH.ordinal();
         float frac = ClientState.cooldownFraction(i, td);
         float half = size / 2f;
-        mc.getTextureManager().getTexture(ICON).setFilter(true, false);
+        // 능력 전용 아이콘이 있으면 사용 (dash_<능력>.png), 빛 색도 능력 스킬바 색을 따름
+        Identifier icon = ICON;
+        float ar = 0.75f, ag = 0.55f, ab = 1f;
+        HudLayouts.Layout lay = HudLayouts.get(ClientState.ability);
+        if (lay != null) {
+            ar = lay.accent[0];
+            ag = lay.accent[1];
+            ab = lay.accent[2];
+            Identifier own = com.abilitywar.AbilityWar.id("textures/gui/dash_" + ClientState.ability + ".png");
+            if (mc.getResourceManager().getResource(own).isPresent()) icon = own;
+        }
+        mc.getTextureManager().getTexture(icon).setFilter(true, false);
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShaderColor(1, 1, 1, 1);
         Matrix4f m = ctx.getMatrices().peek().getPositionMatrix();
-        quad(m, ICON, cx - half, cy - half, cx + half, cy + half, frac > 0 ? 0.55f : 1f);
+        quad(m, icon, cx - half, cy - half, cx + half, cy + half, frac > 0 ? 0.55f : 1f);
         if (frac > 0) {
             pie(m, cx, cy, half * 0.86f, 1 - frac, 1f, 0, 0, 0, 0.62f);
             RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
-            ring(m, cx, cy, half * 0.84f, half * 0.98f, 0, 1 - frac, 0.75f, 0.55f, 1f, 0.9f);
+            ring(m, cx, cy, half * 0.84f, half * 0.98f, 0, 1 - frac, ar, ag, ab, 0.9f);
             RenderSystem.defaultBlendFunc();
         }
         float flash = Math.max(ClientState.readyFlash[i], ClientState.pressFlash[i] * 0.6f);
         if (flash > 0) {
             RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
-            pie(m, cx, cy, half * 0.95f, 0, 1, 0.85f, 0.7f, 1f, flash * 0.7f);
+            pie(m, cx, cy, half * 0.95f, 0, 1, ar + (1 - ar) * 0.4f, ag + (1 - ag) * 0.4f, ab + (1 - ab) * 0.4f, flash * 0.7f);
             RenderSystem.defaultBlendFunc();
         }
         RenderSystem.disableBlend();

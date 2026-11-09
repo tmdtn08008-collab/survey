@@ -4,6 +4,8 @@ uniform sampler2D DiffuseSampler;
 uniform float Strength;
 uniform float VoidAmount;
 uniform float Time;
+uniform vec3 TintDark;
+uniform vec3 TintLight;
 
 in vec2 texCoord;
 in vec2 oneTexel;
@@ -42,7 +44,7 @@ void main() {
     // 공허 색조
     float v = clamp(VoidAmount, 0.0, 1.0);
     float vl = dot(col, vec3(0.299, 0.587, 0.114));
-    vec3 voidCol = mix(vec3(0.01, 0.0, 0.035), vec3(0.42, 0.22, 0.78), pow(vl, 1.35));
+    vec3 voidCol = mix(TintDark, TintLight, pow(vl, 1.35));
     col = mix(col, voidCol, v * 0.62);
     col *= mix(1.0, smoothstep(1.1, 0.15, length(c) * 1.55), v * 0.7);
     fragColor = vec4(col, 1.0);

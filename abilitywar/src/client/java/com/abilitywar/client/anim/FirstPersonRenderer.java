@@ -93,6 +93,7 @@ public final class FirstPersonRenderer {
         Vector3f fist = new Vector3f(0, 0, -0.72f);
         m.transformPosition(fist);
         FIST_VIEW[arm].set(fist);
+        com.abilitywar.client.fx.dragon.DragonParts.fpClaws(matrices, consumers, player, arm);
         // 팔 모델 방향 맞추기: 모델 +Y(손 방향) -> -Z, 모델 앞면 -> 위
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90f));
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180f));
@@ -102,6 +103,7 @@ public final class FirstPersonRenderer {
         if (sleeve.visible) {
             sleeve.render(matrices, consumers.getBuffer(RenderLayer.getEntityTranslucent(player.getSkinTexture())), light, OverlayTexture.DEFAULT_UV);
         }
+        com.abilitywar.client.fx.dragon.DragonParts.fpArmOverlay(matrices, consumers, light, player, part);
         matrices.pop();
 
         restore(part, savedA);

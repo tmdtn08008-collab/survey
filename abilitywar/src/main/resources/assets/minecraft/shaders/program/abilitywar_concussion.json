@@ -10,6 +10,8 @@
     {"name": "OutSize", "type": "float", "count": 2, "values": [1.0, 1.0]},
     {"name": "Strength", "type": "float", "count": 1, "values": [0.0]},
     {"name": "VoidAmount", "type": "float", "count": 1, "values": [0.0]},
-    {"name": "Time", "type": "float", "count": 1, "values": [0.0]}
+    {"name": "Time", "type": "float", "count": 1, "values": [0.0]},
+    {"name": "TintDark", "type": "float", "count": 3, "values": [0.01, 0.0, 0.035]},
+    {"name": "TintLight", "type": "float", "count": 3, "values": [0.42, 0.22, 0.78]}
   ]
 }

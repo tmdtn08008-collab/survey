@@ -7,6 +7,8 @@ public interface AWPlayer {
     byte FLAG_SHADOW = 4;
     byte FLAG_CINEMATIC = 8;
     byte FLAG_ULT_READY = 16;
+    /** 용기사 용화 상태. */
+    byte FLAG_TRANSFORMED = 32;
 
     String aw$getAbilityKey();
 

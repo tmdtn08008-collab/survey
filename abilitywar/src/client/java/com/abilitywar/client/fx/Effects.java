@@ -24,33 +24,33 @@ import static com.abilitywar.client.fx.Particles.spawn;
 
 /** 공허 능력 이펙트 모음. */
 public final class Effects {
-    static final Random R = new Random();
+    public static final Random R = new Random();
 
-    static float rf(float a, float b) {
+    public static float rf(float a, float b) {
         return a + R.nextFloat() * (b - a);
     }
 
-    static Vec3d randDir() {
+    public static Vec3d randDir() {
         double u = R.nextDouble() * 2 - 1, th = R.nextDouble() * Math.PI * 2;
         double s = Math.sqrt(1 - u * u);
         return new Vec3d(s * Math.cos(th), u, s * Math.sin(th));
     }
 
-    static Vec3d pos(NbtCompound n) {
+    public static Vec3d pos(NbtCompound n) {
         return new Vec3d(n.getDouble("x"), n.getDouble("y"), n.getDouble("z"));
     }
 
-    static Vec3d chest(Entity e, float td) {
+    public static Vec3d chest(Entity e, float td) {
         return e.getLerpedPos(td).add(0, e.getHeight() * 0.62, 0);
     }
 
-    static boolean isLocalFp(Entity e) {
+    public static boolean isLocalFp(Entity e) {
         MinecraftClient mc = MinecraftClient.getInstance();
         return e == mc.player && mc.options.getPerspective().isFirstPerson() && !CameraController.isCinematic();
     }
 
     @Nullable
-    static Vec3d ground(ClientWorld w, Vec3d p, int depth) {
+    public static Vec3d ground(ClientWorld w, Vec3d p, int depth) {
         BlockPos.Mutable m = BlockPos.ofFloored(p).mutableCopy();
         for (int i = 0; i < depth; i++) {
             BlockState s = w.getBlockState(m);
@@ -63,7 +63,7 @@ public final class Effects {
         return null;
     }
 
-    static BlockState groundState(ClientWorld w, Vec3d p) {
+    public static BlockState groundState(ClientWorld w, Vec3d p) {
         BlockPos.Mutable m = BlockPos.ofFloored(p.add(0, 0.2, 0)).mutableCopy();
         for (int i = 0; i < 4; i++) {
             BlockState s = w.getBlockState(m);
@@ -73,7 +73,7 @@ public final class Effects {
         return null;
     }
 
-    static void sparks(Vec3d p, int n, float speed, int color, float size) {
+    public static void sparks(Vec3d p, int n, float speed, int color, float size) {
         for (int i = 0; i < n; i++) {
             Vec3d d = randDir().multiply(rf(0.3f, 1f) * speed);
             spawn(Kind.STREAK, p, d, rf(5, 11), size * rf(0.6f, 1.2f)).color(color, 1f).drag = 0.82f;
@@ -179,13 +179,21 @@ public final class Effects {
         final float scale;
         final float rot = R.nextFloat() * 6.28f;
 
+        final int c1, c2;
+
         Impact(Vec3d p, String kind, float scale) {
+            this(p, kind, scale, -1);
+        }
+
+        Impact(Vec3d p, String kind, float scale, int col) {
             super(kind.equals("punch") ? 7 : 10);
             this.p = p;
             this.kind = kind;
             this.scale = scale;
+            this.c1 = col < 0 ? PURPLE : col;
+            this.c2 = col < 0 ? PINK : mixWhite(col, 0.45f);
             boolean big = !kind.equals("punch");
-            sparks(p, big ? 22 : 10, big ? 0.75f : 0.45f, big ? PINK : PURPLE, big ? 0.13f : 0.09f);
+            sparks(p, big ? 22 : 10, big ? 0.75f : 0.45f, big ? c2 : c1, big ? 0.13f : 0.09f);
             for (int i = 0; i < (big ? 6 : 2); i++) {
                 spawn(Kind.SMOKE_DARK, p, randDir().multiply(0.06), rf(10, 18), rf(0.3f, 0.6f) * scale).color(0x0A0012, 0.55f).size1 = 0.9f * scale;
             }
@@ -206,14 +214,14 @@ public final class Effects {
             VertexConsumer imp = c.imm.getBuffer(AWRenderLayers.additive(Tex.IMPACT));
             float fs = s * (0.6f + 1.4f * (1 - (1 - t) * (1 - t)));
             Draw.billboard(imp, c.m, c.camRot, rp.x, rp.y, rp.z, fs, rot, r(PALE), g(PALE), b(PALE), (1 - t));
-            Draw.billboard(imp, c.m, c.camRot, rp.x, rp.y, rp.z, fs * 1.3f, rot + 0.7f, r(PURPLE), g(PURPLE), b(PURPLE), (1 - t) * 0.8f);
+            Draw.billboard(imp, c.m, c.camRot, rp.x, rp.y, rp.z, fs * 1.3f, rot + 0.7f, r(c1), g(c1), b(c1), (1 - t) * 0.8f);
             VertexConsumer ring = c.imm.getBuffer(AWRenderLayers.additive(Tex.RING));
-            Draw.billboard(ring, c.m, c.camRot, rp.x, rp.y, rp.z, s * (0.3f + t * 1.8f), 0, r(PINK), g(PINK), b(PINK), (1 - t) * 0.9f);
+            Draw.billboard(ring, c.m, c.camRot, rp.x, rp.y, rp.z, s * (0.3f + t * 1.8f), 0, r(c2), g(c2), b(c2), (1 - t) * 0.9f);
             if (!kind.equals("punch")) {
                 VertexConsumer fl = c.imm.getBuffer(AWRenderLayers.additive(Tex.FLARE));
                 Draw.billboard(fl, c.m, c.camRot, rp.x, rp.y, rp.z, s * 2.6f * (1 - t * 0.5f), 0, 1, 1, 1, (1 - t) * (1 - t));
                 VertexConsumer sw = c.imm.getBuffer(AWRenderLayers.additive(Tex.SHOCKWAVE));
-                Draw.billboard(sw, c.m, c.camRot, rp.x, rp.y, rp.z, s * (0.4f + t * 3.2f), rot, r(PURPLE), g(PURPLE), b(PURPLE), (1 - t) * 0.7f);
+                Draw.billboard(sw, c.m, c.camRot, rp.x, rp.y, rp.z, s * (0.4f + t * 3.2f), rot, r(c1), g(c1), b(c1), (1 - t) * 0.7f);
                 VertexConsumer dk = c.imm.getBuffer(AWRenderLayers.translucent(Tex.GLOW));
                 Draw.billboard(dk, c.m, c.camRot, rp.x, rp.y, rp.z, s * 0.7f * (1 - t), 0, 0.02f, 0, 0.05f, (1 - t) * 0.8f);
             }
@@ -421,8 +429,18 @@ public final class Effects {
         final float radius;
         final float rot = R.nextFloat() * 6.28f;
 
+        int col = PURPLE, col2 = PINK;
+
         Crater(ClientWorld w, Vec3d at, float radius) {
+            this(w, at, radius, -1);
+        }
+
+        Crater(ClientWorld w, Vec3d at, float radius, int color) {
             super(40);
+            if (color >= 0) {
+                col = color;
+                col2 = mixWhite(color, 0.4f);
+            }
             Vec3d gnd = ground(w, at.add(0, 0.5, 0), 4);
             this.p = gnd != null ? gnd.add(0, 0.03, 0) : at;
             this.radius = radius;
@@ -447,11 +465,11 @@ public final class Effects {
                 double a = i / 28.0 * Math.PI * 2;
                 Vec3d dir = new Vec3d(Math.cos(a), 0, Math.sin(a));
                 spawn(Kind.SMOKE_DARK, p.add(dir.multiply(0.4)).add(0, 0.2, 0), dir.multiply(rf(0.15f, 0.3f) * radius / 3).add(0, 0.03, 0), rf(18, 30), rf(0.5f, 0.9f))
-                        .color(0x0B0612, 0.55f).size1 = 1.4f;
+                        .color(col == PURPLE ? 0x0B0612 : 0x140A06, 0.55f).size1 = 1.4f;
             }
-            sparks(p.add(0, 0.3, 0), (int) (radius * 8), 0.8f, PINK, 0.14f);
+            sparks(p.add(0, 0.3, 0), (int) (radius * 8), 0.8f, col2, 0.14f);
             for (int i = 0; i < 6; i++) {
-                spawn(Kind.WISP_ADD, p.add(rf(-1, 1) * radius * 0.4, 0.2, rf(-1, 1) * radius * 0.4), new Vec3d(0, rf(0.1f, 0.25f), 0), rf(10, 18), rf(0.4f, 0.8f)).color(PURPLE, 0.8f);
+                spawn(Kind.WISP_ADD, p.add(rf(-1, 1) * radius * 0.4, 0.2, rf(-1, 1) * radius * 0.4), new Vec3d(0, rf(0.1f, 0.25f), 0), rf(10, 18), rf(0.4f, 0.8f)).color(col, 0.8f);
             }
             CameraController.hitstop(3f);
         }
@@ -465,12 +483,12 @@ public final class Effects {
             float ca = t < 0.7f ? 1 : (1 - t) / 0.3f;
             Draw.flat(crack, c.m, rp.x, rp.y, rp.z, radius * 0.9f, rot, 0.03f, 0.0f, 0.06f, ca * 0.9f);
             VertexConsumer crackGlow = c.imm.getBuffer(AWRenderLayers.additive(Tex.CRACK));
-            Draw.flat(crackGlow, c.m, rp.x, rp.y + 0.01, rp.z, radius * 0.9f, rot, r(PURPLE), g(PURPLE), b(PURPLE), ca * 0.6f * (1 - t));
+            Draw.flat(crackGlow, c.m, rp.x, rp.y + 0.01, rp.z, radius * 0.9f, rot, r(col), g(col), b(col), ca * 0.6f * (1 - t));
             VertexConsumer sw = c.imm.getBuffer(AWRenderLayers.additive(Tex.SHOCKWAVE));
-            Draw.flat(sw, c.m, rp.x, rp.y + 0.05, rp.z, radius * (0.3f + 1.6f * e), 0, r(PINK), g(PINK), b(PINK), (1 - Math.min(1, t * 2f)) * 0.9f);
-            VertexConsumer mc = c.imm.getBuffer(AWRenderLayers.additive(Tex.MAGIC_CIRCLE2));
+            Draw.flat(sw, c.m, rp.x, rp.y + 0.05, rp.z, radius * (0.3f + 1.6f * e), 0, r(col2), g(col2), b(col2), (1 - Math.min(1, t * 2f)) * 0.9f);
+            VertexConsumer mc = c.imm.getBuffer(AWRenderLayers.additive(col == PURPLE ? Tex.MAGIC_CIRCLE2 : Tex.fx("dragon_rune")));
             float mt = Math.min(1, t * 3);
-            Draw.flat(mc, c.m, rp.x, rp.y + 0.04, rp.z, radius * (0.6f + 0.6f * mt), rot + t * 1.5f, r(PURPLE), g(PURPLE), b(PURPLE), (1 - mt) * 0.9f);
+            Draw.flat(mc, c.m, rp.x, rp.y + 0.04, rp.z, radius * (0.6f + 0.6f * mt), rot + t * 1.5f, r(col), g(col), b(col), (1 - mt) * 0.9f);
             VertexConsumer fl = c.imm.getBuffer(AWRenderLayers.additive(Tex.FLARE));
             float ft = Math.min(1, t * 4);
             Draw.billboard(fl, c.m, c.camRot, rp.x, rp.y + 0.5, rp.z, radius * 1.6f * (1 - ft * 0.5f), 0, 1, 1, 1, (1 - ft));
@@ -480,7 +498,7 @@ public final class Effects {
             Vec3d side = new Vec3d(toCam.z, 0, -toCam.x);
             side = side.lengthSquared() < 1e-6 ? new Vec3d(1, 0, 0) : side.normalize();
             float rr = radius * (0.2f + e * 0.8f);
-            Draw.quad(ring, c.m, rp.add(0, rr * 0.3, 0), side.multiply(rr), new Vec3d(0, rr * 0.35, 0), r(PURPLE), g(PURPLE), b(PURPLE), (1 - Math.min(1, t * 3)) * 0.8f);
+            Draw.quad(ring, c.m, rp.add(0, rr * 0.3, 0), side.multiply(rr), new Vec3d(0, rr * 0.35, 0), r(col), g(col), b(col), (1 - Math.min(1, t * 3)) * 0.8f);
         }
     }
 
@@ -540,9 +558,10 @@ public final class Effects {
             Draw.quad(dk, c.m, center, right.multiply(size * 1.1), new Vec3d(0, size * 1.1, 0), 0.02f, 0, 0.05f, 0.55f * vis);
             VertexConsumer rs = c.imm.getBuffer(AWRenderLayers.additive(Tex.RUNE_SHIELD));
             float pulse = kind == 0 ? 0.75f + 0.25f * (float) Math.sin(time * 1.2) : 0.6f;
-            Draw.quad(rs, c.m, center, ax, ay, r(PURPLE), g(PURPLE), b(PURPLE), vis * pulse);
+            int col = abilityColor(e), col2 = col == PURPLE ? PINK : mixWhite(col, 0.4f);
+            Draw.quad(rs, c.m, center, ax, ay, r(col), g(col), b(col), vis * pulse);
             VertexConsumer ring = c.imm.getBuffer(AWRenderLayers.additive(Tex.RING));
-            Draw.quad(ring, c.m, center, right.multiply(size * 1.15), new Vec3d(0, size * 1.15, 0), r(PINK), g(PINK), b(PINK), vis * 0.7f);
+            Draw.quad(ring, c.m, center, right.multiply(size * 1.15), new Vec3d(0, size * 1.15, 0), r(col2), g(col2), b(col2), vis * 0.7f);
         }
     }
 
@@ -559,6 +578,23 @@ public final class Effects {
             if (!on) fade();
             return age >= life;
         }
+    }
+
+    /** 능력 고유 색 (막기 방패, 주먹 기운 등). 능력이 없으면 공허 보라. */
+    public static int abilityColor(Entity e) {
+        if (e instanceof AWPlayer p) {
+            com.abilitywar.ability.Ability a = com.abilitywar.ability.Abilities.byString(p.aw$getAbilityKey());
+            if (a != null) return a.color;
+        }
+        return Fx.PURPLE;
+    }
+
+    public static int mixWhite(int rgb, float k) {
+        int r = (rgb >> 16) & 255, g = (rgb >> 8) & 255, b = rgb & 255;
+        r = (int) (r + (255 - r) * k);
+        g = (int) (g + (255 - g) * k);
+        b = (int) (b + (255 - b) * k);
+        return (r << 16) | (g << 8) | b;
     }
 
     public static float outBack(float x) {
