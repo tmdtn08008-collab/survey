@@ -16,6 +16,17 @@ public final class ClientNet {
             boolean forced = buf.readBoolean();
             client.execute(() -> com.abilitywar.client.screen.AbilitySelectScreen.request(forced));
         });
+        ClientPlayNetworking.registerGlobalReceiver(com.abilitywar.rpg.RpgManager.S2C_RPG, (client, handler, buf, sender) -> {
+            net.minecraft.network.PacketByteBuf copy = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.copy(buf);
+            client.execute(() -> {
+                com.abilitywar.client.rpg.RpgClient.read(copy);
+                copy.release();
+            });
+        });
+        ClientPlayNetworking.registerGlobalReceiver(com.abilitywar.rpg.RpgManager.S2C_OPEN_NPC, (client, handler, buf, sender) -> {
+            int npc = buf.readVarInt();
+            client.execute(() -> com.abilitywar.client.screen.JobMasterScreen.open(npc));
+        });
         ClientPlayNetworking.registerGlobalReceiver(AWNet.S2C_STATE, (client, handler, buf, sender) -> {
             net.minecraft.network.PacketByteBuf copy = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.copy(buf);
             client.execute(() -> {

@@ -1,0 +1,223 @@
+#!/usr/bin/env python3
+"""RPG (레벨·스탯·전직 퀘스트·직업 트리) + 1차 직업 + 수호기사 언어 파일 항목을 ko_kr/en_us 에 써 넣음.
+사용: python3 tools/gen_rpg_lang.py"""
+import json, os
+
+ROOT = os.path.join(os.path.dirname(__file__), '..')
+LANG = os.path.join(ROOT, 'src', 'main', 'resources', 'assets', 'abilitywar', 'lang')
+
+E = {}  # key -> (ko, en)
+
+
+def t(key, ko, en):
+    E[key] = (ko, en)
+
+
+# ---------------------------------------------------------------- 키
+t('key.abilitywar.stats', '능력치 창', 'Stats')
+t('key.abilitywar.quests', '퀘스트 창', 'Quests')
+t('key.abilitywar.select', '직업 트리', 'Class Tree')
+
+# ---------------------------------------------------------------- 엔티티 / 아이템
+t('entity.abilitywar.job_master', '전직 교관', 'Class Master')
+t('item.abilitywar.job_master_spawn_egg', '전직 교관 생성 알', 'Class Master Spawn Egg')
+
+# ---------------------------------------------------------------- 직업 (능력)
+SK = ['skill1', 'skill2', 'skill3', 'skill4', 'ultimate', 'passive']
+LOCK_KO = ('잠김 (2차 전직)', '2차 전직을 하면 열립니다. 레벨을 올려 전직 교관을 찾아가세요.')
+LOCK_EN = ('Locked (2nd class)', 'Unlocks after your 2nd class advancement. Level up and visit the Class Master.')
+
+
+def ability(key, ko, en, desc_ko, desc_en, skills):
+    t(f'ability.abilitywar.{key}', ko, en)
+    t(f'ability.abilitywar.{key}.desc', desc_ko, desc_en)
+    for slot, v in zip(SK, skills):
+        if v is None:
+            v = (LOCK_KO[0], LOCK_EN[0], LOCK_KO[1], LOCK_EN[1])
+        nk, ne, dk, de = v
+        t(f'abilitywar.skill.{key}.{slot}', nk, ne)
+        t(f'abilitywar.skill.{key}.{slot}.desc', dk, de)
+
+
+ability('warrior', '전사', 'Warrior',
+        '1차 직업. 가까이 붙어 베고 버티는 근접 전투. 2차: 마검사 · 혈귀 · 용기사.',
+        '1st class. Close-range fighter who cuts and endures. 2nd: Spellblade, Blood Fiend, Dragon Knight.',
+        [('돌진 베기', 'Dash Slash', '앞으로 6칸 돌진하며 지나가는 적을 벤다 (피해 4). 재사용 8초.', 'Dash 6 blocks forward, cutting enemies in the way (4 dmg). 8s cooldown.'),
+         ('회오리 베기', 'Whirlwind', '한 바퀴 돌며 주위 3.5칸을 벤다 (피해 5, 밀쳐냄). 재사용 10초.', 'Spin and cut everything within 3.5 blocks (5 dmg, knockback). 10s cooldown.'),
+         ('전투의 함성', 'War Cry', '8칸 안 파티에 용맹 (8초, 주는 피해 +15%), 나는 저항. 재사용 20초.', 'Valor for party within 8 blocks (8s, +15% damage); Resistance for yourself. 20s cooldown.'),
+         None, None,
+         ('재정비', 'Second Wind', '숨을 고르며 최대 체력의 30% 회복 + 재생. 재사용 30초.', 'Catch your breath: heal 30% max health + Regeneration. 30s cooldown.')])
+ability('mage', '마법사', 'Mage',
+        '1차 직업. 멀리서 마법을 쏘는 원거리 딜러. 2차: 공허 · 흑마법사.',
+        '1st class. Ranged caster. 2nd: Void, Warlock.',
+        [('화염구', 'Fireball', '불덩이를 던져 맞은 곳 2.5칸에 폭발 (피해 6 + 불). 재사용 6초.', 'Hurl a fireball that explodes in 2.5 blocks (6 dmg + fire). 6s cooldown.'),
+         ('서리 고리', 'Frost Ring', '땅을 내리쳐 주위 5칸을 얼린다 (피해 4 + 구속 II 3초). 재사용 12초.', 'Slam the ground and freeze everything within 5 blocks (4 dmg + Slowness II 3s). 12s cooldown.'),
+         ('순간이동', 'Blink', '바라보는 쪽으로 8칸 순간이동. 재사용 8초.', 'Teleport 8 blocks where you look. 8s cooldown.'),
+         None, None,
+         ('마나 방패', 'Mana Shield', '10초 동안 마나 보호막 (흡수 II). 재사용 25초.', 'Mana barrier for 10s (Absorption II). 25s cooldown.')])
+ability('tank', '탱커', 'Tank',
+        '1차 직업. 적을 끌어모으고 막아내는 방패 전사. 2차: 수호기사.',
+        '1st class. Shield fighter who draws and absorbs attacks. 2nd: Guardian.',
+        [('도발', 'Taunt', '10칸 안의 몹이 나를 노린다. 다른 팀 플레이어는 불협화음 (주는 피해 -20%). 나는 저항 5초. 재사용 12초.', 'Mobs within 10 blocks target you; enemy players get Dissonance (-20% damage). Resistance for 5s. 12s cooldown.'),
+         ('방패 돌격', 'Shield Charge', '방패를 앞세워 돌진, 부딪힌 적을 1초 기절. 재사용 9초.', 'Charge behind your shield; enemies hit are stunned for 1s. 9s cooldown.'),
+         ('철벽', 'Iron Wall', '5초 동안 저항 II + 보호막 + 밀려나지 않음. 재사용 18초.', 'Resistance II + absorption + unstoppable for 5s. 18s cooldown.'),
+         None, None,
+         ('버티기', 'Endure', '최대 체력의 25% 회복 + 재생. 재사용 30초.', 'Heal 25% max health + Regeneration. 30s cooldown.')])
+ability('healer', '힐러', 'Healer',
+        '1차 직업. 같은 팀을 치유하고 돕는 지원가. 평타로 바라보는 아군을 치유한다. 2차: 천사 · 성가사.',
+        '1st class. Support who heals teammates (basic attack heals the ally you look at). 2nd: Angel, Cantor.',
+        [('치유', 'Heal', '바라보는 아군 (없으면 나) 체력 6 회복. 재사용 6초.', 'Heal the ally you look at (or yourself) for 6. 6s cooldown.'),
+         ('정화', 'Purify', '5칸 안 파티의 나쁜 효과를 지우고 체력 3 회복. 재사용 12초.', 'Cleanse party within 5 blocks and heal 3. 12s cooldown.'),
+         ('축복', 'Blessing', '6칸 안 파티에 수호 (8초, 받는 피해 감소). 재사용 16초.', 'Aegis for party within 6 blocks (8s, less damage taken). 16s cooldown.'),
+         None, None,
+         ('기도', 'Prayer', '6칸 안 파티에 재생 6초. 재사용 25초.', 'Regeneration for party within 6 blocks for 6s. 25s cooldown.')])
+ability('guardian', '수호기사', 'Guardian',
+        '탱커 2차 직업. 거대한 방패로 파티를 지킨다. 궁극기 게이지는 맞거나 막을수록 빨리 찬다.',
+        'Tank 2nd class. Protects the party with a great shield. Ultimate charges fastest from damage taken or blocked.',
+        [('도발의 함성', 'Rallying Roar', '12칸 안 적을 도발하고, 나는 저항 + 흡수 II. 재사용 12초.', 'Taunt enemies within 12 blocks; gain Resistance + Absorption II. 12s cooldown.'),
+         ('방패 돌진', 'Shield Rush', '7칸 돌진하며 부딪힌 적을 방패 앞에 붙여 밀고 가다 1.5초 기절 (피해 5). 재사용 10초.', 'Rush 7 blocks pushing enemies on your shield, then stun them 1.5s (5 dmg). 10s cooldown.'),
+         ('수호의 결계', 'Bulwark', '방패를 꽂아 6초 동안 반지름 5 결계: 안의 아군 받는 피해 -30%, 적은 느려짐. 재사용 22초.', 'Plant your shield: a radius-5 dome for 6s. Allies inside take 30% less damage, enemies are slowed. 22s cooldown.'),
+         ('대지 강타', 'Earthshaker', '뛰어올라 방패로 내리찍어 반지름 4 피해 7 + 띄움 + 구속. 재사용 14초.', 'Leap and slam: 7 dmg in radius 4, knock up and slow. 14s cooldown.'),
+         ('금성철벽', 'Fortress', '하늘에서 거대한 방패가 내려와 10초 동안 10칸 안 아군 받는 피해 -60%. 12칸 안의 적을 끌어당겨 도발.', 'A giant shield falls from the sky: allies within 10 blocks take 60% less damage for 10s. Enemies within 12 are pulled in and taunted.'),
+         ('수호 태세', 'Guardian Stance', '켜고 끄기. 켜면 8칸 안 같은 팀이 받는 피해의 40% 를 대신 받는다. 나는 받는 피해 -25%, 이동 속도 -15%.', 'Toggle. While on, you take 40% of damage dealt to teammates within 8 blocks. You take 25% less damage but move 15% slower.')])
+t('abilitywar.ult.guardian.title', '金城鐵壁', 'FORTRESS')
+t('abilitywar.ult.guardian.subtitle', '금성철벽', 'Unbreakable Wall')
+
+# ---------------------------------------------------------------- 단계 / 스탯
+t('rpg.abilitywar.tier.1', '1차', '1st')
+t('rpg.abilitywar.tier.2', '2차', '2nd')
+t('rpg.abilitywar.tier.3', '3차', '3rd')
+for k, ko, en, dko, den, eko, een in [
+    ('str', '힘', 'Strength', '물리 공격 (전사·탱커 계열 평타·스킬, 맨손/무기 공격)이 세진다.', 'Stronger physical attacks (warrior/tank line, melee).', '물리 피해 +%s%% · 공격력 +%s', 'Physical +%s%% · Attack +%s'),
+    ('dex', '민첩', 'Dexterity', '치명타가 자주 터지고 조금 빨라진다.', 'More critical hits and a bit more speed.', '치명타 +%s%% · 이동 속도 +%s%%', 'Crit +%s%% · Speed +%s%%'),
+    ('int', '지능', 'Intelligence', '마법 공격 (마법사·힐러 계열 평타·스킬)이 세진다.', 'Stronger magic (mage/healer line).', '마법 피해 +%s%%', 'Magic +%s%%'),
+    ('vit', '체력', 'Vitality', '최대 체력이 늘어난다.', 'More max health.', '최대 체력 +%s', 'Max health +%s'),
+    ('wis', '지혜', 'Wisdom', '스킬을 더 자주 쓰고 회복량이 늘어난다.', 'Shorter cooldowns and stronger healing.', '재사용 대기 -%s%% · 회복량 +%s%%', 'Cooldown -%s%% · Healing +%s%%'),
+]:
+    t(f'rpg.abilitywar.stat.{k}', ko, en)
+    t(f'rpg.abilitywar.stat.{k}.desc', dko, den)
+    t(f'rpg.abilitywar.stat.{k}.eff', eko, een)
+
+# ---------------------------------------------------------------- 메시지
+t('rpg.abilitywar.xp_gain', '+%s 경험치', '+%s XP')
+t('rpg.abilitywar.level_up', '레벨 업! 레벨 %s (스탯 포인트 +%s, [K] 로 찍기)', 'Level up! Level %s (+%s stat points, press [K])')
+t('rpg.abilitywar.job_ready', '2차 전직을 할 수 있습니다! 전직 교관을 찾아가세요.', 'You can now take your 2nd class! Visit the Class Master.')
+t('rpg.abilitywar.objective_done', '퀘스트 목표 완료!', 'Quest objective complete!')
+t('rpg.abilitywar.quest_accepted', '퀘스트 수락: %s ([J] 로 확인)', 'Quest accepted: %s (press [J])')
+t('rpg.abilitywar.quest_abandoned', '퀘스트를 포기했습니다.', 'Quest abandoned.')
+t('rpg.abilitywar.advanced_title', '전직 성공!', 'Class Advanced!')
+t('rpg.abilitywar.advanced_broadcast', '%s 님이 %s (으)로 전직했습니다!', '%s advanced to %s!')
+t('rpg.abilitywar.locked_skill', '2차 전직을 하면 쓸 수 있습니다', 'Unlocks with your 2nd class')
+t('rpg.abilitywar.npc_spawned', '전직 교관을 불렀습니다', 'Class Master summoned')
+t('rpg.abilitywar.err.no_quest', '받은 퀘스트가 없습니다.', 'You have no quest.')
+t('rpg.abilitywar.err.wrong_class', '이 퀘스트는 다른 1차 직업의 길입니다.', 'This quest belongs to another 1st class.')
+t('rpg.abilitywar.err.already_advanced', '이미 2차 전직을 했습니다.', 'You have already advanced.')
+t('rpg.abilitywar.err.level', '레벨 %s 부터 받을 수 있습니다.', 'Requires level %s.')
+t('rpg.abilitywar.err.has_quest', '이미 진행 중인 전직 퀘스트가 있습니다.', 'You already have an advancement quest.')
+t('rpg.abilitywar.err.not_done', '아직 목표를 다 채우지 못했습니다.', 'Objectives are not complete yet.')
+t('rpg.abilitywar.err.far', '전직 교관에게 더 가까이 가세요.', 'Get closer to the Class Master.')
+
+# ---------------------------------------------------------------- 퀘스트
+Q = {
+    'void': ('공허를 엿본 자', 'The One Who Gazed Into the Void', '엔더맨의 눈은 공허를 비춘다고 한다. 엔더맨을 쓰러뜨리고 엔더 진주를 모아 공허의 힘을 다룰 자격을 증명하라.',
+             'They say the eyes of Endermen reflect the void. Defeat Endermen and gather ender pearls to prove you can wield it.'),
+    'warlock': ('죽음과의 계약', 'Pact With Death', '죽은 자를 부리려면 먼저 죽음을 알아야 한다. 언데드를 쓰러뜨리고 뼈를 바쳐라.',
+                'To command the dead, first know death. Slay the undead and offer their bones.'),
+    'blade': ('검에 깃든 마력', 'Mana in the Blade', '수많은 싸움을 이겨낸 자만이 검에 마력을 담는다. 적대적인 몹을 쓰러뜨리고 검을 벼릴 철을 모아라.',
+              'Only those who survive countless battles can bind mana to steel. Defeat hostile mobs and gather iron to forge your blade.'),
+    'blood': ('피의 밤', 'Night of Blood', '혈귀의 힘은 밤에 깨어난다. 밤에 적대적인 몹을 사냥하고 거미 눈을 모아라.',
+              'The fiend awakens at night. Hunt hostile mobs after dark and gather spider eyes.'),
+    'dragon': ('용의 불꽃', 'Dragonfire', '용의 피를 깨우려면 불을 견뎌야 한다. 블레이즈를 쓰러뜨리고 블레이즈 막대를 모아라.',
+               'To awaken dragon blood, endure the flame. Defeat Blazes and gather blaze rods.'),
+    'guardian': ('무너지지 않는 벽', 'The Unbreaking Wall', '수호기사는 동료 대신 맞는다. 피해를 받거나 막아서 견뎌내고, 철 블록으로 방패를 만들 재료를 가져와라.',
+                 'A Guardian takes the blows meant for others. Endure damage (taken or blocked) and bring iron blocks to forge your shield.'),
+    'angel': ('날개를 얻는 길', 'Path to Wings', '천사는 수많은 생명을 구한 자에게 날개를 준다. 체력을 회복시키고 깃털을 모아라.',
+              'Wings are granted to those who save many lives. Restore health and gather feathers.'),
+    'cantor': ('첫 번째 성가', 'The First Hymn', '성가사의 노래는 동료를 강하게 한다. 같은 팀에게 버프를 걸고 소리 블록을 가져와라.',
+               'A Cantor\'s song empowers allies. Buff teammates and bring note blocks.'),
+}
+for reward, (nk, ne, dk, de) in Q.items():
+    t(f'rpg.abilitywar.quest.job_{reward}', nk, ne)
+    t(f'rpg.abilitywar.quest.job_{reward}.desc', dk, de)
+t('rpg.abilitywar.obj.kill', '%s 처치', 'Defeat %s')
+t('rpg.abilitywar.obj.kill_night', '밤에 %s 처치', 'Defeat %s at night')
+t('rpg.abilitywar.obj.item', '%s 모으기', 'Gather %s')
+t('rpg.abilitywar.obj.heal', '아군 체력 회복', 'Restore health')
+t('rpg.abilitywar.obj.buff', '같은 팀에게 버프', 'Buff teammates')
+t('rpg.abilitywar.obj.tank', '피해 받기 / 막기', 'Take or block damage')
+t('rpg.abilitywar.target.hostile', '적대적인 몹', 'hostile mobs')
+t('rpg.abilitywar.target.undead', '언데드', 'undead')
+for k, ko, en in [('available', '받을 수 있음', 'Available'), ('locked_level', '레벨 %s 필요', 'Requires Lv. %s'), ('active', '진행 중', 'In progress'),
+                  ('ready', '완료 가능!', 'Ready to turn in!'), ('completed', '완료', 'Completed'), ('other_active', '다른 퀘스트 진행 중', 'Another quest active'),
+                  ('advanced', '이미 전직함', 'Already advanced'), ('wrong_class', '다른 직업', 'Other class')]:
+    t(f'rpg.abilitywar.status.{k}', ko, en)
+
+# ---------------------------------------------------------------- HUD / 화면
+t('rpg.abilitywar.hud.no_class', '직업 없음', 'No class')
+t('rpg.abilitywar.hud.points', '+%s 스탯 포인트 [%s]', '+%s stat points [%s]')
+t('rpg.abilitywar.hud.return', '▶ 전직 교관에게 돌아가세요', '▶ Return to the Class Master')
+t('rpg.abilitywar.hud.level_up', 'LEVEL UP', 'LEVEL UP')
+t('rpg.abilitywar.hud.level_now', '레벨 %s', 'Level %s')
+t('rpg.abilitywar.screen.stats', '능력치', 'Stats')
+t('rpg.abilitywar.screen.points', '남은 포인트: %s', 'Points left: %s')
+t('rpg.abilitywar.screen.spent', '찍은 포인트 %s', '%s points spent')
+t('rpg.abilitywar.screen.per_point', '1 포인트당: ', 'Per point: ')
+t('rpg.abilitywar.screen.recommended', '★ 지금 직업에 추천', '★ Recommended for your class')
+t('rpg.abilitywar.screen.stats_hint', '레벨 업마다 3 포인트 (10레벨마다 +2) · [%s] 닫기', '3 points per level (+2 every 10 levels) · [%s] to close')
+t('rpg.abilitywar.screen.quests', '퀘스트', 'Quests')
+t('rpg.abilitywar.screen.no_quests', '받을 수 있는 퀘스트가 없습니다.', 'No quests available.')
+t('rpg.abilitywar.screen.requires', '조건', 'Requirements')
+t('rpg.abilitywar.screen.req_level', '레벨 %s 이상', 'Level %s+')
+t('rpg.abilitywar.screen.req_class', '1차 직업: %s', '1st class: %s')
+t('rpg.abilitywar.screen.objectives', '목표', 'Objectives')
+t('rpg.abilitywar.screen.rewards', '보상', 'Rewards')
+t('rpg.abilitywar.screen.reward_class', '2차 직업: %s', '2nd class: %s')
+t('rpg.abilitywar.screen.reward_xp', '경험치 %s', '%s XP')
+t('rpg.abilitywar.screen.reward_gear', '희귀 등급 무기 1개', '1 Rare weapon')
+t('rpg.abilitywar.screen.abandon', '퀘스트 포기', 'Abandon')
+t('rpg.abilitywar.screen.abandon_confirm', '정말 포기?', 'Really?')
+t('rpg.abilitywar.screen.tree', '직업 트리', 'Class Tree')
+t('rpg.abilitywar.guide.no_class', '아직 직업이 없습니다.', 'You have no class yet.')
+t('rpg.abilitywar.guide.advanced', '2차 전직 완료! 3차 전직은 준비 중입니다.', '2nd class done! 3rd class is coming later.')
+t('rpg.abilitywar.guide.ready', '목표 완료! 전직 교관에게 돌아가 전직하세요.', 'Done! Return to the Class Master to advance.')
+t('rpg.abilitywar.guide.progress', '전직 퀘스트 진행 중', 'Advancement quest in progress')
+t('rpg.abilitywar.guide.level', '레벨 %s 이 되면 전직 교관에게서 전직 퀘스트를 받을 수 있습니다 (지금 %s)', 'Reach level %s to get an advancement quest from the Class Master (now %s)')
+t('rpg.abilitywar.guide.visit', '전직 교관을 찾아가 퀘스트를 받으세요.', 'Visit the Class Master to get your quest.')
+t('rpg.abilitywar.npc.accept', '퀘스트 수락', 'Accept')
+t('rpg.abilitywar.npc.turn_in', '전직하기!', 'Advance!')
+t('rpg.abilitywar.npc.close', '닫기', 'Close')
+t('rpg.abilitywar.npc.say.no_class', '자네는 아직 길을 정하지 않았군. 먼저 직업을 고르고 오게.', 'You have not chosen a path yet. Pick a class first.')
+t('rpg.abilitywar.npc.say.advanced', '%s의 길을 걷고 있군. 더 높은 경지는... 아직 때가 아니네.', 'You walk the path of the %s. The next step... is not yet ready.')
+t('rpg.abilitywar.npc.say.ready', '오, 「%s」을(를) 해냈구나! 증표를 보여주게. 새로운 힘을 주지.', 'You finished "%s"! Show me the proof and I will grant you new power.')
+t('rpg.abilitywar.npc.say.progress', '「%s」은(는) 아직 끝나지 않았네. 목표를 채우고 다시 오게.', '"%s" is not finished yet. Come back when you are done.')
+t('rpg.abilitywar.npc.say.level', '아직 부족하네. 레벨 %s 이 되면 다시 찾아오게.', 'You are not ready. Come back at level %s.')
+t('rpg.abilitywar.npc.say.choose.warrior', '전사여, 검의 끝에서 무엇을 찾나? 마력, 피, 아니면 용의 불꽃? 하나만 고를 수 있네.', 'Warrior, what do you seek at the edge of the blade? Mana, blood, or dragonfire? Choose one.')
+t('rpg.abilitywar.npc.say.choose.mage', '마법사여, 깊은 마법은 두 갈래라네. 공허를 다룰 텐가, 죽음을 부릴 텐가?', 'Mage, deep magic splits in two. Will you wield the void, or command death?')
+t('rpg.abilitywar.npc.say.choose.tank', '탱커여, 동료의 방패가 될 각오가 되었나? 수호기사의 길은 험하다네.', 'Tank, are you ready to be the shield of your allies? The Guardian\'s path is hard.')
+t('rpg.abilitywar.npc.say.choose.healer', '힐러여, 날개를 얻어 하늘에서 구할 텐가, 노래로 동료를 강하게 할 텐가?', 'Healer, will you earn wings to save from the sky, or sing to empower allies?')
+t('rpg.abilitywar.tree.sub', '1차 직업 → 전직 교관의 퀘스트 → 2차 직업 → (3차 준비 중)', '1st class → Class Master quest → 2nd class → (3rd coming soon)')
+t('rpg.abilitywar.tree.all', '모든 능력 보기', 'All abilities')
+t('rpg.abilitywar.tree.soon', '준비 중', 'Soon')
+t('rpg.abilitywar.tree.third', '3차 직업', '3rd class')
+t('rpg.abilitywar.tree.third_desc', '아직 준비 중입니다.', 'Not available yet.')
+t('rpg.abilitywar.tree.base_info', '처음 접속할 때 고르는 1차 직업', 'Chosen when you first join')
+t('rpg.abilitywar.tree.how', '레벨 %s + %s 전직 퀘스트:', 'Level %s + %s quest:')
+t('rpg.abilitywar.tree.click', '눌러서 바로 바꾸기 (관리자)', 'Click to switch (admin)')
+t('rpg.abilitywar.tree.hint', '전직은 전직 교관에게서 · [%s] 닫기', 'Advance at the Class Master · [%s] to close')
+t('rpg.abilitywar.tree.hint_admin', '직업을 눌러 바로 바꿀 수 있습니다 · [%s] 닫기', 'Click a class to switch · [%s] to close')
+t('abilitywar.screen.first_hint', '1차 직업을 고르세요. 레벨 30 에 전직 교관에게서 2차 직업으로 전직할 수 있습니다.', 'Choose your 1st class. At level 30 the Class Master can advance you to a 2nd class.')
+
+
+def apply(fname, idx):
+    p = os.path.join(LANG, fname)
+    d = json.load(open(p, encoding='utf-8'))
+    for k, v in E.items():
+        d[k] = v[idx]
+    with open(p, 'w', encoding='utf-8') as f:
+        json.dump(d, f, ensure_ascii=False, indent=1)
+        f.write('\n')
+    print(fname, len(d))
+
+
+apply('ko_kr.json', 0)
+apply('en_us.json', 1)

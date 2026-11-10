@@ -62,6 +62,7 @@ public final class FirstPersonRenderer {
         } finally {
             PlayerAnimator.renderingFirstPersonArms = false;
         }
+        if (pose.visible[1]) com.abilitywar.client.fx.guardian.GuardianParts.fpShield(consumers, player, FIST_VIEW[1]);
         FpEffects.render(tickDelta, matrices, consumers, player, light, pose);
         matrices.pop();
         consumers.draw();

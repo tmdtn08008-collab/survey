@@ -2917,6 +2917,586 @@ write('angel', A)
 
 
 # =====================================================================================
+#                 1차 직업 (전사·마법사·탱커·힐러) + 수호기사 (탱커 2차)
+# =====================================================================================
+import copy as _copy
+
+
+def mkP(defaults):
+    def P(**kw):
+        d = _copy.deepcopy(defaults)
+        for k, v in kw.items():
+            if k == 'root':
+                d['root'] = dict(d['root'], **v)
+            else:
+                d[k] = v
+        return d
+    return P
+
+
+def FPF(R, L, cam=(0, 0, 0), fov=0):
+    return {'R': R, 'L': L, 'cam': list(cam), 'fov': fov}
+
+
+def kit_locomotion(T, key, K, FR, FL, guard_left=False, guard=None, guard_fp=None, heavy=1.0):
+    """기본 이동 동작: idle / walk / run / sneak / sneak_walk / block / block_hit."""
+    ra, la, body, head = K['right_arm'], K['left_arm'], K['body'], K['head']
+    rl, ll, rp = K['right_leg'], K['left_leg'], K['root']['pos']
+    lamp = 0.25 if guard_left else 1.0
+    T[key + '.idle'] = clip(60, loop=True, bones={
+        'body': {'rot': cyc(60, body, [1, 0, 0])},
+        'head': {'rot': cyc(60, head, [1.5, 4, 0], phase=1.0)},
+        'right_arm': {'rot': cyc(60, ra, [3, 2, 2], phase=0.3)},
+        'left_arm': {'rot': cyc(60, la, [2 * lamp, 0, -2 * lamp], phase=0.9)},
+        'right_leg': {'rot': {'0': rl}},
+        'left_leg': {'rot': {'0': ll}},
+        'root': {'pos': cyc(60, rp, [0, -0.25 * heavy, 0])},
+    }, fp={
+        'right_arm': {'pos': cyc(60, FR[0], [0.2, 0.5, 0.1]), 'rot': cyc(60, FR[1], [2, 2, 2])},
+        'left_arm': {'pos': cyc(60, FL[0], [0, 0.4 * lamp, 0.1], phase=0.9), 'rot': cyc(60, FL[1], [1.5 * lamp, 0, -1.5 * lamp], phase=0.9)},
+    })
+    T[key + '.walk'] = clip(20, loop=True, stride=9.42, bones={
+        'body': {'rot': cyc(20, add(body, [1, 0, 0]), [0, 4 * heavy, 0], phase=math.pi)},
+        'head': {'rot': {'0': head}},
+        'right_arm': {'rot': cyc(20, add(ra, [2, 0, 0]), [18, 0, 0], phase=math.pi)},
+        'left_arm': {'rot': cyc(20, add(la, [2 * lamp, 0, 0]), [24 * lamp, 0, 0])},
+        'right_leg': {'rot': cyc(20, [0, 0, 1], [30, 0, 0])},
+        'left_leg': {'rot': cyc(20, [0, 0, -1], [30, 0, 0], phase=math.pi)},
+        'root': {'pos': cyc(20, rp, [0, 0, 0], harm=([0, 0.45 * heavy, 0], -math.pi / 2))},
+    }, fp={
+        'right_arm': {'pos': cyc(20, FR[0], [0.3, 0.6, 0.8], phase=math.pi), 'rot': cyc(20, FR[1], [3, 0, 0], phase=math.pi)},
+        'left_arm': {'pos': cyc(20, FL[0], [0.3 * lamp, 0.7 * lamp, 0.9 * lamp]), 'rot': cyc(20, FL[1], [3 * lamp, 0, 0])},
+    })
+    T[key + '.run'] = clip(18, loop=True, stride=9.42, bones={
+        'body': {'rot': cyc(18, [14, 0, 0], [0, 7, 0], phase=math.pi, harm=([1.5, 0, 0], 0))},
+        'head': {'rot': {'0': [-12, 0, 0]}},
+        'right_arm': {'rot': cyc(18, [-8, 0, 14], [42, 0, 0], phase=math.pi)},
+        'left_arm': {'rot': cyc(18, [-50, 26, -10], [6, 0, 0]) if guard_left else cyc(18, [-8, 0, -14], [42, 0, 0])},
+        'right_leg': {'rot': cyc(18, [-6, 0, 2], [52, 0, 0], harm=([-8, 0, 0], 0))},
+        'left_leg': {'rot': cyc(18, [-6, 0, -2], [52, 0, 0], phase=math.pi, harm=([-8, 0, 0], 0))},
+        'root': {'pos': cyc(18, [0, 0.3, 0], [0, 0, 0], harm=([0, 1.0 * heavy, 0], -math.pi / 2)), 'rot': {'0': [4, 0, 0]}},
+    }, fp={
+        'right_arm': {'pos': cyc(18, [8.5, -17, 4.5], [0.4, 1.4, 1.2], phase=math.pi), 'rot': cyc(18, [14, 0, 64], [8, 0, 0], phase=math.pi)},
+        'left_arm': {'pos': cyc(18, FL[0] if guard_left else [-8.5, -17.5, 4], [0.4, 1.0, 0.6] if guard_left else [0.4, 1.4, 1.2]),
+                     'rot': cyc(18, FL[1] if guard_left else [12, 0, -64], [3, 0, 0] if guard_left else [8, 0, 0])},
+        'camera': {'rot': cyc(18, [0, 0, 0], [0, 0, 0.6], harm=([0.5, 0, 0], 0))},
+        'fov': {'0': [5, 0, 0]},
+    })
+    T[key + '.sneak'] = clip(50, loop=True, bones={
+        'body': {'rot': cyc(50, [24, 0, 0], [1.2, 0, 0])},
+        'head': {'rot': {'0': [-18, 0, 0]}},
+        'right_arm': {'rot': cyc(50, add(ra, [-6, 0, 2]), [3, 0, 0], phase=0.4)},
+        'left_arm': {'rot': cyc(50, add(la, [-6, 0, -2]), [3, 0, 0], phase=0.9)},
+        'right_leg': {'rot': {'0': [10, 4, 4]}, 'pos': {'0': [0, 0, -1]}},
+        'left_leg': {'rot': {'0': [-16, -4, -4]}, 'pos': {'0': [0, 0, 1]}},
+        'root': {'pos': {'0': [0, -1.4, 0]}},
+    }, fp={
+        'right_arm': {'pos': cyc(50, add(FR[0], [0, -0.6, 0.6]), [0, 0.3, 0]), 'rot': cyc(50, FR[1], [1.5, 0, 0])},
+        'left_arm': {'pos': cyc(50, add(FL[0], [0, -0.6, 0.6]), [0, 0.3, 0], phase=0.6), 'rot': cyc(50, FL[1], [1.5, 0, 0], phase=0.6)},
+        'fov': {'0': [-3, 0, 0]},
+    })
+    T[key + '.sneak_walk'] = clip(20, loop=True, stride=9.42, bones={
+        'body': {'rot': cyc(20, [24, 0, 0], [0, 4, 0])},
+        'head': {'rot': {'0': [-18, 0, 0]}},
+        'right_arm': {'rot': cyc(20, add(ra, [-6, 0, 2]), [8, 0, 0], phase=math.pi)},
+        'left_arm': {'rot': cyc(20, add(la, [-6, 0, -2]), [10 * lamp, 0, 0])},
+        'right_leg': {'rot': cyc(20, [4, 4, 4], [24, 0, 0])},
+        'left_leg': {'rot': cyc(20, [-4, -4, -4], [24, 0, 0], phase=math.pi)},
+        'root': {'pos': cyc(20, [0, -1.4, 0], [0, 0, 0], harm=([0, 0.3, 0], -math.pi / 2))},
+    }, fp={
+        'right_arm': {'pos': cyc(20, add(FR[0], [0, -0.6, 0.6]), [0.2, 0.4, 0.6], phase=math.pi), 'rot': cyc(20, FR[1], [2, 0, 0], phase=math.pi)},
+        'left_arm': {'pos': cyc(20, add(FL[0], [0, -0.6, 0.6]), [0.2, 0.4, 0.6]), 'rot': cyc(20, FL[1], [2, 0, 0])},
+        'fov': {'0': [-3, 0, 0]},
+    })
+    BLK = guard or {'body': [6, 0, 0], 'head': [6, 0, 0], 'right_arm': [-100, -38, 6], 'left_arm': [-96, 40, -6],
+                    'right_leg': [8, 4, 4], 'left_leg': [-10, -4, -4], 'root': {'pos': [0, -0.8, 0], 'rot': [0, 0, 0]}}
+    BF = guard_fp or (([3, -10, 10], [44, 40, 50]), ([-3, -10.5, 9.5], [42, -40, -50]))
+    T[key + '.block'] = clip(40, loop=True, blend_in=2, bones={
+        'body': {'rot': cyc(40, BLK['body'], [1, 0, 0])},
+        'head': {'rot': {'0': BLK['head']}},
+        'right_arm': {'rot': cyc(40, BLK['right_arm'], [2, 0, 0])},
+        'left_arm': {'rot': cyc(40, BLK['left_arm'], [2, 0, 0], phase=0.5)},
+        'right_leg': {'rot': {'0': BLK['right_leg']}},
+        'left_leg': {'rot': {'0': BLK['left_leg']}},
+        'root': {'pos': {'0': BLK['root']['pos']}},
+    }, fp={
+        'right_arm': {'pos': cyc(40, BF[0][0], [0, 0.2, 0]), 'rot': cyc(40, BF[0][1], [1, 0, 0])},
+        'left_arm': {'pos': cyc(40, BF[1][0], [0, 0.2, 0], phase=0.5), 'rot': cyc(40, BF[1][1], [1, 0, 0], phase=0.5)},
+        'fov': {'0': [-4, 0, 0]},
+    })
+    hit = dict(BLK, body=add(BLK['body'], [-12, 0, 0]), right_arm=add(BLK['right_arm'], [-8, 6, 0]), left_arm=add(BLK['left_arm'], [-8, -6, 0]),
+               root={'pos': add(BLK['root']['pos'], [0, 0, -1.8]), 'rot': [-4, 0, 0]})
+    T[key + '.block_hit'] = clip(7, blend_in=0.5, blend_out=3, bones=seq([(0, BLK), (1.5, hit, 'outExpo'), (7, BLK, 'outCubic')]), fp=fpseq([
+        (0, {'R': BF[0], 'L': BF[1], 'cam': [0, 0, 0]}),
+        (1.5, {'R': (add(BF[0][0], [0, 1, -2.5]), add(BF[0][1], [6, 0, 0])), 'L': (add(BF[1][0], [0, 1, -2.5]), add(BF[1][1], [6, 0, 0])), 'cam': [-2.5, 0, 1.2]}, 'outExpo'),
+        (7, {'R': BF[0], 'L': BF[1], 'cam': [0, 0, 0]}, 'outCubic'),
+    ]))
+
+
+def strike(P, K, FG, length, hit, wind, hitp, fp_w, fp_h, cam, lunge=1.2, fov=-2, follow=None):
+    """한 번 치는 동작: 준비(wind) → 맞는 순간(hitp) → 따라감 → 기본 자세."""
+    fol = follow or hitp
+    bones = seq([
+        (0, K),
+        (hit * 0.55, P(**wind), 'outQuad'),
+        (hit, P(**dict(hitp, root={'pos': [0, -0.3, lunge]})), 'outExpo'),
+        (hit + (length - hit) * 0.45, P(**dict(fol, root={'pos': [0, -0.2, lunge * 0.7]}))),
+        (length, K, 'inOutSine'),
+    ])
+    fp = fpseq([
+        (0, dict(FG)),
+        (hit * 0.55, dict(fp_w, cam=[-0.4, 0.4, 0.3], fov=1), 'outQuad'),
+        (hit, dict(fp_h, cam=list(cam), fov=fov), 'outExpo'),
+        (hit + (length - hit) * 0.45, dict(fp_h, cam=[x * 0.4 for x in cam], fov=fov * 0.4)),
+        (length, dict(FG), 'inOutSine'),
+    ])
+    return clip(length, bones=bones, fp=fp, blend_in=0.5, blend_out=2.5)
+
+
+def select_clip(P, K, FG, up=False):
+    rest0 = P(body=[0, 0, 0], head=[0, 0, 0], right_arm=[0, 0, 0], left_arm=[0, 0, 0], right_leg=[0, 0, 0], left_leg=[0, 0, 0], root={'pos': [0, 0, 0]})
+    return clip(24, blend_in=2, blend_out=5, bones=seq([
+        (0, rest0),
+        (8, P(body=[12, 0, 0], head=[16, 0, 0], right_arm=[-40, 30, 20], left_arm=[-40, -30, -20], root={'pos': [0, -0.6, 0]}), 'outCubic'),
+        (13, P(body=[-8, 0, 0], head=[-14, 0, 0], right_arm=[-150 if up else -60, -10, 30], left_arm=[-30, 10, -40], root={'pos': [0, 0.4, 0]}), 'outExpo'),
+        (24, K, 'inOutSine'),
+    ]), fp=fpseq([
+        (0, {'R': LOW_R, 'L': LOW_L, 'cam': [0, 0, 0]}),
+        (8, {'R': ([4, -12, 8], [40, 30, 40]), 'L': ([-4, -12, 7.5], [40, -30, -40])}, 'outCubic'),
+        (13, {'R': ([6, -4, 7], [80, 10, 40]) if up else ([4, -9, 13], [20, 8, 24]), 'L': LOW_L, 'cam': [-2, 0, 0]}, 'outExpo'),
+        (24, dict(FG), 'inOutSine'),
+    ]))
+
+
+# ------------------------------------------------------------------ 전사
+WR = {}
+WK_ = {'body': [5, -6, 0], 'head': [-6, 6, 0], 'right_arm': [-34, -14, 10], 'left_arm': [-24, 12, -14],
+       'right_leg': [-6, 6, 5], 'left_leg': [8, -6, -4], 'root': {'pos': [0, -0.3, 0], 'rot': [0, 0, 0]}}
+WP = mkP(WK_)
+WK = WP()
+W_FR = ([7, -13.5, 8], [30, 6, 50])
+W_FL = ([-7, -15, 6.5], [20, -4, -50])
+WFG = FPF(W_FR, W_FL)
+kit_locomotion(WR, 'warrior', WK_, W_FR, W_FL)
+W_WIDE_R = ([13, -11, 5], [34, -42, 80])    # 오른쪽 뒤로 젖힘
+W_CROSS_R = ([-6, -11, 13], [20, 46, 30])    # 왼쪽 앞까지 휘두름
+WR['warrior.attack1'] = strike(WP, WK, WFG, 8, 2.5,
+                               dict(body=[2, 26, 0], right_arm=[-90, 60, 40]), dict(body=[8, -26, 0], right_arm=[-84, -50, -6]),
+                               {'R': W_WIDE_R}, {'R': W_CROSS_R}, (0.5, -1.4, -1.4))
+WR['warrior.attack2'] = strike(WP, WK, WFG, 8, 2.5,
+                               dict(body=[4, -20, 0], right_arm=[-60, -50, -20]), dict(body=[6, 22, 0], right_arm=[-110, 50, 40]),
+                               {'R': ([-4, -14, 10], [10, 46, 20])}, {'R': ([13, -7, 7], [56, -40, 84])}, (0.4, 1.4, 1.4))
+WR['warrior.attack3'] = strike(WP, WK, WFG, 13, 4.5,
+                               dict(body=[-14, 0, 0], head=[-14, 0, 0], right_arm=[-170, 0, 10], left_arm=[-60, 0, -20]),
+                               dict(body=[22, 0, 0], head=[8, 0, 0], right_arm=[-60, -6, 6], left_arm=[-20, 0, -20]),
+                               {'R': ([5, -3, 6], [84, 8, 40])}, {'R': ([3, -13, 13], [-14, 6, 40])}, (4.5, 0, 0), lunge=2.2, fov=-4)
+# 1. 돌진 베기: 몸을 낮췄다가 (3) 앞으로 쏘아가며 (5) 크게 가로베기
+WR['warrior.skill1'] = clip(14, blend_in=0.5, blend_out=3, bones=seq([
+    (0, WK),
+    (3, WP(body=[20, 30, 0], head=[-14, -20, 0], right_arm=[-30, 70, 50], left_arm=[30, 0, -30], right_leg=[-40, 6, 6], left_leg=[30, -6, -4], root={'pos': [0, -2, -0.6]}), 'outCubic'),
+    (5.5, WP(body=[18, -34, 0], head=[-10, 24, 0], right_arm=[-90, -70, -10], left_arm=[40, 0, -30], right_leg=[30, 6, 6], left_leg=[-40, -6, -4], root={'pos': [0, -1.2, 3]}), 'outExpo'),
+    (9, WP(body=[14, -30, 0], head=[-8, 20, 0], right_arm=[-84, -66, -10], left_arm=[30, 0, -30], root={'pos': [0, -0.8, 2]})),
+    (14, WK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(WFG)),
+    (3, {'R': W_WIDE_R, 'L': LOW_L, 'cam': [2, 2, 2], 'fov': -2}, 'outCubic'),
+    (5.5, {'R': W_CROSS_R, 'cam': [-1, -3, -4], 'fov': 10}, 'outExpo'),
+    (9, {'cam': [0, -1, -1], 'fov': 4}),
+    (14, dict(WFG), 'inOutSine'),
+]))
+# 2. 회오리 베기: 팔을 벌리고 한 바퀴 반 돎
+_ws = [(0, WK), (2.5, WP(body=[10, 30, 0], right_arm=[-90, 70, 20], left_arm=[-60, -30, -30], root={'pos': [0, -1.2, 0], 'rot': [0, 30, 0]}), 'outCubic')]
+for i, a in enumerate([-90, -180, -270, -360]):
+    _ws.append((4 + i * 1.6, WP(body=[12, -10, 0], right_arm=[-90, -10, 60], left_arm=[-80, 10, -60], root={'pos': [0, -1.0, 0], 'rot': [0, a, 0]}), 'linear'))
+# 끝에서 -360도 = 0도: 블렌드가 거꾸로 돌지 않게 마지막 자세를 기본 자세로 맞추고 blend_out 을 아주 짧게
+_ws += [(11.5, WP(body=[10, -20, 0], right_arm=[-80, -40, 30], left_arm=[-60, 10, -50], root={'pos': [0, -0.6, 0], 'rot': [0, -360, 0]}), 'outCubic'),
+        (16, dict(WK, root={'pos': [0, -0.3, 0], 'rot': [0, -360, 0]}), 'inOutSine')]
+WR['warrior.skill2'] = clip(16, blend_in=0.5, blend_out=0.1, bones=seq(_ws), fp=fpseq([
+    (0, dict(WFG)),
+    (2.5, {'R': W_WIDE_R, 'L': ([-13, -11, 4.5], [34, 42, -80]), 'cam': [0, 3, 0], 'fov': 2}, 'outCubic'),
+    (4, {'R': W_CROSS_R, 'cam': [0, -10, -3], 'fov': 8}, 'linear'),
+    (7, {'R': W_WIDE_R, 'cam': [0, -6, 3], 'fov': 8}, 'linear'),
+    (10, {'R': W_CROSS_R, 'cam': [0, -4, -2], 'fov': 5}, 'linear'),
+    (16, dict(WFG), 'inOutSine'),
+]))
+# 3. 함성: 가슴을 젖히고 두 팔을 벌려 포효
+_roar = WP(body=[-16, 0, 0], head=[-30, 0, 0], right_arm=[-70, -20, 70], left_arm=[-70, 20, -70], right_leg=[-10, 6, 8], left_leg=[10, -6, -8], root={'pos': [0, 0.3, 0]})
+WR['warrior.skill3'] = clip(20, blend_in=0.5, blend_out=4, bones=seq([
+    (0, WK),
+    (4, WP(body=[22, 0, 0], head=[16, 0, 0], right_arm=[-30, 30, 30], left_arm=[-30, -30, -30], root={'pos': [0, -1.4, 0]}), 'outCubic'),
+    (6, _roar, 'outExpo'),
+    (8, dict(_roar, body=[-14, 2, 0]), 'linear'),
+    (10, dict(_roar, body=[-16, -2, 0]), 'linear'),
+    (13, _roar),
+    (20, WK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(WFG)),
+    (4, {'R': ([4, -12, 8], [40, 30, 40]), 'L': ([-4, -12, 7.5], [40, -30, -40]), 'cam': [5, 0, 0], 'fov': -3}, 'outCubic'),
+    (6, {'R': ([14, -10, 3], [30, -50, 88]), 'L': ([-14, -10, 2.5], [30, 50, -88]), 'cam': [-6, 0, 0], 'fov': 8}, 'outExpo'),
+    (8, {'cam': [-5, 0.6, 0.8]}, 'linear'),
+    (10, {'cam': [-5, -0.6, -0.8]}, 'linear'),
+    (13, {'cam': [-4, 0, 0], 'fov': 5}),
+    (20, dict(WFG), 'inOutSine'),
+]))
+# T. 재정비: 주먹으로 가슴을 치고 숨을 고름
+WR['warrior.passive'] = clip(16, blend_in=0.5, blend_out=4, bones=seq([
+    (0, WK),
+    (4, WP(body=[10, 0, 0], head=[14, 0, 0], right_arm=[-70, 50, 10], left_arm=[-20, 0, -20], root={'pos': [0, -0.8, 0]}), 'outCubic'),
+    (6, WP(body=[-6, 0, 0], head=[-10, 0, 0], right_arm=[-60, 56, 4], left_arm=[-10, 0, -30], root={'pos': [0, 0.3, 0]}), 'outExpo'),
+    (11, WP(body=[-4, 0, 0], head=[-6, 0, 0], right_arm=[-56, 50, 6], left_arm=[-12, 0, -28], root={'pos': [0, 0.2, 0]})),
+    (16, WK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(WFG)),
+    (4, {'R': ([-1, -12, 7], [30, 50, 40]), 'cam': [3, 0, 0]}, 'outCubic'),
+    (6, {'R': ([-2, -14, 4], [10, 60, 30]), 'cam': [-2, 0, 0], 'fov': 2}, 'outExpo'),
+    (16, dict(WFG), 'inOutSine'),
+]))
+WR['warrior.select'] = select_clip(WP, WK, WFG, up=True)
+write('warrior', WR)
+
+# ------------------------------------------------------------------ 마법사
+MG = {}
+MK_ = {'body': [0, -4, 0], 'head': [-4, 4, 0], 'right_arm': [-46, -16, 10], 'left_arm': [-10, 6, -10],
+       'right_leg': [2, 2, 1], 'left_leg': [-2, -2, -1], 'root': {'pos': [0, 0, 0], 'rot': [0, 0, 0]}}
+MP = mkP(MK_)
+MKP = MP()
+M_FR = ([7, -12.5, 9], [32, 4, 50])
+M_FL = ([-7.5, -16, 6], [16, -4, -50])
+MFG = FPF(M_FR, M_FL)
+kit_locomotion(MG, 'mage', MK_, M_FR, M_FL)
+M_PUSH_R = ([3, -10, 15], [10, 6, 24])
+M_PUSH_L = ([-3, -10, 14.5], [10, -6, -24])
+MG['mage.attack1'] = strike(MP, MKP, MFG, 8, 2.5, dict(body=[0, 14, 0], right_arm=[-50, 30, 30]), dict(body=[4, -12, 0], right_arm=[-96, -6, 4]),
+                            {'R': ([10, -11, 6], [36, -30, 66])}, {'R': M_PUSH_R}, (0.4, -0.6, -0.6), lunge=0.6)
+MG['mage.attack2'] = strike(MP, MKP, MFG, 8, 2.5, dict(body=[0, -10, 0], left_arm=[-50, -30, -30]), dict(body=[4, 14, 0], left_arm=[-96, 6, -4]),
+                            {'L': ([-10, -11, 5.5], [36, 30, -66])}, {'L': M_PUSH_L}, (0.4, 0.6, 0.6), lunge=0.6)
+MG['mage.attack3'] = strike(MP, MKP, MFG, 12, 4, dict(body=[-6, 0, 0], right_arm=[-40, 30, 40], left_arm=[-40, -30, -40]),
+                            dict(body=[10, 0, 0], right_arm=[-92, -12, 4], left_arm=[-92, 12, -4]),
+                            {'R': ([12, -10, 4], [40, -40, 80]), 'L': ([-12, -10, 3.5], [40, 40, -80])}, {'R': M_PUSH_R, 'L': M_PUSH_L}, (2.5, 0, 0), lunge=1.0, fov=-5)
+# 1. 화염구: 오른손을 뒤로 당겨 모았다가 (5) 앞으로 던짐 (7)
+MG['mage.skill1'] = clip(16, blend_in=0.5, blend_out=4, bones=seq([
+    (0, MKP),
+    (5, MP(body=[-4, 30, 0], head=[-6, -24, 0], right_arm=[-60, 70, 40], left_arm=[-90, -10, -6], right_leg=[10, 6, 4], left_leg=[-14, -6, -4], root={'pos': [0, 0, -0.8]}), 'outCubic'),
+    (7, MP(body=[12, -26, 0], head=[0, 18, 0], right_arm=[-100, -14, 4], left_arm=[-30, 10, -30], right_leg=[-20, 6, 4], left_leg=[10, -6, -4], root={'pos': [0, -0.6, 1.4]}), 'outExpo'),
+    (11, MP(body=[10, -22, 0], head=[0, 16, 0], right_arm=[-94, -14, 4], left_arm=[-26, 10, -30], root={'pos': [0, -0.4, 1.0]})),
+    (16, MKP, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(MFG)),
+    (5, {'R': ([12, -12, 2], [40, -40, 84]), 'L': ([-3, -10, 12], [24, -10, -20]), 'cam': [-1, 3, 1], 'fov': 3}, 'outCubic'),
+    (7, {'R': M_PUSH_R, 'L': LOW_L, 'cam': [2.5, -2, -1], 'fov': -6}, 'outExpo'),
+    (11, {'cam': [1, -1, 0], 'fov': -2}),
+    (16, dict(MFG), 'inOutSine'),
+]))
+# 2. 서리 고리: 두 팔을 들어 (5) 땅을 내리침 (7)
+MG['mage.skill2'] = clip(18, blend_in=0.5, blend_out=4, bones=seq([
+    (0, MKP),
+    (5, MP(body=[-12, 0, 0], head=[-22, 0, 0], right_arm=[-170, 10, 20], left_arm=[-170, -10, -20], root={'pos': [0, 0.6, 0]}), 'outCubic'),
+    (7, MP(body=[34, 0, 0], head=[10, 0, 0], right_arm=[-40, 10, 20], left_arm=[-40, -10, -20], right_leg=[-30, 6, 6], left_leg=[20, -6, -6], root={'pos': [0, -3, 0.6]}), 'outExpo'),
+    (12, MP(body=[30, 0, 0], head=[8, 0, 0], right_arm=[-44, 10, 20], left_arm=[-44, -10, -20], right_leg=[-28, 6, 6], left_leg=[18, -6, -6], root={'pos': [0, -2.6, 0.5]})),
+    (18, MKP, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(MFG)),
+    (5, {'R': ([6, -3, 7], [84, 8, 40]), 'L': ([-6, -3, 6.5], [84, -8, -40]), 'cam': [-6, 0, 0], 'fov': 5}, 'outCubic'),
+    (7, {'R': ([4, -16, 12], [-30, 10, 40]), 'L': ([-4, -16, 11.5], [-30, -10, -40]), 'cam': [9, 0, 0], 'fov': -6}, 'outExpo'),
+    (12, {'cam': [7, 0, 0], 'fov': -4}),
+    (18, dict(MFG), 'inOutSine'),
+]))
+# 3. 순간이동: 손가락을 튕기며 몸을 웅크림 (3) → 나타나며 펴짐
+MG['mage.skill3'] = clip(10, blend_in=0.3, blend_out=3, bones=seq([
+    (0, MKP),
+    (2, MP(body=[24, 0, 0], head=[14, 0, 0], right_arm=[-110, 10, 10], left_arm=[-20, 0, -40], root={'pos': [0, -2, 0]}), 'outCubic'),
+    (4, MP(body=[-6, 0, 0], head=[-6, 0, 0], right_arm=[-30, -20, 50], left_arm=[-20, 20, -50], root={'pos': [0, 0.4, 0]}), 'outExpo'),
+    (10, MKP, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(MFG)),
+    (2, {'R': ([3, -8, 12], [40, 10, 20]), 'cam': [3, 0, 0], 'fov': -4}, 'outCubic'),
+    (4, {'R': M_FR, 'cam': [-2, 0, 0], 'fov': 12}, 'outExpo'),
+    (10, dict(MFG), 'inOutSine'),
+]))
+# T. 마나 방패: 두 팔을 가슴 앞에서 교차했다가 활짝
+MG['mage.passive'] = clip(14, blend_in=0.5, blend_out=4, bones=seq([
+    (0, MKP),
+    (4, MP(body=[8, 0, 0], head=[6, 0, 0], right_arm=[-100, 40, 10], left_arm=[-100, -40, -10], root={'pos': [0, -0.8, 0]}), 'outCubic'),
+    (6.5, MP(body=[-8, 0, 0], head=[-10, 0, 0], right_arm=[-50, -20, 70], left_arm=[-50, 20, -70], root={'pos': [0, 0.3, 0]}), 'outExpo'),
+    (14, MKP, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(MFG)),
+    (4, {'R': CROSS_R, 'L': CROSS_L, 'cam': [2, 0, 0]}, 'outCubic'),
+    (6.5, {'R': ([13, -10, 4], [40, -50, 86]), 'L': ([-13, -10, 3.5], [40, 50, -86]), 'cam': [-2, 0, 0], 'fov': 4}, 'outExpo'),
+    (14, dict(MFG), 'inOutSine'),
+]))
+MG['mage.select'] = select_clip(MP, MKP, MFG, up=True)
+write('mage', MG)
+
+# ------------------------------------------------------------------ 탱커 / 수호기사 (왼팔 방패)
+def shield_kit(T, key, heavy):
+    K_ = {'body': [6, 8, 0], 'head': [-6, -6, 0], 'right_arm': [-30, -10, 10], 'left_arm': [-62, 34, -8],
+          'right_leg': [-8, 6, 6], 'left_leg': [10, -6, -5], 'root': {'pos': [0, -0.5 * heavy, 0], 'rot': [0, 0, 0]}}
+    P = mkP(K_)
+    K = P()
+    FR = ([7.5, -15, 7], [20, 4, 50])
+    FL = ([-5.5, -12.5, 8.5], [34, -10, -30])
+    FG = FPF(FR, FL)
+    guard = {'body': [10, 12, 0], 'head': [4, -10, 0], 'right_arm': [-40, -10, 10], 'left_arm': [-88, 48, -4],
+             'right_leg': [-14, 8, 8], 'left_leg': [14, -8, -6], 'root': {'pos': [0, -1.4, 0], 'rot': [0, 0, 0]}}
+    kit_locomotion(T, key, K_, FR, FL, guard_left=True, guard=guard, guard_fp=(([7, -15, 6], [20, 4, 50]), ([-3.5, -10.5, 10.5], [44, -20, -20])), heavy=heavy)
+    SH_PUSH = ([-2.5, -10.5, 14.5], [30, -16, -14])
+    T[key + '.attack1'] = strike(P, K, FG, 9, 3, dict(body=[0, 26, 0], left_arm=[-60, 60, -10]), dict(body=[10, -18, 0], left_arm=[-96, 10, -4]),
+                                 {'L': ([-8, -13, 5], [30, 20, -50])}, {'L': SH_PUSH}, (0.6, 0.8, 0.5), lunge=1.6)
+    T[key + '.attack2'] = strike(P, K, FG, 9, 3, dict(body=[0, -24, 0], right_arm=[-60, 50, 30]), dict(body=[8, 22, 0], right_arm=[-96, -10, 4]),
+                                 {'R': ([11, -12, 4], [30, -30, 70])}, {'R': JAB_R}, (0.5, -0.8, -0.5), lunge=1.4)
+    T[key + '.attack3'] = strike(P, K, FG, 14, 5, dict(body=[-14, 10, 0], head=[-10, 0, 0], left_arm=[-160, 20, -10], right_arm=[-60, 0, 20]),
+                                 dict(body=[26, 0, 0], head=[6, 0, 0], left_arm=[-60, 10, -6], right_arm=[-30, 0, 20], right_leg=[-30, 6, 6], left_leg=[20, -6, -6]),
+                                 {'L': ([-5, -3, 7], [80, -10, -30])}, {'L': ([-3, -15, 13], [-20, -10, -20])}, (5, 0, 0), lunge=2.0, fov=-4)
+    return P, K, FG, guard
+
+
+# 탱커
+TK = {}
+TP, TKK, TFG, TGUARD = shield_kit(TK, 'tank', 1.0)
+# 1. 도발: 오른 주먹으로 방패를 두드리며 고개를 내밂
+_tk = [(0, TKK)]
+for i in range(3):
+    t0 = 2 + i * 3.5
+    _tk.append((t0, TP(body=[4, 20, 0], head=[8, -14, 0], right_arm=[-90, 50, 10], left_arm=[-80, 40, -6], root={'pos': [0, -0.6, 0]}), 'outCubic'))
+    _tk.append((t0 + 1.2, TP(body=[10, 14, 0], head=[14, -10, 0], right_arm=[-76, 64, 6], left_arm=[-84, 36, -6], root={'pos': [0, -0.9, 0.4]}), 'outExpo'))
+_tk += [(13, TP(body=[-10, 0, 0], head=[-24, 0, 0], right_arm=[-60, -20, 60], left_arm=[-70, 30, -40], root={'pos': [0, 0.2, 0]}), 'outExpo'), (20, TKK, 'inOutSine')]
+TK['tank.skill1'] = clip(20, blend_in=0.5, blend_out=4, bones=seq(_tk), fp=fpseq([
+    (0, dict(TFG)),
+    (2, {'R': ([0, -11, 9], [30, 40, 30]), 'cam': [0, 0, 0]}, 'outCubic'),
+    (3.2, {'R': ([-2, -12, 9], [24, 46, 20]), 'cam': [1.2, 0, 0.6]}, 'outExpo'),
+    (5.5, {'R': ([0, -11, 9], [30, 40, 30]), 'cam': [0, 0, 0]}, 'outCubic'),
+    (6.7, {'R': ([-2, -12, 9], [24, 46, 20]), 'cam': [1.2, 0, -0.6]}, 'outExpo'),
+    (9, {'R': ([0, -11, 9], [30, 40, 30]), 'cam': [0, 0, 0]}, 'outCubic'),
+    (10.2, {'R': ([-2, -12, 9], [24, 46, 20]), 'cam': [1.5, 0, 0.6]}, 'outExpo'),
+    (13, {'R': ([13, -10, 4], [40, -50, 86]), 'cam': [-4, 0, 0], 'fov': 5}, 'outExpo'),
+    (20, dict(TFG), 'inOutSine'),
+]))
+# 2. 방패 돌격: 어깨를 낮추고 방패를 앞세워 뛰어듦
+_rush = TP(body=[30, 16, 0], head=[-20, -12, 0], right_arm=[20, 0, 20], left_arm=[-96, 30, -4], right_leg=[30, 6, 4], left_leg=[-40, -6, -4], root={'pos': [0, -1.8, 2], 'rot': [10, 0, 0]})
+TK['tank.skill2'] = clip(14, blend_in=0.5, blend_out=4, bones=seq([
+    (0, TKK),
+    (2, TP(body=[20, 20, 0], head=[-10, -14, 0], left_arm=[-80, 40, -6], right_leg=[-30, 6, 4], left_leg=[20, -6, -4], root={'pos': [0, -1.6, -0.5]}), 'outCubic'),
+    (4, _rush, 'outExpo'),
+    (6, dict(_rush, right_leg=[-40, 6, 4], left_leg=[30, -6, -4]), 'linear'),
+    (8, _rush, 'linear'),
+    (10, TP(body=[14, 10, 0], left_arm=[-90, 30, -4], root={'pos': [0, -1, 0.5]}), 'outCubic'),
+    (14, TKK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(TFG)),
+    (2, {'L': ([-4, -11, 9], [36, -14, -20]), 'cam': [2, 0, 0]}, 'outCubic'),
+    (4, {'L': ([-1, -9, 12], [40, -20, -6]), 'R': ([8, -20, 2], [-10, 0, 60]), 'cam': [3, 0, 0], 'fov': 12}, 'outExpo'),
+    (8, {'cam': [3, 0, 0.5], 'fov': 12}, 'linear'),
+    (14, dict(TFG), 'inOutSine'),
+]))
+# 3. 철벽: 다리를 넓게 벌리고 두 팔을 앞에서 겹쳐 버팀
+_wall = TP(body=[16, 0, 0], head=[8, 0, 0], right_arm=[-96, 40, 6], left_arm=[-96, -10, -6], right_leg=[-20, 10, 14], left_leg=[20, -10, -14], root={'pos': [0, -2.4, 0]})
+TK['tank.skill3'] = clip(16, blend_in=0.5, blend_out=4, bones=seq([
+    (0, TKK),
+    (3, TP(body=[-6, 0, 0], head=[-8, 0, 0], right_arm=[-140, 10, 20], left_arm=[-140, -10, -20], root={'pos': [0, 0.4, 0]}), 'outCubic'),
+    (5, _wall, 'outExpo'),
+    (11, dict(_wall, body=[18, 0, 0])),
+    (16, TKK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(TFG)),
+    (3, {'R': ([6, -4, 7], [80, 10, 40]), 'L': ([-6, -4, 6.5], [80, -10, -40]), 'cam': [-3, 0, 0], 'fov': 3}, 'outCubic'),
+    (5, {'R': CROSS_R, 'L': CROSS_L, 'cam': [5, 0, 0], 'fov': -6}, 'outExpo'),
+    (11, {'cam': [4, 0, 0], 'fov': -5}),
+    (16, dict(TFG), 'inOutSine'),
+]))
+TK['tank.passive'] = clip(16, blend_in=0.5, blend_out=4, bones=seq([
+    (0, TKK),
+    (4, TP(body=[26, 0, 0], head=[20, 0, 0], right_arm=[-30, 20, 20], right_leg=[-50, 6, 6], left_leg=[30, -6, -6], root={'pos': [0, -3.4, 0]}), 'outCubic'),
+    (9, TP(body=[24, 0, 0], head=[16, 0, 0], right_arm=[-32, 20, 20], right_leg=[-50, 6, 6], left_leg=[30, -6, -6], root={'pos': [0, -3.2, 0]})),
+    (12, TP(body=[-6, 0, 0], head=[-12, 0, 0], right_arm=[-50, -20, 50], root={'pos': [0, 0.3, 0]}), 'outExpo'),
+    (16, TKK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(TFG)),
+    (4, {'cam': [8, 0, 0], 'fov': -3}, 'outCubic'),
+    (9, {'cam': [7, 0, 0]}),
+    (12, {'cam': [-2, 0, 0], 'fov': 3}, 'outExpo'),
+    (16, dict(TFG), 'inOutSine'),
+]))
+TK['tank.select'] = select_clip(TP, TKK, TFG)
+write('tank', TK)
+
+# 수호기사
+GD = {}
+GP_, GKK, GFG, GGUARD = shield_kit(GD, 'guardian', 1.3)
+# 1. 도발의 함성: 방패를 높이 들고 포효
+_gs = GP_(body=[-14, 0, 0], head=[-30, 0, 0], right_arm=[-70, -20, 70], left_arm=[-170, 20, -16], right_leg=[-14, 8, 10], left_leg=[14, -8, -10], root={'pos': [0, 0, 0]})
+GD['guardian.skill1'] = clip(18, blend_in=0.5, blend_out=4, bones=seq([
+    (0, GKK),
+    (3, GP_(body=[20, 0, 0], head=[16, 0, 0], right_arm=[-30, 30, 30], left_arm=[-60, 30, -20], root={'pos': [0, -1.6, 0]}), 'outCubic'),
+    (4.5, _gs, 'outExpo'),
+    (7, dict(_gs, body=[-12, 2, 0]), 'linear'),
+    (9, dict(_gs, body=[-14, -2, 0]), 'linear'),
+    (12, _gs),
+    (18, GKK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(GFG)),
+    (3, {'L': ([-4, -12, 8], [40, -20, -30]), 'cam': [5, 0, 0], 'fov': -3}, 'outCubic'),
+    (4.5, {'L': ([-5, -2, 7], [84, -10, -30]), 'R': ([14, -10, 3], [30, -50, 88]), 'cam': [-6, 0, 0], 'fov': 8}, 'outExpo'),
+    (7, {'cam': [-5, 0.6, 0.8]}, 'linear'),
+    (9, {'cam': [-5, -0.6, -0.8]}, 'linear'),
+    (12, {'cam': [-4, 0, 0], 'fov': 5}),
+    (18, dict(GFG), 'inOutSine'),
+]))
+# 2. 방패 돌진 (탱커 돌격보다 묵직하게)
+GD['guardian.skill2'] = clip(14, blend_in=0.5, blend_out=4, bones=seq([
+    (0, GKK),
+    (2, GP_(body=[24, 22, 0], head=[-10, -14, 0], left_arm=[-80, 44, -6], right_leg=[-34, 6, 4], left_leg=[24, -6, -4], root={'pos': [0, -2, -0.6]}), 'outCubic'),
+    (3.5, dict(_rush, body=[34, 18, 0], root={'pos': [0, -2.2, 2.4], 'rot': [12, 0, 0]}), 'outExpo'),
+    (5.5, dict(_rush, body=[34, 18, 0], right_leg=[-40, 6, 4], left_leg=[30, -6, -4], root={'pos': [0, -2.2, 2.4], 'rot': [12, 0, 0]}), 'linear'),
+    (7.5, dict(_rush, body=[30, 18, 0], root={'pos': [0, -2, 2], 'rot': [10, 0, 0]}), 'linear'),
+    (9, GP_(body=[-8, 10, 0], head=[-12, -6, 0], left_arm=[-110, 30, -4], right_arm=[-50, -20, 40], root={'pos': [0, -0.4, 1]}), 'outExpo'),
+    (14, GKK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(GFG)),
+    (2, {'L': ([-4, -11, 9], [36, -14, -20]), 'cam': [2, 0, 0]}, 'outCubic'),
+    (3.5, {'L': ([-1, -9, 12], [40, -20, -6]), 'R': ([8, -20, 2], [-10, 0, 60]), 'cam': [3, 0, 0], 'fov': 14}, 'outExpo'),
+    (7.5, {'cam': [3, 0, 0.5], 'fov': 12}, 'linear'),
+    (9, {'L': ([-3, -7, 11], [56, -20, -10]), 'cam': [-3, 0, 0], 'fov': -2}, 'outExpo'),
+    (14, dict(GFG), 'inOutSine'),
+]))
+# 3. 수호의 결계: 방패를 들어 (4) 땅에 내리꽂고 (6) 무릎 꿇어 버팀
+_plant = GP_(body=[30, 6, 0], head=[14, 0, 0], left_arm=[-40, 20, -6], right_arm=[-60, 30, 10], right_leg=[-70, 6, 6], left_leg=[-6, -6, -4], root={'pos': [0, -4, 0.4]})
+GD['guardian.skill3'] = clip(16, blend_in=0.5, blend_out=4, bones=seq([
+    (0, GKK),
+    (4, GP_(body=[-10, 0, 0], head=[-16, 0, 0], left_arm=[-170, 10, -10], right_arm=[-160, -10, 10], root={'pos': [0, 0.6, 0]}), 'outCubic'),
+    (6, _plant, 'outExpo'),
+    (11, dict(_plant, body=[28, 6, 0])),
+    (16, GKK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(GFG)),
+    (4, {'L': ([-5, -2, 7], [84, -10, -30]), 'R': ([5, -2, 7], [84, 10, 30]), 'cam': [-5, 0, 0], 'fov': 4}, 'outCubic'),
+    (6, {'L': ([-3, -16, 12], [-24, -10, -20]), 'R': ([3, -16, 12], [-24, 10, 20]), 'cam': [9, 0, 0], 'fov': -6}, 'outExpo'),
+    (11, {'cam': [7, 0, 0], 'fov': -4}),
+    (16, dict(GFG), 'inOutSine'),
+]))
+# 4. 대지 강타: 뛰어오르며 방패를 머리 위로 (1~5) → 내리찍기 (7~9) → 착지 자세
+_air = GP_(body=[-16, 0, 0], head=[-20, 0, 0], left_arm=[-176, 10, -10], right_arm=[-170, -10, 10], right_leg=[-30, 6, 4], left_leg=[10, -6, -4], root={'pos': [0, 1, 0]})
+_slam = GP_(body=[36, 0, 0], head=[14, 0, 0], left_arm=[-30, 10, -6], right_arm=[-30, -10, 6], right_leg=[-60, 6, 8], left_leg=[10, -6, -8], root={'pos': [0, -4, 1]})
+GD['guardian.skill4'] = clip(20, blend_in=0.5, blend_out=4, bones=seq([
+    (0, GKK),
+    (2, GP_(body=[20, 0, 0], left_arm=[-60, 30, -10], right_leg=[-30, 6, 4], left_leg=[20, -6, -4], root={'pos': [0, -1.8, 0]}), 'outCubic'),
+    (5, _air, 'outCubic'),
+    (8, _slam, 'inExpo'),
+    (14, dict(_slam, body=[32, 0, 0])),
+    (20, GKK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(GFG)),
+    (2, {'cam': [3, 0, 0], 'fov': -2}, 'outCubic'),
+    (5, {'L': ([-5, -2, 7], [86, -10, -30]), 'R': ([5, -2, 7], [86, 10, 30]), 'cam': [-8, 0, 0], 'fov': 6}, 'outCubic'),
+    (8, {'L': ([-3, -16, 13], [-30, -10, -20]), 'R': ([3, -16, 13], [-30, 10, 20]), 'cam': [12, 0, 0], 'fov': -8}, 'inExpo'),
+    (14, {'cam': [8, 0, 0], 'fov': -5}),
+    (20, dict(GFG), 'inOutSine'),
+]))
+# R. 금성철벽 (60틱): 방패를 하늘로 (0~12) → 거대한 방패가 내려오는 동안 버팀 (12~22) → 내리꽂으며 무릎 (22~26) → 일어나 방패를 앞세움
+_raise = GP_(body=[-16, 0, 0], head=[-34, 0, 0], left_arm=[-176, 10, -8], right_arm=[-40, -20, 60], right_leg=[-12, 8, 10], left_leg=[12, -8, -10], root={'pos': [0, 0.4, 0]})
+_um = [(0, GKK), (8, _raise, 'outCubic'), (12, dict(_raise, body=[-18, 0, 0])), (18, dict(_raise, body=[-14, 0, 0], head=[-38, 0, 0])),
+       (22, dict(_raise, body=[-16, 0, 0], head=[-40, 0, 0])), (25, dict(_plant, body=[36, 6, 0], root={'pos': [0, -4.4, 0.6]}), 'inExpo'),
+       (32, dict(_plant, body=[30, 6, 0])), (38, GP_(body=[10, 10, 0], head=[0, -8, 0], left_arm=[-92, 40, -4], right_arm=[-40, -10, 30], right_leg=[-16, 8, 10], left_leg=[16, -8, -10], root={'pos': [0, -1.6, 0]}), 'outCubic'),
+       (54, GP_(body=[12, 10, 0], head=[2, -8, 0], left_arm=[-94, 40, -4], right_arm=[-42, -10, 30], right_leg=[-16, 8, 10], left_leg=[16, -8, -10], root={'pos': [0, -1.7, 0]})),
+       (60, GKK, 'inOutSine')]
+GD['guardian.ult'] = clip(60, blend_in=1, blend_out=5, bones=seq(_um), fp=fpseq([
+    (0, dict(GFG)),
+    (8, {'L': ([-5, -1, 7], [88, -10, -30]), 'R': ([14, -10, 3], [30, -50, 88]), 'cam': [-12, 0, 0], 'fov': 8}, 'outCubic'),
+    (22, {'cam': [-14, 0, 0], 'fov': 10}),
+    (25, {'L': ([-3, -16, 12], [-24, -10, -20]), 'R': ([3, -16, 12], [-24, 10, 20]), 'cam': [12, 0, 0], 'fov': -8}, 'inExpo'),
+    (32, {'cam': [8, 0, 0], 'fov': -5}),
+    (38, {'L': ([-3.5, -10.5, 10.5], [44, -20, -20]), 'R': GFG['R'], 'cam': [0, 0, 0], 'fov': -2}, 'outCubic'),
+    (60, dict(GFG), 'inOutSine'),
+]))
+# T. 수호 태세: 방패를 앞으로 세우고 자세를 낮춤
+GD['guardian.passive'] = clip(12, blend_in=0.5, blend_out=4, bones=seq([
+    (0, GKK),
+    (3, GP_(body=[-4, 8, 0], head=[-8, -6, 0], left_arm=[-120, 40, -6], root={'pos': [0, 0.2, 0]}), 'outCubic'),
+    (5, dict(GGUARD), 'outExpo'),
+    (12, GKK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(GFG)),
+    (3, {'L': ([-4, -7, 9], [56, -16, -24]), 'cam': [-2, 0, 0]}, 'outCubic'),
+    (5, {'L': ([-3.5, -10.5, 10.5], [44, -20, -20]), 'cam': [2, 0, 0], 'fov': -3}, 'outExpo'),
+    (12, dict(GFG), 'inOutSine'),
+]))
+GD['guardian.select'] = select_clip(GP_, GKK, GFG)
+write('guardian', GD)
+
+# ------------------------------------------------------------------ 힐러
+HL = {}
+HK_ = {'body': [0, 0, 0], 'head': [-4, 0, 0], 'right_arm': [-32, -16, 8], 'left_arm': [-26, 16, -8],
+       'right_leg': [2, 2, 1], 'left_leg': [-2, -2, -1], 'root': {'pos': [0, 0, 0], 'rot': [0, 0, 0]}}
+HP_ = mkP(HK_)
+HKK = HP_()
+H_FR = ([6, -13, 8.5], [28, 10, 50])
+H_FL = ([-6, -13.5, 8], [26, -10, -50])
+HFG = FPF(H_FR, H_FL)
+kit_locomotion(HL, 'healer', HK_, H_FR, H_FL)
+HL['healer.attack1'] = strike(HP_, HKK, HFG, 8, 2.5, dict(body=[0, 14, 0], right_arm=[-50, 30, 30]), dict(body=[4, -12, 0], right_arm=[-96, -6, 4]),
+                              {'R': ([10, -11, 6], [36, -30, 66])}, {'R': M_PUSH_R}, (0.4, -0.6, -0.6), lunge=0.5)
+HL['healer.attack2'] = strike(HP_, HKK, HFG, 8, 2.5, dict(body=[0, -10, 0], left_arm=[-50, -30, -30]), dict(body=[4, 14, 0], left_arm=[-96, 6, -4]),
+                              {'L': ([-10, -11, 5.5], [36, 30, -66])}, {'L': M_PUSH_L}, (0.4, 0.6, 0.6), lunge=0.5)
+HL['healer.attack3'] = strike(HP_, HKK, HFG, 12, 4, dict(body=[-6, 0, 0], right_arm=[-40, 30, 40], left_arm=[-40, -30, -40]),
+                              dict(body=[10, 0, 0], right_arm=[-92, -12, 4], left_arm=[-92, 12, -4]),
+                              {'R': ([12, -10, 4], [40, -40, 80]), 'L': ([-12, -10, 3.5], [40, 40, -80])}, {'R': M_PUSH_R, 'L': M_PUSH_L}, (2, 0, 0), lunge=0.8, fov=-4)
+# 1. 치유: 오른손을 대상에게 뻗어 빛을 보냄
+HL['healer.skill1'] = clip(14, blend_in=0.5, blend_out=4, bones=seq([
+    (0, HKK),
+    (3, HP_(body=[-4, 10, 0], right_arm=[-60, 40, 20], left_arm=[-60, -10, -30], root={'pos': [0, 0.3, 0]}), 'outCubic'),
+    (5, HP_(body=[6, -10, 0], head=[-2, 8, 0], right_arm=[-100, -10, 4], left_arm=[-30, 10, -30], root={'pos': [0, -0.2, 0.6]}), 'outExpo'),
+    (9, HP_(body=[5, -8, 0], right_arm=[-96, -10, 4], left_arm=[-30, 10, -30], root={'pos': [0, -0.1, 0.5]})),
+    (14, HKK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(HFG)),
+    (3, {'R': ([4, -12, 8], [40, 30, 40]), 'cam': [-1, 0, 0]}, 'outCubic'),
+    (5, {'R': M_PUSH_R, 'cam': [1.5, 0, 0], 'fov': -3}, 'outExpo'),
+    (14, dict(HFG), 'inOutSine'),
+]))
+# 2. 정화: 두 손을 모았다가 아래 바깥으로 쓸어냄
+HL['healer.skill2'] = clip(14, blend_in=0.6, blend_out=4, bones=seq([
+    (0, HKK),
+    (3, HP_(body=[-4, 0, 0], head=[-8, 0, 0], right_arm=[-70, 40, 20], left_arm=[-70, -40, -20], root={'pos': [0, 0.4, 0]}), 'outCubic'),
+    (5.5, HP_(body=[10, 0, 0], head=[10, 0, 0], right_arm=[-36, -10, 60], left_arm=[-36, 10, -60], root={'pos': [0, -1.0, 0]}, right_leg=[-8, 4, 4], left_leg=[10, -4, -4]), 'outExpo'),
+    (9, HP_(body=[8, 0, 0], head=[8, 0, 0], right_arm=[-34, -10, 56], left_arm=[-34, 10, -56], root={'pos': [0, -0.8, 0]})),
+    (14, HKK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(HFG)),
+    (3, {'R': ([2, -11, 9], [40, 40, 30]), 'L': ([-2, -11, 8.5], [40, -40, -30]), 'cam': [-2, 0, 0], 'fov': 2}, 'outCubic'),
+    (5.5, {'R': ([12, -14, 6], [-6, -40, 80]), 'L': ([-12, -14, 5.5], [-6, 40, -80]), 'cam': [5, 0, 0], 'fov': -4}, 'outExpo'),
+    (14, dict(HFG), 'inOutSine'),
+]))
+# 3. 축복: 두 팔을 하늘로
+HL['healer.skill3'] = clip(16, blend_in=0.6, blend_out=4, bones=seq([
+    (0, HKK),
+    (4, HP_(body=[2, 0, 0], head=[-6, 0, 0], right_arm=[-60, 20, 50], left_arm=[-60, -20, -50], root={'pos': [0, -0.4, 0]}), 'inOutSine'),
+    (6.5, HP_(body=[-14, 0, 0], head=[-30, 0, 0], right_arm=[-168, 10, 30], left_arm=[-168, -10, -30], root={'pos': [0, 0.6, 0], 'rot': [-3, 0, 0]}), 'outExpo'),
+    (11, HP_(body=[-12, 0, 0], head=[-26, 0, 0], right_arm=[-162, 10, 32], left_arm=[-162, -10, -32], root={'pos': [0, 0.5, 0]})),
+    (16, HKK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(HFG)),
+    (4, {'R': ([12, -10, 6], [50, -30, 76]), 'L': ([-12, -10, 5.5], [50, 30, -76]), 'cam': [-1, 0, 0], 'fov': 2}, 'inOutSine'),
+    (6.5, {'R': ([6, -3, 7.5], [84, 8, 40]), 'L': ([-6, -3, 7], [84, -8, -40]), 'cam': [-7, 0, 0], 'fov': 7}, 'outExpo'),
+    (11, {'cam': [-5, 0, 0], 'fov': 5}),
+    (16, dict(HFG), 'inOutSine'),
+]))
+# T. 기도: 손을 모으고 고개를 숙임
+HL['healer.passive'] = clip(20, blend_in=0.6, blend_out=4, bones=seq([
+    (0, HKK),
+    (4, HP_(body=[8, 0, 0], head=[24, 0, 0], right_arm=[-66, 44, 20], left_arm=[-66, -44, -20], root={'pos': [0, -0.4, 0]}), 'outCubic'),
+    (14, HP_(body=[10, 0, 0], head=[26, 0, 0], right_arm=[-68, 46, 20], left_arm=[-68, -46, -20], root={'pos': [0, -0.5, 0]})),
+    (20, HKK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(HFG)),
+    (4, {'R': ([2, -11, 9], [40, 40, 30]), 'L': ([-2, -11, 8.5], [40, -40, -30]), 'cam': [6, 0, 0], 'fov': -3}, 'outCubic'),
+    (14, {'cam': [7, 0, 0]}),
+    (20, dict(HFG), 'inOutSine'),
+]))
+HL['healer.select'] = select_clip(HP_, HKK, HFG, up=True)
+write('healer', HL)
+
+
+# =====================================================================================
 #                        공통 피격 반응 (능력 없는 플레이어 포함)
 # =====================================================================================
 C = {}

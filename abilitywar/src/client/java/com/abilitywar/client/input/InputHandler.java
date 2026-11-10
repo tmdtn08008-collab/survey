@@ -39,7 +39,7 @@ import java.util.Map;
  */
 public final class InputHandler {
     public static final String CATEGORY = "key.categories.abilitywar";
-    public static KeyBinding SKILL1, SKILL2, SKILL3, SKILL4, ULTIMATE, PASSIVE, BLOCK, SELECT, DASH, GRIMOIRE;
+    public static KeyBinding SKILL1, SKILL2, SKILL3, SKILL4, ULTIMATE, PASSIVE, BLOCK, SELECT, DASH, GRIMOIRE, STATS, QUESTS;
     private static KeyBinding[] SLOT_KEYS;
 
     private static boolean blockHeld;
@@ -63,6 +63,8 @@ public final class InputHandler {
         SELECT = reg("key.abilitywar.select", GLFW.GLFW_KEY_B);
         DASH = reg("key.abilitywar.dash", GLFW.GLFW_KEY_Q);
         GRIMOIRE = reg("key.abilitywar.grimoire", GLFW.GLFW_KEY_G);
+        STATS = reg("key.abilitywar.stats", GLFW.GLFW_KEY_K);
+        QUESTS = reg("key.abilitywar.quests", GLFW.GLFW_KEY_J);
         SLOT_KEYS = new KeyBinding[]{SKILL1, SKILL2, SKILL3, SKILL4, ULTIMATE, PASSIVE};
     }
 
@@ -99,7 +101,15 @@ public final class InputHandler {
         if (mc.player == null || mc.currentScreen != null) return false;
         if (InputUtil.isKeyPressed(mc.getWindow().getHandle(), GLFW.GLFW_KEY_F3)) return false;
         if (SELECT.matchesKey(key, scancode)) {
-            if (action == GLFW.GLFW_PRESS) mc.setScreen(new AbilitySelectScreen());
+            if (action == GLFW.GLFW_PRESS) mc.setScreen(new com.abilitywar.client.screen.ClassTreeScreen());
+            return true;
+        }
+        if (STATS.matchesKey(key, scancode)) {
+            if (action == GLFW.GLFW_PRESS) mc.setScreen(new com.abilitywar.client.screen.StatScreen());
+            return true;
+        }
+        if (QUESTS.matchesKey(key, scancode)) {
+            if (action == GLFW.GLFW_PRESS) mc.setScreen(new com.abilitywar.client.screen.QuestScreen());
             return true;
         }
         if (!active()) return false;

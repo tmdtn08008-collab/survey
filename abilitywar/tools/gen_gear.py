@@ -533,13 +533,16 @@ def write_lang(weapons, armors):
         'ability_hint': ('능력 평타·스킬에도 적용', 'Also applies to ability attacks and skills'),
         'give': ('%s 등급 장비 %s개를 받았습니다', 'Received %2$s %1$s gear'),
         'grade_mark': ('◆ ', '◆ '),
+        'req_level': ('착용 레벨 %s', 'Requires level %s'),
+        'level_locked': ('레벨 %s 이 되어야 쓸 수 있는 장비입니다', 'You need level %s to use this gear'),
     }
     for k, (a, b) in ui.items():
         ko[f'gear.abilitywar.ui.{k}'] = a
         en[f'gear.abilitywar.ui.{k}'] = b
     attrs = {'ability_damage': ('능력 피해', 'Ability Damage'), 'crit_chance': ('치명타 확률', 'Critical Chance'), 'crit_damage': ('치명타 피해', 'Critical Damage'),
              'cooldown_reduction': ('재사용 대기시간 감소', 'Cooldown Reduction'), 'lifesteal': ('흡혈', 'Lifesteal'), 'ult_charge': ('궁극기 충전', 'Ultimate Charge'),
-             'damage_reduction': ('받는 피해 감소', 'Damage Reduction')}
+             'damage_reduction': ('받는 피해 감소', 'Damage Reduction'),
+             'physical_damage': ('물리 피해', 'Physical Damage'), 'magic_damage': ('마법 피해', 'Magic Damage'), 'heal_power': ('회복량', 'Healing Power')}
     for k, (a, b) in attrs.items():
         ko[f'attribute.name.abilitywar.{k}'] = a
         en[f'attribute.name.abilitywar.{k}'] = b

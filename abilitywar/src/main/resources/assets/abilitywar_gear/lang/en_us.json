@@ -5279,5 +5279,10 @@
  "item.abilitywar.a_unknown_010_leggings": "??? #10 (Leggings)",
  "item.abilitywar.a_unknown_010_leggings.lore": "The wearer's outline blurs.",
  "item.abilitywar.a_unknown_010_boots": "??? #10 (Boots)",
- "item.abilitywar.a_unknown_010_boots.lore": "The wearer's outline blurs."
+ "item.abilitywar.a_unknown_010_boots.lore": "The wearer's outline blurs.",
+ "gear.abilitywar.ui.req_level": "Requires level %s",
+ "gear.abilitywar.ui.level_locked": "You need level %s to use this gear",
+ "attribute.name.abilitywar.physical_damage": "Physical Damage",
+ "attribute.name.abilitywar.magic_damage": "Magic Damage",
+ "attribute.name.abilitywar.heal_power": "Healing Power"
 }

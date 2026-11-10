@@ -428,6 +428,7 @@ public final class RpgManager {
         buf.writeVarInt(p.getWorld().getGameRules().getInt(AWGameRules.JOB_LEVEL));
         buf.writeVarInt(r.completed.size());
         for (String c : r.completed) buf.writeString(c);
+        buf.writeBoolean(p.getWorld().getGameRules().getBoolean(AWGameRules.SELF_SELECT));
         if (ServerPlayNetworking.canSend(p, S2C_RPG)) ServerPlayNetworking.send(p, S2C_RPG, buf);
     }
 

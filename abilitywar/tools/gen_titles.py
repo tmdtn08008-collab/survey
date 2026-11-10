@@ -260,7 +260,37 @@ def angel():
     save(out, 'ult_title_angel.png')
 
 
+def guardian():
+    """수호기사: 한자 金城鐵壁 (강철·금빛) + 뒤의 거대한 방패 윤곽 + 땅을 가르는 빛."""
+    W, H = 1024, 300
+    m = text_mask(W, H, '金城鐵壁', KANJI, 184, 34, 4, yoff=-4)
+    out = compose(W, H, m, (255, 252, 236), (236, 214, 150), (150, 120, 70), (24, 20, 14), (255, 206, 96), 16, 77, rough=0.12)
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    cx, cy = W / 2, H / 2
+    # 방패 윤곽 (위는 평평, 아래로 뾰족)
+    u = (xx - cx) / 150.0
+    v = (yy - (cy - 128)) / 250.0
+    half = np.where(v < 0.45, 1.0, np.sqrt(np.clip(1 - (v - 0.45) / 0.55, 0, 1)))
+    inside = (np.abs(u) < half) & (v > 0) & (v < 1)
+    d_edge = np.minimum(half - np.abs(u), np.minimum(v, 1 - v) * 1.5)
+    rim = np.exp(-(d_edge / 0.035) ** 2) * inside * 0.75
+    face = inside * 0.12
+    # 가로로 뻗는 빛 (방패가 땅에 박히는 순간)
+    flare = np.exp(-((yy - cy - 10) / 5) ** 2) * np.exp(-((xx - cx) / 420) ** 2) * 0.55
+    light = np.clip(rim + face + flare, 0, 1) * (1 - out[..., 3])
+    for k, c in enumerate((1.0, 0.86, 0.5)):
+        out[..., k] = out[..., k] * (1 - light) + c * light
+    out[..., 3] = np.maximum(out[..., 3], light)
+    save(out, 'ult_title_guardian.png')
+
+
 if __name__ == '__main__':
+    import sys
+    if len(sys.argv) > 1:
+        for name in sys.argv[1:]:
+            globals()[name]()
+        raise SystemExit
+    guardian()
     angel()
     warlock()
     cantor()

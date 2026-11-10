@@ -35,6 +35,8 @@ public class AbilityWarClient implements ClientModInitializer {
         net.minecraft.client.gui.screen.ingame.HandledScreens.register(com.abilitywar.ability.warlock.GrimoireScreenHandler.TYPE, com.abilitywar.client.screen.GrimoireScreen::new);
         InputHandler.init();
         com.abilitywar.client.gear.GearClient.init();
+        com.abilitywar.gear.GearItem.CLIENT_LEVEL[0] = () -> com.abilitywar.client.rpg.RpgClient.level;
+        EntityRendererRegistry.register(AWEntities.JOB_MASTER, com.abilitywar.client.render.JobMasterRenderer::new);
         com.abilitywar.client.dev.TestDriver.init();
         ClientNet.init();
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new AnimRegistry());
@@ -61,6 +63,7 @@ public class AbilityWarClient implements ClientModInitializer {
                 helper.register(new com.abilitywar.client.fx.cantor.CantorParts.Feature(pr));
                 helper.register(new com.abilitywar.client.fx.warlock.WarlockParts.Feature(pr));
                 helper.register(new com.abilitywar.client.fx.angel.AngelParts.Feature(pr));
+                helper.register(new com.abilitywar.client.fx.guardian.GuardianParts.Feature(pr));
             }
         });
 
@@ -70,6 +73,7 @@ public class AbilityWarClient implements ClientModInitializer {
             if (client.world != null && !client.isPaused()) {
                 ClientClock.tick();
                 ClientState.tick();
+                com.abilitywar.client.rpg.RpgClient.tick();
                 CameraController.tick();
                 DamageNumbers.tick();
                 PlayerAnimator.tick();
@@ -83,6 +87,7 @@ public class AbilityWarClient implements ClientModInitializer {
         HudRenderCallback.EVENT.register((ctx, td) -> {
             SkillHud.renderShadowHint(ctx, td);
             SkillHud.render(ctx, td);
+            com.abilitywar.client.hud.RpgHud.render(ctx, td);
             DamageNumbers.renderHud(ctx, td);
         });
         WorldRenderEvents.AFTER_SETUP.register(VfxManager::beginFrame);
@@ -94,6 +99,7 @@ public class AbilityWarClient implements ClientModInitializer {
 
     static void reset() {
         ClientState.reset();
+        com.abilitywar.client.rpg.RpgClient.reset();
         PlayerAnimator.clear();
         VfxManager.clear();
         DamageNumbers.clear();

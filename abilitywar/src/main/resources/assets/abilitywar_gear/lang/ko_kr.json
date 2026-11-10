@@ -5279,5 +5279,10 @@
  "item.abilitywar.a_unknown_010_leggings": "??? #10 (각반)",
  "item.abilitywar.a_unknown_010_leggings.lore": "입으면 몸의 윤곽이 흐려진다.",
  "item.abilitywar.a_unknown_010_boots": "??? #10 (장화)",
- "item.abilitywar.a_unknown_010_boots.lore": "입으면 몸의 윤곽이 흐려진다."
+ "item.abilitywar.a_unknown_010_boots.lore": "입으면 몸의 윤곽이 흐려진다.",
+ "gear.abilitywar.ui.req_level": "착용 레벨 %s",
+ "gear.abilitywar.ui.level_locked": "레벨 %s 이 되어야 쓸 수 있는 장비입니다",
+ "attribute.name.abilitywar.physical_damage": "물리 피해",
+ "attribute.name.abilitywar.magic_damage": "마법 피해",
+ "attribute.name.abilitywar.heal_power": "회복량"
 }

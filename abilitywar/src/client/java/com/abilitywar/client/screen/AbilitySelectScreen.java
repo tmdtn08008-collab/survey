@@ -23,7 +23,7 @@ import java.util.List;
 public class AbilitySelectScreen extends Screen {
     private static final String[] SLOTS = {"skill1", "skill2", "skill3", "skill4", "ultimate", "passive"};
     private static final String[] KEYS = {"1", "2", "3", "4", "R", "T"};
-    private final List<Ability> list = new ArrayList<>(Abilities.all());
+    private final List<Ability> list;
     private int selected;
     /** 처음 접속: 직업을 고르기 전에는 닫을 수 없음. */
     private final boolean forced;
@@ -36,6 +36,8 @@ public class AbilitySelectScreen extends Screen {
     public AbilitySelectScreen(boolean forced) {
         super(Text.translatable(forced ? "abilitywar.screen.first_title" : "abilitywar.screen.title"));
         this.forced = forced;
+        // 처음 접속: 1차 직업(전사·마법사·탱커·힐러)만
+        this.list = new ArrayList<>(forced ? Abilities.all().stream().filter(a -> com.abilitywar.rpg.ClassTree.isBase(a.key)).toList() : Abilities.all());
         for (int i = 0; i < list.size(); i++) if (list.get(i).key.equals(ClientState.ability)) selected = i;
     }
 

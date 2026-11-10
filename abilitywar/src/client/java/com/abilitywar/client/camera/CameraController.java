@@ -260,6 +260,39 @@ public final class CameraController {
                 look = M.add(0, 1.4, 0);
                 fov = 72 - 3 * k;
             }
+        } else if (cin.type.equals("guardian_ult")) {
+            // 거대한 방패: 시전자 뒤 2.2칸에 22틱째 박힘 (ClassFx.UltShield)
+            Vec3d S = cin.start;
+            Vec3d B = S.subtract(F.multiply(2.2));
+            if (t < 12) {
+                // 정면 로우앵글: 방패를 들어 올리는 수호기사
+                float k = smooth(t / 12f);
+                double th = Math.toRadians(28 - 12 * k);
+                double rad = 3.4 - 0.6 * k;
+                cam = C.add(F.multiply(Math.cos(th) * rad)).add(R.multiply(Math.sin(th) * rad)).add(0, 0.4, 0);
+                look = C.add(0, 1.5 + 0.3 * k, 0);
+                fov = 60 + 4 * k;
+            } else if (t < 22) {
+                // 하늘에서 내려오는 거대한 방패: 앞에서 올려다봄
+                float k = smooth((t - 12) / 10f);
+                cam = S.add(F.multiply(7.5)).add(R.multiply(2.5)).add(0, 0.5, 0);
+                look = B.add(0, 9 - 5 * k, 0);
+                fov = 84;
+            } else if (t < 40) {
+                // 박히는 순간 + 결계: 옆에서 넓게 (살짝 돎)
+                float k = smooth((t - 22) / 18f);
+                double th = Math.toRadians(70 + 25 * k);
+                double rad = 13 + 2 * k;
+                cam = S.add(F.multiply(Math.cos(th) * rad)).add(R.multiply(Math.sin(th) * rad)).add(0, 4.5 + 1.5 * k, 0);
+                look = S.add(0, 2.2, 0);
+                fov = 78;
+            } else {
+                // 어깨 너머: 방패를 등지고 끌려오는 적을 봄
+                float k = smooth((t - 40) / 20f);
+                cam = C.subtract(F.multiply(3.0 + 0.8 * k)).add(R.multiply(1.4)).add(0, 2.2 + 0.3 * k, 0);
+                look = C.add(F.multiply(8)).add(0, 0.8, 0);
+                fov = 72;
+            }
         } else if (cin.type.equals("angel_ult")) {
             // 마법진: 중앙 = S + 15, 둘레 6개 = 반지름 9, 높이 13~15 (AngelAbility.circle)
             Vec3d S = cin.start;

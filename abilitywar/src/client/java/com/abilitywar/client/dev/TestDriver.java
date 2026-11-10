@@ -48,7 +48,7 @@ public final class TestDriver {
     public static void tick(MinecraftClient mc) {
         if (lines == null) return;
         if (mc.player == null || mc.world == null) return;
-        if (mc.currentScreen != null && worldTicks > 0 && !(mc.currentScreen instanceof com.abilitywar.client.screen.GrimoireScreen) && !(mc.currentScreen instanceof com.abilitywar.client.screen.AbilitySelectScreen) && !(mc.currentScreen instanceof net.minecraft.client.gui.screen.ingame.HandledScreen<?>)) mc.setScreen(null);
+        if (mc.currentScreen != null && worldTicks > 0 && !(mc.currentScreen instanceof com.abilitywar.client.screen.GrimoireScreen) && !(mc.currentScreen instanceof com.abilitywar.client.screen.AbilitySelectScreen) && !mc.currentScreen.getClass().getPackageName().equals("com.abilitywar.client.screen") && !(mc.currentScreen instanceof net.minecraft.client.gui.screen.ingame.HandledScreen<?>)) mc.setScreen(null);
         worldTicks++;
         if (!started) {
             if (worldTicks < 60) return;
@@ -153,6 +153,26 @@ public final class TestDriver {
                     if (mc.currentScreen != null) mc.currentScreen.close();
                 }
                 case "clearchat" -> mc.inGameHud.getChatHud().clear(false);
+                // RPG 화면 테스트: 창 열기 / 화면 좌표 클릭 / 가까운 전직 교관에게 말 걸기
+                case "screen" -> mc.setScreen(switch (arg) {
+                    case "stats" -> new com.abilitywar.client.screen.StatScreen();
+                    case "quests" -> new com.abilitywar.client.screen.QuestScreen();
+                    default -> new com.abilitywar.client.screen.ClassTreeScreen();
+                });
+                case "click" -> {
+                    String[] p4 = arg.split(" ");
+                    if (mc.currentScreen != null) {
+                        double cx = Double.parseDouble(p4[0]), cy = Double.parseDouble(p4[1]);
+                        mc.currentScreen.mouseClicked(cx, cy, 0);
+                        mc.currentScreen.mouseReleased(cx, cy, 0);
+                    }
+                }
+                case "talk" -> {
+                    net.minecraft.entity.Entity best = null;
+                    for (net.minecraft.entity.Entity e : mc.world.getEntities())
+                        if (e instanceof com.abilitywar.rpg.JobMasterEntity && (best == null || e.squaredDistanceTo(mc.player) < best.squaredDistanceTo(mc.player))) best = e;
+                    if (best != null) mc.interactionManager.interactEntity(mc.player, best, net.minecraft.util.Hand.MAIN_HAND);
+                }
                 case "bind" -> {
                     String[] p = arg.split("\\s+");
                     net.minecraft.client.option.KeyBinding kb = switch (p[0]) {
