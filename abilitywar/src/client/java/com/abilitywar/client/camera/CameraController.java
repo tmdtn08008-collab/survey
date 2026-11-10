@@ -293,6 +293,39 @@ public final class CameraController {
                 look = C.add(F.multiply(8)).add(0, 0.8, 0);
                 fov = 72;
             }
+        } else if (cin.type.equals("paladin_ult")) {
+            // T = 거대한 성검이 박히는 자리 (24틱째)
+            Vec3d toT = new Vec3d(T.x - C.x, 0, T.z - C.z);
+            Vec3d dT = toT.lengthSquared() > 1e-3 ? toT.normalize() : F;
+            Vec3d sT = new Vec3d(-dT.z, 0, dT.x);
+            if (t < 12) {
+                // 정면 로우앵글: 성검을 하늘로 드는 성기사
+                float k = smooth(t / 12f);
+                double th = Math.toRadians(26 - 10 * k);
+                double rad = 3.2 + 0.6 * k;
+                cam = C.add(F.multiply(Math.cos(th) * rad)).add(R.multiply(Math.sin(th) * rad)).add(0, 0.3, 0);
+                look = C.add(0, 1.7 + 1.0 * k, 0);
+                fov = 62 + 8 * k;
+            } else if (t < 24) {
+                // 하늘에서 떨어지는 거대한 성검: 박힐 자리 옆에서 올려다봄
+                float k = smooth((t - 12) / 12f);
+                cam = T.add(sT.multiply(9)).subtract(dT.multiply(4)).add(0, 0.8, 0);
+                look = T.add(0, 18 - 12 * k, 0);
+                fov = 86;
+            } else if (t < 40) {
+                // 박히는 순간: 멀리 비스듬히 위에서 넓게
+                float k = smooth((t - 24) / 16f);
+                double th = Math.toRadians(50 + 30 * k);
+                cam = T.add(dT.multiply(-Math.cos(th) * 15)).add(sT.multiply(Math.sin(th) * 15)).add(0, 6.5 - k, 0);
+                look = T.add(0, 4, 0);
+                fov = 80;
+            } else {
+                // 성기사 어깨 너머로 박힌 성검을 봄
+                float k = smooth((t - 40) / 20f);
+                cam = C.subtract(dT.multiply(3.2 + k)).add(sT.multiply(1.6)).add(0, 2.0 + 0.4 * k, 0);
+                look = T.add(0, 5 + 2 * k, 0);
+                fov = 74;
+            }
         } else if (cin.type.equals("angel_ult")) {
             // 마법진: 중앙 = S + 15, 둘레 6개 = 반지름 9, 높이 13~15 (AngelAbility.circle)
             Vec3d S = cin.start;

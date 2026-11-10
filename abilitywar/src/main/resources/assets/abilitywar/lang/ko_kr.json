@@ -544,5 +544,21 @@
  "rpg.abilitywar.king.say.grand_done": "대성기사여, 그대가 있어 왕국은 무너지지 않는다.",
  "rpg.abilitywar.king.say.ready": "「%s」을(를) 해냈구나! 무릎을 꿇어라, 기사 서임을 하겠다.",
  "rpg.abilitywar.king.say.progress": "「%s」은(는) 아직이다. 왕국은 그대를 믿는다.",
- "rpg.abilitywar.king.say.busy": "지금은 「%s」에 힘쓰게. 끝나면 다시 오라."
+ "rpg.abilitywar.king.say.busy": "지금은 「%s」에 힘쓰게. 끝나면 다시 오라.",
+ "ability.abilitywar.paladin": "성기사",
+ "ability.abilitywar.paladin.desc": "왕의 퀘스트로 얻는 특별 직업 (전사·탱커·힐러). 성검으로 싸우며 동료를 지키고 치유한다. 언데드에게 50% 더 강하다.",
+ "abilitywar.skill.paladin.skill1": "심판의 일격",
+ "abilitywar.skill.paladin.skill1.desc": "앞으로 뛰어올라 성검을 내리꽂는다. 반지름 3 피해 6 + 구속 + 빛기둥. 재사용 8초.",
+ "abilitywar.skill.paladin.skill2": "신성한 방패",
+ "abilitywar.skill.paladin.skill2.desc": "6칸 안 파티의 나쁜 효과를 지우고 보호막 (흡수 II) + 수호 8초. 재사용 16초.",
+ "abilitywar.skill.paladin.skill3": "정화의 땅",
+ "abilitywar.skill.paladin.skill3.desc": "성검을 땅에 꽂아 6초 동안 반지름 5 성역: 적은 0.5초마다 피해 1.5 (언데드 2배), 아군은 회복. 재사용 18초.",
+ "abilitywar.skill.paladin.skill4": "빛의 사슬",
+ "abilitywar.skill.paladin.skill4.desc": "14칸 안 적 하나를 빛의 사슬로 묶어 2.5초 속박 + 피해 4 + 끌어당김. 재사용 12초.",
+ "abilitywar.skill.paladin.ultimate": "성검강림 (聖劍降臨)",
+ "abilitywar.skill.paladin.ultimate.desc": "연출: 하늘에서 거대한 성검이 내려와 박힌다. 반지름 7 피해 18 + 2초 기절, 10칸 안 아군 체력 40% 회복 + 저항 II, 박힌 성검은 8초 동안 성역.",
+ "abilitywar.skill.paladin.passive": "성스러운 오라",
+ "abilitywar.skill.paladin.passive.desc": "켜기/끄기. 8칸 안 아군 받는 피해 -12%, 내 공격이 6칸 안 아군을 조금씩 회복.",
+ "abilitywar.ult.paladin.title": "聖劍降臨",
+ "abilitywar.ult.paladin.subtitle": "성검강림"
 }

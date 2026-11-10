@@ -181,11 +181,11 @@ public final class Effects {
 
         final int c1, c2;
 
-        Impact(Vec3d p, String kind, float scale) {
+        public Impact(Vec3d p, String kind, float scale) {
             this(p, kind, scale, -1);
         }
 
-        Impact(Vec3d p, String kind, float scale, int col) {
+        public Impact(Vec3d p, String kind, float scale, int col) {
             super(kind.equals("punch") ? 7 : 10);
             this.p = p;
             this.kind = kind;
@@ -856,7 +856,7 @@ public final class Effects {
         final int color;
         final net.minecraft.util.Identifier tex;
 
-        Flash(Vec3d p, float size, int color, int life, net.minecraft.util.Identifier tex) {
+        public Flash(Vec3d p, float size, int color, int life, net.minecraft.util.Identifier tex) {
             super(life);
             this.p = p;
             this.size = size;

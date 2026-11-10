@@ -284,12 +284,38 @@ def guardian():
     save(out, 'ult_title_guardian.png')
 
 
+def paladin():
+    """성기사: 한자 聖劍降臨 (흰빛·금빛) + 뒤에 세로로 내리꽂히는 거대한 검의 빛."""
+    W, H = 1024, 300
+    m = text_mask(W, H, '聖劍降臨', KANJI, 180, 32, 4, yoff=-4)
+    out = compose(W, H, m, (255, 255, 255), (255, 240, 190), (214, 168, 70), (40, 28, 6), (255, 228, 150), 18, 91)
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    cx, cy = W / 2, H / 2
+    # 세로 검 모양 빛 (날 + 가드)
+    blade = np.exp(-((xx - cx) / (14 + np.clip(yy - 40, 0, None) * 0.02)) ** 2) * np.clip((yy - 10) / 40, 0, 1) * 0.8
+    guard = np.exp(-((yy - 62) / 7) ** 2) * np.exp(-((xx - cx) / 120) ** 2) * 0.7
+    rays = np.zeros((H, W), np.float32)
+    for k in range(10):
+        a = np.radians(-80 + k * 17.8)
+        dx, dy = np.cos(a), np.sin(a)
+        px, py = xx - cx, yy - 62
+        along = px * dx + py * dy
+        perp = np.abs(-px * dy + py * dx)
+        rays += np.exp(-(perp / 5) ** 2) * (along > 0) * np.clip(1 - along / 420, 0, 1) * 0.25
+    light = np.clip(blade + guard + rays, 0, 1) * (1 - out[..., 3])
+    for k, c in enumerate((1.0, 0.94, 0.72)):
+        out[..., k] = out[..., k] * (1 - light) + c * light
+    out[..., 3] = np.maximum(out[..., 3], light)
+    save(out, 'ult_title_paladin.png')
+
+
 if __name__ == '__main__':
     import sys
     if len(sys.argv) > 1:
         for name in sys.argv[1:]:
             globals()[name]()
         raise SystemExit
+    paladin()
     guardian()
     angel()
     warlock()

@@ -246,6 +246,7 @@ public final class AbilityManager {
         ServerActions.tick();
         com.abilitywar.ability.warlock.Necromancy.tick(server);
         com.abilitywar.ability.guardian.GuardianAbility.tickWorld(server);
+        com.abilitywar.ability.paladin.PaladinAbility.tickWorld(server);
         for (ServerPlayerEntity p : server.getPlayerManager().getPlayerList()) {
             tickPlayer(p, now);
             com.abilitywar.gear.GearEffects.tick(p);
@@ -303,6 +304,7 @@ public final class AbilityManager {
             else com.abilitywar.gear.GearEffects.lastCrit = false;
             amount = com.abilitywar.gear.GearEffects.incoming(victim, amount);
             amount = com.abilitywar.ability.guardian.GuardianAbility.incoming(victim, source, amount);
+            amount = com.abilitywar.ability.paladin.PaladinAbility.incoming(victim, amount);
         }
         if (!(victim instanceof ServerPlayerEntity sp)) return amount;
         AbilityData d = data(sp);

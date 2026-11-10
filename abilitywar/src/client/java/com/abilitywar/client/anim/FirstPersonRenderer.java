@@ -100,6 +100,7 @@ public final class FirstPersonRenderer {
         com.abilitywar.client.fx.cantor.CantorParts.fpBaton(matrices, consumers, player, arm);
         com.abilitywar.client.fx.warlock.WarlockParts.fpFlame(matrices, consumers, player, arm);
         com.abilitywar.client.fx.angel.AngelParts.fpOrb(matrices, consumers, player, arm);
+        com.abilitywar.client.fx.paladin.PaladinParts.fpSword(matrices, consumers, player, arm);
         if (arm == 0) com.abilitywar.client.fx.blade.BladeParts.fpSword(matrices, consumers, light, player, pose.rot[AnimClip.FP_ITEM], pose.pos[AnimClip.FP_ITEM]);
         // 팔 모델 방향 맞추기: 모델 +Y(손 방향) -> -Z, 모델 앞면 -> 위
         matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90f));

@@ -37,6 +37,7 @@ public class AbilityWarClient implements ClientModInitializer {
         com.abilitywar.client.gear.GearClient.init();
         com.abilitywar.gear.GearItem.CLIENT_LEVEL[0] = () -> com.abilitywar.client.rpg.RpgClient.level;
         EntityRendererRegistry.register(AWEntities.JOB_MASTER, com.abilitywar.client.render.JobMasterRenderer::new);
+        EntityRendererRegistry.register(AWEntities.KING, com.abilitywar.client.render.JobMasterRenderer::king);
         com.abilitywar.client.dev.TestDriver.init();
         ClientNet.init();
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new AnimRegistry());
@@ -64,6 +65,7 @@ public class AbilityWarClient implements ClientModInitializer {
                 helper.register(new com.abilitywar.client.fx.warlock.WarlockParts.Feature(pr));
                 helper.register(new com.abilitywar.client.fx.angel.AngelParts.Feature(pr));
                 helper.register(new com.abilitywar.client.fx.guardian.GuardianParts.Feature(pr));
+                helper.register(new com.abilitywar.client.fx.paladin.PaladinParts.Feature(pr));
             }
         });
 

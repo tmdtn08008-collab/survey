@@ -268,6 +268,18 @@ t('rpg.abilitywar.king.say.ready', '「%s」을(를) 해냈구나! 무릎을 꿇
 t('rpg.abilitywar.king.say.progress', '「%s」은(는) 아직이다. 왕국은 그대를 믿는다.', '"%s" is not yet done. The realm trusts you.')
 t('rpg.abilitywar.king.say.busy', '지금은 「%s」에 힘쓰게. 끝나면 다시 오라.', 'See "%s" through first, then return.')
 
+ability('paladin', '성기사', 'Paladin',
+        '왕의 퀘스트로 얻는 특별 직업 (전사·탱커·힐러). 성검으로 싸우며 동료를 지키고 치유한다. 언데드에게 50% 더 강하다.',
+        'Special class from the King\'s quest (warrior, tank, healer). Fights with a holy sword, shields and heals allies. +50% vs undead.',
+        [('심판의 일격', 'Judgment', '앞으로 뛰어올라 성검을 내리꽂는다. 반지름 3 피해 6 + 구속 + 빛기둥. 재사용 8초.', 'Leap and drive your holy sword down: 6 dmg in radius 3, slow, pillar of light. 8s cooldown.'),
+         ('신성한 방패', 'Sacred Shield', '6칸 안 파티의 나쁜 효과를 지우고 보호막 (흡수 II) + 수호 8초. 재사용 16초.', 'Cleanse party within 6 blocks and grant Absorption II + Aegis for 8s. 16s cooldown.'),
+         ('정화의 땅', 'Consecration', '성검을 땅에 꽂아 6초 동안 반지름 5 성역: 적은 0.5초마다 피해 1.5 (언데드 2배), 아군은 회복. 재사용 18초.', 'Plant your sword: a radius-5 sanctum for 6s. Enemies take 1.5 every 0.5s (undead x2), allies heal. 18s cooldown.'),
+         ('빛의 사슬', 'Chains of Light', '14칸 안 적 하나를 빛의 사슬로 묶어 2.5초 속박 + 피해 4 + 끌어당김. 재사용 12초.', 'Bind an enemy within 14 blocks: 2.5s root, 4 dmg, pulled toward you. 12s cooldown.'),
+         ('성검강림 (聖劍降臨)', 'Descent of the Holy Sword', '연출: 하늘에서 거대한 성검이 내려와 박힌다. 반지름 7 피해 18 + 2초 기절, 10칸 안 아군 체력 40% 회복 + 저항 II, 박힌 성검은 8초 동안 성역.', 'Cinematic: a colossal holy sword falls from the sky. 18 dmg in radius 7 + 2s stun, allies within 10 heal 40% + Resistance II, the sword stays as an 8s sanctum.'),
+         ('성스러운 오라', 'Devotion Aura', '켜기/끄기. 8칸 안 아군 받는 피해 -12%, 내 공격이 6칸 안 아군을 조금씩 회복.', 'Toggle. Allies within 8 blocks take 12% less damage; your hits heal allies within 6 a little.')])
+t('abilitywar.ult.paladin.title', '聖劍降臨', 'HOLY SWORD')
+t('abilitywar.ult.paladin.subtitle', '성검강림', 'Descent of the Holy Sword')
+
 
 def apply(fname, idx):
     p = os.path.join(LANG, fname)

@@ -3496,6 +3496,119 @@ HL['healer.select'] = select_clip(HP_, HKK, HFG, up=True)
 write('healer', HL)
 
 
+# ------------------------------------------------------------------ 성기사 (왕의 특별 직업): 오른손 성검
+PL = {}
+PK_ = {'body': [3, -6, 0], 'head': [-4, 6, 0], 'right_arm': [-38, -12, 10], 'left_arm': [-18, 10, -12],
+       'right_leg': [-6, 6, 5], 'left_leg': [8, -6, -4], 'root': {'pos': [0, -0.2, 0], 'rot': [0, 0, 0]}}
+PP = mkP(PK_)
+PKK = PP()
+P_FR = ([7, -13, 8], [30, 6, 50])
+P_FL = ([-7, -15.5, 6.5], [18, -4, -50])
+PFG = FPF(P_FR, P_FL)
+kit_locomotion(PL, 'paladin', PK_, P_FR, P_FL, guard={'body': [8, 0, 0], 'head': [4, 0, 0], 'right_arm': [-100, 40, 10], 'left_arm': [-96, 36, -6],
+                                                      'right_leg': [-10, 6, 6], 'left_leg': [12, -6, -5], 'root': {'pos': [0, -1.0, 0], 'rot': [0, 0, 0]}},
+               guard_fp=(([2, -9, 11], [50, 40, 30]), ([-2, -10, 10.5], [44, 30, -30])))
+PL['paladin.attack1'] = strike(PP, PKK, PFG, 8, 2.5, dict(body=[2, 26, 0], right_arm=[-90, 60, 40]), dict(body=[8, -26, 0], right_arm=[-84, -50, -6]),
+                               {'R': W_WIDE_R}, {'R': W_CROSS_R}, (0.5, -1.4, -1.4))
+PL['paladin.attack2'] = strike(PP, PKK, PFG, 8, 2.5, dict(body=[4, -20, 0], right_arm=[-60, -50, -20]), dict(body=[6, 22, 0], right_arm=[-110, 50, 40]),
+                               {'R': ([-4, -14, 10], [10, 46, 20])}, {'R': ([13, -7, 7], [56, -40, 84])}, (0.4, 1.4, 1.4))
+PL['paladin.attack3'] = strike(PP, PKK, PFG, 12, 4.5, dict(body=[-14, 0, 0], head=[-14, 0, 0], right_arm=[-172, 0, 10], left_arm=[-150, 0, -10]),
+                               dict(body=[24, 0, 0], head=[8, 0, 0], right_arm=[-56, -6, 6], left_arm=[-50, 6, -6]),
+                               {'R': ([5, -3, 6], [84, 8, 40]), 'L': ([-5, -3, 5.5], [84, -8, -40])}, {'R': ([3, -13, 13], [-14, 6, 40]), 'L': ([-3, -13, 12.5], [-14, -6, -40])},
+                               (4.5, 0, 0), lunge=2.0, fov=-4)
+# 1. 심판의 일격: 웅크림 (2) → 성검을 머리 위로 들고 뜀 (5) → 내리꽂음 (8)
+_jair = PP(body=[-16, 0, 0], head=[-16, 0, 0], right_arm=[-174, 0, 8], left_arm=[-166, 0, -8], right_leg=[-24, 6, 4], left_leg=[12, -6, -4], root={'pos': [0, 1, 0]})
+_jslam = PP(body=[34, 0, 0], head=[12, 0, 0], right_arm=[-40, -4, 6], left_arm=[-40, 4, -6], right_leg=[-56, 6, 8], left_leg=[12, -6, -8], root={'pos': [0, -3.6, 1.2]})
+PL['paladin.skill1'] = clip(18, blend_in=0.5, blend_out=4, bones=seq([
+    (0, PKK),
+    (2, PP(body=[22, 0, 0], right_arm=[-60, 20, 20], left_arm=[-40, -20, -20], right_leg=[-30, 6, 4], left_leg=[20, -6, -4], root={'pos': [0, -1.8, 0]}), 'outCubic'),
+    (5, _jair, 'outCubic'),
+    (8, _jslam, 'inExpo'),
+    (13, dict(_jslam, body=[30, 0, 0])),
+    (18, PKK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(PFG)),
+    (2, {'cam': [3, 0, 0], 'fov': -2}, 'outCubic'),
+    (5, {'R': ([5, -2, 7], [86, 10, 30]), 'L': ([-5, -2, 7], [86, -10, -30]), 'cam': [-8, 0, 0], 'fov': 6}, 'outCubic'),
+    (8, {'R': ([3, -15, 13], [-26, 10, 20]), 'L': ([-3, -15, 13], [-26, -10, -20]), 'cam': [11, 0, 0], 'fov': -8}, 'inExpo'),
+    (13, {'cam': [8, 0, 0], 'fov': -5}),
+    (18, dict(PFG), 'inOutSine'),
+]))
+# 2. 신성한 방패: 성검을 하늘로 들어 올리고 왼손을 벌림
+_raise = PP(body=[-12, 0, 0], head=[-26, 0, 0], right_arm=[-176, -6, 6], left_arm=[-60, 20, -70], root={'pos': [0, 0.5, 0]})
+PL['paladin.skill2'] = clip(14, blend_in=0.5, blend_out=4, bones=seq([
+    (0, PKK),
+    (3, PP(body=[8, 0, 0], right_arm=[-90, 30, 10], left_arm=[-30, 10, -30], root={'pos': [0, -0.6, 0]}), 'outCubic'),
+    (5.5, _raise, 'outExpo'),
+    (10, dict(_raise, body=[-10, 0, 0])),
+    (14, PKK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(PFG)),
+    (3, {'R': ([4, -12, 8], [40, 30, 40]), 'cam': [2, 0, 0]}, 'outCubic'),
+    (5.5, {'R': ([6, -2, 7], [88, 8, 40]), 'L': ([-14, -10, 3], [30, 50, -88]), 'cam': [-7, 0, 0], 'fov': 6}, 'outExpo'),
+    (10, {'cam': [-5, 0, 0], 'fov': 4}),
+    (14, dict(PFG), 'inOutSine'),
+]))
+# 3. 정화의 땅: 두 손으로 성검을 땅에 꽂고 무릎 꿇음
+_kneel = PP(body=[26, 0, 0], head=[14, 0, 0], right_arm=[-58, 22, 10], left_arm=[-58, -22, -10], right_leg=[-80, 6, 6], left_leg=[-6, -6, -4], root={'pos': [0, -4.2, 0.4]})
+PL['paladin.skill3'] = clip(16, blend_in=0.5, blend_out=4, bones=seq([
+    (0, PKK),
+    (3, PP(body=[-8, 0, 0], head=[-14, 0, 0], right_arm=[-160, 20, 10], left_arm=[-160, -20, -10], root={'pos': [0, 0.5, 0]}), 'outCubic'),
+    (6, _kneel, 'outExpo'),
+    (11, dict(_kneel, body=[24, 0, 0])),
+    (16, PKK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(PFG)),
+    (3, {'R': ([3, -3, 7], [84, 20, 30]), 'L': ([-3, -3, 7], [84, -20, -30]), 'cam': [-4, 0, 0], 'fov': 4}, 'outCubic'),
+    (6, {'R': ([2, -16, 12], [-20, 20, 20]), 'L': ([-2, -16, 12], [-20, -20, -20]), 'cam': [9, 0, 0], 'fov': -6}, 'outExpo'),
+    (11, {'cam': [7, 0, 0], 'fov': -4}),
+    (16, dict(PFG), 'inOutSine'),
+]))
+# 4. 빛의 사슬: 왼손을 뻗어 (3) 사슬을 쏘고 당김 (7)
+PL['paladin.skill4'] = clip(14, blend_in=0.5, blend_out=4, bones=seq([
+    (0, PKK),
+    (3, PP(body=[6, 20, 0], head=[0, -16, 0], left_arm=[-96, 10, -4], right_arm=[-30, -10, 20], root={'pos': [0, -0.3, 0.6]}), 'outExpo'),
+    (5, PP(body=[6, 22, 0], head=[0, -16, 0], left_arm=[-98, 10, -4], right_arm=[-30, -10, 20], root={'pos': [0, -0.3, 0.6]})),
+    (8, PP(body=[-6, -10, 0], head=[-6, 8, 0], left_arm=[-60, 40, -10], right_arm=[-50, -20, 30], root={'pos': [0, 0, -0.8]}), 'outCubic'),
+    (14, PKK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(PFG)),
+    (3, {'L': ([-3, -9.5, 14], [22, -12, -12]), 'cam': [0, 1.5, 0], 'fov': -3}, 'outExpo'),
+    (8, {'L': ([-7, -12, 6], [30, 30, -40]), 'cam': [-2, -1, 0], 'fov': 3}, 'outCubic'),
+    (14, dict(PFG), 'inOutSine'),
+]))
+# R. 성검강림 (60틱): 성검을 하늘로 (0~12) → 버팀 (12~24) → 앞을 가리켜 내리침 (24~28) → 무릎 꿇고 기도 (28~40) → 일어남
+_upr = PP(body=[-16, 0, 0], head=[-34, 0, 0], right_arm=[-178, -4, 6], left_arm=[-170, 4, -6], right_leg=[-10, 6, 8], left_leg=[10, -6, -8], root={'pos': [0, 0.5, 0]})
+_point = PP(body=[14, 0, 0], head=[0, 0, 0], right_arm=[-96, -4, 6], left_arm=[-90, 4, -6], right_leg=[-30, 6, 6], left_leg=[16, -6, -6], root={'pos': [0, -1.6, 1]})
+PL['paladin.ult'] = clip(60, blend_in=1, blend_out=5, bones=seq([
+    (0, PKK), (8, _upr, 'outCubic'), (14, dict(_upr, body=[-18, 0, 0])), (22, dict(_upr, body=[-16, 0, 0], head=[-38, 0, 0])),
+    (26, _point, 'inExpo'), (30, dict(_point, body=[16, 0, 0])),
+    (36, _kneel, 'inOutCubic'), (46, dict(_kneel, body=[24, 0, 0])),
+    (60, PKK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(PFG)),
+    (8, {'R': ([5, -1, 7], [88, 8, 30]), 'L': ([-5, -1, 7], [88, -8, -30]), 'cam': [-12, 0, 0], 'fov': 8}, 'outCubic'),
+    (22, {'cam': [-14, 0, 0], 'fov': 10}),
+    (26, {'R': ([3, -9, 15], [14, 6, 24]), 'L': ([-3, -9, 15], [14, -6, -24]), 'cam': [3, 0, 0], 'fov': -6}, 'inExpo'),
+    (36, {'R': ([2, -16, 12], [-20, 20, 20]), 'L': ([-2, -16, 12], [-20, -20, -20]), 'cam': [8, 0, 0], 'fov': -4}, 'inOutCubic'),
+    (60, dict(PFG), 'inOutSine'),
+]))
+# T. 성스러운 오라: 성검을 얼굴 앞에 세워 경례
+PL['paladin.passive'] = clip(14, blend_in=0.5, blend_out=4, bones=seq([
+    (0, PKK),
+    (4, PP(body=[-4, 0, 0], head=[6, 0, 0], right_arm=[-120, 30, 0], left_arm=[-20, 0, -14], root={'pos': [0, 0.2, 0]}), 'outCubic'),
+    (9, PP(body=[-4, 0, 0], head=[8, 0, 0], right_arm=[-122, 32, 0], left_arm=[-20, 0, -14], root={'pos': [0, 0.2, 0]})),
+    (14, PKK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(PFG)),
+    (4, {'R': ([1, -7, 10], [64, 40, 10]), 'cam': [-2, 0, 0], 'fov': 2}, 'outCubic'),
+    (9, {'R': ([1, -7, 10], [66, 40, 10])}),
+    (14, dict(PFG), 'inOutSine'),
+]))
+PL['paladin.select'] = select_clip(PP, PKK, PFG, up=True)
+write('paladin', PL)
+
+
 # =====================================================================================
 #                        공통 피격 반응 (능력 없는 플레이어 포함)
 # =====================================================================================

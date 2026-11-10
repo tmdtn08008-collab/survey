@@ -544,5 +544,21 @@
  "rpg.abilitywar.king.say.grand_done": "Grand Paladin, with you the realm shall never fall.",
  "rpg.abilitywar.king.say.ready": "You completed \"%s\"! Kneel, and be knighted.",
  "rpg.abilitywar.king.say.progress": "\"%s\" is not yet done. The realm trusts you.",
- "rpg.abilitywar.king.say.busy": "See \"%s\" through first, then return."
+ "rpg.abilitywar.king.say.busy": "See \"%s\" through first, then return.",
+ "ability.abilitywar.paladin": "Paladin",
+ "ability.abilitywar.paladin.desc": "Special class from the King's quest (warrior, tank, healer). Fights with a holy sword, shields and heals allies. +50% vs undead.",
+ "abilitywar.skill.paladin.skill1": "Judgment",
+ "abilitywar.skill.paladin.skill1.desc": "Leap and drive your holy sword down: 6 dmg in radius 3, slow, pillar of light. 8s cooldown.",
+ "abilitywar.skill.paladin.skill2": "Sacred Shield",
+ "abilitywar.skill.paladin.skill2.desc": "Cleanse party within 6 blocks and grant Absorption II + Aegis for 8s. 16s cooldown.",
+ "abilitywar.skill.paladin.skill3": "Consecration",
+ "abilitywar.skill.paladin.skill3.desc": "Plant your sword: a radius-5 sanctum for 6s. Enemies take 1.5 every 0.5s (undead x2), allies heal. 18s cooldown.",
+ "abilitywar.skill.paladin.skill4": "Chains of Light",
+ "abilitywar.skill.paladin.skill4.desc": "Bind an enemy within 14 blocks: 2.5s root, 4 dmg, pulled toward you. 12s cooldown.",
+ "abilitywar.skill.paladin.ultimate": "Descent of the Holy Sword",
+ "abilitywar.skill.paladin.ultimate.desc": "Cinematic: a colossal holy sword falls from the sky. 18 dmg in radius 7 + 2s stun, allies within 10 heal 40% + Resistance II, the sword stays as an 8s sanctum.",
+ "abilitywar.skill.paladin.passive": "Devotion Aura",
+ "abilitywar.skill.paladin.passive.desc": "Toggle. Allies within 8 blocks take 12% less damage; your hits heal allies within 6 a little.",
+ "abilitywar.ult.paladin.title": "HOLY SWORD",
+ "abilitywar.ult.paladin.subtitle": "Descent of the Holy Sword"
 }

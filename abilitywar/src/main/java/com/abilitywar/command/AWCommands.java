@@ -116,6 +116,17 @@ public final class AWCommands {
                                 .executes(ctx -> rpgEach(List.of(ctx.getSource().getPlayerOrThrow()), p -> com.abilitywar.rpg.RpgManager.setGrand(p, com.mojang.brigadier.arguments.BoolArgumentType.getBool(ctx, "on"))))
                                 .then(argument("targets", EntityArgumentType.players())
                                         .executes(ctx -> rpgEach(EntityArgumentType.getPlayers(ctx, "targets"), p -> com.abilitywar.rpg.RpgManager.setGrand(p, com.mojang.brigadier.arguments.BoolArgumentType.getBool(ctx, "on")))))))
+                .then(literal("king").requires(s -> s.hasPermissionLevel(2)).executes(ctx -> {
+                    ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
+                    var npc = com.abilitywar.registry.AWEntities.KING.create(p.getServerWorld());
+                    if (npc == null) return 0;
+                    npc.refreshPositionAndAngles(p.getX(), p.getY(), p.getZ(), p.getYaw() + 180, 0);
+                    npc.setHeadYaw(p.getYaw() + 180);
+                    npc.setBodyYaw(p.getYaw() + 180);
+                    p.getServerWorld().spawnEntity(npc);
+                    ctx.getSource().sendFeedback(() -> Text.translatable("rpg.abilitywar.npc_spawned"), false);
+                    return 1;
+                }))
                 .then(literal("npc").requires(s -> s.hasPermissionLevel(2)).executes(ctx -> {
                     ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
                     var npc = com.abilitywar.registry.AWEntities.JOB_MASTER.create(p.getServerWorld());

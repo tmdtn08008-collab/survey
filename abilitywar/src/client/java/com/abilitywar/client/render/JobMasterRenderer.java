@@ -17,14 +17,66 @@ import org.joml.Matrix4f;
 /** 전직 교관: 사람 모양 + 머리 위 퀘스트 표시 (! 받을 수 있음, ? 완료 가능). */
 public class JobMasterRenderer extends MobEntityRenderer<JobMasterEntity, PlayerEntityModel<JobMasterEntity>> {
     static final Identifier SKIN = AbilityWar.id("textures/entity/job_master.png");
+    static final Identifier KING_SKIN = AbilityWar.id("textures/entity/king.png");
+    final Identifier skin;
 
     public JobMasterRenderer(EntityRendererFactory.Context ctx) {
+        this(ctx, SKIN, false);
+    }
+
+    JobMasterRenderer(EntityRendererFactory.Context ctx, Identifier skin, boolean crown) {
         super(ctx, new PlayerEntityModel<>(ctx.getPart(EntityModelLayers.PLAYER), false), 0.5f);
+        this.skin = skin;
+        if (crown) addFeature(new Crown(this));
+    }
+
+    /** 왕: 붉은 왕의 옷 + 금관. */
+    public static JobMasterRenderer king(EntityRendererFactory.Context ctx) {
+        return new JobMasterRenderer(ctx, KING_SKIN, true);
     }
 
     @Override
     public Identifier getTexture(JobMasterEntity e) {
-        return SKIN;
+        return skin;
+    }
+
+    /** 머리 위 금관 (뾰족한 끝 + 보석). */
+    static final class Crown extends net.minecraft.client.render.entity.feature.FeatureRenderer<JobMasterEntity, PlayerEntityModel<JobMasterEntity>> {
+        Crown(net.minecraft.client.render.entity.feature.FeatureRendererContext<JobMasterEntity, PlayerEntityModel<JobMasterEntity>> ctx) {
+            super(ctx);
+        }
+
+        @Override
+        public void render(MatrixStack ms, VertexConsumerProvider vcp, int light, JobMasterEntity e, float limbAngle, float limbDistance, float td, float anim, float headYaw, float headPitch) {
+            ms.push();
+            getContextModel().head.rotate(ms);
+            Matrix4f m = ms.peek().getPositionMatrix();
+            net.minecraft.client.render.VertexConsumer vc = vcp.getBuffer(com.abilitywar.client.fx.AWRenderLayers.SOLID_COLOR);
+            float y0 = -0.5f - 0.02f, h = 0.12f, r = 0.27f;
+            // 둘레 띠 (8각)
+            for (int i = 0; i < 8; i++) {
+                double a0 = i * Math.PI / 4 + Math.PI / 8, a1 = (i + 1) * Math.PI / 4 + Math.PI / 8;
+                float x0 = (float) Math.cos(a0) * r, z0 = (float) Math.sin(a0) * r, x1 = (float) Math.cos(a1) * r, z1 = (float) Math.sin(a1) * r;
+                float k = 0.75f + 0.25f * (float) Math.cos(a0 + 0.7);
+                vc.vertex(m, x0, y0, z0).color(0.95f * k, 0.76f * k, 0.3f * k, 1).next();
+                vc.vertex(m, x1, y0, z1).color(0.95f * k, 0.76f * k, 0.3f * k, 1).next();
+                vc.vertex(m, x1, y0 - h, z1).color(1f * k, 0.86f * k, 0.42f * k, 1).next();
+                vc.vertex(m, x0, y0 - h, z0).color(1f * k, 0.86f * k, 0.42f * k, 1).next();
+                // 뾰족한 끝
+                float xm = (x0 + x1) / 2, zm = (z0 + z1) / 2;
+                vc.vertex(m, x0 * 0.98f, y0 - h, z0 * 0.98f).color(1f * k, 0.86f * k, 0.42f * k, 1).next();
+                vc.vertex(m, x1 * 0.98f, y0 - h, z1 * 0.98f).color(1f * k, 0.86f * k, 0.42f * k, 1).next();
+                vc.vertex(m, xm, y0 - h - 0.13f, zm).color(1f, 0.93f, 0.6f, 1).next();
+                vc.vertex(m, xm, y0 - h - 0.13f, zm).color(1f, 0.93f, 0.6f, 1).next();
+            }
+            // 앞쪽 붉은 보석
+            float gz = -r - 0.005f;
+            vc.vertex(m, -0.05f, y0 - 0.02f, gz).color(0.85f, 0.08f, 0.12f, 1).next();
+            vc.vertex(m, 0.05f, y0 - 0.02f, gz).color(0.85f, 0.08f, 0.12f, 1).next();
+            vc.vertex(m, 0.05f, y0 - 0.1f, gz).color(1f, 0.3f, 0.3f, 1).next();
+            vc.vertex(m, -0.05f, y0 - 0.1f, gz).color(1f, 0.3f, 0.3f, 1).next();
+            ms.pop();
+        }
     }
 
     @Override

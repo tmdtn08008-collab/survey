@@ -23,11 +23,12 @@ public final class CinematicOverlay {
     static final Theme WARLOCK = new Theme("warlock", 0.02f, 0.1f, 0.06f, 0x48E8A0, 0x2AA870, 0xE0FFF0, 0xA8F0CC, 0xA8F0CC, 0xD8FFE8, 16, 26, 26, 24);
     static final Theme ANGEL = new Theme("angel", 0.22f, 0.2f, 0.12f, 0xFFF0C0, 0xFFD978, 0xFFFDF4, 0xFFF0C8, 0xFFF0C8, 0xFFFFFF, 14, 30, 34, 30);
     static final Theme GUARDIAN = new Theme("guardian", 0.16f, 0.13f, 0.05f, 0xF0C860, 0xD8A040, 0xFFF8E4, 0xF0E0B0, 0xF0E0B0, 0xFFF6DC, 12, 22, 30, 26);
+    static final Theme PALADIN = new Theme("paladin", 0.22f, 0.19f, 0.1f, 0xFFE7A0, 0xFFD978, 0xFFFDF4, 0xFFF0C8, 0xFFF0C8, 0xFFFFFF, 12, 24, 30, 26);
     static final Theme BLOOD = new Theme("blood", 0.24f, 0.0f, 0.02f, 0xFF2A3A, 0xD0102A, 0xFFE4E4, 0xFFB4B4, 0xFFB0B0, 0xFFD8D8, 16, 58, 36, 34);
 
     static Theme theme() {
         String ty = CameraController.cinematicType();
-        return ty.startsWith("dragon") ? DRAGON : ty.startsWith("blade") ? BLADE : ty.startsWith("blood") ? BLOOD : ty.startsWith("cantor") ? CANTOR : ty.startsWith("warlock") ? WARLOCK : ty.startsWith("angel") ? ANGEL : ty.startsWith("guardian") ? GUARDIAN : VOID;
+        return ty.startsWith("dragon") ? DRAGON : ty.startsWith("blade") ? BLADE : ty.startsWith("blood") ? BLOOD : ty.startsWith("cantor") ? CANTOR : ty.startsWith("warlock") ? WARLOCK : ty.startsWith("angel") ? ANGEL : ty.startsWith("guardian") ? GUARDIAN : ty.startsWith("paladin") ? PALADIN : VOID;
     }
 
     public static void render(DrawContext ctx, float td) {
@@ -47,7 +48,7 @@ public final class CinematicOverlay {
             multiply(ctx, sw, sh, 1f, 1f - 0.62f * red, 1f - 0.58f * red);
         }
         // 천상의 심판: 하늘에서 쏟아지는 빛 (위쪽이 밝게)
-        if (th == ANGEL) {
+        if (th == ANGEL || th == PALADIN) {
             float holy = k * Math.min(1, t / 16f);
             ctx.fillGradient(0, 0, sw, (int) (sh * 0.6f), HudDraw.argb(0.32f * holy, 0xFFF6DC), HudDraw.argb(0f, 0xFFF6DC));
         }
@@ -92,7 +93,7 @@ public final class CinematicOverlay {
             net.minecraft.util.Identifier tex = com.abilitywar.AbilityWar.id("textures/gui/ult_title_" + th.key() + ".png");
             if (MinecraftClient.getInstance().getResourceManager().getResource(tex).isPresent()) {
                 // 능력별 제목 그림 (용기사 = 한자, 공허 = 영어): 크게 들어왔다가 자리 잡음
-                float[] sz = {1024, th == DRAGON || th == BLOOD || th == ANGEL || th == GUARDIAN ? 300 : th == BLADE || th == CANTOR ? 260 : 220}; // tools/gen_titles.py 의 그림 크기
+                float[] sz = {1024, th == DRAGON || th == BLOOD || th == ANGEL || th == GUARDIAN || th == PALADIN ? 300 : th == BLADE || th == CANTOR ? 260 : 220}; // tools/gen_titles.py 의 그림 크기
                 float w = Math.min(sw * 0.62f, 380f);
                 float h = w * sz[1] / sz[0];
                 float zoom = 1f + 0.35f * (float) Math.pow(1 - Math.min(1, tt / 7f), 3);
@@ -133,7 +134,7 @@ public final class CinematicOverlay {
             float sa = Math.min(1, Math.max(0, (tt - 3) / 5f)) * out;
             int sw2 = tr.getWidth(sub);
             float lineW = (sw2 * 1.4f + 40) * Math.min(1, tt / 10f);
-            HudDraw.rect(ctx, sw / 2f - lineW, cy + 20, sw / 2f + lineW, cy + 21, HudDraw.argb(sa * 0.8f, th == DRAGON ? 0xFF9A50 : th == BLADE ? 0xC870FF : th == BLOOD ? 0xFF3A4A : th == CANTOR ? 0xFFD86A : th == WARLOCK ? 0x48E8A0 : th == ANGEL ? 0xFFE8A0 : th == GUARDIAN ? 0xF0C860 : 0xB27BFF));
+            HudDraw.rect(ctx, sw / 2f - lineW, cy + 20, sw / 2f + lineW, cy + 21, HudDraw.argb(sa * 0.8f, th == DRAGON ? 0xFF9A50 : th == BLADE ? 0xC870FF : th == BLOOD ? 0xFF3A4A : th == CANTOR ? 0xFFD86A : th == WARLOCK ? 0x48E8A0 : th == ANGEL ? 0xFFE8A0 : th == GUARDIAN ? 0xF0C860 : th == PALADIN ? 0xFFE7A0 : 0xB27BFF));
             ctx.getMatrices().push();
             ctx.getMatrices().translate(sw / 2f, cy + 27, 0);
             ctx.getMatrices().scale(1.4f, 1.4f, 1);

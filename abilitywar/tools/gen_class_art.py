@@ -470,7 +470,7 @@ def cards():
     card('mage', 0x7AA8FF, 0xD8E8FF, 0x080E28, mage, 2)
     card('tank', 0x9AB4D0, 0xE8F2FF, 0x0C1420, tank, 3)
     card('healer', 0xA8F0B0, 0xF0FFF0, 0x06200E, healer, 4)
-    card('guardian', 0xF0C860, 0xFFF6DC, 0x1E1606, guardian, 5)
+    # 수호기사 카드는 사용자 그림 (tools/gen_hud.py guardian)
 
 
 # ============================================================ 전직 교관 피부 (64x64, 플레이어 모양)
@@ -564,12 +564,154 @@ def job_master_skin():
     im.save(os.path.join(ENT, 'job_master.png'))
 
 
+def paladin_icons():
+    col, col2, bg = 0xFFE7A0, 0xFFFDF4, 0x241A06
+    # 1 심판의 일격: 땅에 꽂히는 검 + 십자 빛
+    def s1(d):
+        sword(d, S / 2, S * 0.42, math.radians(180), 190, 22)
+        for k in range(4):
+            a = k * math.pi / 2 + math.pi / 4
+            d.line([(S / 2, S * 0.8), (S / 2 + math.cos(a) * 90, S * 0.8 + math.sin(a) * 40)], fill=220, width=8)
+        d.ellipse([S * 0.2, S * 0.74, S * 0.8, S * 0.88], outline=255, width=7)
+    save_icon(compose_icon(mask(s1), col, col2, bg, seed=51), 'paladin_skill1')
+    # 2 신성한 방패: 십자 방패 + 빛 고리
+    sh = mask(lambda d: (shield(d, S / 2, S / 2 + 6, 74, 176), ring(d, S / 2, S / 2, 112, 7)))
+    cr = mask(lambda d: (d.rectangle([S / 2 - 11, S * 0.3, S / 2 + 11, S * 0.68], fill=255), d.rectangle([S / 2 - 42, S * 0.4, S / 2 + 42, S * 0.48], fill=255)))
+    save_icon(compose_icon(np.clip(sh - cr, 0, 1), col, col2, bg, seed=52, extra=(cr, 0x9FD8FF)), 'paladin_skill2')
+    # 3 정화의 땅: 바닥의 십자 마법진 + 솟는 빛
+    def s3(d):
+        d.ellipse([S * 0.08, S * 0.6, S * 0.92, S * 0.9], outline=255, width=8)
+        d.polygon([(S * 0.5, S * 0.62), (S * 0.56, S * 0.75), (S * 0.5, S * 0.88), (S * 0.44, S * 0.75)], fill=255)
+        d.polygon([(S * 0.24, S * 0.75), (S * 0.5, S * 0.71), (S * 0.76, S * 0.75), (S * 0.5, S * 0.79)], fill=255)
+        for k in range(5):
+            x = S * (0.22 + k * 0.14)
+            d.line([(x, S * 0.68), (x, S * (0.18 + 0.08 * (k % 2)))], fill=200, width=7)
+    save_icon(compose_icon(mask(s3), col, col2, bg, seed=53), 'paladin_skill3')
+    # 4 빛의 사슬: 대각선 사슬 고리
+    def s4(d):
+        for k in range(6):
+            cx, cy = S * (0.18 + k * 0.13), S * (0.82 - k * 0.13)
+            if k % 2 == 0:
+                d.ellipse([cx - 26, cy - 14, cx + 26, cy + 14], outline=255, width=9)
+            else:
+                d.ellipse([cx - 14, cy - 26, cx + 14, cy + 26], outline=255, width=9)
+        star(d, S * 0.78, S * 0.22, 30, 8)
+    save_icon(compose_icon(mask(s4), col, col2, bg, seed=54), 'paladin_skill4')
+    # R 성검강림: 거대한 검 + 사방 빛살
+    def u(d):
+        for k in range(16):
+            a = k * math.pi / 8
+            d.line([(S / 2 + math.cos(a) * 60, S * 0.42 + math.sin(a) * 60), (S / 2 + math.cos(a) * 124, S * 0.42 + math.sin(a) * 124)], fill=190, width=7)
+        sword(d, S / 2, S * 0.48, math.radians(180), 240, 30)
+    save_icon(compose_icon(mask(u), col, col2, bg, seed=55, halo=1.4), 'paladin_ultimate')
+    # T 성스러운 오라: 십자 + 둥근 빛살
+    def p(d):
+        cross(d, S / 2, S / 2, 70, 16)
+        ring(d, S / 2, S / 2, 100, 8)
+        for k in range(12):
+            a = k * math.pi / 6
+            d.line([(S / 2 + math.cos(a) * 108, S / 2 + math.sin(a) * 108), (S / 2 + math.cos(a) * 124, S / 2 + math.sin(a) * 124)], fill=230, width=7)
+    save_icon(compose_icon(mask(p), col, col2, bg, seed=56), 'paladin_passive')
+
+
+def paladin_card():
+    def pal(d, W, H):
+        for k in range(14):
+            a = k * math.pi / 7
+            d.line([(W * 0.5 + math.cos(a) * 120, H * 0.42 + math.sin(a) * 120), (W * 0.5 + math.cos(a) * 170, H * 0.42 + math.sin(a) * 170)], fill=200, width=8)
+        sword(d, W * 0.5, H * 0.5, math.radians(180), 300, 34)
+    card('paladin', 0xFFE7A0, 0xFFFDF4, 0x241A06, pal, 6)
+
+
+def king_skin():
+    """왕: 붉은 왕의 옷 + 흰 담비털 (검은 점) + 금 목걸이, 갈색 수염. 관은 3D 로 따로 그림."""
+    im = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
+    px = im.load()
+    rng = random.Random(11)
+    SKIN = (222, 178, 140)
+    SKIN_D = (188, 142, 108)
+    HAIR = (120, 78, 44)
+    RED = (150, 20, 32)
+    RED_D = (104, 12, 22)
+    ERM = (240, 238, 232)
+    GOLD = (232, 190, 80)
+    PANTS = (60, 20, 70)
+    BOOT = (60, 36, 22)
+
+    def rect(x, y, w, h, c, noise=7):
+        for i in range(x, x + w):
+            for j in range(y, y + h):
+                n = rng.randint(-noise, noise)
+                px[i, j] = (max(0, min(255, c[0] + n)), max(0, min(255, c[1] + n)), max(0, min(255, c[2] + n)), 255)
+
+    def box(u, v, w, h, d, side, top, bottom, front=None, back=None):
+        rect(u + d, v, w, d, top)
+        rect(u + d + w, v, w, d, bottom)
+        rect(u, v + d, d, h, side)
+        rect(u + d, v + d, w, h, front or side)
+        rect(u + d + w, v + d, d, h, side)
+        rect(u + d + w + d, v + d, w, h, back or side)
+
+    def ermine(u, v, w, h):
+        rect(u, v, w, h, ERM, 4)
+        for _ in range(max(1, w * h // 6)):
+            px[u + rng.randrange(w), v + rng.randrange(h)] = (30, 30, 34, 255)
+
+    # 머리: 갈색 머리 + 수염
+    box(0, 0, 8, 8, 8, HAIR, HAIR, SKIN)
+    rect(8, 8, 8, 8, SKIN)
+    rect(8, 8, 8, 2, HAIR)
+    rect(9, 11, 2, 1, (70, 40, 20), 0)
+    rect(13, 11, 2, 1, (70, 40, 20), 0)
+    px[9, 12] = px[14, 12] = (240, 240, 240, 255)
+    px[10, 12] = px[13, 12] = (60, 90, 40, 255)
+    rect(11, 13, 2, 1, SKIN_D, 0)
+    rect(9, 14, 6, 2, HAIR)
+    rect(10, 13, 1, 1, HAIR)
+    rect(13, 13, 1, 1, HAIR)
+    for (u, w) in [(0, 8), (16, 8), (24, 8)]:
+        rect(u, 8, w, 8, HAIR)
+    rect(2, 13, 4, 3, HAIR)
+    rect(18, 13, 4, 3, HAIR)
+    # 몸: 붉은 옷 + 담비털 어깨 + 금 목걸이
+    box(16, 16, 8, 12, 4, RED, RED, RED, RED, RED)
+    ermine(20, 20, 8, 3)
+    ermine(16, 20, 4, 3)
+    ermine(28, 20, 4, 3)
+    ermine(32, 20, 8, 3)
+    for (x, y) in [(21, 23), (22, 24), (23, 25), (24, 25), (25, 24), (26, 23)]:
+        px[x, y] = GOLD + (255,)
+    rect(23, 26, 2, 2, (200, 30, 40), 0)
+    rect(23, 23, 2, 9, RED_D, 3)
+    rect(20, 28, 8, 1, GOLD, 3)
+    rect(34, 24, 4, 6, RED_D, 3)  # 등의 망토 접힘
+    # 팔: 붉은 소매 + 담비털 소매 끝
+    box(40, 16, 4, 12, 4, RED, RED, SKIN)
+    box(32, 48, 4, 12, 4, RED, RED, SKIN)
+    for (u, v) in [(40, 29), (44, 29), (48, 29), (52, 29), (32, 61), (36, 61), (40, 61), (44, 61)]:
+        ermine(u, v, 4, 2)
+    for (u, v) in [(40, 31), (44, 31), (48, 31), (52, 31), (32, 63), (36, 63), (40, 63), (44, 63)]:
+        rect(u, v, 4, 1, SKIN)
+    # 다리: 보라 바지 + 장화 + 옷자락
+    box(0, 16, 4, 12, 4, PANTS, PANTS, BOOT)
+    box(16, 48, 4, 12, 4, PANTS, PANTS, BOOT)
+    for (u, v) in [(0, 20), (4, 20), (8, 20), (12, 20), (16, 52), (20, 52), (24, 52), (28, 52)]:
+        rect(u, v, 4, 4, RED)
+        rect(u, v + 4, 4, 1, ERM, 3)
+        rect(u, v + 8, 4, 4, BOOT)
+    os.makedirs(ENT, exist_ok=True)
+    im.save(os.path.join(ENT, 'king.png'))
+
+
 if __name__ == '__main__':
     warrior_icons()
     mage_icons()
     tank_icons()
     healer_icons()
-    guardian_icons()
+    # guardian_icons(): 수호기사는 사용자 그림 (tools/gen_hud.py guardian) 을 씀
     cards()
     job_master_skin()
+    paladin_icons()
+    paladin_card()
+    king_skin()
     print('done')
