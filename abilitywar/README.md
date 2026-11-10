@@ -96,7 +96,7 @@
 | ![](screenshots/59_cantor_ward.jpg) | ![](screenshots/60_cantor_switch.jpg) |
 | 같은 팀 화면: 용맹·수호·신속이 걸림 (멀티, 오른쪽 위) | R GLORIA: 빛의 날개 + 거대한 광륜 + 합창의 빛기둥 |
 | ![](screenshots/61_cantor_ally_buffs.jpg) | ![](screenshots/62_cantor_ult_wings.jpg) |
-| R GLORIA: 천상의 합창 폭발 (제목은 라틴어) | 성가사 스킬 바 (임시 그림 · T 칸 = 지금 선율 색 + 화음 음표 3개) |
+| R GLORIA: 천상의 합창 폭발 (제목은 라틴어) | 성가사 스킬 바 (보내주신 그림 · T 칸 = 지금 선율 색 + 화음 음표 3개) |
 | ![](screenshots/63_cantor_ult_gloria.jpg) | ![](screenshots/65_cantor_hud.jpg) |
 
 ## 설치
@@ -221,7 +221,7 @@ RPG 의 버퍼 역할. 찬가로 **자신과 같은 팀**(`/team`)을 강화하�
 - 평타: 지휘봉으로 음표탄 (사거리 약 16칸) 2 / 2 / 3.5 (3타는 음표 세 개 화음 + 살짝 밀쳐냄).
 - 아군은 **같은 팀**(`/team join <팀> <플레이어>`) 플레이어입니다. 팀이 없으면 자신만 강화됩니다.
 - 버프가 걸린 사람은 발밑에 색깔 고리(용맹 주황 / 수호 하늘색 / 신속 초록 / 은총 금색)와 빛 가루가 보입니다. 침묵에 걸린 적은 머리 위에 빗금 친 음표가 뜹니다.
-- 스킬바는 아직 임시 그림입니다. 성가사 스킬바 그림을 보내주시면 다른 능력처럼 그대로 넣습니다.
+- 스킬바는 보내주신 그림입니다 (투명 배경 그대로). 위쪽 띠에 빛의 잔상이 흐르고 보석 문양이 빛납니다.
 
 ## 화면 표시
 
@@ -280,7 +280,7 @@ python3 tools/gen_blade_textures.py && python3 tools/gen_hud.py blade   # 마검
 python3 tools/gen_blood_textures.py   # 혈귀 핏줄/날개/박쥐/달/창/사슬 텍스처, 출혈 아이콘
 python3 tools/import_blood_art.py && python3 tools/gen_hud.py blood   # 혈귀 스킬바 (보내주신 그림)
 python3 tools/gen_cantor_textures.py   # 성가사 날개/성가집/음표/마법진/종/돔 텍스처, 버프·디버프 아이콘
-python3 tools/gen_cantor_hud.py && python3 tools/gen_hud.py cantor   # 성가사 임시 스킬바
+python3 tools/gen_hud.py cantor   # 성가사 스킬바 (보내주신 그림)
 bash tools/gen_sounds.sh          # 합성 효과음 다시 생성
 ```
 
