@@ -113,7 +113,7 @@
 | R 영혼 강탈: 뜯겨 나온 영혼 | R 영혼 강탈 (제목은 영어) |
 | ![](screenshots/72_warlock_soul_rip.jpg) | ![](screenshots/74_warlock_ult_title.jpg) |
 
-흑마법사 스킬 바 (임시 그림 · T 칸 숫자 = 모은 영혼, 2번 칸 = 되살린 몹 수, 1번 칸 ☠ = 해골이 나와 있음): ![](screenshots/75_warlock_hud.jpg)
+흑마법사 스킬 바 (보내주신 그림 · T 칸 숫자 = 모은 영혼, 2번 칸 = 되살린 몹 수, 1번 칸 ☠ = 해골이 나와 있음): ![](screenshots/75_warlock_hud.jpg)
 
 ## 설치
 
@@ -259,7 +259,7 @@ RPG 의 버퍼 역할. 찬가로 **자신과 같은 팀**(`/team`)을 강화하�
 - 흑마법서(해골 장비 + 영혼)는 플레이어에 저장되어 **죽거나 재접속해도 유지**됩니다. 로그아웃·사망·능력 변경 시 하수인은 흑마법서로 돌아갑니다.
 - 엔더 드래곤은 영혼이 남지 않습니다 (궁극기로는 처치).
 - 평타: 흑마법 구체 (사거리 약 15칸) 2 / 2 / 3.5.
-- 스킬바는 아직 임시 그림입니다. 흑마법사 스킬바 그림을 보내주시면 그대로 넣습니다.
+- 스킬바는 보내주신 그림입니다 (가짜 체크무늬 배경은 `tools/import_hud_art.py` 로 지움).
 
 ## 화면 표시
 
@@ -320,7 +320,7 @@ python3 tools/import_blood_art.py && python3 tools/gen_hud.py blood   # 혈귀 �
 python3 tools/gen_cantor_textures.py   # 성가사 날개/성가집/음표/마법진/종/돔 텍스처, 버프·디버프 아이콘
 python3 tools/gen_hud.py cantor   # 성가사 스킬바 (보내주신 그림)
 python3 tools/gen_warlock_textures.py   # 흑마법사 소환진/영혼/사슬/흑마법서/눈 텍스처
-python3 tools/gen_warlock_hud.py && python3 tools/gen_hud.py warlock   # 흑마법사 임시 스킬바
+python3 tools/import_hud_art.py tools/art/warlock_hud_original.webp tools/art/warlock_hud_source.png && python3 tools/gen_hud.py warlock   # 흑마법사 스킬바
 bash tools/gen_sounds.sh          # 합성 효과음 다시 생성
 ```
 
