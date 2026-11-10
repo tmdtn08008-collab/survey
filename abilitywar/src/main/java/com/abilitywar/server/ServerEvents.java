@@ -43,11 +43,17 @@ public final class ServerEvents {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             ServerPlayerEntity p = handler.getPlayer();
             AbilityManager.data(p).dirty = true;
-            server.execute(() -> AWNet.sendState(p));
+            server.execute(() -> {
+                AWNet.sendState(p);
+                // 처음 접속 (직업 없음): 직업 선택 화면. 고른 직업은 저장되어 다음 접속 때도 그대로.
+                if (((com.abilitywar.data.AWPlayer) p).aw$getAbilityKey().isEmpty() && p.getWorld().getGameRules().getBoolean(com.abilitywar.registry.AWGameRules.FIRST_JOIN_SELECT))
+                    AWNet.openSelect(p, true);
+            });
         });
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
             ServerPlayerEntity p = handler.getPlayer();
             ServerActions.cancelFor(p);
+            com.abilitywar.gear.GearEffects.forget(p);
             AbilityManager.onDeathOrRespawn(p);
         });
 

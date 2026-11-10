@@ -30,6 +30,11 @@ public abstract class PlayerEntityMixin extends LivingEntity implements AWPlayer
         super(entityType, world);
     }
 
+    @Inject(method = "createPlayerAttributes", at = @At("RETURN"))
+    private static void aw$gearAttributes(org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<net.minecraft.entity.attribute.DefaultAttributeContainer.Builder> cir) {
+        com.abilitywar.gear.GearAttributes.addTo(cir.getReturnValue());
+    }
+
     @Inject(method = "initDataTracker", at = @At("TAIL"))
     private void aw$initTracker(CallbackInfo ci) {
         this.dataTracker.startTracking(AW_ABILITY, "");

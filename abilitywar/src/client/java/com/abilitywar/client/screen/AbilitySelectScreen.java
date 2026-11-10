@@ -25,31 +25,79 @@ public class AbilitySelectScreen extends Screen {
     private static final String[] KEYS = {"1", "2", "3", "4", "R", "T"};
     private final List<Ability> list = new ArrayList<>(Abilities.all());
     private int selected;
+    /** 처음 접속: 직업을 고르기 전에는 닫을 수 없음. */
+    private final boolean forced;
+    private static boolean pendingForced;
 
     public AbilitySelectScreen() {
-        super(Text.translatable("abilitywar.screen.title"));
+        this(false);
+    }
+
+    public AbilitySelectScreen(boolean forced) {
+        super(Text.translatable(forced ? "abilitywar.screen.first_title" : "abilitywar.screen.title"));
+        this.forced = forced;
         for (int i = 0; i < list.size(); i++) if (list.get(i).key.equals(ClientState.ability)) selected = i;
+    }
+
+    /** 서버가 요청: 접속 중 로딩 화면이 닫힌 뒤에 염. */
+    public static void request(boolean forced) {
+        if (forced) pendingForced = true;
+        else net.minecraft.client.MinecraftClient.getInstance().setScreen(new AbilitySelectScreen(false));
+    }
+
+    public static void tickPending(net.minecraft.client.MinecraftClient mc) {
+        if (!pendingForced || mc.player == null) return;
+        if (!ClientState.ability.isEmpty()) {
+            pendingForced = false;
+            return;
+        }
+        if (mc.currentScreen == null) {
+            pendingForced = false;
+            mc.setScreen(new AbilitySelectScreen(true));
+        }
     }
 
     @Override
     protected void init() {
         int bw = 120;
+        if (forced) {
+            this.addDrawableChild(ButtonWidget.builder(Text.translatable("abilitywar.screen.first_choose"), b -> choose(list.get(selected).key))
+                    .dimensions(this.width / 2 - bw / 2 - 20, this.height - 30, bw + 40, 20).build());
+            return;
+        }
         this.addDrawableChild(ButtonWidget.builder(Text.translatable("abilitywar.screen.choose"), b -> choose(list.get(selected).key))
                 .dimensions(this.width / 2 - bw - 4, this.height - 30, bw, 20).build());
         this.addDrawableChild(ButtonWidget.builder(Text.translatable("abilitywar.screen.clear"), b -> choose(""))
                 .dimensions(this.width / 2 + 4, this.height - 30, bw, 20).build());
     }
 
+    @Override
+    public void tick() {
+        // 명령어 등으로 직업이 정해지면 저절로 닫힘
+        if (forced && !ClientState.ability.isEmpty()) this.client.setScreen(null);
+    }
+
+    @Override
+    public boolean shouldCloseOnEsc() {
+        return !forced;
+    }
+
     void choose(String key) {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeString(key);
         ClientPlayNetworking.send(AWNet.C2S_SELECT, buf);
-        this.close();
+        this.client.setScreen(null);
+    }
+
+    /** 카드 크기: 직업이 많아도 한 줄에 들어가게. */
+    int cardW() {
+        int gap = 8;
+        return Math.max(56, Math.min(110, (this.width - 20 + gap) / list.size() - gap));
     }
 
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
-        int cardW = 110, cardH = 72, gap = 8;
+        int cardW = cardW(), cardH = cardW * 72 / 110, gap = 8;
         int total = list.size() * (cardW + gap) - gap;
         int x0 = (this.width - total) / 2;
         for (int i = 0; i < list.size(); i++) {
@@ -66,8 +114,9 @@ public class AbilitySelectScreen extends Screen {
     public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
         this.renderBackground(ctx);
         HudDraw.rect(ctx, 0, 0, this.width, this.height, 0x880A0414);
-        ctx.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 12, 0xE6CCFF);
-        int cardW = 110, cardH = 72, gap = 8;
+        ctx.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, forced ? 8 : 12, 0xE6CCFF);
+        if (forced) ctx.drawCenteredTextWithShadow(this.textRenderer, Text.translatable("abilitywar.screen.first_hint"), this.width / 2, 20, 0x9A8DB0);
+        int cardW = cardW(), cardH = cardW * 72 / 110, gap = 8;
         int total = list.size() * (cardW + gap) - gap;
         int x0 = (this.width - total) / 2;
         for (int i = 0; i < list.size(); i++) {
@@ -76,6 +125,7 @@ public class AbilitySelectScreen extends Screen {
             boolean sel = i == selected;
             boolean hover = mouseX >= x && mouseX < x + cardW && mouseY >= y && mouseY < y + cardH;
             ctx.drawTexture(AbilityWar.id("textures/gui/card_" + a.key + ".png"), x, y, cardW, cardH - 14, 0, 0, 256, 160, 256, 160);
+            if (forced && i == selected) HudDraw.rect(ctx, x, y, x + cardW, y + cardH - 14, 0x22FFFFFF);
             HudDraw.rect(ctx, x, y + cardH - 14, x + cardW, y + cardH, 0xEE120A1E);
             ctx.drawCenteredTextWithShadow(this.textRenderer, Text.translatable(a.translationKey()), x + cardW / 2, y + cardH - 11, 0xFFFFFF);
             int border = sel ? 0xFFB27BFF : hover ? 0xAA9B7BC0 : 0x663A2A50;

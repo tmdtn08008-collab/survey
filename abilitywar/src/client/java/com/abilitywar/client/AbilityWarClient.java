@@ -34,6 +34,7 @@ public class AbilityWarClient implements ClientModInitializer {
     public void onInitializeClient() {
         net.minecraft.client.gui.screen.ingame.HandledScreens.register(com.abilitywar.ability.warlock.GrimoireScreenHandler.TYPE, com.abilitywar.client.screen.GrimoireScreen::new);
         InputHandler.init();
+        com.abilitywar.client.gear.GearClient.init();
         com.abilitywar.client.dev.TestDriver.init();
         ClientNet.init();
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(new AnimRegistry());
@@ -64,6 +65,7 @@ public class AbilityWarClient implements ClientModInitializer {
         });
 
         ClientTickEvents.START_CLIENT_TICK.register(com.abilitywar.client.input.DashController::tick);
+        ClientTickEvents.END_CLIENT_TICK.register(com.abilitywar.client.screen.AbilitySelectScreen::tickPending);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.world != null && !client.isPaused()) {
                 ClientClock.tick();

@@ -34,6 +34,7 @@ public final class AWNet {
     public static final Identifier C2S_SELECT = AbilityWar.id("select");
     // S2C
     public static final Identifier S2C_STATE = AbilityWar.id("state");
+    public static final Identifier S2C_OPEN_SELECT = AbilityWar.id("open_select");
     public static final Identifier S2C_SOULS = AbilityWar.id("souls");
     public static final Identifier C2S_GRIMOIRE = AbilityWar.id("grimoire");
     public static final Identifier C2S_SOUL_ACTION = AbilityWar.id("soul_action");
@@ -87,7 +88,10 @@ public final class AWNet {
         ServerPlayNetworking.registerGlobalReceiver(C2S_SELECT, (server, player, handler, buf, sender) -> {
             String key = buf.readString(64);
             server.execute(() -> {
-                if (!player.getWorld().getGameRules().getBoolean(AWGameRules.SELF_SELECT) && !player.hasPermissionLevel(2)) {
+                // 아직 직업이 없으면 (처음 접속) 게임 규칙과 상관없이 고를 수 있음
+                boolean first = ((com.abilitywar.data.AWPlayer) player).aw$getAbilityKey().isEmpty();
+                if (first && key.isEmpty()) return;
+                if (!first && !player.getWorld().getGameRules().getBoolean(AWGameRules.SELF_SELECT) && !player.hasPermissionLevel(2)) {
                     player.sendMessage(Text.translatable("abilitywar.msg.select_locked"), true);
                     return;
                 }
@@ -99,6 +103,13 @@ public final class AWNet {
     }
 
     // ---------------------------------------------------------------- senders
+
+    /** 직업 선택 화면 열기 (forced = 고르기 전에는 닫을 수 없음). */
+    public static void openSelect(ServerPlayerEntity p, boolean forced) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        buf.writeBoolean(forced);
+        send(p, S2C_OPEN_SELECT, buf);
+    }
 
     private static void send(ServerPlayerEntity p, Identifier id, PacketByteBuf buf) {
         if (ServerPlayNetworking.canSend(p, id)) {

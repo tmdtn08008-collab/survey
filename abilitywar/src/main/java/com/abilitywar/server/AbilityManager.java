@@ -246,6 +246,7 @@ public final class AbilityManager {
         com.abilitywar.ability.warlock.Necromancy.tick(server);
         for (ServerPlayerEntity p : server.getPlayerManager().getPlayerList()) {
             tickPlayer(p, now);
+            com.abilitywar.gear.GearEffects.tick(p);
         }
     }
 
@@ -288,6 +289,11 @@ public final class AbilityManager {
             net.minecraft.entity.effect.StatusEffectInstance ag = victim.getStatusEffect(AWEffects.AEGIS);
             if (ag != null) mult *= Math.max(0.4f, 1f - 0.15f * (ag.getAmplifier() + 1));
             amount *= mult;
+            // RPG 장비: 능력 피해 / 처형 / 치명타, 받는 피해 감소
+            if (source.getAttacker() instanceof net.minecraft.entity.player.PlayerEntity pa && pa != victim)
+                amount = com.abilitywar.gear.GearEffects.outgoing(pa, victim, source, amount);
+            else com.abilitywar.gear.GearEffects.lastCrit = false;
+            amount = com.abilitywar.gear.GearEffects.incoming(victim, amount);
         }
         if (!(victim instanceof ServerPlayerEntity sp)) return amount;
         AbilityData d = data(sp);
@@ -323,7 +329,11 @@ public final class AbilityManager {
             else if (source.isIn(AWDamage.TAG_ABILITY_SKILL) || source.isOf(AWDamage.GRAB)) kind = AWNet.DMG_SKILL;
             else kind = AWNet.DMG_NORMAL;
         }
+        if (com.abilitywar.gear.GearEffects.lastCrit && kind != AWNet.DMG_ULT) kind = AWNet.DMG_CRIT;
+        com.abilitywar.gear.GearEffects.lastCrit = false;
         AWNet.damageNumber(victim, lost, kind, attacker);
+        if (attacker instanceof ServerPlayerEntity gp && gp != victim) com.abilitywar.gear.GearEffects.afterHit(gp, victim, source, lost);
+        com.abilitywar.gear.GearEffects.thorns(victim, source, lost);
         boolean ult = source.isIn(AWDamage.TAG_ULTIMATE);
         if (attacker instanceof ServerPlayerEntity ap && ap != victim && !ult) {
             AbilityData ad = data(ap);

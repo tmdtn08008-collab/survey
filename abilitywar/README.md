@@ -1,6 +1,6 @@
 # 능력대전쟁 (Ability War) — Minecraft 모드
 
-능력을 하나 골라 싸우는 **능력대전쟁** 모드입니다. 지금 있는 능력은 **공허(Void)**, **🐉 용기사(Dragon Knight)**, **⚔ 마검사(Demonic Swordsman)**, **🩸 혈귀(Bloodfiend)**, **🎼 성가사(Cantor, 버퍼 직업)**, **💀 흑마법사(Warlock, 소환 직업)**, **😇 천사(Angel, 힐러 직업)** 입니다.
+능력을 하나 골라 싸우는 **능력대전쟁** 모드입니다. 지금 있는 능력은 **공허(Void)**, **🐉 용기사(Dragon Knight)**, **⚔ 마검사(Demonic Swordsman)**, **🩸 혈귀(Bloodfiend)**, **🎼 성가사(Cantor, 버퍼 직업)**, **💀 흑마법사(Warlock, 소환 직업)**, **😇 천사(Angel, 힐러 직업)** 입니다. RPG 를 위한 **8등급 장비 (무기 470개 + 갑옷 470세트)** 와 처음 접속 시 직업 선택도 있습니다.
 앞으로 알려주시는 능력들을 같은 구조로 계속 추가할 수 있게 만들어 두었습니다.
 
 - 마인크래프트 **Java 1.20.1** / **Fabric**
@@ -129,12 +129,24 @@
 | R 천상의 심판: 하늘에 그려지는 마법진 7개 | R 천상의 심판: 쏟아지는 빛줄기 (제목은 한자) |
 | ![](screenshots/85_angel_ult_circles.jpg) | ![](screenshots/86_angel_ult_beams.jpg) |
 
-천사 스킬 바 (임시 그림 — 그림을 보내주시면 바꿉니다 · T 칸 = 지금 모드 '비행'/'걷기'): ![](screenshots/88_angel_hud.jpg)
+천사 스킬 바 (보내주신 그림 · T 칸 = 지금 모드 '비행'/'걷기'): ![](screenshots/95_angel_hud_art.jpg)
+
+### RPG 장비 · 처음 접속 직업 선택
+
+| 갑옷 세트 + 무기 (일반 · 좋음 · 희귀 · 영웅) | 갑옷 세트 + 무기 (전설 · 신화 · 시크릿 · ?) |
+|---|---|
+| ![](screenshots/89_gear_armor_stands_1.jpg) | ![](screenshots/90_gear_armor_stands_2.jpg) |
+| 무기 툴팁 (등급 색 테두리 · 능력치 · 특수 효과) | 갑옷 툴팁 (세트 4/4 · 세트 효과 켜짐) |
+| ![](screenshots/91_gear_tooltip_weapon.jpg) | ![](screenshots/92_gear_tooltip_set.jpg) |
+| 처음 접속하면 직업 선택 (고르기 전에는 닫을 수 없음) | 무기를 들고 능력 평타 (무기 능력치 적용 · 치명타 !) |
+| ![](screenshots/93_first_join_select.jpg) | ![](screenshots/94_gear_weapon_hit.jpg) |
+
+장비 전체 그림 (등급별): `tools/art/gear_sheets/weapons_*.png`, `tools/art/gear_sheets/armor_*.png`
 
 ## 설치
 
 1. Fabric Loader(1.20.1)를 설치합니다.
-2. `mods` 폴더에 **Fabric API** 와 **`dist/abilitywar-1.7.0.jar`** 를 넣습니다.
+2. `mods` 폴더에 **Fabric API** 와 **`dist/abilitywar-1.8.0.jar`** 를 넣습니다.
 3. 게임 실행 → 월드 접속 → **B 키**(능력 선택 화면)에서 능력을 고르거나 `/aw set void` / `dragon` / `blade` / `blood` / `cantor` / `warlock` / `angel`
 
 ## 조작
@@ -295,6 +307,42 @@ RPG 의 버퍼 역할. 찬가로 **자신과 같은 팀**(`/team`)을 강화하�
 - 새 상태 효과 **열정**(공격 속도)은 바닐라 공격 속도와 능력 평타 간격 둘 다 빨라집니다.
 - 회복량은 피해 숫자처럼 **초록색 +숫자**로 뜹니다.
 
+## ⚔ RPG 장비
+
+RPG 를 위한 무기와 방어구입니다. 등급은 8개이고, 등급마다 이름 색과 칸 배경색·툴팁 테두리 색이 다릅니다.
+
+| 등급 | 색 | 무기 | 갑옷 세트 (부위 4개씩) | 특징 |
+|---|---|---|---|---|
+| 일반 | 회색 | 100 | 100 | 기본 능력치 |
+| 좋음 | 초록 | 100 | 100 | 추가 능력치 1줄 |
+| 희귀 | 파랑 | 100 | 100 | 추가 능력치 2줄, 칼날에 룬, 갑옷 세트 효과(능력치) |
+| 영웅 | 보라 | 50 | 50 | **무기 특수 효과** (화염·번개 등) |
+| 전설 | 주황 | 50 | 50 | 아이콘 빛 번짐, 갑옷 장식이 빛남, **세트 특수 효과** |
+| 신화 | 빨강 | 50 | 50 | 아이콘이 반짝이는 애니메이션, 이름 색이 흐름 (엑스칼리버·궁니르·묠니르…) |
+| 시크릿 | 청록↔금빛 | 10 | 10 | 고유한 이름과 설명, 무기 특수 효과 2개, 세트 효과 2개 |
+| ? | 깜빡임 | 10 | 10 | 이름이 깨진 글자, **능력치가 ???** 로 보임, 무기는 공격할 때마다 무작위 효과(혼돈) |
+
+모두 합쳐 **무기 470개 + 갑옷 470세트(1880부위)**. 부서지지 않고, 전설 이상은 불에 타지 않습니다.
+
+- **얻는 법 (지금)**: 크리에이티브 탭 'RPG 장비 · 등급' (등급마다 탭 하나), 또는 `/aw gear <등급> [weapon|armor|set|all] [개수]` (OP).
+  등급 키: `common good rare hero legendary mythic secret unknown`. 나중에 맵·몹·상자 드롭으로 연결할 수 있게 만들었습니다.
+- **무기**: 검·대검·단검·도끼·전투 망치·창·낫·태도·레이피어·철퇴·지팡이·완드 12종. 손에 들면 공격력·공격 속도와 함께
+  **능력 피해 / 치명타 확률 / 치명타 피해** 등이 붙습니다. **직업(능력)이 있으면 무기를 든 채로 좌클릭해도 능력 평타**가 나가고, 무기 능력치가 평타·스킬·궁극기에 모두 적용됩니다.
+  지팡이·완드는 공격력이 낮은 대신 능력 피해가 높습니다.
+- **추가 능력치**: 최대 체력, 이동 속도, 재사용 대기시간 감소, 흡혈, 궁극기 충전, 방어력, 치명타, 밀쳐내기 저항, 받는 피해 감소, 행운.
+- **무기 특수 효과 (영웅 이상)**: 화염(불태움), 서리(느리게), 번개(번개 + 추가 피해), 출혈, 맹독, 쇠약, 흡혈, 신성(주변 아군 회복), 처형(체력 30% 이하 적에게 추가 피해),
+  연쇄(옆 적에게 튐), 폭발(주변 피해), 공허(끌어당기기 + 어둠), 가속(스킬 쿨타임 감소), 광폭(힘).
+- **갑옷 세트**: 같은 세트 4부위를 모두 입으면 세트 효과가 켜집니다 (툴팁에 '세트: 이름 (n/4)'). 희귀 이상은 능력치, 전설 이상은 특수 효과
+  (재생, 화염 저항, 신속, 가시(근접 피해 30% 반사), 수호(30초마다 보호막), 밤눈, 물의 숨결, 도약, 강철 의지(저항), 치유의 오라).
+  갑옷 모양은 12가지 (가죽·사슬·판금·로브·비늘·뼈·수정·기사·용·천사·악마·암살자) × 재료 색.
+- 장비 정의는 `tools/gen_gear.py` 가 만든 `data/abilitywar/gear/gear.json` 에 있습니다 (이름·능력치·효과·그림을 한 번에 다시 생성).
+
+## 처음 접속: 직업 선택
+
+직업(능력)이 없는 플레이어가 서버에 처음 들어오면 **직업 선택 화면**이 뜹니다. 고르기 전에는 닫을 수 없고, 고른 직업은 저장되어
+**다음에 접속할 때도 그 직업으로 시작**합니다. 게임 규칙 `abilitywarFirstJoinSelect`(기본 켜짐)로 끌 수 있습니다.
+(2차·3차 전직은 맵과 퀘스트를 만들 때 이어서 추가할 예정입니다.)
+
 ## 화면 표시
 
 - **오른쪽 아래 스킬 바** (능력마다 전용 그림): 1·2·3·4·R 아이콘. 쿨타임은 숫자가 아니라 **어두운 부채꼴이 시계방향으로 줄어드는 게이지**(빛나는 바늘 포함)로 표시되고, 다 차면 반짝이며 소리가 납니다.
@@ -316,8 +364,9 @@ RPG 의 버퍼 역할. 찬가로 **자신과 같은 팀**(`/team`)을 강화하�
 | `/aw clear [플레이어]` | 능력 해제 |
 | `/aw charge [플레이어] [양]` | 궁극기 게이지 채우기 (OP) |
 | `/aw reset [플레이어]` | 쿨타임 초기화 (OP) |
+| `/aw gear <등급> [weapon\|armor\|set\|all] [개수]` | 그 등급의 RPG 장비를 무작위로 받기 (OP) |
 
-게임 규칙: `abilitywarNoCooldown`(쿨타임 없음, 테스트용), `abilitywarSelfSelect`(B 화면으로 직접 선택 허용), `abilitywarCinematicRadius`(궁극기 연출 반경, 기본 10), `abilitywarUltChargePercent`(게이지 충전 배율 %).
+게임 규칙: `abilitywarNoCooldown`(쿨타임 없음, 테스트용), `abilitywarSelfSelect`(B 화면으로 직접 선택 허용), `abilitywarCinematicRadius`(궁극기 연출 반경, 기본 10), `abilitywarUltChargePercent`(게이지 충전 배율 %), `abilitywarFirstJoinSelect`(처음 접속 시 직업 선택 화면).
 `/team` 으로 같은 팀이 된 플레이어는 스킬에 맞지 않습니다.
 
 ## 애니메이션
@@ -340,7 +389,7 @@ RPG 의 버퍼 역할. 찬가로 **자신과 같은 팀**(`/team`)을 강화하�
 ## 개발자용
 
 ```
-./gradlew build          # build/libs/abilitywar-1.7.0.jar
+./gradlew build          # build/libs/abilitywar-1.8.0.jar
 ./gradlew runClient      # 개발 클라이언트
 python3 tools/gen_textures.py     # 이펙트/아이콘 텍스처 다시 생성
 python3 tools/gen_animations.py   # 애니메이션 JSON 다시 생성
@@ -356,7 +405,8 @@ python3 tools/gen_hud.py cantor   # 성가사 스킬바 (보내주신 그림)
 python3 tools/gen_warlock_textures.py   # 흑마법사 소환진/영혼/사슬/흑마법서/눈 텍스처
 python3 tools/import_hud_art.py tools/art/warlock_hud_original.webp tools/art/warlock_hud_source.png && python3 tools/gen_hud.py warlock   # 흑마법사 스킬바
 python3 tools/gen_angel_textures.py   # 천사 날개/깃털/마법진/빛줄기 텍스처, 열정 아이콘
-python3 tools/gen_angel_hud.py && python3 tools/gen_hud.py angel   # 천사 스킬바 (임시 그림)
+python3 tools/gen_gear.py             # RPG 장비 470+470: 정의(gear.json)·이름·아이콘·착용 텍스처·한눈에 보는 그림 (tools/gear_data.py 에 단어/색)
+python3 tools/import_hud_art.py tools/art/angel_hud_original.webp tools/art/angel_hud_source.png --black && python3 tools/gen_hud.py angel   # 천사 스킬바 (보내주신 그림)
 bash tools/gen_sounds.sh          # 합성 효과음 다시 생성
 ```
 

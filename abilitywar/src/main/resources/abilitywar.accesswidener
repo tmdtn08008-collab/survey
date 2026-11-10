@@ -7,3 +7,9 @@ accessible field net/minecraft/client/option/KeyBinding KEYS_BY_ID Ljava/util/Ma
 accessible field net/minecraft/client/option/KeyBinding boundKey Lnet/minecraft/client/util/InputUtil$Key;
 accessible field net/minecraft/client/render/entity/model/PlayerEntityModel thinArms Z
 accessible field net/minecraft/client/MinecraftClient attackCooldown I
+accessible field net/minecraft/client/Mouse x D
+mutable field net/minecraft/client/Mouse x D
+accessible field net/minecraft/client/Mouse y D
+mutable field net/minecraft/client/Mouse y D
+accessible field net/minecraft/client/gui/screen/ingame/HandledScreen x I
+accessible field net/minecraft/client/gui/screen/ingame/HandledScreen y I

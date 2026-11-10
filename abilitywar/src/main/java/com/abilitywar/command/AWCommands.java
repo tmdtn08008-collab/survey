@@ -32,6 +32,39 @@ public final class AWCommands {
     private static final SuggestionProvider<ServerCommandSource> ABILITIES = (ctx, b) ->
             CommandSource.suggestMatching(Abilities.all().stream().map(a -> a.key), b);
 
+    private static final SuggestionProvider<ServerCommandSource> GRADES = (ctx, b) ->
+            CommandSource.suggestMatching(java.util.Arrays.stream(com.abilitywar.gear.GearGrade.values()).map(g -> g.key), b);
+
+    /** /aw gear <등급> [weapon|armor|set|all] [개수]: 그 등급 장비를 무작위로 받음 (set = 갑옷 한 벌). */
+    private static int gear(CommandContext<ServerCommandSource> ctx, String kind, int count) throws CommandSyntaxException {
+        ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
+        com.abilitywar.gear.GearGrade g = com.abilitywar.gear.GearGrade.byKey(StringArgumentType.getString(ctx, "grade"));
+        java.util.Random r = new java.util.Random();
+        int given = 0;
+        for (int i = 0; i < count; i++) {
+            List<net.minecraft.item.Item> give = new java.util.ArrayList<>();
+            boolean weapon = kind.equals("weapon") || (kind.equals("all") && r.nextBoolean());
+            if (weapon) {
+                var l = com.abilitywar.gear.GearItems.WEAPONS.get(g);
+                give.add(l.get(r.nextInt(l.size())));
+            } else {
+                var sets = com.abilitywar.gear.GearItems.SETS.get(g);
+                var set = sets.get(r.nextInt(sets.size()));
+                var items = com.abilitywar.gear.GearItems.setItems(set);
+                if (kind.equals("set")) give.addAll(items);
+                else give.add(items.get(r.nextInt(items.size())));
+            }
+            for (net.minecraft.item.Item it : give) {
+                net.minecraft.item.ItemStack st = new net.minecraft.item.ItemStack(it);
+                if (!p.getInventory().insertStack(st)) p.dropItem(st, false);
+                given++;
+            }
+        }
+        int n = given;
+        ctx.getSource().sendFeedback(() -> Text.translatable("gear.abilitywar.ui.give", g.displayName(), n), false);
+        return n;
+    }
+
     public static void init() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, env) -> register(dispatcher));
     }
@@ -53,6 +86,13 @@ public final class AWCommands {
                         .executes(ctx -> clear(List.of(ctx.getSource().getPlayerOrThrow())))
                         .then(argument("targets", EntityArgumentType.players()).requires(s -> s.hasPermissionLevel(2))
                                 .executes(ctx -> clear(EntityArgumentType.getPlayers(ctx, "targets")))))
+                .then(literal("gear").requires(s -> s.hasPermissionLevel(2))
+                        .then(argument("grade", StringArgumentType.word()).suggests(GRADES)
+                                .executes(ctx -> gear(ctx, "all", 1))
+                                .then(argument("kind", StringArgumentType.word()).suggests((c, sb) -> CommandSource.suggestMatching(List.of("weapon", "armor", "set", "all"), sb))
+                                        .executes(ctx -> gear(ctx, StringArgumentType.getString(ctx, "kind"), 1))
+                                        .then(argument("count", com.mojang.brigadier.arguments.IntegerArgumentType.integer(1, 36))
+                                                .executes(ctx -> gear(ctx, StringArgumentType.getString(ctx, "kind"), com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "count")))))))
                 .then(literal("charge").requires(s -> s.hasPermissionLevel(2))
                         .executes(ctx -> charge(List.of(ctx.getSource().getPlayerOrThrow()), 100))
                         .then(argument("targets", EntityArgumentType.players())

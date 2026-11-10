@@ -18,4 +18,9 @@ public class InGameHudMixin {
             ci.cancel();
         }
     }
+
+    @Inject(method = "renderHotbarItem", at = @At("HEAD"))
+    private void aw$gearHotbar(DrawContext context, int x, int y, float tickDelta, net.minecraft.entity.player.PlayerEntity player, net.minecraft.item.ItemStack stack, int seed, CallbackInfo ci) {
+        com.abilitywar.client.gear.GearClient.slotBackground(context, x, y, stack);
+    }
 }

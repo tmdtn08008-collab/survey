@@ -48,7 +48,7 @@ public final class TestDriver {
     public static void tick(MinecraftClient mc) {
         if (lines == null) return;
         if (mc.player == null || mc.world == null) return;
-        if (mc.currentScreen != null && worldTicks > 0 && !(mc.currentScreen instanceof com.abilitywar.client.screen.GrimoireScreen)) mc.setScreen(null);
+        if (mc.currentScreen != null && worldTicks > 0 && !(mc.currentScreen instanceof com.abilitywar.client.screen.GrimoireScreen) && !(mc.currentScreen instanceof com.abilitywar.client.screen.AbilitySelectScreen) && !(mc.currentScreen instanceof net.minecraft.client.gui.screen.ingame.HandledScreen<?>)) mc.setScreen(null);
         worldTicks++;
         if (!started) {
             if (worldTicks < 60) return;
@@ -132,6 +132,22 @@ public final class TestDriver {
                     b.writeByte(Integer.parseInt(p2[0]));
                     b.writeVarInt(Integer.parseInt(p2[1]));
                     net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(com.abilitywar.net.AWNet.C2S_SOUL_ACTION, b);
+                }
+                // 장비 테스트: 인벤토리 열기 / 칸 위에 마우스 올리기 (툴팁)
+                case "inv" -> mc.setScreen(new net.minecraft.client.gui.screen.ingame.InventoryScreen(mc.player));
+                case "hoverslot" -> {
+                    if (mc.currentScreen instanceof net.minecraft.client.gui.screen.ingame.HandledScreen<?> hs) {
+                        net.minecraft.screen.slot.Slot sl = hs.getScreenHandler().slots.get(Integer.parseInt(arg));
+                        double sf = mc.getWindow().getScaleFactor();
+                        mc.mouse.x = (hs.x + sl.x + 8) * sf;
+                        mc.mouse.y = (hs.y + sl.y + 8) * sf;
+                    }
+                }
+                case "mouse" -> {
+                    String[] p3 = arg.split(" ");
+                    double sf = mc.getWindow().getScaleFactor();
+                    mc.mouse.x = Double.parseDouble(p3[0]) * sf;
+                    mc.mouse.y = Double.parseDouble(p3[1]) * sf;
                 }
                 case "close" -> {
                     if (mc.currentScreen != null) mc.currentScreen.close();

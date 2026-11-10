@@ -282,5 +282,8 @@
  "subtitles.abilitywar.angel.bless": "축복",
  "subtitles.abilitywar.angel.choir": "천상의 합창",
  "subtitles.abilitywar.angel.beam": "천상의 빛줄기",
- "subtitles.abilitywar.angel.wings": "날갯짓"
+ "subtitles.abilitywar.angel.wings": "날갯짓",
+ "abilitywar.screen.first_title": "직업 선택",
+ "abilitywar.screen.first_hint": "처음 한 번 고르면 접속할 때마다 이 직업으로 시작합니다",
+ "abilitywar.screen.first_choose": "이 직업으로 시작"
 }

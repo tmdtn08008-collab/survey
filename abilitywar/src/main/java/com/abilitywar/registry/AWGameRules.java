@@ -18,6 +18,10 @@ public final class AWGameRules {
     public static final GameRules.Key<GameRules.IntRule> ULT_CHARGE_PERCENT =
             GameRuleRegistry.register("abilitywarUltChargePercent", GameRules.Category.PLAYER, GameRuleFactory.createIntRule(100, 0, 10000));
 
+    /** 직업(능력)이 없는 플레이어가 접속하면 직업 선택 화면을 띄움 (고르기 전에는 닫을 수 없음). */
+    public static final GameRules.Key<GameRules.BooleanRule> FIRST_JOIN_SELECT =
+            GameRuleRegistry.register("abilitywarFirstJoinSelect", GameRules.Category.PLAYER, GameRuleFactory.createBooleanRule(true));
+
     public static void init() {
     }
 

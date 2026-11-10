@@ -271,7 +271,8 @@ public final class InputHandler {
             useSkill(SkillSlot.PASSIVE);
             return true;
         }
-        if (!p.getMainHandStack().isEmpty()) return locked(p);
+        // RPG 무기를 들고 있으면 능력 평타 (무기 능력치가 붙음), 다른 아이템이면 바닐라 공격
+        if (!p.getMainHandStack().isEmpty() && !(p.getMainHandStack().getItem() instanceof com.abilitywar.gear.GearWeaponItem)) return locked(p);
         HitResult hit = mc.crosshairTarget;
         if (hit != null && hit.getType() == HitResult.Type.BLOCK) return locked(p);
         if (locked(p) || blockHeld || ClientState.busy > 0) return true;

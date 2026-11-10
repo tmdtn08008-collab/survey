@@ -282,5 +282,8 @@
  "subtitles.abilitywar.angel.bless": "Blessing",
  "subtitles.abilitywar.angel.choir": "Heavenly choir",
  "subtitles.abilitywar.angel.beam": "Heavenly beam",
- "subtitles.abilitywar.angel.wings": "Wings beat"
+ "subtitles.abilitywar.angel.wings": "Wings beat",
+ "abilitywar.screen.first_title": "Choose your class",
+ "abilitywar.screen.first_hint": "Pick once - you will start with this class every time you join",
+ "abilitywar.screen.first_choose": "Start with this class"
 }

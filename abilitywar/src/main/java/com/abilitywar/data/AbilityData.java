@@ -86,6 +86,11 @@ public class AbilityData {
         if (player instanceof ServerPlayerEntity sp && sp.getWorld().getGameRules().getBoolean(AWGameRules.NO_COOLDOWN)) {
             ticks = Math.min(ticks, 10);
         }
+        // RPG 장비: 재사용 대기시간 감소
+        if (player != null) {
+            net.minecraft.entity.attribute.EntityAttributeInstance cdr = player.getAttributeInstance(com.abilitywar.gear.GearAttributes.COOLDOWN);
+            if (cdr != null && cdr.getValue() > 0) ticks = Math.max(1, (int) Math.round(ticks * (1 - cdr.getValue())));
+        }
         cdEnd[slot.ordinal()] = now + ticks;
         cdTotal[slot.ordinal()] = ticks;
         dirty = true;
@@ -127,6 +132,8 @@ public class AbilityData {
         if (amount <= 0) return;
         if (player instanceof ServerPlayerEntity sp) {
             amount *= sp.getWorld().getGameRules().getInt(AWGameRules.ULT_CHARGE_PERCENT) / 100f;
+            net.minecraft.entity.attribute.EntityAttributeInstance uc = sp.getAttributeInstance(com.abilitywar.gear.GearAttributes.ULT_CHARGE);
+            if (uc != null) amount *= 1f + (float) uc.getValue();
         }
         float before = ult;
         ult = Math.min(ULT_MAX, ult + amount);

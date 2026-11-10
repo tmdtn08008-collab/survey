@@ -12,6 +12,10 @@ import net.minecraft.util.math.Vec3d;
 
 public final class ClientNet {
     public static void init() {
+        ClientPlayNetworking.registerGlobalReceiver(AWNet.S2C_OPEN_SELECT, (client, handler, buf, sender) -> {
+            boolean forced = buf.readBoolean();
+            client.execute(() -> com.abilitywar.client.screen.AbilitySelectScreen.request(forced));
+        });
         ClientPlayNetworking.registerGlobalReceiver(AWNet.S2C_STATE, (client, handler, buf, sender) -> {
             net.minecraft.network.PacketByteBuf copy = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.copy(buf);
             client.execute(() -> {
