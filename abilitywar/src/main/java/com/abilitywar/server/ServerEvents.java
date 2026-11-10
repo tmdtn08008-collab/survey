@@ -14,15 +14,20 @@ import net.minecraft.util.ActionResult;
 public final class ServerEvents {
     public static void init() {
         ServerTickEvents.END_SERVER_TICK.register(AbilityManager::tickServer);
-        ServerLifecycleEvents.SERVER_STOPPING.register(s -> ServerActions.clear());
+        ServerLifecycleEvents.SERVER_STOPPING.register(s -> {
+            com.abilitywar.ability.warlock.Necromancy.shutdown(s);
+            ServerActions.clear();
+        });
 
         ServerLivingEntityEvents.ALLOW_DAMAGE.register(AbilityManager::allowDamage);
         // 서버 종료 등으로 고정이 풀리지 않은 엔티티 복구
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
             if (entity.getCommandTags().contains(com.abilitywar.combat.Combat.NOGRAV_TAG)) com.abilitywar.combat.Combat.hold(entity, false);
+            com.abilitywar.ability.warlock.Necromancy.onLoad(entity);
         });
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
             if (entity instanceof ServerPlayerEntity sp) AbilityManager.onDeathOrRespawn(sp);
+            com.abilitywar.ability.warlock.Necromancy.onDeath(entity, source);
         });
 
         ServerPlayerEvents.COPY_FROM.register((oldPlayer, newPlayer, alive) -> {

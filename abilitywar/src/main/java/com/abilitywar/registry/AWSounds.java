@@ -62,6 +62,14 @@ public final class AWSounds {
     public static final SoundEvent BLADE_MARK = reg("blade.mark");
     public static final SoundEvent BLOOD_SLASH = reg("blood.slash");
     public static final SoundEvent CANTOR_NOTE = reg("cantor.note");
+    public static final SoundEvent WARLOCK_BOLT = reg("warlock.bolt");
+    public static final SoundEvent WARLOCK_CHANT = reg("warlock.chant");
+    public static final SoundEvent WARLOCK_SUMMON = reg("warlock.summon");
+    public static final SoundEvent WARLOCK_BEAM = reg("warlock.beam");
+    public static final SoundEvent WARLOCK_CHAIN = reg("warlock.chain");
+    public static final SoundEvent WARLOCK_ULT = reg("warlock.ult");
+    public static final SoundEvent WARLOCK_RIP = reg("warlock.rip");
+    public static final SoundEvent WARLOCK_SOUL = reg("warlock.soul");
     public static final SoundEvent CANTOR_HYMN = reg("cantor.hymn");
     public static final SoundEvent CANTOR_SANCTUARY = reg("cantor.sanctuary");
     public static final SoundEvent CANTOR_BELL = reg("cantor.bell");

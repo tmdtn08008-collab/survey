@@ -243,6 +243,7 @@ public final class AbilityManager {
     public static void tickServer(MinecraftServer server) {
         long now = server.getTicks();
         ServerActions.tick();
+        com.abilitywar.ability.warlock.Necromancy.tick(server);
         for (ServerPlayerEntity p : server.getPlayerManager().getPlayerList()) {
             tickPlayer(p, now);
         }
@@ -253,6 +254,10 @@ public final class AbilityManager {
     /** @return false 면 피해 취소. */
     public static boolean allowDamage(LivingEntity victim, DamageSource source, float amount) {
         if (victim.getWorld().isClient) return true;
+        // 흑마법사 하수인: 주인 / 같은 팀 / 같은 주인의 하수인끼리는 피해 없음
+        Entity src = source.getAttacker();
+        if (src != null && src != victim && (com.abilitywar.ability.warlock.Necromancy.isMinion(src) || com.abilitywar.ability.warlock.Necromancy.isMinion(victim))
+                && com.abilitywar.ability.warlock.Necromancy.allied(src, victim)) return false;
         if (victim instanceof ServerPlayerEntity sp) {
             AbilityData d = data(sp);
             d.setNow(sp.getServer().getTicks());
@@ -277,6 +282,8 @@ public final class AbilityManager {
                 net.minecraft.entity.effect.StatusEffectInstance v = la.getStatusEffect(AWEffects.VALOR);
                 if (v != null) mult *= 1f + 0.15f * (v.getAmplifier() + 1);
                 if (la.hasStatusEffect(AWEffects.DISSONANCE)) mult *= 0.8f;
+                // 되살린 몹은 피해 절반
+                if (com.abilitywar.ability.warlock.Necromancy.isRaised(la)) mult *= 0.5f;
             }
             net.minecraft.entity.effect.StatusEffectInstance ag = victim.getStatusEffect(AWEffects.AEGIS);
             if (ag != null) mult *= Math.max(0.4f, 1f - 0.15f * (ag.getAmplifier() + 1));
@@ -308,6 +315,8 @@ public final class AbilityManager {
         if (victim.getWorld().isClient || lost <= 0.001f) return;
         if (source.isOf(net.minecraft.entity.damage.DamageTypes.GENERIC_KILL) || source.isOf(net.minecraft.entity.damage.DamageTypes.OUT_OF_WORLD)) return;
         Entity attacker = source.getAttacker();
+        if (attacker != null && attacker != victim) com.abilitywar.ability.warlock.Necromancy.onHit(attacker, victim);
+        com.abilitywar.ability.warlock.Necromancy.onHurt(victim, lost);
         byte kind = kindHint;
         if (kind < 0) {
             if (source.isIn(AWDamage.TAG_ULTIMATE)) kind = AWNet.DMG_ULT;

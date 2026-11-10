@@ -31,6 +31,7 @@ public class AbilityWar implements ModInitializer {
         AWEntities.init();
         AWGameRules.init();
         Abilities.init();
+        com.abilitywar.ability.warlock.GrimoireScreenHandler.init();
         AWNet.initServer();
         AWCommands.init();
         ServerEvents.init();

@@ -197,7 +197,38 @@ def cantor():
     save(out, 'ult_title_cantor.png')
 
 
+def warlock():
+    """흑마법사: 영어 SOUL HARVEST (창백한 녹색) + 금 간 글자 + 피어오르는 영혼 불꽃."""
+    W, H = 1024, 220
+    m = text_mask(W, H, 'SOUL HARVEST', LATIN, 92, 8, 1)
+    # 금 간 자국
+    r = random.Random(13)
+    cr = Image.new('L', (W, H), 0)
+    d = ImageDraw.Draw(cr)
+    for _ in range(14):
+        x, y = r.uniform(120, W - 120), r.uniform(70, 150)
+        pts = [(x, y)]
+        for k in range(4):
+            pts.append((pts[-1][0] + r.uniform(-14, 14), pts[-1][1] + r.uniform(-12, 12)))
+        d.line(pts, fill=255, width=3)
+    crack = np.asarray(cr, np.float32) / 255
+    out = compose(W, H, m, (230, 255, 240), (120, 240, 170), (20, 120, 80), (4, 14, 10), (60, 230, 150), 16, 41, rough=0.3)
+    out[..., :3] = out[..., :3] * (1 - 0.8 * (crack * m)[..., None])
+    sp = Image.new('L', (W, H), 0)
+    d = ImageDraw.Draw(sp)
+    for _ in range(40):
+        x, y = r.uniform(80, W - 80), r.uniform(10, 70)
+        s = r.uniform(2, 6)
+        d.ellipse([x - s, y - s * 1.6, x + s, y + s], fill=int(r.uniform(120, 255)))
+    spa = np.asarray(sp.filter(ImageFilter.GaussianBlur(1.6)), np.float32) / 255
+    for k, c in enumerate((0.55, 1.0, 0.75)):
+        out[..., k] = out[..., k] * (1 - spa) + c * spa
+    out[..., 3] = np.maximum(out[..., 3], spa)
+    save(out, 'ult_title_warlock.png')
+
+
 if __name__ == '__main__':
+    warlock()
     cantor()
     blood()
     dragon()

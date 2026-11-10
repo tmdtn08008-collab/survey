@@ -63,6 +63,7 @@ public final class ArtSkillBar {
         ultimate(td, time, locked);
         passive(td, time);
         if ("cantor".equals(ClientState.ability)) cantor(ctx, time);
+        if ("warlock".equals(ClientState.ability)) warlock(ctx, time);
         isAdditive = false;
         RenderSystem.defaultBlendFunc();
         TextRenderer tr = mc.textRenderer;
@@ -231,6 +232,41 @@ public final class ArtSkillBar {
         }
         isAdditive = false;
         RenderSystem.defaultBlendFunc();
+    }
+
+    /** 흑마법사: T 칸 = 모은 영혼 수 (주변에 영혼이 있으면 빛남), 2번 칸 = 되살린 몹 수, 1번 칸 = 해골이 나와 있음. */
+    private static void warlock(DrawContext ctx, float time) {
+        int souls = ClientState.extra & 31, raised = (ClientState.extra >> 5) & 7;
+        boolean skel = ((ClientState.extra >> 8) & 1) != 0, nearby = ((ClientState.extra >> 9) & 1) != 0;
+        TextRenderer tr = MinecraftClient.getInstance().textRenderer;
+        float[] t = L.slots.get("passive");
+        if (t != null) {
+            if (nearby) {
+                additive(true);
+                maskRect(t, 0, 1, ar, ag, ab, 0.25f + 0.2f * (float) Math.sin(time * 0.4));
+                additive(false);
+            }
+            corner(ctx, tr, t, String.valueOf(souls), nearby ? 0xFFE0FFF0 : 0xFFB8FFD8, false);
+        }
+        float[] s2 = L.slots.get("skill2");
+        if (s2 != null && raised > 0) corner(ctx, tr, s2, raised + "/6", 0xFF7CFFB0, true);
+        float[] s1 = L.slots.get("skill1");
+        if (s1 != null && skel) corner(ctx, tr, s1, "☠", 0xFF7CFFB0, true);
+        isAdditive = false;
+        RenderSystem.defaultBlendFunc();
+    }
+
+    /** 칸 모서리에 작은 글자 (top=true 면 왼쪽 위, 아니면 오른쪽 아래 근처 위쪽). */
+    private static void corner(DrawContext ctx, TextRenderer tr, float[] s, String txt, int color, boolean top) {
+        float h = (s[3] - s[1]) * sc;
+        float scale = Math.max(0.5f, Math.min(1f, h / 26f));
+        float x = top ? bx + s[0] * sc + 1.5f : bx + s[0] * sc + 1.5f;
+        float y = top ? by + s[1] * sc + 1.5f : by + s[3] * sc - 9 * scale;
+        ctx.getMatrices().push();
+        ctx.getMatrices().translate(x, y, 120);
+        ctx.getMatrices().scale(scale, scale, 1);
+        ctx.drawTextWithShadow(tr, txt, 0, 0, color);
+        ctx.getMatrices().pop();
     }
 
     private static void passive(float td, float time) {

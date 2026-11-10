@@ -34,6 +34,9 @@ public final class AWNet {
     public static final Identifier C2S_SELECT = AbilityWar.id("select");
     // S2C
     public static final Identifier S2C_STATE = AbilityWar.id("state");
+    public static final Identifier S2C_SOULS = AbilityWar.id("souls");
+    public static final Identifier C2S_GRIMOIRE = AbilityWar.id("grimoire");
+    public static final Identifier C2S_SOUL_ACTION = AbilityWar.id("soul_action");
     public static final Identifier S2C_ANIM = AbilityWar.id("anim");
     public static final Identifier S2C_FX = AbilityWar.id("fx");
     public static final Identifier S2C_DAMAGE = AbilityWar.id("damage");
@@ -68,6 +71,16 @@ public final class AWNet {
         ServerPlayNetworking.registerGlobalReceiver(C2S_BLOCK, (server, player, handler, buf, sender) -> {
             boolean pressed = buf.readBoolean();
             server.execute(() -> AbilityManager.handleBlock(player, pressed));
+        });
+        ServerPlayNetworking.registerGlobalReceiver(C2S_GRIMOIRE, (server, player, handler, buf, sender) ->
+                server.execute(() -> com.abilitywar.ability.warlock.WarlockAbility.openGrimoire(player)));
+        ServerPlayNetworking.registerGlobalReceiver(C2S_SOUL_ACTION, (server, player, handler, buf, sender) -> {
+            int action = buf.readByte();
+            int id = buf.readVarInt();
+            server.execute(() -> {
+                if ("warlock".equals(((com.abilitywar.data.AWPlayer) player).aw$getAbilityKey()))
+                    com.abilitywar.ability.warlock.WarlockAbility.soulAction(player, action, id);
+            });
         });
         ServerPlayNetworking.registerGlobalReceiver(C2S_SELECT, (server, player, handler, buf, sender) -> {
             String key = buf.readString(64);

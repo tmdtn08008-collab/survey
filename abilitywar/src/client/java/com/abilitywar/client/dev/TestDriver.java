@@ -48,7 +48,7 @@ public final class TestDriver {
     public static void tick(MinecraftClient mc) {
         if (lines == null) return;
         if (mc.player == null || mc.world == null) return;
-        if (mc.currentScreen != null && worldTicks > 0) mc.setScreen(null);
+        if (mc.currentScreen != null && worldTicks > 0 && !(mc.currentScreen instanceof com.abilitywar.client.screen.GrimoireScreen)) mc.setScreen(null);
         worldTicks++;
         if (!started) {
             if (worldTicks < 60) return;
@@ -118,6 +118,24 @@ public final class TestDriver {
                     return;
                 }
                 case "say" -> mc.player.networkHandler.sendChatMessage(arg);
+                // 흑마법서 화면 테스트: 열기 / 칸 빠른 이동 / 영혼 동작 / 닫기
+                case "grimoire" -> net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(com.abilitywar.net.AWNet.C2S_GRIMOIRE,
+                        net.fabricmc.fabric.api.networking.v1.PacketByteBufs.empty());
+                case "quickmove" -> {
+                    if (mc.player.currentScreenHandler != null && mc.interactionManager != null)
+                        mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, Integer.parseInt(arg), 0,
+                                net.minecraft.screen.slot.SlotActionType.QUICK_MOVE, mc.player);
+                }
+                case "soulaction" -> {
+                    String[] p2 = arg.split(" ");
+                    net.minecraft.network.PacketByteBuf b = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create();
+                    b.writeByte(Integer.parseInt(p2[0]));
+                    b.writeVarInt(Integer.parseInt(p2[1]));
+                    net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(com.abilitywar.net.AWNet.C2S_SOUL_ACTION, b);
+                }
+                case "close" -> {
+                    if (mc.currentScreen != null) mc.currentScreen.close();
+                }
                 case "clearchat" -> mc.inGameHud.getChatHud().clear(false);
                 case "bind" -> {
                     String[] p = arg.split("\\s+");

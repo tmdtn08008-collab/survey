@@ -20,11 +20,12 @@ public final class CinematicOverlay {
     static final Theme BLADE = new Theme("blade", 0.12f, 0.02f, 0.18f, 0xB44CFF, 0x8A2BE2, 0xF5E8FF, 0xD8B8FF, 0xD8B8FF, 0xF0D8FF, 20, 46, 48, 40);
     static final Theme DRAGON = new Theme("dragon", 0.2f, 0.05f, 0.0f, 0xFF7A2E, 0xFF4A12, 0xFFF1DC, 0xFFD2A0, 0xFFC890, 0xFFE6C0, 26, 56, 58, 42);
     static final Theme CANTOR = new Theme("cantor", 0.2f, 0.16f, 0.05f, 0xFFD86A, 0xFFC040, 0xFFF6DC, 0xFFE6A0, 0xFFE6A0, 0xFFF6DC, 16, 48, 40, 36);
+    static final Theme WARLOCK = new Theme("warlock", 0.02f, 0.1f, 0.06f, 0x48E8A0, 0x2AA870, 0xE0FFF0, 0xA8F0CC, 0xA8F0CC, 0xD8FFE8, 16, 26, 26, 24);
     static final Theme BLOOD = new Theme("blood", 0.24f, 0.0f, 0.02f, 0xFF2A3A, 0xD0102A, 0xFFE4E4, 0xFFB4B4, 0xFFB0B0, 0xFFD8D8, 16, 58, 36, 34);
 
     static Theme theme() {
         String ty = CameraController.cinematicType();
-        return ty.startsWith("dragon") ? DRAGON : ty.startsWith("blade") ? BLADE : ty.startsWith("blood") ? BLOOD : ty.startsWith("cantor") ? CANTOR : VOID;
+        return ty.startsWith("dragon") ? DRAGON : ty.startsWith("blade") ? BLADE : ty.startsWith("blood") ? BLOOD : ty.startsWith("cantor") ? CANTOR : ty.startsWith("warlock") ? WARLOCK : VOID;
     }
 
     public static void render(DrawContext ctx, float td) {
@@ -123,7 +124,7 @@ public final class CinematicOverlay {
             float sa = Math.min(1, Math.max(0, (tt - 3) / 5f)) * out;
             int sw2 = tr.getWidth(sub);
             float lineW = (sw2 * 1.4f + 40) * Math.min(1, tt / 10f);
-            HudDraw.rect(ctx, sw / 2f - lineW, cy + 20, sw / 2f + lineW, cy + 21, HudDraw.argb(sa * 0.8f, th == DRAGON ? 0xFF9A50 : th == BLADE ? 0xC870FF : th == BLOOD ? 0xFF3A4A : th == CANTOR ? 0xFFD86A : 0xB27BFF));
+            HudDraw.rect(ctx, sw / 2f - lineW, cy + 20, sw / 2f + lineW, cy + 21, HudDraw.argb(sa * 0.8f, th == DRAGON ? 0xFF9A50 : th == BLADE ? 0xC870FF : th == BLOOD ? 0xFF3A4A : th == CANTOR ? 0xFFD86A : th == WARLOCK ? 0x48E8A0 : 0xB27BFF));
             ctx.getMatrices().push();
             ctx.getMatrices().translate(sw / 2f, cy + 27, 0);
             ctx.getMatrices().scale(1.4f, 1.4f, 1);

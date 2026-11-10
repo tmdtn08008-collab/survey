@@ -37,6 +37,8 @@ public class AbilityData {
     public long lastArmorText;
     public long frozenUntil;
 
+    /** 흑마법사의 흑마법서 (해골 장비 + 영혼). 다른 능력으로 바꿔도 유지. */
+    public final com.abilitywar.ability.warlock.Grimoire grimoire = new com.abilitywar.ability.warlock.Grimoire();
     /** 능력마다 쓰는 작은 상태값 (HUD 로 보냄). 성가사: 선율(0~2) + 음표 수 * 4. */
     public int extra;
     public boolean shadowForm;
@@ -168,6 +170,7 @@ public class AbilityData {
         tag.putIntArray("CdRemaining", rem);
         tag.putIntArray("CdTotal", tot);
         tag.putBoolean("ForcedNoGravity", forcedNoGravity);
+        tag.put("Grimoire", grimoire.write());
         nbt.put("AbilityWar", tag);
     }
 
@@ -180,6 +183,7 @@ public class AbilityData {
         int[] tot = tag.getIntArray("CdTotal");
         for (int i = 0; i < N && i < tot.length; i++) cdTotal[i] = tot[i];
         pendingRemaining = rem;
+        if (tag.contains("Grimoire")) grimoire.read(tag.getCompound("Grimoire"));
         if (tag.getBoolean("ForcedNoGravity")) {
             player.setNoGravity(false);
         }
@@ -189,6 +193,7 @@ public class AbilityData {
     /** 다른 플레이어 객체(리스폰)로 복사. */
     public void copyFrom(AbilityData other) {
         ult = other.ult;
+        grimoire.read(other.grimoire.write());
         for (int i = 0; i < N; i++) {
             cdEnd[i] = other.cdEnd[i];
             cdTotal[i] = other.cdTotal[i];

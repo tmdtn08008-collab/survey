@@ -32,6 +32,17 @@ public abstract class LivingEntityMixin extends Entity {
         super(type, world);
     }
 
+    /** 흑마법사 하수인은 죽어도 아이템/경험치를 떨어뜨리지 않는다. */
+    @Inject(method = "drop", at = @At("HEAD"), cancellable = true)
+    private void aw$minionDrop(DamageSource source, org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
+        if (com.abilitywar.ability.warlock.Necromancy.isMinion(this)) ci.cancel();
+    }
+
+    @Inject(method = "dropXp", at = @At("HEAD"), cancellable = true)
+    private void aw$minionXp(org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
+        if (com.abilitywar.ability.warlock.Necromancy.isMinion(this)) ci.cancel();
+    }
+
     @ModifyVariable(method = "damage", at = @At("HEAD"), argsOnly = true)
     private float aw$modifyDamage(float amount, DamageSource source, float originalAmount) {
         if (this.getWorld().isClient) return amount;

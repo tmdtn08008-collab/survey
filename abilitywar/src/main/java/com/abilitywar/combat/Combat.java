@@ -36,6 +36,7 @@ public final class Combat {
         if (target instanceof PlayerEntity p && (p.isCreative() && !(attacker instanceof PlayerEntity))) return false;
         if (target instanceof ArmorStandEntity as && as.isMarker()) return false;
         if (attacker != null && attacker.isTeammate(target)) return false;
+        if (attacker != null && com.abilitywar.ability.warlock.Necromancy.allied(attacker, target)) return false;
         if (target instanceof AWPlayer awp && awp.aw$hasFlag(AWPlayer.FLAG_SHADOW)) return false;
         return true;
     }

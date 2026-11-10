@@ -2312,6 +2312,287 @@ write('cantor', C)
 
 
 # =====================================================================================
+#                              흑마법사 (warlock)
+# =====================================================================================
+W = {}
+WGR = ([8, -14, 6.5], [26, 2, 56])     # 1인칭: 손바닥을 앞으로 (불꽃)
+WGL = ([-8, -14.5, 6], [24, -2, -56])
+W_PUSH_R = ([4, -10, 15], [8, 6, 20])  # 앞으로 쭉 (광선/구체)
+W_PUSH_L = ([-4, -10, 14.5], [8, -6, -20])
+W_UP_R = ([5, -3, 8], [84, 6, 40])
+W_UP_L = ([-5, -3, 7.5], [84, -6, -40])
+W_GRASP_R = ([3, -8, 16], [30, 6, 10])
+W_PULL_R = ([7, -12, 6], [40, -20, 70])
+W_DOWN_R = ([3, -17, 12], [-30, 8, 30])
+
+
+def WP(**kw):
+    """흑마법사 기본 자세: 살짝 구부정, 두 손은 앞쪽 아래에서 불꽃을 쥐고 있음."""
+    d = {
+        'body': [8, 0, 0], 'head': [-6, 0, 0],
+        'right_arm': [-28, -6, 14], 'left_arm': [-28, 6, -14],
+        'right_leg': [4, 4, 3], 'left_leg': [-4, -4, -3],
+        'root': {'pos': [0, -0.4, 0], 'rot': [0, 0, 0]},
+    }
+    for k, v in kw.items():
+        if k == 'root':
+            d['root'] = dict(d['root'], **v)
+        else:
+            d[k] = v
+    return d
+
+
+WK = WP()
+
+
+def WF(R=WGR, L=WGL, cam=(0, 0, 0), fov=0):
+    return {'R': R, 'L': L, 'cam': list(cam), 'fov': fov}
+
+
+WFG = WF()
+
+W['warlock.idle'] = clip(60, loop=True, bones={
+    'body': {'rot': cyc(60, [8, 0, 0], [1.5, 0, 0])},
+    'head': {'rot': cyc(60, [-6, 0, 0], [1.5, 5, 0], phase=1.0)},
+    'right_arm': {'rot': cyc(60, [-28, -6, 14], [4, 3, 3], phase=0.3)},
+    'left_arm': {'rot': cyc(60, [-28, 6, -14], [4, -3, -3], phase=1.2)},
+    'right_leg': {'rot': {'0': [4, 4, 3]}},
+    'left_leg': {'rot': {'0': [-4, -4, -3]}},
+    'root': {'pos': cyc(60, [0, -0.4, 0], [0, -0.3, 0])},
+}, fp={
+    'right_arm': {'pos': cyc(60, WGR[0], [0.2, 0.5, 0.1]), 'rot': cyc(60, WGR[1], [2, 2, 2])},
+    'left_arm': {'pos': cyc(60, WGL[0], [0.2, 0.5, 0.1], phase=1.2), 'rot': cyc(60, WGL[1], [2, -2, -2], phase=1.2)},
+})
+W['warlock.walk'] = clip(20, loop=True, stride=9.42, bones={
+    'body': {'rot': cyc(20, [9, 0, 0], [0, 5, 0], phase=math.pi)},
+    'head': {'rot': {'0': [-7, 0, 0]}},
+    'right_arm': {'rot': cyc(20, [-24, -6, 14], [16, 0, 0], phase=math.pi)},
+    'left_arm': {'rot': cyc(20, [-24, 6, -14], [16, 0, 0])},
+    'right_leg': {'rot': cyc(20, [0, 0, 2], [32, 0, 0])},
+    'left_leg': {'rot': cyc(20, [0, 0, -2], [32, 0, 0], phase=math.pi)},
+    'root': {'pos': cyc(20, [0, -0.3, 0], [0, 0, 0], harm=([0, 0.45, 0], -math.pi / 2))},
+}, fp={
+    'right_arm': {'pos': cyc(20, WGR[0], [0.3, 0.7, 0.9], phase=math.pi), 'rot': cyc(20, WGR[1], [3, 0, 0], phase=math.pi)},
+    'left_arm': {'pos': cyc(20, WGL[0], [0.3, 0.7, 0.9]), 'rot': cyc(20, WGL[1], [3, 0, 0])},
+})
+W['warlock.run'] = clip(18, loop=True, stride=9.42, bones={
+    'body': {'rot': cyc(18, [22, 0, 0], [0, 7, 0], phase=math.pi, harm=([1.5, 0, 0], 0))},
+    'head': {'rot': {'0': [-20, 0, 0]}},
+    'right_arm': {'rot': cyc(18, [30, 4, 20], [14, 0, 4], phase=math.pi)},
+    'left_arm': {'rot': cyc(18, [30, -4, -20], [14, 0, -4])},
+    'right_leg': {'rot': cyc(18, [-6, 0, 2], [54, 0, 0], harm=([-8, 0, 0], 0))},
+    'left_leg': {'rot': cyc(18, [-6, 0, -2], [54, 0, 0], phase=math.pi, harm=([-8, 0, 0], 0))},
+    'root': {'pos': cyc(18, [0, 0, 0], [0, 0, 0], harm=([0, 1.0, 0], -math.pi / 2)), 'rot': {'0': [5, 0, 0]}},
+}, fp={
+    'right_arm': {'pos': cyc(18, [9, -19, 3.5], [0.4, 1.4, 1.2], phase=math.pi), 'rot': cyc(18, [6, 0, 64], [8, 0, 0], phase=math.pi)},
+    'left_arm': {'pos': cyc(18, [-9, -19, 3], [0.4, 1.4, 1.2]), 'rot': cyc(18, [6, 0, -64], [8, 0, 0])},
+    'camera': {'rot': cyc(18, [0, 0, 0], [0, 0, 0.6], harm=([0.5, 0, 0], 0))},
+    'fov': {'0': [5, 0, 0]},
+})
+W['warlock.sneak'] = clip(50, loop=True, bones={
+    'body': {'rot': cyc(50, [28, 0, 0], [1.2, 0, 0])},
+    'head': {'rot': {'0': [-20, 0, 0]}},
+    'right_arm': {'rot': cyc(50, [-36, -6, 16], [3, 0, 0], phase=0.4)},
+    'left_arm': {'rot': cyc(50, [-36, 6, -16], [3, 0, 0], phase=0.9)},
+    'right_leg': {'rot': {'0': [12, 4, 4]}, 'pos': {'0': [0, 0, -1]}},
+    'left_leg': {'rot': {'0': [-18, -4, -4]}, 'pos': {'0': [0, 0, 1]}},
+    'root': {'pos': {'0': [0, -1.5, 0]}},
+}, fp={
+    'right_arm': {'pos': cyc(50, [7.5, -15, 7.5], [0, 0.3, 0]), 'rot': cyc(50, [24, 2, 58], [1.5, 0, 0])},
+    'left_arm': {'pos': cyc(50, [-7.5, -15.5, 7], [0, 0.3, 0], phase=0.6), 'rot': cyc(50, [22, -2, -58], [1.5, 0, 0], phase=0.6)},
+    'fov': {'0': [-3, 0, 0]},
+})
+W['warlock.sneak_walk'] = clip(20, loop=True, stride=9.42, bones={
+    'body': {'rot': cyc(20, [28, 0, 0], [0, 4, 0])},
+    'head': {'rot': {'0': [-20, 0, 0]}},
+    'right_arm': {'rot': cyc(20, [-36, -6, 16], [8, 0, 0], phase=math.pi)},
+    'left_arm': {'rot': cyc(20, [-36, 6, -16], [8, 0, 0])},
+    'right_leg': {'rot': cyc(20, [4, 4, 4], [24, 0, 0])},
+    'left_leg': {'rot': cyc(20, [-4, -4, -4], [24, 0, 0], phase=math.pi)},
+    'root': {'pos': cyc(20, [0, -1.5, 0], [0, 0, 0], harm=([0, 0.3, 0], -math.pi / 2))},
+}, fp={
+    'right_arm': {'pos': cyc(20, [7.5, -15, 7.5], [0.2, 0.4, 0.6], phase=math.pi), 'rot': cyc(20, [24, 2, 58], [2, 0, 0], phase=math.pi)},
+    'left_arm': {'pos': cyc(20, [-7.5, -15.5, 7], [0.2, 0.4, 0.6]), 'rot': cyc(20, [22, -2, -58], [2, 0, 0])},
+    'fov': {'0': [-3, 0, 0]},
+})
+W['warlock.air'] = clip(24, loop=True, bones={
+    'body': {'rot': cyc(24, [6, 0, 0], [2, 0, 0])},
+    'head': {'rot': {'0': [-8, 0, 0]}},
+    'right_arm': {'rot': cyc(24, [-44, 10, 44], [6, 0, 6])},
+    'left_arm': {'rot': cyc(24, [-44, -10, -44], [6, 0, -6], phase=0.6)},
+    'right_leg': {'rot': {'0': [20, 4, 6]}},
+    'left_leg': {'rot': {'0': [-24, -4, -5]}},
+}, fp={
+    'right_arm': {'pos': cyc(24, [10, -12.5, 6], [0, 0.6, 0]), 'rot': cyc(24, [40, -14, 70], [3, 0, 0])},
+    'left_arm': {'pos': cyc(24, [-10, -13, 5.5], [0, 0.6, 0], phase=0.6), 'rot': cyc(24, [38, 14, -70], [3, 0, 0], phase=0.6)},
+})
+W_BLK = {'body': [10, 0, 0], 'head': [6, 0, 0], 'right_arm': [-100, -42, 6], 'left_arm': [-96, 44, -6], 'right_leg': [8, 4, 4], 'left_leg': [-10, -4, -4], 'root': {'pos': [0, -0.8, 0], 'rot': [0, 0, 0]}}
+W['warlock.block'] = clip(40, loop=True, blend_in=2, bones={
+    'body': {'rot': cyc(40, [10, 0, 0], [1, 0, 0])},
+    'head': {'rot': {'0': [6, 0, 0]}},
+    'right_arm': {'rot': cyc(40, [-100, -42, 6], [2, 0, 0])},
+    'left_arm': {'rot': cyc(40, [-96, 44, -6], [2, 0, 0], phase=0.5)},
+    'right_leg': {'rot': {'0': [8, 4, 4]}},
+    'left_leg': {'rot': {'0': [-10, -4, -4]}},
+    'root': {'pos': {'0': [0, -0.8, 0]}},
+}, fp={
+    'right_arm': {'pos': cyc(40, ([3, -10, 10]), [0, 0.2, 0]), 'rot': cyc(40, [44, 40, 50], [1, 0, 0])},
+    'left_arm': {'pos': cyc(40, ([-3, -10.5, 9.5]), [0, 0.2, 0], phase=0.5), 'rot': cyc(40, [42, -40, -50], [1, 0, 0], phase=0.5)},
+    'fov': {'0': [-4, 0, 0]},
+})
+W['warlock.block_hit'] = clip(7, blend_in=0.5, blend_out=3, bones=seq([
+    (0, W_BLK),
+    (1.5, dict(W_BLK, body=[-4, 0, 0], right_arm=[-108, -36, 6], left_arm=[-104, 38, -6], root={'pos': [0, -0.8, -1.6], 'rot': [-4, 0, 0]}), 'outExpo'),
+    (7, W_BLK, 'outCubic'),
+]), fp=fpseq([
+    (0, {'R': ([3, -10, 10], [44, 40, 50]), 'L': ([-3, -10.5, 9.5], [42, -40, -50]), 'cam': [0, 0, 0]}),
+    (1.5, {'R': ([3, -9, 7.5], [50, 40, 50]), 'L': ([-3, -9.5, 7], [48, -40, -50]), 'cam': [-2.5, 0, 1.2]}, 'outExpo'),
+    (7, {'R': ([3, -10, 10], [44, 40, 50]), 'L': ([-3, -10.5, 9.5], [42, -40, -50]), 'cam': [0, 0, 0]}, 'outCubic'),
+]))
+
+
+def wcast(length, hit, arm_w, arm_h, body_w, body_h, fp_w, fp_h, cam, other=None, fov=-1):
+    o = other or {}
+    bones = seq([
+        (0, WK),
+        (hit * 0.5, WP(body=body_w, right_arm=arm_w, **o, root={'pos': [0, -0.4, -0.4]}), 'outQuad'),
+        (hit, WP(body=body_h, right_arm=arm_h, **o, root={'pos': [0, -0.6, 0.8]}), 'outExpo'),
+        (hit + (length - hit) * 0.5, WP(body=[body_h[0], body_h[1] * 0.8, 0], right_arm=add(arm_h, [4, 0, 0]), **o, root={'pos': [0, -0.5, 0.5]})),
+        (length, WK, 'inOutSine'),
+    ])
+    fp = fpseq([
+        (0, dict(WFG)),
+        (hit * 0.5, {'R': fp_w, 'cam': [-0.3, 0.5, 0.4], 'fov': 1}, 'outQuad'),
+        (hit, {'R': fp_h, 'cam': list(cam), 'fov': fov}, 'outExpo'),
+        (hit + (length - hit) * 0.5, {'R': (fp_h[0], add(fp_h[1], [-3, 0, 0])), 'cam': [x * 0.4 for x in cam], 'fov': fov * 0.4}),
+        (length, dict(WFG), 'inOutSine'),
+    ])
+    return clip(length, bones=bones, fp=fp, blend_in=0.5, blend_out=2.5)
+
+
+W['warlock.attack1'] = wcast(8, 2.5, [-60, 30, 40], [-92, -10, 4], [0, 16, 0], [8, -16, 0], ([10, -10, 6], [40, -30, 70]), W_PUSH_R, (0.6, -0.8, -0.8))
+W['warlock.attack2'] = wcast(8, 2.5, [-40, -10, 10], [-90, 6, -4], [0, 10, 0], [6, 14, 0], ([2, -16, 8], [-10, 20, 30]), W_PUSH_R, (0.6, 0.8, 0.8),
+                             other={'left_arm': [-92, 10, -4]})
+W['warlock.attack3'] = clip(14, blend_in=0.5, blend_out=3, bones=seq([
+    (0, WK),
+    (3, WP(body=[-8, 0, 0], head=[-14, 0, 0], right_arm=[-40, 30, 50], left_arm=[-40, -30, -50], root={'pos': [0, 0.3, -0.6]}), 'outCubic'),
+    (5, WP(body=[18, 0, 0], head=[0, 0, 0], right_arm=[-90, -14, 4], left_arm=[-90, 14, -4], root={'pos': [0, -0.8, 1.4], 'rot': [3, 0, 0]}, right_leg=[-12, 4, 4], left_leg=[14, -4, -4]), 'outExpo'),
+    (9, WP(body=[14, 0, 0], right_arm=[-88, -14, 6], left_arm=[-88, 14, -6], root={'pos': [0, -0.6, 1.1], 'rot': [2, 0, 0]})),
+    (14, WK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(WFG)),
+    (3, {'R': ([12, -10, 4], [40, -40, 80]), 'L': ([-12, -10, 3.5], [40, 40, -80]), 'cam': [-2, 0, 0], 'fov': 3}, 'outCubic'),
+    (5, {'R': W_PUSH_R, 'L': W_PUSH_L, 'cam': [3.5, 0, 0], 'fov': -6}, 'outExpo'),
+    (9, {'R': (W_PUSH_R[0], [6, 6, 20]), 'L': (W_PUSH_L[0], [6, -6, -20]), 'cam': [1.5, 0, 0], 'fov': -3}),
+    (14, dict(WFG), 'inOutSine'),
+]))
+
+# 1. 해골 소환: 땅을 짚었다가 (5) 손을 들어 올려 끌어냄 (8)
+W_KNEEL = WP(body=[34, 0, 0], head=[10, 0, 0], right_arm=[-20, -10, 6], left_arm=[-40, 20, -20], root={'pos': [0, -3.6, 0.8]}, right_leg=[-60, 6, 4], left_leg=[36, -4, -4])
+W['warlock.skill1'] = clip(16, blend_in=0.8, blend_out=4, bones=seq([
+    (0, WK),
+    (4, W_KNEEL, 'outCubic'),
+    (6, dict(W_KNEEL, right_arm=[-14, -10, 6])),
+    (8.5, WP(body=[-6, 0, 0], head=[-20, 0, 0], right_arm=[-160, -10, 14], left_arm=[-50, 20, -30], root={'pos': [0, 0.2, 0]}), 'outExpo'),
+    (12, WP(body=[-4, 0, 0], head=[-16, 0, 0], right_arm=[-150, -10, 14], left_arm=[-48, 20, -30], root={'pos': [0, 0.1, 0]})),
+    (16, WK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(WFG)),
+    (4, {'R': W_DOWN_R, 'L': ([-6, -14, 9], [10, -10, -40]), 'cam': [12, 0, 0], 'fov': -4}, 'outCubic'),
+    (6, {'R': (W_DOWN_R[0], [-34, 8, 30]), 'cam': [13, 0, 0]}),
+    (8.5, {'R': W_UP_R, 'cam': [-6, 0, 0], 'fov': 6}, 'outExpo'),
+    (12, {'R': (W_UP_R[0], [80, 6, 40]), 'cam': [-4, 0, 0], 'fov': 4}),
+    (16, dict(WFG), 'inOutSine'),
+]))
+# 2. 사령 소환: 두 손을 천천히 들어 (8) 위로 확 (10)
+W['warlock.skill2'] = clip(18, blend_in=0.8, blend_out=4, bones=seq([
+    (0, WK),
+    (8, WP(body=[-4, 0, 0], head=[-10, 0, 0], right_arm=[-80, 30, 30], left_arm=[-80, -30, -30], root={'pos': [0, -0.2, 0]}), 'inOutSine'),
+    (10.5, WP(body=[-16, 0, 0], head=[-30, 0, 0], right_arm=[-170, 10, 20], left_arm=[-170, -10, -20], root={'pos': [0, 0.5, 0], 'rot': [-4, 0, 0]}), 'outExpo'),
+    (14, WP(body=[-14, 0, 0], head=[-26, 0, 0], right_arm=[-164, 10, 22], left_arm=[-164, -10, -22], root={'pos': [0, 0.4, 0]})),
+    (18, WK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(WFG)),
+    (8, {'R': ([10, -8, 7], [60, -30, 70]), 'L': ([-10, -8, 6.5], [60, 30, -70]), 'cam': [-2, 0, 0], 'fov': 2}, 'inOutSine'),
+    (10.5, {'R': W_UP_R, 'L': W_UP_L, 'cam': [-8, 0, 0], 'fov': 8}, 'outExpo'),
+    (14, {'cam': [-6, 0, 0], 'fov': 6}),
+    (18, dict(WFG), 'inOutSine'),
+]))
+# 3. 흑마법 광선: 두 손을 앞으로 모아 14틱 동안 쏨 (떨림)
+_bm = [(0, WK), (2, WP(body=[-6, 20, 0], right_arm=[-60, 40, 30], left_arm=[-60, -10, -30], root={'pos': [0, -0.4, -0.8]}), 'outCubic')]
+_bf = [(0, dict(WFG)), (2, {'R': ([10, -10, 5], [40, -30, 70]), 'L': ([-6, -12, 7], [30, 10, -60]), 'cam': [-1, 1, 0.5], 'fov': 2}, 'outCubic')]
+for k in range(6):
+    t = 3 + k * 2
+    s = 1 if k % 2 == 0 else -1
+    _bm.append((t, WP(body=[14, -4 + s, 0], head=[-2, 0, 0], right_arm=[-92 + s, -12, 2], left_arm=[-90 - s, 14, -2], root={'pos': [0, -0.8, 0.4 + 0.15 * s], 'rot': [2, 0, 0]}, right_leg=[-10, 4, 4], left_leg=[12, -4, -4]),
+                'outExpo' if k == 0 else 'inOutSine'))
+    _bf.append((t, {'R': (add(W_PUSH_R[0], [0, 0.15 * s, -0.4]), W_PUSH_R[1]), 'L': (add(W_PUSH_L[0], [0, -0.15 * s, -0.4]), W_PUSH_L[1]), 'cam': [1.2 + 0.4 * s, 0.3 * s, 0.4 * s], 'fov': -4},
+                'outExpo' if k == 0 else 'inOutSine'))
+_bm.append((18, WK, 'inOutSine'))
+_bf.append((18, dict(WFG), 'inOutSine'))
+W['warlock.skill3'] = clip(18, blend_in=0.6, blend_out=3, bones=seq(_bm), fp=fpseq(_bf))
+# 4. 속박: 앞으로 손을 뻗어 움켜쥐고 (2) 아래로 끌어내림 (5)
+W['warlock.skill4'] = clip(14, blend_in=0.5, blend_out=4, bones=seq([
+    (0, WK),
+    (2, WP(body=[4, -14, 0], right_arm=[-100, -14, 0], root={'pos': [0, -0.4, 0.8]}), 'outExpo'),
+    (3.5, WP(body=[6, -14, 0], right_arm=[-104, -14, 0], root={'pos': [0, -0.4, 0.8]})),
+    (5.5, WP(body=[20, -10, 0], head=[6, 4, 0], right_arm=[-30, -10, 20], root={'pos': [0, -1.2, 0]}, right_leg=[-10, 4, 4], left_leg=[12, -4, -4]), 'outExpo'),
+    (9, WP(body=[18, -8, 0], head=[4, 4, 0], right_arm=[-32, -10, 20], root={'pos': [0, -1.1, 0]})),
+    (14, WK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(WFG)),
+    (2, {'R': W_GRASP_R, 'cam': [-1, -0.5, -0.5], 'fov': -3}, 'outExpo'),
+    (3.5, {'R': (W_GRASP_R[0], [34, 6, 10])}),
+    (5.5, {'R': W_DOWN_R, 'cam': [6, 0, 0], 'fov': -5}, 'outExpo'),
+    (9, {'R': (W_DOWN_R[0], [-28, 8, 30]), 'cam': [3, 0, 0], 'fov': -2}),
+    (14, dict(WFG), 'inOutSine'),
+]))
+# R. 영혼 강탈 (50틱): 손을 뻗음 → 천천히 움켜쥐며 들어 올림 → 26 확 잡아당김
+W['warlock.ult'] = clip(50, blend_in=1, blend_out=5, bones=seq([
+    (0, WK),
+    (6, WP(body=[10, -16, 0], head=[-4, 8, 0], right_arm=[-96, -10, 0], left_arm=[-30, 20, -40], root={'pos': [0, -0.6, 0.8]}), 'outCubic'),
+    (14, WP(body=[8, -16, 0], head=[-6, 8, 0], right_arm=[-104, -10, 0], left_arm=[-30, 20, -40], root={'pos': [0, -0.6, 0.8]})),
+    (24, WP(body=[0, -14, 0], head=[-14, 8, 0], right_arm=[-140, -10, 0], left_arm=[-34, 20, -40], root={'pos': [0, -0.2, 0.6]}), 'inOutSine'),
+    (27, WP(body=[-18, 20, 0], head=[-10, -10, 0], right_arm=[-40, 40, 30], left_arm=[-20, 20, -40], root={'pos': [0, 0, -1.4], 'rot': [-4, 0, 0]}, right_leg=[10, 4, 4], left_leg=[-14, -4, -4]), 'outExpo'),
+    (36, WP(body=[-12, 16, 0], head=[-8, -8, 0], right_arm=[-60, 40, 20], left_arm=[-30, 20, -40], root={'pos': [0, -0.1, -1.0], 'rot': [-3, 0, 0]})),
+    (50, WK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(WFG)),
+    (6, {'R': W_GRASP_R, 'L': ([-9, -16, 5], [10, 0, -60]), 'cam': [0, 0, 0], 'fov': -4}, 'outCubic'),
+    (14, {'R': (W_GRASP_R[0], [36, 6, 10]), 'fov': -5}),
+    (24, {'R': ([3, -4, 14], [70, 6, 20]), 'cam': [-4, 0, 0], 'fov': -2}, 'inOutSine'),
+    (27, {'R': W_PULL_R, 'cam': [3, 2, 2], 'fov': 8}, 'outExpo'),
+    (36, {'R': (W_PULL_R[0], [44, -20, 70]), 'cam': [1, 1, 1], 'fov': 4}),
+    (50, dict(WFG), 'inOutSine'),
+]))
+# T. 영혼 수집: 팔을 휘둘러 손바닥으로 끌어들임
+W['warlock.collect'] = clip(12, blend_in=0.5, blend_out=3, bones=seq([
+    (0, WK),
+    (3, WP(body=[0, 20, 0], right_arm=[-80, 50, 40], left_arm=[-60, 10, -30], root={'pos': [0, -0.2, 0]}), 'outCubic'),
+    (6, WP(body=[4, -14, 0], right_arm=[-90, -30, -10], left_arm=[-60, 10, -30], root={'pos': [0, -0.4, -0.3]}), 'inOutCubic'),
+    (12, WK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(WFG)),
+    (3, {'R': ([14, -10, 5], [40, -50, 80]), 'cam': [-0.5, 1, 0.6], 'fov': 3}, 'outCubic'),
+    (6, {'R': ([1, -11, 11], [30, 30, 20]), 'cam': [0.5, -0.6, -0.4], 'fov': -2}, 'inOutCubic'),
+    (12, dict(WFG), 'inOutSine'),
+]))
+W['warlock.select'] = clip(26, blend_in=2, blend_out=5, bones=seq([
+    (0, WP(body=[0, 0, 0], head=[0, 0, 0], right_arm=[0, 0, 0], left_arm=[0, 0, 0], right_leg=[0, 0, 0], left_leg=[0, 0, 0], root={'pos': [0, 0, 0]})),
+    (8, WP(body=[20, 0, 0], head=[20, 0, 0], right_arm=[-40, 30, 30], left_arm=[-40, -30, -30], root={'pos': [0, -0.8, 0]}), 'outCubic'),
+    (14, WP(body=[-14, 0, 0], head=[-26, 0, 0], right_arm=[-120, 20, 50], left_arm=[-120, -20, -50], root={'pos': [0, 0.3, 0]}), 'outExpo'),
+    (26, WK, 'inOutSine'),
+]), fp=fpseq([
+    (0, {'R': LOW_R, 'L': LOW_L, 'cam': [0, 0, 0]}),
+    (8, {'R': WGR, 'L': WGL}, 'outCubic'),
+    (14, {'R': W_UP_R, 'L': W_UP_L, 'cam': [-2, 0, 0]}, 'outExpo'),
+    (26, dict(WFG), 'inOutSine'),
+]))
+
+write('warlock', W)
+
+
+# =====================================================================================
 #                        공통 피격 반응 (능력 없는 플레이어 포함)
 # =====================================================================================
 C = {}

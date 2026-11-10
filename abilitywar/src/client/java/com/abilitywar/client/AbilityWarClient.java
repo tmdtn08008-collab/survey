@@ -32,6 +32,7 @@ public class AbilityWarClient implements ClientModInitializer {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void onInitializeClient() {
+        net.minecraft.client.gui.screen.ingame.HandledScreens.register(com.abilitywar.ability.warlock.GrimoireScreenHandler.TYPE, com.abilitywar.client.screen.GrimoireScreen::new);
         InputHandler.init();
         com.abilitywar.client.dev.TestDriver.init();
         ClientNet.init();
@@ -57,6 +58,7 @@ public class AbilityWarClient implements ClientModInitializer {
                 helper.register(new com.abilitywar.client.fx.blade.BladeParts.Feature(pr));
                 helper.register(new com.abilitywar.client.fx.blood.BloodParts.Feature(pr));
                 helper.register(new com.abilitywar.client.fx.cantor.CantorParts.Feature(pr));
+                helper.register(new com.abilitywar.client.fx.warlock.WarlockParts.Feature(pr));
             }
         });
 

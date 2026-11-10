@@ -39,7 +39,7 @@ import java.util.Map;
  */
 public final class InputHandler {
     public static final String CATEGORY = "key.categories.abilitywar";
-    public static KeyBinding SKILL1, SKILL2, SKILL3, SKILL4, ULTIMATE, PASSIVE, BLOCK, SELECT, DASH;
+    public static KeyBinding SKILL1, SKILL2, SKILL3, SKILL4, ULTIMATE, PASSIVE, BLOCK, SELECT, DASH, GRIMOIRE;
     private static KeyBinding[] SLOT_KEYS;
 
     private static boolean blockHeld;
@@ -62,6 +62,7 @@ public final class InputHandler {
         BLOCK = reg("key.abilitywar.block", GLFW.GLFW_KEY_F);
         SELECT = reg("key.abilitywar.select", GLFW.GLFW_KEY_B);
         DASH = reg("key.abilitywar.dash", GLFW.GLFW_KEY_Q);
+        GRIMOIRE = reg("key.abilitywar.grimoire", GLFW.GLFW_KEY_G);
         SLOT_KEYS = new KeyBinding[]{SKILL1, SKILL2, SKILL3, SKILL4, ULTIMATE, PASSIVE};
     }
 
@@ -102,6 +103,11 @@ public final class InputHandler {
             return true;
         }
         if (!active()) return false;
+        if (GRIMOIRE.matchesKey(key, scancode) && "warlock".equals(ClientState.ability)) {
+            // 흑마법사: 흑마법서 (해골 장비 / 영혼 목록)
+            if (action == GLFW.GLFW_PRESS) ClientPlayNetworking.send(AWNet.C2S_GRIMOIRE, net.fabricmc.fabric.api.networking.v1.PacketByteBufs.empty());
+            return true;
+        }
         for (int i = 0; i < SLOT_KEYS.length; i++) {
             if (SLOT_KEYS[i].matchesKey(key, scancode)) {
                 if (action == GLFW.GLFW_PRESS) pressSlot(SkillSlot.VALUES[i]);

@@ -19,6 +19,13 @@ public final class ClientNet {
                 copy.release();
             });
         });
+        ClientPlayNetworking.registerGlobalReceiver(AWNet.S2C_SOULS, (client, handler, buf, sender) -> {
+            net.minecraft.network.PacketByteBuf copy = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.copy(buf);
+            client.execute(() -> {
+                com.abilitywar.client.screen.GrimoireScreen.read(copy);
+                copy.release();
+            });
+        });
         ClientPlayNetworking.registerGlobalReceiver(AWNet.S2C_ANIM, (client, handler, buf, sender) -> {
             int id = buf.readVarInt();
             String anim = buf.readString();

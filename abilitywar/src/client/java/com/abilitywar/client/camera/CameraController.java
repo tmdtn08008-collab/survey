@@ -234,6 +234,32 @@ public final class CameraController {
                 look = S.add(F.multiply(11 + 4 * k)).add(0, 2.0, 0);
                 fov = 80 - 3 * k;
             }
+        } else if (cin.type.equals("warlock_ult")) {
+            // T = 붙잡힌 대상 위치
+            Vec3d toT = new Vec3d(T.x - C.x, 0, T.z - C.z);
+            double dist = toT.length();
+            Vec3d dirT = dist > 1e-3 ? toT.normalize() : F;
+            Vec3d sideT = new Vec3d(-dirT.z, 0, dirT.x);
+            if (t < 14) {
+                // 손을 뻗는 흑마법사: 어깨 너머로 대상을 봄
+                float k = smooth(t / 14f);
+                cam = C.subtract(dirT.multiply(2.6 - 0.6 * k)).add(sideT.multiply(1.3)).add(0, 1.9, 0);
+                look = T.add(0, 1.0 + 0.6 * k, 0);
+                fov = 62 - 4 * k;
+            } else if (t < 30) {
+                // 어둠의 손이 대상을 움켜쥐어 들어 올림: 아래에서 올려다봄
+                float k = smooth((t - 14) / 16f);
+                cam = T.subtract(dirT.multiply(4.5)).add(sideT.multiply(3.5)).add(0, 0.4, 0);
+                look = T.add(0, 1.6 + 1.2 * k, 0);
+                fov = 74;
+            } else {
+                // 영혼을 뜯어냄: 옆에서 둘을 함께
+                float k = smooth((t - 30) / 20f);
+                Vec3d M = C.lerp(T, 0.5);
+                cam = M.add(sideT.multiply(dist * 0.6 + 4.5)).add(0, 2.2 - 0.4 * k, 0);
+                look = M.add(0, 1.4, 0);
+                fov = 72 - 3 * k;
+            }
         } else if (cin.type.equals("cantor_ult")) {
             Vec3d S = cin.start;
             if (t < 16) {
