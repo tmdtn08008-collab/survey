@@ -20,7 +20,20 @@ public final class AWEntities {
                     .disableSummon()
                     .build());
 
+    /** 전직 교관 NPC. */
+    public static final EntityType<com.abilitywar.rpg.JobMasterEntity> JOB_MASTER = Registry.register(Registries.ENTITY_TYPE,
+            AbilityWar.id("job_master"),
+            FabricEntityTypeBuilder.<com.abilitywar.rpg.JobMasterEntity>create(SpawnGroup.MISC, com.abilitywar.rpg.JobMasterEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.6f, 1.95f))
+                    .trackRangeBlocks(64)
+                    .fireImmune()
+                    .build());
+    public static final net.minecraft.item.Item JOB_MASTER_EGG = Registry.register(Registries.ITEM, AbilityWar.id("job_master_spawn_egg"),
+            new net.minecraft.item.SpawnEggItem(JOB_MASTER, 0x2A2440, 0xF0C860, new net.minecraft.item.Item.Settings()));
+
     public static void init() {
+        net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(JOB_MASTER, com.abilitywar.rpg.JobMasterEntity.createAttributes());
+        net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(net.minecraft.item.ItemGroups.SPAWN_EGGS).register(e -> e.add(JOB_MASTER_EGG));
     }
 
     private AWEntities() {

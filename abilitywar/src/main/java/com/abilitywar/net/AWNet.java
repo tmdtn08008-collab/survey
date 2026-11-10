@@ -91,6 +91,8 @@ public final class AWNet {
                 // 아직 직업이 없으면 (처음 접속) 게임 규칙과 상관없이 고를 수 있음
                 boolean first = ((com.abilitywar.data.AWPlayer) player).aw$getAbilityKey().isEmpty();
                 if (first && key.isEmpty()) return;
+                // 처음 고를 때는 1차 직업만 (관리자는 아무거나)
+                if (first && !com.abilitywar.rpg.ClassTree.isBase(key) && !player.hasPermissionLevel(2)) return;
                 if (!first && !player.getWorld().getGameRules().getBoolean(AWGameRules.SELF_SELECT) && !player.hasPermissionLevel(2)) {
                     player.sendMessage(Text.translatable("abilitywar.msg.select_locked"), true);
                     return;

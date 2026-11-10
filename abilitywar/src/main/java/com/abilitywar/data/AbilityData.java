@@ -48,6 +48,8 @@ public class AbilityData {
 
     public boolean dirty = true;
     public boolean forcedNoGravity;
+    /** RPG: 레벨, 스탯, 1차 직업, 전직 퀘스트. */
+    public final com.abilitywar.rpg.RpgData rpg = new com.abilitywar.rpg.RpgData();
 
     public AbilityData(PlayerEntity player) {
         this.player = player;
@@ -178,6 +180,7 @@ public class AbilityData {
         tag.putIntArray("CdTotal", tot);
         tag.putBoolean("ForcedNoGravity", forcedNoGravity);
         tag.put("Grimoire", grimoire.write());
+        tag.put("Rpg", rpg.write());
         nbt.put("AbilityWar", tag);
     }
 
@@ -191,6 +194,7 @@ public class AbilityData {
         for (int i = 0; i < N && i < tot.length; i++) cdTotal[i] = tot[i];
         pendingRemaining = rem;
         if (tag.contains("Grimoire")) grimoire.read(tag.getCompound("Grimoire"));
+        if (tag.contains("Rpg")) rpg.read(tag.getCompound("Rpg"));
         if (tag.getBoolean("ForcedNoGravity")) {
             player.setNoGravity(false);
         }
@@ -201,6 +205,7 @@ public class AbilityData {
     public void copyFrom(AbilityData other) {
         ult = other.ult;
         grimoire.read(other.grimoire.write());
+        rpg.copyFrom(other.rpg);
         for (int i = 0; i < N; i++) {
             cdEnd[i] = other.cdEnd[i];
             cdTotal[i] = other.cdTotal[i];

@@ -20,6 +20,7 @@ public final class Abilities {
     public static Ability CANTOR;
     public static Ability WARLOCK;
     public static Ability ANGEL;
+    public static Ability WARRIOR, MAGE, TANK, HEALER, GUARDIAN;
 
     public static void init() {
         VOID = register(new VoidAbility());
@@ -29,6 +30,12 @@ public final class Abilities {
         CANTOR = register(new com.abilitywar.ability.cantor.CantorAbility());
         WARLOCK = register(new com.abilitywar.ability.warlock.WarlockAbility());
         ANGEL = register(new com.abilitywar.ability.angel.AngelAbility());
+        // 1차 직업
+        WARRIOR = register(new com.abilitywar.ability.basic.WarriorClass());
+        MAGE = register(new com.abilitywar.ability.basic.MageClass());
+        TANK = register(new com.abilitywar.ability.basic.TankClass());
+        HEALER = register(new com.abilitywar.ability.basic.HealerClass());
+        GUARDIAN = register(new com.abilitywar.ability.guardian.GuardianAbility());
     }
 
     public static <T extends Ability> T register(T ability) {

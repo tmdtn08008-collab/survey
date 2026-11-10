@@ -52,6 +52,7 @@ public final class AbilityManager {
         d.clearCooldowns();
         d.ult = 0;
         ((AWPlayer) player).aw$setAbilityKey(ability == null ? "" : ability.key);
+        com.abilitywar.rpg.RpgManager.onAbilitySet(player, ability == null ? "" : ability.key);
         d.dirty = true;
         AWNet.sendState(player);
         if (ability != null) {
@@ -244,9 +245,11 @@ public final class AbilityManager {
         long now = server.getTicks();
         ServerActions.tick();
         com.abilitywar.ability.warlock.Necromancy.tick(server);
+        com.abilitywar.ability.guardian.GuardianAbility.tickWorld(server);
         for (ServerPlayerEntity p : server.getPlayerManager().getPlayerList()) {
             tickPlayer(p, now);
             com.abilitywar.gear.GearEffects.tick(p);
+            com.abilitywar.rpg.RpgManager.tick(p);
         }
     }
 
@@ -294,6 +297,7 @@ public final class AbilityManager {
                 amount = com.abilitywar.gear.GearEffects.outgoing(pa, victim, source, amount);
             else com.abilitywar.gear.GearEffects.lastCrit = false;
             amount = com.abilitywar.gear.GearEffects.incoming(victim, amount);
+            amount = com.abilitywar.ability.guardian.GuardianAbility.incoming(victim, source, amount);
         }
         if (!(victim instanceof ServerPlayerEntity sp)) return amount;
         AbilityData d = data(sp);
@@ -305,6 +309,7 @@ public final class AbilityManager {
         if (look.dotProduct(to) < 0.1) return amount; // 뒤/옆에서 맞음
         float factor = source.isIn(AWDamage.TAG_ABILITY_SKILL) ? 0.5f : 0.2f;
         float result = amount * factor;
+        com.abilitywar.rpg.RpgManager.onTanked(sp, amount - result);
         ServerWorld world = sp.getServerWorld();
         NbtCompound n = new NbtCompound();
         n.putInt("e", sp.getId());
@@ -340,6 +345,7 @@ public final class AbilityManager {
             if (ad.ability() != null) ad.ability().onDealtDamage(ap, ad, lost);
         }
         if (victim instanceof ServerPlayerEntity vp) {
+            com.abilitywar.rpg.RpgManager.onTanked(vp, lost);
             AbilityData vd = data(vp);
             if (vd.ability() != null) vd.ability().onDamaged(vp, vd, lost);
         }

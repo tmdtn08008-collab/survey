@@ -31,6 +31,12 @@ public final class GearTooltip {
         return t;
     }
 
+    static void levelLine(GearGrade g, List<Text> out) {
+        int need = g.requiredLevel();
+        int have = GearItem.CLIENT_LEVEL[0] == null ? 999 : GearItem.CLIENT_LEVEL[0].getAsInt();
+        out.add(c(Text.translatable("gear.abilitywar.ui.req_level", need), have >= need ? 0xB8B8C4 : 0xFF5555));
+    }
+
     static void lore(String key, List<Text> out) {
         if (!Language.getInstance().hasTranslation(key)) return;
         out.add(Text.translatable(key).styled(s -> s.withColor(TextColor.fromRgb(LORE)).withItalic(true)));
@@ -60,6 +66,7 @@ public final class GearTooltip {
         GearDefs.Weapon d = item.def;
         boolean unk = d.grade() == GearGrade.UNKNOWN;
         out.add(header(d.grade(), Text.translatable("gear.abilitywar.type." + d.type())));
+        levelLine(d.grade(), out);
         lore(item.getTranslationKey() + ".lore", out);
         out.add(Text.empty());
         out.add(c(Text.translatable("gear.abilitywar.ui.held"), 0xA0A0AC));
@@ -75,6 +82,7 @@ public final class GearTooltip {
         GearDefs.ArmorSet set = item.set;
         boolean unk = set.grade() == GearGrade.UNKNOWN;
         out.add(header(set.grade(), Text.translatable("gear.abilitywar.piece." + item.piece.slot())));
+        levelLine(set.grade(), out);
         lore(item.getTranslationKey() + ".lore", out);
         out.add(Text.empty());
         out.add(c(Text.translatable("gear.abilitywar.ui.worn"), 0xA0A0AC));

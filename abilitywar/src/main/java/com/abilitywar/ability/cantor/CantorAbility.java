@@ -130,6 +130,7 @@ public class CantorAbility extends Ability {
         n.putInt("d", ticks);
         AWNet.fx(w, t.getPos(), "cantor_buff", n);
         if (t != c) d.addUlt(3);
+        com.abilitywar.rpg.RpgManager.onBuff(c, 1);
     }
 
     static void heal(ServerWorld w, LivingEntity t, float amount) {

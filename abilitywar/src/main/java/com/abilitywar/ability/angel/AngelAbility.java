@@ -94,12 +94,12 @@ public class AngelAbility extends Ability {
 
     // =================================================================== 아군 / 회복 / 버프
 
-    static boolean ally(ServerPlayerEntity c, Entity e) {
+    public static boolean ally(ServerPlayerEntity c, Entity e) {
         return e == c || (e instanceof ServerPlayerEntity o && o.isAlive() && !o.isSpectator() && c.isTeammate(o));
     }
 
     /** 자신 + 같은 팀 플레이어. */
-    static List<ServerPlayerEntity> party(ServerPlayerEntity c, Vec3d center, double r) {
+    public static List<ServerPlayerEntity> party(ServerPlayerEntity c, Vec3d center, double r) {
         List<ServerPlayerEntity> out = new ArrayList<>();
         for (ServerPlayerEntity o : c.getServerWorld().getPlayers()) {
             if (ally(c, o) && o.getPos().squaredDistanceTo(center) <= r * r) out.add(o);
@@ -109,7 +109,7 @@ public class AngelAbility extends Ability {
 
     /** 조준한 아군 (자신 제외). */
     @Nullable
-    static ServerPlayerEntity aimedAlly(ServerPlayerEntity c, double range, double cone) {
+    public static ServerPlayerEntity aimedAlly(ServerPlayerEntity c, double range, double cone) {
         Vec3d eye = c.getEyePos(), look = c.getRotationVec(1f);
         ServerPlayerEntity best = null;
         double bestScore = Double.MAX_VALUE;
@@ -133,6 +133,7 @@ public class AngelAbility extends Ability {
 
     /** 회복 (+초록 숫자). 실제로 찬 체력만큼 궁극기 게이지. */
     static float heal(ServerWorld w, ServerPlayerEntity c, AbilityData d, LivingEntity t, float amount) {
+        amount *= com.abilitywar.rpg.RpgManager.healPower(c);
         float before = t.getHealth();
         if (before < t.getMaxHealth()) t.heal(amount);
         float got = t.getHealth() - before;
@@ -141,6 +142,7 @@ public class AngelAbility extends Ability {
         n.putFloat("a", amount);
         AWNet.fx(w, t.getPos(), "angel_heal", n);
         if (got > 0.01f) {
+            com.abilitywar.rpg.RpgManager.onHeal(c, got);
             AWNet.damageNumber(t, got, AWNet.DMG_HEAL, c);
             d.addUlt(got * GAUGE_PER_HEAL);
         }
@@ -162,7 +164,7 @@ public class AngelAbility extends Ability {
         if (t != c) d.addUlt(4);
     }
 
-    static void cleanse(LivingEntity t) {
+    public static void cleanse(LivingEntity t) {
         for (StatusEffect e : new StatusEffect[]{AWEffects.CONCUSSION, AWEffects.BLEED, AWEffects.SILENCE, AWEffects.DISSONANCE, AWEffects.DRAGON_MARK,
                 AWEffects.MANA_MARK, StatusEffects.SLOWNESS, StatusEffects.WEAKNESS, StatusEffects.POISON, StatusEffects.WITHER, StatusEffects.BLINDNESS}) {
             t.removeStatusEffect(e);

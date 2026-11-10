@@ -65,6 +65,11 @@ public final class AWCommands {
         return n;
     }
 
+    private static int rpgEach(Collection<ServerPlayerEntity> ps, java.util.function.Consumer<ServerPlayerEntity> f) {
+        for (ServerPlayerEntity p : ps) f.accept(p);
+        return ps.size();
+    }
+
     public static void init() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, env) -> register(dispatcher));
     }
@@ -86,6 +91,37 @@ public final class AWCommands {
                         .executes(ctx -> clear(List.of(ctx.getSource().getPlayerOrThrow())))
                         .then(argument("targets", EntityArgumentType.players()).requires(s -> s.hasPermissionLevel(2))
                                 .executes(ctx -> clear(EntityArgumentType.getPlayers(ctx, "targets")))))
+                .then(literal("level").requires(s -> s.hasPermissionLevel(2))
+                        .then(argument("level", com.mojang.brigadier.arguments.IntegerArgumentType.integer(1, com.abilitywar.rpg.RpgManager.MAX_LEVEL))
+                                .executes(ctx -> rpgEach(List.of(ctx.getSource().getPlayerOrThrow()), p -> com.abilitywar.rpg.RpgManager.setLevel(p, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "level"))))
+                                .then(argument("targets", EntityArgumentType.players())
+                                        .executes(ctx -> rpgEach(EntityArgumentType.getPlayers(ctx, "targets"), p -> com.abilitywar.rpg.RpgManager.setLevel(p, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "level")))))))
+                .then(literal("xp").requires(s -> s.hasPermissionLevel(2))
+                        .then(argument("amount", com.mojang.brigadier.arguments.IntegerArgumentType.integer(1))
+                                .executes(ctx -> rpgEach(List.of(ctx.getSource().getPlayerOrThrow()), p -> com.abilitywar.rpg.RpgManager.addXp(p, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "amount"))))
+                                .then(argument("targets", EntityArgumentType.players())
+                                        .executes(ctx -> rpgEach(EntityArgumentType.getPlayers(ctx, "targets"), p -> com.abilitywar.rpg.RpgManager.addXp(p, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "amount")))))))
+                .then(literal("stats").requires(s -> s.hasPermissionLevel(2))
+                        .then(literal("reset")
+                                .executes(ctx -> rpgEach(List.of(ctx.getSource().getPlayerOrThrow()), com.abilitywar.rpg.RpgManager::resetStats))
+                                .then(argument("targets", EntityArgumentType.players())
+                                        .executes(ctx -> rpgEach(EntityArgumentType.getPlayers(ctx, "targets"), com.abilitywar.rpg.RpgManager::resetStats)))))
+                .then(literal("quest").requires(s -> s.hasPermissionLevel(2))
+                        .then(literal("complete").executes(ctx -> rpgEach(List.of(ctx.getSource().getPlayerOrThrow()), com.abilitywar.rpg.RpgManager::forceProgress))
+                                .then(argument("targets", EntityArgumentType.players()).executes(ctx -> rpgEach(EntityArgumentType.getPlayers(ctx, "targets"), com.abilitywar.rpg.RpgManager::forceProgress))))
+                        .then(literal("abandon").executes(ctx -> rpgEach(List.of(ctx.getSource().getPlayerOrThrow()), com.abilitywar.rpg.RpgManager::abandon))
+                                .then(argument("targets", EntityArgumentType.players()).executes(ctx -> rpgEach(EntityArgumentType.getPlayers(ctx, "targets"), com.abilitywar.rpg.RpgManager::abandon)))))
+                .then(literal("npc").requires(s -> s.hasPermissionLevel(2)).executes(ctx -> {
+                    ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
+                    var npc = com.abilitywar.registry.AWEntities.JOB_MASTER.create(p.getServerWorld());
+                    if (npc == null) return 0;
+                    npc.refreshPositionAndAngles(p.getX(), p.getY(), p.getZ(), p.getYaw() + 180, 0);
+                    npc.setHeadYaw(p.getYaw() + 180);
+                    npc.setBodyYaw(p.getYaw() + 180);
+                    p.getServerWorld().spawnEntity(npc);
+                    ctx.getSource().sendFeedback(() -> Text.translatable("rpg.abilitywar.npc_spawned"), false);
+                    return 1;
+                }))
                 .then(literal("gear").requires(s -> s.hasPermissionLevel(2))
                         .then(argument("grade", StringArgumentType.word()).suggests(GRADES)
                                 .executes(ctx -> gear(ctx, "all", 1))

@@ -39,7 +39,7 @@ import java.util.UUID;
 public final class GearEffects {
     static final Random R = new Random();
     /** 장비 효과로 생긴 피해 처리 중 (효과가 또 효과를 부르지 않게). */
-    static boolean inEffect;
+    public static boolean inEffect;
     /** 이번 피해가 장비 치명타였는지 (피해 숫자 표시용). */
     public static boolean lastCrit;
     static final String[] CHAOS = {"ignite", "frost", "lightning", "bleed", "poison", "wither", "vampire", "chain", "explode", "void", "berserk"};
@@ -50,7 +50,9 @@ public final class GearEffects {
     }
 
     static GearDefs.Weapon weapon(LivingEntity e) {
-        return e.getMainHandStack().getItem() instanceof GearWeaponItem w ? w.def : null;
+        if (!(e.getMainHandStack().getItem() instanceof GearWeaponItem w)) return null;
+        if (e instanceof PlayerEntity p && !levelOk(p, w)) return null;
+        return w.def;
     }
 
     // ================================================================ 피해 계산 (AbilityManager.modifyDamage)
@@ -61,6 +63,9 @@ public final class GearEffects {
         if (inEffect) return amount;
         boolean vanillaMelee = source.isOf(DamageTypes.PLAYER_ATTACK);
         if (!vanillaMelee && source.isIn(AWDamage.TAG_ABILITY)) amount *= 1f + (float) attr(attacker, GearAttributes.ABILITY_DAMAGE);
+        // 스탯: 마법 직업은 지능(마법 피해), 그 외는 힘(물리 피해)
+        boolean magic = !vanillaMelee && com.abilitywar.rpg.ClassTree.isMagic(((com.abilitywar.data.AWPlayer) attacker).aw$getAbilityKey());
+        amount *= 1f + (float) attr(attacker, magic ? GearAttributes.MAGIC_DAMAGE : GearAttributes.PHYSICAL_DAMAGE);
         GearDefs.Weapon w = weapon(attacker);
         if (w != null) {
             for (GearDefs.Effect e : w.effects()) {
@@ -231,8 +236,50 @@ public final class GearEffects {
         return s;
     }
 
+    // ================================================================ 착용 레벨
+    static final Map<UUID, String> LOCKED = new HashMap<>();
+
+    public static boolean levelOk(PlayerEntity p, GearItem g) {
+        if (!p.getWorld().getGameRules().getBoolean(com.abilitywar.registry.AWGameRules.GEAR_LEVEL)) return true;
+        return com.abilitywar.rpg.RpgManager.rpg(p).level >= g.grade().requiredLevel();
+    }
+
+    /** 레벨이 모자란 무기는 능력치를 0 으로 (같은 크기의 반대 수정치), 갑옷은 벗김. */
+    static void levelChecks(ServerPlayerEntity p, boolean armorToo) {
+        ItemStack hand = p.getMainHandStack();
+        String lock = hand.getItem() instanceof GearWeaponItem w && !levelOk(p, w) ? w.def.id() : null;
+        String prev = LOCKED.get(p.getUuid());
+        if (!java.util.Objects.equals(lock, prev)) {
+            for (GearStat st : GearStat.values()) {
+                EntityAttributeInstance inst = p.getAttributeInstance(st.attribute());
+                if (inst != null) inst.removeModifier(GearUuids.of("lock", st));
+            }
+            if (lock != null) {
+                GearWeaponItem w = (GearWeaponItem) hand.getItem();
+                for (Map.Entry<GearStat, Double> e : w.def.stats().entrySet()) {
+                    EntityAttributeInstance inst = p.getAttributeInstance(e.getKey().attribute());
+                    if (inst != null) inst.addTemporaryModifier(new EntityAttributeModifier(GearUuids.of("lock", e.getKey()), "Gear level lock",
+                            -e.getKey().modifierValue(e.getValue()), e.getKey().operation()));
+                }
+                p.sendMessage(net.minecraft.text.Text.translatable("gear.abilitywar.ui.level_locked", w.grade().requiredLevel()).formatted(net.minecraft.util.Formatting.RED), true);
+                LOCKED.put(p.getUuid(), lock);
+            } else LOCKED.remove(p.getUuid());
+        }
+        if (!armorToo) return;
+        for (EquipmentSlot slot : ARMOR) {
+            ItemStack st = p.getEquippedStack(slot);
+            if (st.getItem() instanceof GearArmorItem a && !levelOk(p, a)) {
+                ItemStack copy = st.copy();
+                p.equipStack(slot, ItemStack.EMPTY);
+                if (!p.getInventory().insertStack(copy)) p.dropItem(copy, false);
+                p.sendMessage(net.minecraft.text.Text.translatable("gear.abilitywar.ui.level_locked", a.grade().requiredLevel()).formatted(net.minecraft.util.Formatting.RED), true);
+            }
+        }
+    }
+
     public static void tick(ServerPlayerEntity p) {
         long now = p.getServer().getTicks();
+        levelChecks(p, (now + p.getId()) % 10 == 0);
         if ((now + p.getId()) % 10 != 0) return;
         GearDefs.ArmorSet set = fullSet(p);
         String id = set == null ? null : set.id();
@@ -327,6 +374,7 @@ public final class GearEffects {
 
     public static void forget(ServerPlayerEntity p) {
         ACTIVE.remove(p.getUuid());
+        LOCKED.remove(p.getUuid());
         LAST_PULSE.remove(p.getUuid());
     }
 

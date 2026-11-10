@@ -35,6 +35,7 @@ public class AbilityWar implements ModInitializer {
         Abilities.init();
         com.abilitywar.ability.warlock.GrimoireScreenHandler.init();
         AWNet.initServer();
+        com.abilitywar.rpg.RpgManager.initNet();
         AWCommands.init();
         ServerEvents.init();
         LOG.info("Ability War loaded: {} abilities", Abilities.all().size());

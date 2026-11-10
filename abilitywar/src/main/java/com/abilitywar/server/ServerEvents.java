@@ -28,6 +28,7 @@ public final class ServerEvents {
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
             if (entity instanceof ServerPlayerEntity sp) AbilityManager.onDeathOrRespawn(sp);
             com.abilitywar.ability.warlock.Necromancy.onDeath(entity, source);
+            com.abilitywar.rpg.RpgManager.onDeath(entity, source);
         });
 
         ServerPlayerEvents.COPY_FROM.register((oldPlayer, newPlayer, alive) -> {
@@ -39,12 +40,16 @@ public final class ServerEvents {
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
             AbilityManager.onDeathOrRespawn(newPlayer);
             AWNet.sendState(newPlayer);
+            com.abilitywar.rpg.RpgManager.applyStats(newPlayer);
+            newPlayer.setHealth(newPlayer.getMaxHealth());
+            com.abilitywar.rpg.RpgManager.rpg(newPlayer).dirty = true;
         });
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             ServerPlayerEntity p = handler.getPlayer();
             AbilityManager.data(p).dirty = true;
             server.execute(() -> {
                 AWNet.sendState(p);
+                com.abilitywar.rpg.RpgManager.onJoin(p);
                 // 처음 접속 (직업 없음): 직업 선택 화면. 고른 직업은 저장되어 다음 접속 때도 그대로.
                 if (((com.abilitywar.data.AWPlayer) p).aw$getAbilityKey().isEmpty() && p.getWorld().getGameRules().getBoolean(com.abilitywar.registry.AWGameRules.FIRST_JOIN_SELECT))
                     AWNet.openSelect(p, true);

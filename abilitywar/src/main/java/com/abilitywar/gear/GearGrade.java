@@ -26,6 +26,11 @@ public enum GearGrade {
         return ordinal();
     }
 
+    /** 착용 레벨 (게임 규칙 abilitywarGearLevel 이 켜져 있을 때). */
+    public int requiredLevel() {
+        return new int[]{1, 10, 20, 35, 50, 65, 80, 90}[ordinal()];
+    }
+
     public Text displayName() {
         return Text.translatable("gear.abilitywar.grade." + key);
     }
