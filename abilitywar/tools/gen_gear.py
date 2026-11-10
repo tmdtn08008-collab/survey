@@ -341,6 +341,38 @@ def pal(key):
     return D.HANDLE.get(key, D.MAT['iron'])
 
 
+ICON_OVERRIDE = os.path.join(ROOT, 'tools', 'art', 'gear_icons')
+
+
+def base_weapon_frames(w):
+    """생성기로 그린 무기 아이콘 (프레임 목록)."""
+    t = TIER[w['grade']]
+    rng = random.Random('wp-' + w['id'])
+    extra = {'stars': w['grade'] == 'secret' and w['mat'] in ('stariron', 'void', 'obsidian', 'abyss', 'moon')}
+    return P.paint_weapon(w['type'], pal(w['mat']), D.HANDLE.get(w['hand'], D.HANDLE['leather']), D.GEMS.get(w['gem']) if w['gem'] else None, t, rng, extra)
+
+
+def base_armor_icon_frames(a, pkey):
+    t = TIER[a['grade']]
+    gem = D.GEMS.get(a['gem']) if a['gem'] else None
+    rng = random.Random('ap-' + a['pieces'][pkey]['id'])
+    return P.paint_armor_icon(pkey, a['style'], pal(a['mat']), pal(a['trim']), gem, t, rng)
+
+
+def override_frames(item_id, tier):
+    """tools/art/gear_icons/<아이템>.png (꾸민 그림에서 가져온 아이콘) 이 있으면 그것 (신화 이상은 반짝임 애니메이션)."""
+    path = os.path.join(ICON_OVERRIDE, item_id + '.png')
+    if not os.path.exists(path):
+        return None
+    img = np.asarray(Image.open(path).convert('RGBA')).astype(np.uint8)
+    return P.animate_icon(img, tier, random.Random('ov-' + item_id))
+
+
+def armor_palettes():
+    path = os.path.join(ICON_OVERRIDE, 'palettes.json')
+    return json.load(open(path)) if os.path.exists(path) else {}
+
+
 def write_textures(weapons, armors):
     os.makedirs(TEX_ITEM, exist_ok=True)
     os.makedirs(TEX_ARMOR, exist_ok=True)
@@ -349,24 +381,31 @@ def write_textures(weapons, armors):
     for f in os.listdir(TEX_ARMOR):
         os.remove(os.path.join(TEX_ARMOR, f))
     icons = {}
+    n_over = 0
     for w in weapons:
-        t = TIER[w['grade']]
-        rng = random.Random('wp-' + w['id'])
-        extra = {'stars': w['grade'] == 'secret' and w['mat'] in ('stariron', 'void', 'obsidian', 'abyss', 'moon')}
-        frames = P.paint_weapon(w['type'], pal(w['mat']), D.HANDLE.get(w['hand'], D.HANDLE['leather']), D.GEMS.get(w['gem']) if w['gem'] else None, t, rng, extra)
+        frames = override_frames(w['id'], TIER[w['grade']])
+        n_over += frames is not None
+        frames = frames or base_weapon_frames(w)
         save_frames(frames, os.path.join(TEX_ITEM, w['id'] + '.png'))
         icons[w['id']] = frames[0]
+    pals = armor_palettes()
     for a in armors:
         t = TIER[a['grade']]
         gem = D.GEMS.get(a['gem']) if a['gem'] else None
         trim = pal(a['trim'])
+        mat = pal(a['mat'])
+        if a['id'] in pals:
+            # 꾸민 그림에서 새로 그린 세트: 착용 갑옷 색을 아이콘에 맞춤
+            mat = tuple(tuple(c) for c in pals[a['id']]['mat'])
+            trim = tuple(tuple(c) for c in pals[a['id']]['trim'])
         for pkey, pc in a['pieces'].items():
-            rng = random.Random('ap-' + pc['id'])
-            frames = P.paint_armor_icon(pkey, a['style'], pal(a['mat']), trim, gem, t, rng)
+            frames = override_frames(pc['id'], t)
+            n_over += frames is not None
+            frames = frames or base_armor_icon_frames(a, pkey)
             save_frames(frames, os.path.join(TEX_ITEM, pc['id'] + '.png'))
             icons[pc['id']] = frames[0]
         rng = random.Random('al-' + a['id'])
-        l1, l2, e1, e2 = P.paint_armor_layers(a['style'], pal(a['mat']), trim, gem, t, rng)
+        l1, l2, e1, e2 = P.paint_armor_layers(a['style'], mat, trim, gem, t, rng)
         Image.fromarray(l1, 'RGBA').save(os.path.join(TEX_ARMOR, a['id'] + '_1.png'))
         Image.fromarray(l2, 'RGBA').save(os.path.join(TEX_ARMOR, a['id'] + '_2.png'))
         if t >= 4:
@@ -375,6 +414,7 @@ def write_textures(weapons, armors):
                 f = img.astype(np.float32)
                 f[..., :3] *= f[..., 3:4] / 255
                 Image.fromarray(f.clip(0, 255).astype(np.uint8), 'RGBA').save(os.path.join(TEX_ARMOR, a['id'] + suf + '.png'))
+    print('imported icons used:', n_over)
     return icons
 
 

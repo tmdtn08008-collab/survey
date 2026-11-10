@@ -767,3 +767,27 @@ def paint_armor_layers(style, mat, trim, gem, tier, rng):
                 img[y:y + 2] = np.roll(img[y:y + 2], rng.choice([-4, -2, 2, 4]), 1)
     # 별 무늬 (시크릿 별 계열)
     return [x.clip(0, 255).astype(np.uint8) for x in (L1, L2, E1, E2)]
+
+
+# ================================================================ 가져온 아이콘 애니메이션
+def animate_icon(img, tier, rng):
+    """가져온 32x32 아이콘: 신화·시크릿은 빛줄기가 지나가는 8장, ? 는 깨지는 8장, 나머지는 1장."""
+    if tier < 5:
+        return [img]
+    rgb = img[..., :3].astype(np.float32)
+    a = img[..., 3].astype(np.float32) / 255
+    yy, xx = np.mgrid[0:S, 0:S].astype(np.float32)
+    frames = []
+    for f in range(8):
+        r2, a2 = rgb.copy(), a.copy()
+        if tier == 7:
+            r2, a2 = glitch(r2, a2, f, rng)
+        else:
+            pos = -6 + f / 8 * 50
+            band = np.exp(-(((xx + (S - yy)) * 0.7 - pos) / 2.5) ** 2) * (a > 0.5)
+            r2 = r2 + (255 - r2) * band[..., None] * 0.55
+        out = np.zeros((S, S, 4), np.float32)
+        out[..., :3] = np.clip(r2, 0, 255)
+        out[..., 3] = np.clip(a2, 0, 1) * 255
+        frames.append(out.astype(np.uint8))
+    return frames

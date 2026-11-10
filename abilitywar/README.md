@@ -143,6 +143,8 @@
 
 장비 전체 그림 (등급별): `tools/art/gear_sheets/weapons_*.png`, `tools/art/gear_sheets/armor_*.png`
 
+꾸민 도감 그림 (보내주신 그림): `tools/art/gear_decorated/*.webp` — 무기 영웅·전설·신화·시크릿·? 와 갑옷 좋음~? 등급의 아이콘을 이 그림에서 가져와 게임에 넣었습니다 (일반·좋음·희귀 무기와 일반 갑옷은 원래 그림 그대로).
+
 ## 설치
 
 1. Fabric Loader(1.20.1)를 설치합니다.
@@ -406,6 +408,7 @@ python3 tools/gen_warlock_textures.py   # 흑마법사 소환진/영혼/사슬/�
 python3 tools/import_hud_art.py tools/art/warlock_hud_original.webp tools/art/warlock_hud_source.png && python3 tools/gen_hud.py warlock   # 흑마법사 스킬바
 python3 tools/gen_angel_textures.py   # 천사 날개/깃털/마법진/빛줄기 텍스처, 열정 아이콘
 python3 tools/gen_gear.py             # RPG 장비 470+470: 정의(gear.json)·이름·아이콘·착용 텍스처·한눈에 보는 그림 (tools/gear_data.py 에 단어/색)
+python3 tools/import_gear_art.py && python3 tools/gen_gear.py   # 꾸민 도감 그림에서 아이콘 가져오기 → tools/art/gear_icons/ (gen_gear 가 원래 그림 대신 사용)
 python3 tools/import_hud_art.py tools/art/angel_hud_original.webp tools/art/angel_hud_source.png --black && python3 tools/gen_hud.py angel   # 천사 스킬바 (보내주신 그림)
 bash tools/gen_sounds.sh          # 합성 효과음 다시 생성
 ```
