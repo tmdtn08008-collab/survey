@@ -27,6 +27,12 @@ public final class RpgHud {
         // ---- 레벨 배지
         int bs = 24;
         HudDraw.rect(ctx, x, y, x + bs, y + bs, 0xE0140E08);
+        if (RpgClient.grandActive()) {
+            // 3차: 배지 둘레가 금빛으로 일렁임
+            float gp = 0.5f + 0.5f * MathHelper.sin(time * 0.15f);
+            frame(ctx, x - 2, y - 2, x + bs + 2, y + bs + 2, lerpColor(0x8A6A28, 0xFFE9A8, gp));
+            HudDraw.rect(ctx, x - 1, y - 1, x + bs + 1, y + bs + 1, HudDraw.argb(0.12f + 0.12f * gp, 0xFFD86A));
+        }
         frame(ctx, x, y, x + bs, y + bs, GOLD);
         HudDraw.rect(ctx, x + 2, y + 2, x + bs - 2, y + 3, HudDraw.argb(0.35f, GOLD));
         String lv = String.valueOf(RpgClient.level);
@@ -43,10 +49,11 @@ public final class RpgHud {
         ctx.getMatrices().pop();
         // ---- 직업 이름
         int tx = x + bs + 5;
+        boolean grand = RpgClient.grandActive();
         Text cls = ClientState.ability.isEmpty() ? Text.translatable("rpg.abilitywar.hud.no_class").formatted(Formatting.GRAY)
-                : Text.translatable("ability.abilitywar." + ClientState.ability);
-        ctx.drawTextWithShadow(tr, cls, tx, y + 1, 0xFFFFFF);
-        int tierN = com.abilitywar.rpg.ClassTree.tier(ClientState.ability);
+                : RpgClient.className(ClientState.ability, grand);
+        ctx.drawTextWithShadow(tr, cls, tx, y + 1, grand ? lerpColor(0xFFD86A, 0xFFF6DC, 0.5f + 0.5f * MathHelper.sin(time * 0.12f)) : 0xFFFFFF);
+        int tierN = com.abilitywar.rpg.ClassTree.tier(ClientState.ability, grand);
         if (tierN > 0) {
             Text tier = Text.translatable("rpg.abilitywar.tier." + tierN);
             ctx.drawTextWithShadow(tr, tier, tx + tr.getWidth(cls) + 4, y + 1, 0x9A8D70);

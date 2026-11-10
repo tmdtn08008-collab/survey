@@ -35,7 +35,7 @@ public class JobMasterRenderer extends MobEntityRenderer<JobMasterEntity, Player
     @Override
     public void render(JobMasterEntity e, float yaw, float td, MatrixStack ms, VertexConsumerProvider vcp, int light) {
         super.render(e, yaw, td, ms, vcp, light);
-        int mark = RpgClient.marker();
+        int mark = RpgClient.marker(e.giver());
         if (mark == 0 || net.minecraft.client.MinecraftClient.getInstance().currentScreen != null) return;
         float t = e.age + td;
         String s = mark == 1 ? "!" : "?";

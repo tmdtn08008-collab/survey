@@ -207,6 +207,67 @@ t('rpg.abilitywar.tree.hint', '전직은 전직 교관에게서 · [%s] 닫기',
 t('rpg.abilitywar.tree.hint_admin', '직업을 눌러 바로 바꿀 수 있습니다 · [%s] 닫기', 'Click a class to switch · [%s] to close')
 t('abilitywar.screen.first_hint', '1차 직업을 고르세요. 레벨 30 에 전직 교관에게서 2차 직업으로 전직할 수 있습니다.', 'Choose your 1st class. At level 30 the Class Master can advance you to a 2nd class.')
 
+# ================================================================ 3차 전직 ("대") · 왕 · 보스 (2.0)
+GRAND = {'blade': ('대마검사', 'Grand Demonic Swordsman'), 'blood': ('대혈귀', 'Elder Bloodfiend'), 'dragon': ('대용기사', 'Grand Dragon Knight'),
+         'void': ('대공허', 'Abyssal Void'), 'warlock': ('대흑마법사', 'Archwarlock'), 'guardian': ('대수호기사', 'Grand Guardian'),
+         'angel': ('대천사', 'Archangel'), 'cantor': ('대성가사', 'High Cantor'), 'paladin': ('대성기사', 'Grand Paladin')}
+for k, (ko, en) in GRAND.items():
+    t(f'ability.abilitywar.{k}.grand', ko, en)
+t('rpg.abilitywar.tier.3', '3차', '3rd')
+t('rpg.abilitywar.grand_title', '3차 전직 성공!', '3rd Class Awakened!')
+t('rpg.abilitywar.king_title', '왕의 기사가 되었다!', 'Knighted by the King!')
+t('rpg.abilitywar.err.already_grand', '이미 3차 전직을 했습니다.', 'You have already awakened.')
+t('rpg.abilitywar.err.other_giver', '이 퀘스트는 다른 사람에게 완료해야 합니다.', 'Turn this quest in to someone else.')
+t('rpg.abilitywar.obj.boss', '보스 처치', 'Defeat a boss')
+t('rpg.abilitywar.boss_down', '보스 %s 을(를) 쓰러뜨렸다!', 'Boss %s defeated!')
+t('rpg.abilitywar.screen.req_class2', '2차 직업: %s', '2nd class: %s')
+t('rpg.abilitywar.screen.reward_grand', '3차 전직: %s', '3rd class: %s')
+t('rpg.abilitywar.screen.reward_special', '특별 직업: %s', 'Special class: %s')
+t('rpg.abilitywar.screen.reward_gear_job', '희귀 등급 무기 1개', '1 Rare weapon')
+t('rpg.abilitywar.screen.reward_gear_grand', '전설 등급 무기 1개', '1 Legendary weapon')
+t('rpg.abilitywar.screen.reward_gear_king', '영웅 등급 무기 1개', '1 Hero weapon')
+t('rpg.abilitywar.guide.grand_done', '3차 전직 완료! 지금 가장 강한 모습입니다.', '3rd class awakened! You are at your peak.')
+t('rpg.abilitywar.guide.grand_level', '레벨 %s 이 되면 전직 교관에게서 3차 전직 퀘스트를 받을 수 있습니다 (지금 %s)', 'Reach level %s for the 3rd class quest (now %s)')
+t('rpg.abilitywar.guide.grand_visit', '전직 교관을 찾아가 3차 전직 퀘스트를 받으세요.', 'Visit the Class Master for your 3rd class quest.')
+t('rpg.abilitywar.tree.sub', '1차 직업 → 전직 교관 퀘스트 → 2차 직업 → 3차 "대" 전직 (레벨 60 + 보스) · 왕의 퀘스트 → 성기사', '1st → Class Master quest → 2nd → 3rd "Grand" (Lv 60 + boss) · King\'s quest → Paladin')
+t('rpg.abilitywar.tree.king', '왕의 직업', 'King\'s class')
+t('rpg.abilitywar.tree.grand_desc', '3차 전직: 주는 피해 +30%, 받는 피해 -10%, 재사용 대기 -15%, 궁극기 충전 +20%, 회복·버프 +30%, 최대 체력 +6, 금빛 오라와 스킬 폭발', '3rd class: +30% damage, -10% damage taken, -15% cooldowns, +20% ult charge, +30% healing & buffs, +6 max health, golden aura')
+t('rpg.abilitywar.tree.how_grand', '레벨 %s + 전직 교관의 3차 퀘스트:', 'Level %s + Class Master quest:')
+t('rpg.abilitywar.tree.how_king', '레벨 %s + 왕의 3차 퀘스트:', 'Level %s + King\'s quest:')
+t('rpg.abilitywar.tree.how_special', '레벨 %s + 왕의 퀘스트 (전사·탱커·힐러):', 'Level %s + King\'s quest (warrior, tank, healer):')
+t('rpg.abilitywar.npc.say.advanced', '%s의 길을 걷고 있군. 레벨 %s 이 되면 더 높은 경지, "대" 의 이름을 줄 수 있네.', 'You walk the path of the %s. At level %s I can grant you a greater name.')
+t('rpg.abilitywar.npc.say.grand', '%s여, 이제 마지막 시련이다. 보스를 쓰러뜨리고 증표를 가져오면 "대" 의 이름을 주지.', '%s, the final trial awaits. Slay a boss and bring proof, and you shall be Grand.')
+t('rpg.abilitywar.npc.say.grand_done', '%s... 더 가르칠 것이 없네. 자네의 이름이 전설이 되길.', '%s... I have nothing more to teach. May your name become legend.')
+t('rpg.abilitywar.npc.say.special', '자네는 왕의 기사로군. 자네의 시련은 왕께서 내리실 걸세.', 'You are a knight of the King. Your trials come from His Majesty.')
+t('rpg.abilitywar.npc.say.busy', '지금은 「%s」에 집중하게.', 'Focus on "%s" for now.')
+for k, (q, qe, d, de) in {
+    'blade': ('마검의 극의', 'Mastery of the Demon Blade', '검과 마력이 하나가 되는 경지. 수많은 적과 보스를 베고 다이아몬드로 검을 다시 벼려라.', 'Where blade and mana become one. Cut down hordes and a boss, then reforge your sword with diamonds.'),
+    'blood': ('끝나지 않는 밤', 'The Endless Night', '피의 굶주림을 다스려라. 밤마다 사냥하고 보스의 피를 마셔라. 가스트의 눈물이 증표다.', 'Master the hunger. Hunt every night and drink a boss\'s blood. Ghast tears are your proof.'),
+    'dragon': ('고룡의 심장', 'Heart of the Elder Dragon', '불꽃 속에서 태어난 자만이 고룡이 된다. 블레이즈를 사냥하고 보스를 쓰러뜨려라.', 'Only those born of flame become Elder. Hunt blazes and fell a boss.'),
+    'void': ('심연을 걷는 자', 'Walker of the Abyss', '공허의 끝을 보라. 엔더맨을 사냥하고 보스를 쓰러뜨려 엔더의 눈을 모아라.', 'See the end of the void. Hunt endermen, fell a boss, and gather eyes of ender.'),
+    'warlock': ('죽음의 군주', 'Lord of Death', '죽은 자의 군대를 다스려라. 언데드를 쓰러뜨리고 보스의 영혼을 거둬라.', 'Rule an army of the dead. Slay the undead and reap a boss\'s soul.'),
+    'guardian': ('무너지지 않는 성채', 'The Unbreakable Citadel', '동료를 위해 수천 번 맞고도 서 있어라. 보스의 공격까지 막아내라.', 'Stand after taking thousands of blows for your allies. Even a boss\'s.'),
+    'angel': ('대천사의 날개', 'Wings of the Archangel', '수많은 생명을 구하라. 보스와의 싸움에서도 동료를 지켜라.', 'Save countless lives. Keep allies alive even against a boss.'),
+    'cantor': ('천상의 성가', 'The Heavenly Hymn', '노래로 동료를 이끌어라. 보스를 쓰러뜨리는 노래를 불러라.', 'Lead your allies with song. Sing the hymn that fells a boss.'),
+    'paladin': ('성검의 계승자', 'Heir of the Holy Sword', '왕국을 위협하는 어둠을 몰아내라. 언데드를 쓸어버리고 보스 둘을 쓰러뜨려라.', 'Drive back the darkness that threatens the realm. Purge the undead and fell two bosses.'),
+}.items():
+    t(f'rpg.abilitywar.quest.grand_{k}', q, qe)
+    t(f'rpg.abilitywar.quest.grand_{k}.desc', d, de)
+t('rpg.abilitywar.quest.king_paladin', '왕의 서약', 'The King\'s Oath')
+t('rpg.abilitywar.quest.king_paladin.desc', '왕국의 기사가 되려면 어둠과 맞서야 한다. 언데드를 쓰러뜨리고 보스를 무찌른 뒤, 금 블록을 왕께 바쳐라.', 'To be knighted you must face the darkness. Slay the undead, defeat a boss, and offer gold blocks to the King.')
+# 왕
+t('entity.abilitywar.king', '아르덴 왕', 'King Arden')
+t('item.abilitywar.king_spawn_egg', '왕 생성 알', 'King Spawn Egg')
+t('rpg.abilitywar.king.say.offer', '용감한 자여, 왕국은 성스러운 기사가 필요하다. 나의 서약을 받아 성기사가 되겠는가?', 'Brave one, the realm needs holy knights. Will you take my oath and become a Paladin?')
+t('rpg.abilitywar.king.say.level', '자네의 용기는 알겠다. 허나 레벨 %s 은 되어야 나의 기사가 될 수 있다.', 'I see your courage. But you must be level %s to be my knight.')
+t('rpg.abilitywar.king.say.wrong_class', '성기사는 전사·탱커·힐러의 길을 걸은 자만이 될 수 있다.', 'Only warriors, tanks and healers may become Paladins.')
+t('rpg.abilitywar.king.say.paladin', '나의 성기사여, 왕국을 지켜주게. 레벨 %s 이 되면 성검의 비밀을 알려주지.', 'My Paladin, guard the realm. At level %s I will tell you the secret of the holy sword.')
+t('rpg.abilitywar.king.say.grand', '때가 되었다, 성기사여. 성검을 이어받을 시련을 내리노라.', 'The time has come, Paladin. Take up the trial of the holy sword.')
+t('rpg.abilitywar.king.say.grand_done', '대성기사여, 그대가 있어 왕국은 무너지지 않는다.', 'Grand Paladin, with you the realm shall never fall.')
+t('rpg.abilitywar.king.say.ready', '「%s」을(를) 해냈구나! 무릎을 꿇어라, 기사 서임을 하겠다.', 'You completed "%s"! Kneel, and be knighted.')
+t('rpg.abilitywar.king.say.progress', '「%s」은(는) 아직이다. 왕국은 그대를 믿는다.', '"%s" is not yet done. The realm trusts you.')
+t('rpg.abilitywar.king.say.busy', '지금은 「%s」에 힘쓰게. 끝나면 다시 오라.', 'See "%s" through first, then return.')
+
 
 def apply(fname, idx):
     p = os.path.join(LANG, fname)

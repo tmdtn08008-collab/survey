@@ -14,6 +14,9 @@ public interface AWPlayer {
     /** 천사 비행 모드 (날개 펼침). */
     byte FLAG_FLYING = (byte) 128;
 
+    /** 두 번째 플래그 묶음: 3차 전직 ("대"). */
+    byte FLAG2_GRAND = 1;
+
     String aw$getAbilityKey();
 
     void aw$setAbilityKey(String key);
@@ -23,6 +26,20 @@ public interface AWPlayer {
     void aw$setFlags(byte flags);
 
     AbilityData aw$data();
+
+    byte aw$getFlags2();
+
+    void aw$setFlags2(byte flags);
+
+    default boolean aw$hasFlag2(byte flag) {
+        return (aw$getFlags2() & flag) != 0;
+    }
+
+    default void aw$setFlag2(byte flag, boolean on) {
+        byte f = aw$getFlags2();
+        byte n = on ? (byte) (f | flag) : (byte) (f & ~flag);
+        if (n != f) aw$setFlags2(n);
+    }
 
     default boolean aw$hasFlag(byte flag) {
         return (aw$getFlags() & flag) != 0;

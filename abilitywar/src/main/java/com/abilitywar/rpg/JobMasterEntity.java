@@ -22,8 +22,17 @@ public class JobMasterEntity extends PathAwareEntity {
         super(type, world);
         setPersistent();
         setInvulnerable(true);
-        setCustomName(Text.translatable("entity.abilitywar.job_master"));
+        setCustomName(Text.translatable(nameKey()));
         setCustomNameVisible(true);
+    }
+
+    /** 이 NPC 가 주는 퀘스트 (JobQuests.CLASS_MASTER / KING). */
+    public String giver() {
+        return JobQuests.CLASS_MASTER;
+    }
+
+    protected String nameKey() {
+        return "entity.abilitywar.job_master";
     }
 
     public static DefaultAttributeContainer.Builder createAttributes() {
@@ -46,6 +55,9 @@ public class JobMasterEntity extends PathAwareEntity {
 
     @Override
     public boolean damage(DamageSource source, float amount) {
+        // /kill 과 공허는 통과 (관리자가 지울 수 있게)
+        if (source.isOf(net.minecraft.entity.damage.DamageTypes.GENERIC_KILL) || source.isOf(net.minecraft.entity.damage.DamageTypes.OUT_OF_WORLD))
+            return super.damage(source, amount);
         // 창조 모드 플레이어가 웅크리고 때리면 제거
         if (source.getAttacker() instanceof PlayerEntity p && p.isCreative() && p.isSneaking()) {
             discard();

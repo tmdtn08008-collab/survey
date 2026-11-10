@@ -38,15 +38,25 @@ public class ClassTreeScreen extends Screen {
         super(Text.translatable("rpg.abilitywar.screen.tree"));
     }
 
+    /** 왕의 특별 직업 (능력이 등록된 것만). */
+    static List<String> specials() {
+        List<String> out = new ArrayList<>();
+        for (String k : ClassTree.SPECIAL) if (com.abilitywar.ability.Abilities.byString(k) != null) out.add(k);
+        return out;
+    }
+
+    int specialX = -1;
+
     @Override
     protected void init() {
         nodes.clear();
-        int leaves = 0;
+        List<String> sp = specials();
+        int leaves = sp.size();
         for (String b : ClassTree.BASE) leaves += ClassTree.ADVANCE.get(b).size();
-        int gap = 8;
-        nw = MathHelper.clamp((width - 24 - gap * (leaves - 1)) / leaves, 44, 74);
+        int gap = 8, extra = sp.isEmpty() ? 0 : 14;
+        nw = MathHelper.clamp((width - 24 - extra - gap * (leaves - 1)) / leaves, 40, 74);
         nh = nw * 40 / 64 + 12;
-        int total = leaves * nw + (leaves - 1) * gap;
+        int total = leaves * nw + (leaves - 1) * gap + extra;
         int x = (width - total) / 2;
         int y1 = 52, y2 = y1 + nh + 34, y3 = y2 + nh + 30;
         if (y3 + nh > height - 30) {
@@ -59,11 +69,19 @@ public class ClassTreeScreen extends Screen {
             int bx0 = x;
             for (String k : kids) {
                 nodes.add(new Node(k, 2, b, x, y2));
-                nodes.add(new Node("?" + k, 3, k, x + nw / 2 - nw * 3 / 8, y3));
+                nodes.add(new Node("+" + k, 3, k, x, y3));
                 x += nw + gap;
             }
             int span = x - gap - bx0;
             nodes.add(new Node(b, 1, "", bx0 + span / 2 - nw / 2, y1));
+        }
+        // 왕의 직업: 1차와 잇지 않고 따로 (왕관 표시)
+        specialX = sp.isEmpty() ? -1 : x + extra - gap / 2;
+        x += extra;
+        for (String k : sp) {
+            nodes.add(new Node(k, 2, "", x, y2));
+            nodes.add(new Node("+" + k, 3, k, x, y3));
+            x += nw + gap;
         }
         if (RpgClient.canPickFreely()) {
             addDrawableChild(ButtonWidget.builder(Text.translatable("rpg.abilitywar.tree.all"), b -> client.setScreen(new AbilitySelectScreen(false)))
@@ -79,15 +97,21 @@ public class ClassTreeScreen extends Screen {
     /** 내 길: 현재 직업과 그 부모. */
     boolean onPath(String key) {
         String cur = ClientState.ability;
-        return key.equals(cur) || key.equals(ClassTree.baseOf(cur));
+        if (key.startsWith("+")) return RpgClient.grandActive() && key.substring(1).equals(cur);
+        return key.equals(cur) || (!ClassTree.isSpecial(cur) && key.equals(ClassTree.baseOf(cur))) || (ClassTree.isSpecial(cur) && key.equals(RpgClient.baseClass));
+    }
+
+    boolean current(String key) {
+        String cur = ClientState.ability;
+        return key.startsWith("+") ? RpgClient.grandActive() && key.substring(1).equals(cur) : key.equals(cur) && !RpgClient.grandActive();
     }
 
     int w(Node n) {
-        return n.tier == 3 ? nw * 3 / 4 : nw;
+        return nw;
     }
 
     int h(Node n) {
-        return n.tier == 3 ? nh * 3 / 4 : nh;
+        return nh;
     }
 
     @Override
@@ -102,9 +126,9 @@ public class ClassTreeScreen extends Screen {
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
         if (RpgClient.canPickFreely()) for (Node n : nodes) {
-            if (n.tier < 3 && RpgUi.in(mx, my, n.x, n.y, n.x + w(n), n.y + h(n))) {
+            if (RpgUi.in(mx, my, n.x, n.y, n.x + w(n), n.y + h(n))) {
                 PacketByteBuf buf = PacketByteBufs.create();
-                buf.writeString(n.key);
+                buf.writeString(n.key.startsWith("+") ? n.key.substring(1) : n.key);
                 ClientPlayNetworking.send(AWNet.C2S_SELECT, buf);
                 close();
                 return true;
@@ -132,8 +156,8 @@ public class ClassTreeScreen extends Screen {
             if (n.parent.isEmpty()) continue;
             Node p = find(n.parent);
             if (p == null) continue;
-            boolean lit = n.tier == 2 && onPath(n.key) || n.tier == 3 && false;
-            int col = lit ? 0xFF000000 | RpgHud.GOLD : n.tier == 3 ? 0x50605040 : 0x90806A40;
+            boolean lit = onPath(n.key) && onPath(n.parent);
+            int col = lit ? 0xFF000000 | RpgHud.GOLD : n.tier == 3 ? 0x70806030 : 0x90806A40;
             int ax = p.x + w(p) / 2, ay = p.y + h(p), bx = n.x + w(n) / 2, by = n.y;
             int mid = (ay + by) / 2;
             HudDraw.rect(ctx, ax, ay, ax + 1, mid + 1, col);
@@ -150,34 +174,45 @@ public class ClassTreeScreen extends Screen {
             int x = n.x, y = n.y, ww = w(n), hh = h(n);
             boolean hover = RpgUi.in(mx, my, x, y, x + ww, y + hh);
             if (hover) hovered = n.key;
-            if (n.tier == 3) {
-                HudDraw.rect(ctx, x, y, x + ww, y + hh, 0xA0100C08);
-                RpgHud.frame(ctx, x, y, x + ww, y + hh, 0x403828);
-                ctx.drawCenteredTextWithShadow(textRenderer, "?", x + ww / 2, y + hh / 2 - 8, 0x605848);
-                ctx.getMatrices().push();
-                ctx.getMatrices().translate(x + ww / 2f, y + hh - 9, 0);
-                ctx.getMatrices().scale(0.7f, 0.7f, 1);
-                ctx.drawCenteredTextWithShadow(textRenderer, Text.translatable("rpg.abilitywar.tree.soon"), 0, 0, 0x605848);
-                ctx.getMatrices().pop();
-                continue;
-            }
-            boolean cur = n.key.equals(ClientState.ability), path = onPath(n.key);
-            boolean done = n.tier == 2 && (cur || RpgClient.completed.contains("job_" + n.key));
+            boolean grandNode = n.key.startsWith("+");
+            String ak = grandNode ? n.key.substring(1) : n.key;
+            boolean cur = current(n.key), path = onPath(n.key);
+            boolean done = grandNode ? RpgClient.completed.contains("grand_" + ak) || (RpgClient.grand && ak.equals(ClientState.ability))
+                    : n.tier == 2 && (ak.equals(ClientState.ability) || RpgClient.completed.contains("job_" + ak) || RpgClient.completed.contains("king_" + ak));
             int ih = hh - 12;
-            ctx.drawTexture(AbilityWar.id("textures/gui/card_" + n.key + ".png"), x, y, ww, ih, 0, 0, 256, 160, 256, 160);
+            ctx.drawTexture(AbilityWar.id("textures/gui/card_" + ak + ".png"), x, y, ww, ih, 0, 0, 256, 160, 256, 160);
+            if (grandNode) {
+                // 3차: 금빛을 덧칠하고 오른쪽 위에 "大" 도장
+                float gp = 0.5f + 0.5f * MathHelper.sin(time * 0.1f + n.x * 0.05f);
+                HudDraw.rect(ctx, x, y, x + ww, y + ih, HudDraw.argb(0.16f + 0.08f * gp, 0xFFD86A));
+                int sx = x + ww - 12, sy = y + 2;
+                HudDraw.rect(ctx, sx - 1, sy - 1, sx + 11, sy + 11, 0xFFFFD86A);
+                HudDraw.rect(ctx, sx, sy, sx + 10, sy + 10, 0xFFA8141A);
+                ctx.drawText(textRenderer, "大", sx + 1, sy + 1, 0xFFFFF0C0, false);
+            }
             if (!path && !hover) HudDraw.rect(ctx, x, y, x + ww, y + ih, 0x70000000);
-            HudDraw.rect(ctx, x, y + ih, x + ww, y + hh, path ? 0xF0342610 : 0xF0141008);
-            Text nm = Text.translatable("ability.abilitywar." + n.key);
+            HudDraw.rect(ctx, x, y + ih, x + ww, y + hh, path ? 0xF0342610 : grandNode ? 0xF0201606 : 0xF0141008);
+            Text nm = RpgClient.className(ak, grandNode);
             float sc = Math.min(1f, (ww - 4) / (float) textRenderer.getWidth(nm));
             ctx.getMatrices().push();
             ctx.getMatrices().translate(x + ww / 2f, y + ih + 2.5f, 0);
             ctx.getMatrices().scale(sc, sc, 1);
-            ctx.drawCenteredTextWithShadow(textRenderer, nm, 0, 0, path ? 0xFFE9A8 : 0xD0C8B8);
+            ctx.drawCenteredTextWithShadow(textRenderer, nm, 0, 0, path ? 0xFFE9A8 : grandNode ? 0xE8C878 : 0xD0C8B8);
             ctx.getMatrices().pop();
             int border = cur ? lerp(0xC89030, 0xFFF0B0, 0.5f + 0.5f * MathHelper.sin(time * 0.2f)) : path ? RpgHud.GOLD : hover ? 0xA89060 : 0x4A3C20;
             RpgHud.frame(ctx, x - 1, y - 1, x + ww + 1, y + hh + 1, border);
             if (cur) RpgHud.frame(ctx, x - 2, y - 2, x + ww + 2, y + hh + 2, 0x6A5020);
             if (done && !cur) ctx.drawTextWithShadow(textRenderer, Text.literal("✔").formatted(Formatting.GREEN), x + 2, y + 2, 0xFFFFFF);
+        }
+        if (specialX >= 0) {
+            // 왕의 직업 구역: 세로 금선 + 왕관 표시
+            HudDraw.rect(ctx, specialX, anyB != null ? anyB.y : 50, specialX + 1, height - 30, 0x60FFD86A);
+            Text kt = Text.translatable("rpg.abilitywar.tree.king");
+            ctx.getMatrices().push();
+            ctx.getMatrices().translate(specialX + 7 + nw / 2f, (anyB != null ? anyB.y + nh / 2f : 60) - 4, 0);
+            ctx.getMatrices().scale(0.85f, 0.85f, 1);
+            ctx.drawCenteredTextWithShadow(textRenderer, Text.literal("♛ ").append(kt), 0, 0, 0xFFD86A);
+            ctx.getMatrices().pop();
         }
         // 단계 표시 (왼쪽)
         if (anyB != null) tierLabel(ctx, 1, anyB.y + h(anyB) / 2);
@@ -199,9 +234,16 @@ public class ClassTreeScreen extends Screen {
 
     List<Text> tooltip(String key) {
         List<Text> t = new ArrayList<>();
-        if (key.startsWith("?")) {
-            t.add(Text.translatable("rpg.abilitywar.tree.third").formatted(Formatting.GRAY));
-            t.add(Text.translatable("rpg.abilitywar.tree.third_desc").formatted(Formatting.DARK_GRAY));
+        if (key.startsWith("+")) {
+            String k = key.substring(1);
+            t.add(RpgClient.className(k, true).formatted(Formatting.GOLD));
+            t.add(Text.translatable("rpg.abilitywar.tree.grand_desc").formatted(Formatting.GRAY));
+            JobQuests.Quest q = JobQuests.ALL.get("grand_" + k);
+            if (q != null) {
+                t.add(Text.translatable(q.giver().equals(JobQuests.KING) ? "rpg.abilitywar.tree.how_king" : "rpg.abilitywar.tree.how_grand", RpgClient.grandLevel).formatted(Formatting.DARK_AQUA));
+                t.add(Text.literal("  ").append(RpgClient.questName(q)).formatted(Formatting.YELLOW));
+            }
+            if (current(key)) t.add(Text.translatable("abilitywar.screen.current").formatted(Formatting.GREEN));
             return t;
         }
         t.add(Text.translatable("ability.abilitywar." + key).formatted(Formatting.GOLD));
@@ -210,12 +252,16 @@ public class ClassTreeScreen extends Screen {
             t.add(Text.translatable("rpg.abilitywar.tree.base_info").formatted(Formatting.DARK_AQUA));
         } else {
             JobQuests.Quest q = JobQuests.ALL.get("job_" + key);
-            if (q != null) {
+            if (q == null) q = JobQuests.ALL.get("king_" + key);
+            if (q != null && q.kind() == JobQuests.Kind.KING) {
+                t.add(Text.translatable("rpg.abilitywar.tree.how_special", q.minLevel()).formatted(Formatting.DARK_AQUA));
+                t.add(Text.literal("  ").append(RpgClient.questName(q)).formatted(Formatting.YELLOW));
+            } else if (q != null) {
                 t.add(Text.translatable("rpg.abilitywar.tree.how", RpgClient.jobLevel, Text.translatable("ability.abilitywar." + q.base())).formatted(Formatting.DARK_AQUA));
                 t.add(Text.literal("  ").append(RpgClient.questName(q)).formatted(Formatting.YELLOW));
             }
         }
-        if (key.equals(ClientState.ability)) t.add(Text.translatable("abilitywar.screen.current").formatted(Formatting.GREEN));
+        if (current(key)) t.add(Text.translatable("abilitywar.screen.current").formatted(Formatting.GREEN));
         else if (RpgClient.canPickFreely()) t.add(Text.translatable("rpg.abilitywar.tree.click").formatted(Formatting.LIGHT_PURPLE));
         return t;
     }

@@ -69,8 +69,17 @@ public final class RpgManager {
 
     // ================================================================ 경험치 / 레벨
 
+    /** 보스 (바닐라 보스 + 이 모드 보스 + 다른 모드 보스: 태그 abilitywar:bosses). */
+    public static final net.minecraft.registry.tag.TagKey<net.minecraft.entity.EntityType<?>> BOSSES =
+            net.minecraft.registry.tag.TagKey.of(net.minecraft.registry.RegistryKeys.ENTITY_TYPE, com.abilitywar.AbilityWar.id("bosses"));
+
+    public static boolean isBoss(LivingEntity e) {
+        return e.getType().isIn(BOSSES) || e instanceof WitherEntity || e instanceof EnderDragonEntity || e instanceof WardenEntity || e instanceof ElderGuardianEntity;
+    }
+
     public static int mobXp(LivingEntity e) {
         if (e instanceof PlayerEntity) return 0;
+        if (isBoss(e)) return Math.max(200, Math.round(e.getMaxHealth() * 2));
         if (com.abilitywar.ability.warlock.Necromancy.isMinion(e)) return 0;
         if (!(e instanceof Monster)) return 1;
         float xp = e.getMaxHealth() * 0.5f;
@@ -126,6 +135,17 @@ public final class RpgManager {
     /** 몹이 죽음: 막타 친 플레이어 (또는 하수인의 주인) 와 근처 같은 팀에게 경험치, 퀘스트 처치 수. */
     public static void onDeath(LivingEntity dead, net.minecraft.entity.damage.DamageSource source) {
         if (dead.getWorld().isClient) return;
+        if (isBoss(dead) && dead.getWorld() instanceof ServerWorld sw) {
+            // 보스: 가까이서 싸운 모두가 경험치 + 퀘스트 (마지막 한 방이 누구든)
+            int xp = mobXp(dead);
+            for (ServerPlayerEntity o : sw.getEntitiesByClass(ServerPlayerEntity.class, dead.getBoundingBox().expand(48), o -> !o.isSpectator() && o.isAlive())) {
+                addXp(o, xp);
+                questAmount(o, JobQuests.Type.BOSS, 1);
+                questKill(o, dead);
+                o.sendMessage(Text.translatable("rpg.abilitywar.boss_down", dead.getDisplayName()).formatted(Formatting.GOLD), false);
+            }
+            return;
+        }
         Entity att = source.getAttacker();
         ServerPlayerEntity killer = null;
         if (att instanceof ServerPlayerEntity sp) killer = sp;
@@ -181,8 +201,18 @@ public final class RpgManager {
                     inst.addTemporaryModifier(new EntityAttributeModifier(STAT_UUID[i][k], "Stat " + STAT_KEYS[i], es[k].per() * r.stats[i], es[k].op()));
             }
         }
+        // 3차 전직: 최대 체력 +6
+        EntityAttributeInstance hp = p.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
+        if (hp != null) {
+            hp.removeModifier(GRAND_HP);
+            if (isGrand(p)) hp.addTemporaryModifier(new EntityAttributeModifier(GRAND_HP, "Grand class", 6, EntityAttributeModifier.Operation.ADDITION));
+        }
         if (p.getHealth() > p.getMaxHealth()) p.setHealth(p.getMaxHealth());
     }
+
+    static final UUID GRAND_HP = UUID.fromString("7d3e7d2a-1c55-4f0e-9d7a-6b0b8a3e5f11");
+    /** 3차 전직 배율: 주는 피해, 받는 피해, 재사용 대기, 궁극기 충전, 회복량, 버프 지속. */
+    public static final float GRAND_DAMAGE = 1.3f, GRAND_TAKEN = 0.9f, GRAND_COOLDOWN = 0.85f, GRAND_ULT = 1.2f, GRAND_HEAL = 0.3f, GRAND_BUFF = 1.3f;
 
     public static void spend(ServerPlayerEntity p, int stat, int amount) {
         RpgData r = rpg(p);
@@ -207,7 +237,8 @@ public final class RpgManager {
     /** 힐러 회복량 배율 (지혜). */
     public static float healPower(LivingEntity healer) {
         EntityAttributeInstance i = healer.getAttributeInstance(GearAttributes.HEAL_POWER);
-        return 1f + (i == null ? 0f : (float) i.getValue());
+        float g = healer instanceof PlayerEntity pl && isGrand(pl) ? GRAND_HEAL : 0f;
+        return 1f + g + (i == null ? 0f : (float) i.getValue());
     }
 
     // ================================================================ 퀘스트 진행
@@ -296,21 +327,39 @@ public final class RpgManager {
 
     /** @return 실패 이유 번역 키, 성공이면 null. */
     @Nullable
-    public static String accept(ServerPlayerEntity p, String questId) {
+    public static String accept(ServerPlayerEntity p, String questId, String giver) {
         JobQuests.Quest q = JobQuests.ALL.get(questId);
-        if (q == null) return "rpg.abilitywar.err.no_quest";
+        if (q == null || !q.giver().equals(giver)) return "rpg.abilitywar.err.no_quest";
         RpgData r = rpg(p);
         String cur = ((AWPlayer) p).aw$getAbilityKey();
-        if (!r.baseClass.equals(q.base())) return "rpg.abilitywar.err.wrong_class";
-        if (ClassTree.tier(cur) >= 2) return "rpg.abilitywar.err.already_advanced";
-        if (r.level < p.getWorld().getGameRules().getInt(AWGameRules.JOB_LEVEL)) return "rpg.abilitywar.err.level";
-        if (!r.quest.isEmpty()) return "rpg.abilitywar.err.has_quest";
+        var rules = p.getWorld().getGameRules();
+        String err = JobQuests.check(q, cur, r.baseClass, r.level, r.grand, r.quest, rules.getInt(AWGameRules.JOB_LEVEL), rules.getInt(AWGameRules.GRAND_LEVEL));
+        if (err != null) return err;
         r.quest = q.id();
         java.util.Arrays.fill(r.progress, 0);
         r.dirty = true;
         p.sendMessage(Text.translatable("rpg.abilitywar.quest_accepted", Text.translatable("rpg.abilitywar.quest." + q.id())).formatted(Formatting.AQUA), false);
         p.getServerWorld().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 1f, 1f);
         return null;
+    }
+
+    /** 관리자: 3차 전직 켜기/끄기. */
+    public static void setGrand(ServerPlayerEntity p, boolean on) {
+        RpgData r = rpg(p);
+        r.grand = on;
+        r.dirty = true;
+        applyStats(p);
+    }
+
+    /** 3차 전직을 했고 지금 2차 직업 (효과가 켜짐). */
+    public static boolean isGrand(PlayerEntity p) {
+        return rpg(p).grand && ClassTree.tier(((AWPlayer) p).aw$getAbilityKey()) == 2;
+    }
+
+    /** 직업 이름 (3차면 "대" 를 붙임). */
+    public static Text className(String key, boolean grand) {
+        if (key.isEmpty()) return Text.translatable("rpg.abilitywar.hud.no_class");
+        return grand && ClassTree.tier(key) == 2 ? Text.translatable("ability.abilitywar." + key + ".grand") : Text.translatable("ability.abilitywar." + key);
     }
 
     @Nullable
@@ -335,23 +384,44 @@ public final class RpgManager {
         r.completed.add(q.id());
         r.quest = "";
         java.util.Arrays.fill(r.progress, 0);
-        Ability adv = Abilities.byString(q.reward());
-        AbilityManager.setAbility(p, adv);
-        r.baseClass = q.base();
+        GearGrade rewardGrade;
+        String titleKey;
+        Text cls;
+        switch (q.kind()) {
+            case GRAND -> {
+                r.grand = true;
+                rewardGrade = GearGrade.LEGENDARY;
+                titleKey = "rpg.abilitywar.grand_title";
+                cls = className(q.reward(), true);
+                applyStats(p);
+            }
+            case KING -> {
+                AbilityManager.setAbility(p, Abilities.byString(q.reward()));
+                rewardGrade = GearGrade.HERO;
+                titleKey = "rpg.abilitywar.king_title";
+                cls = className(q.reward(), r.grand);
+            }
+            default -> {
+                AbilityManager.setAbility(p, Abilities.byString(q.reward()));
+                r.baseClass = q.base();
+                rewardGrade = GearGrade.RARE;
+                titleKey = "rpg.abilitywar.advanced_title";
+                cls = className(q.reward(), false);
+            }
+        }
         addXp(p, q.xp());
-        // 보상: 희귀 무기 하나
-        var list = GearItems.WEAPONS.get(GearGrade.RARE);
+        // 보상 무기
+        var list = GearItems.WEAPONS.get(rewardGrade);
         if (list != null && !list.isEmpty()) {
             ItemStack st = new ItemStack(list.get(p.getRandom().nextInt(list.size())));
             if (!p.getInventory().insertStack(st)) p.dropItem(st, false);
         }
-        Text cls = Text.translatable("ability.abilitywar." + q.reward());
         p.networkHandler.sendPacket(new TitleFadeS2CPacket(10, 60, 20));
-        p.networkHandler.sendPacket(new TitleS2CPacket(Text.translatable("rpg.abilitywar.advanced_title").formatted(Formatting.GOLD)));
+        p.networkHandler.sendPacket(new TitleS2CPacket(Text.translatable(titleKey).formatted(Formatting.GOLD)));
         p.networkHandler.sendPacket(new SubtitleS2CPacket(cls.copy().formatted(Formatting.YELLOW)));
         NbtCompound n = new NbtCompound();
         n.putInt("e", p.getId());
-        n.putInt("l", -1);
+        n.putInt("l", q.kind() == JobQuests.Kind.GRAND ? -2 : -1);
         AWNet.fx(p.getServerWorld(), p.getPos(), "level_up", n);
         p.getServer().getPlayerManager().broadcast(Text.translatable("rpg.abilitywar.advanced_broadcast", p.getDisplayName(), cls).formatted(Formatting.GOLD), false);
         r.dirty = true;
@@ -389,17 +459,27 @@ public final class RpgManager {
     /** 직업을 바꿈 (명령어/선택 화면): 1차 직업도 맞춤. */
     public static void onAbilitySet(ServerPlayerEntity p, String key) {
         RpgData r = rpg(p);
+        p.getServer().execute(() -> applyStats(p));
         String base = ClassTree.baseOf(key);
         if (!base.isEmpty()) r.baseClass = base;
-        if (ClassTree.tier(key) >= 2 && !r.quest.isEmpty()) {
-            r.quest = "";
-            java.util.Arrays.fill(r.progress, 0);
+        JobQuests.Quest q = JobQuests.ALL.get(r.quest);
+        if (q != null) {
+            boolean stale = switch (q.kind()) {
+                case JOB -> ClassTree.tier(key) >= 2;
+                case GRAND -> !key.equals(q.base());
+                case KING -> key.equals(q.reward());
+            };
+            if (stale) {
+                r.quest = "";
+                java.util.Arrays.fill(r.progress, 0);
+            }
         }
         r.dirty = true;
     }
 
     public static void tick(ServerPlayerEntity p) {
         RpgData r = rpg(p);
+        ((AWPlayer) p).aw$setFlag2(AWPlayer.FLAG2_GRAND, isGrand(p));
         if (r.dirty) {
             r.dirty = false;
             sync(p);
@@ -429,6 +509,8 @@ public final class RpgManager {
         buf.writeVarInt(r.completed.size());
         for (String c : r.completed) buf.writeString(c);
         buf.writeBoolean(p.getWorld().getGameRules().getBoolean(AWGameRules.SELF_SELECT));
+        buf.writeBoolean(r.grand);
+        buf.writeVarInt(p.getWorld().getGameRules().getInt(AWGameRules.GRAND_LEVEL));
         if (ServerPlayNetworking.canSend(p, S2C_RPG)) ServerPlayNetworking.send(p, S2C_RPG, buf);
     }
 
@@ -442,12 +524,24 @@ public final class RpgManager {
                     case 0 -> spend(player, parseInt(arg), 1);
                     case 4 -> spend(player, parseInt(arg), 5);
                     case 1, 2 -> {
-                        if (!nearNpc(player, npc)) {
+                        String giver = giverNear(player, npc);
+                        if (giver == null) {
                             player.sendMessage(Text.translatable("rpg.abilitywar.err.far").formatted(Formatting.RED), true);
                             return;
                         }
-                        String err = action == 1 ? accept(player, arg) : turnIn(player);
-                        if (err != null) player.sendMessage(Text.translatable(err, player.getWorld().getGameRules().getInt(AWGameRules.JOB_LEVEL)).formatted(Formatting.RED), false);
+                        String err;
+                        int needLv;
+                        if (action == 1) {
+                            err = accept(player, arg, giver);
+                            JobQuests.Quest q = JobQuests.ALL.get(arg);
+                            var rules = player.getWorld().getGameRules();
+                            needLv = q == null ? 0 : JobQuests.requiredLevel(q, rules.getInt(AWGameRules.JOB_LEVEL), rules.getInt(AWGameRules.GRAND_LEVEL));
+                        } else {
+                            JobQuests.Quest q = active(player);
+                            err = q != null && !q.giver().equals(giver) ? "rpg.abilitywar.err.other_giver" : turnIn(player);
+                            needLv = 0;
+                        }
+                        if (err != null) player.sendMessage(Text.translatable(err, needLv).formatted(Formatting.RED), false);
                         // 결과를 반영한 대화 화면으로 다시 열기
                         openNpc(player, npc);
                     }
@@ -467,9 +561,11 @@ public final class RpgManager {
         }
     }
 
-    static boolean nearNpc(ServerPlayerEntity p, int npc) {
+    /** 가까이 있는 퀘스트 NPC 가 주는 퀘스트 종류 (멀거나 없으면 null). */
+    @Nullable
+    static String giverNear(ServerPlayerEntity p, int npc) {
         Entity e = p.getWorld().getEntityById(npc);
-        return e instanceof JobMasterEntity && e.squaredDistanceTo(p) < 10 * 10;
+        return e instanceof JobMasterEntity jm && e.squaredDistanceTo(p) < 10 * 10 ? jm.giver() : null;
     }
 
     public static void openNpc(ServerPlayerEntity p, int npc) {

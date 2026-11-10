@@ -22,6 +22,8 @@ public abstract class PlayerEntityMixin extends LivingEntity implements AWPlayer
     private static final TrackedData<String> AW_ABILITY = DataTracker.registerData(PlayerEntity.class, TrackedDataHandlerRegistry.STRING);
     @Unique
     private static final TrackedData<Byte> AW_FLAGS = DataTracker.registerData(PlayerEntity.class, TrackedDataHandlerRegistry.BYTE);
+    @Unique
+    private static final TrackedData<Byte> AW_FLAGS2 = DataTracker.registerData(PlayerEntity.class, TrackedDataHandlerRegistry.BYTE);
 
     @Unique
     private AbilityData aw$data;
@@ -39,6 +41,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements AWPlayer
     private void aw$initTracker(CallbackInfo ci) {
         this.dataTracker.startTracking(AW_ABILITY, "");
         this.dataTracker.startTracking(AW_FLAGS, (byte) 0);
+        this.dataTracker.startTracking(AW_FLAGS2, (byte) 0);
     }
 
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
@@ -69,6 +72,16 @@ public abstract class PlayerEntityMixin extends LivingEntity implements AWPlayer
     @Override
     public void aw$setFlags(byte flags) {
         this.dataTracker.set(AW_FLAGS, flags);
+    }
+
+    @Override
+    public byte aw$getFlags2() {
+        return this.dataTracker.get(AW_FLAGS2);
+    }
+
+    @Override
+    public void aw$setFlags2(byte flags) {
+        this.dataTracker.set(AW_FLAGS2, flags);
     }
 
     @Override

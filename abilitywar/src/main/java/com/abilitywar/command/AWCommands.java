@@ -111,6 +111,11 @@ public final class AWCommands {
                                 .then(argument("targets", EntityArgumentType.players()).executes(ctx -> rpgEach(EntityArgumentType.getPlayers(ctx, "targets"), com.abilitywar.rpg.RpgManager::forceProgress))))
                         .then(literal("abandon").executes(ctx -> rpgEach(List.of(ctx.getSource().getPlayerOrThrow()), com.abilitywar.rpg.RpgManager::abandon))
                                 .then(argument("targets", EntityArgumentType.players()).executes(ctx -> rpgEach(EntityArgumentType.getPlayers(ctx, "targets"), com.abilitywar.rpg.RpgManager::abandon)))))
+                .then(literal("grand").requires(s -> s.hasPermissionLevel(2))
+                        .then(argument("on", com.mojang.brigadier.arguments.BoolArgumentType.bool())
+                                .executes(ctx -> rpgEach(List.of(ctx.getSource().getPlayerOrThrow()), p -> com.abilitywar.rpg.RpgManager.setGrand(p, com.mojang.brigadier.arguments.BoolArgumentType.getBool(ctx, "on"))))
+                                .then(argument("targets", EntityArgumentType.players())
+                                        .executes(ctx -> rpgEach(EntityArgumentType.getPlayers(ctx, "targets"), p -> com.abilitywar.rpg.RpgManager.setGrand(p, com.mojang.brigadier.arguments.BoolArgumentType.getBool(ctx, "on")))))))
                 .then(literal("npc").requires(s -> s.hasPermissionLevel(2)).executes(ctx -> {
                     ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
                     var npc = com.abilitywar.registry.AWEntities.JOB_MASTER.create(p.getServerWorld());

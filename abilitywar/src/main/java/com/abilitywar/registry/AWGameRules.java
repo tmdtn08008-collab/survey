@@ -25,6 +25,9 @@ public final class AWGameRules {
     /** 2차 전직 퀘스트를 받을 수 있는 레벨. */
     public static final GameRules.Key<GameRules.IntRule> JOB_LEVEL =
             GameRuleRegistry.register("abilitywarJobLevel", GameRules.Category.PLAYER, GameRuleFactory.createIntRule(30, 1, 100));
+    /** 3차 전직 ("대") 퀘스트를 받을 수 있는 레벨. */
+    public static final GameRules.Key<GameRules.IntRule> GRAND_LEVEL =
+            GameRuleRegistry.register("abilitywarGrandLevel", GameRules.Category.PLAYER, GameRuleFactory.createIntRule(60, 1, 100));
     /** 경험치 배율 (%). */
     public static final GameRules.Key<GameRules.IntRule> XP_RATE =
             GameRuleRegistry.register("abilitywarXpRate", GameRules.Category.PLAYER, GameRuleFactory.createIntRule(100, 0, 100000));

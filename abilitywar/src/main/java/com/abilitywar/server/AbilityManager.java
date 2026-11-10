@@ -289,6 +289,11 @@ public final class AbilityManager {
                 // 되살린 몹은 피해 절반
                 if (com.abilitywar.ability.warlock.Necromancy.isRaised(la)) mult *= 0.5f;
             }
+            // 3차 전직: 주는 피해 +30%, 받는 피해 -10%
+            if (source.getAttacker() instanceof net.minecraft.entity.player.PlayerEntity gp && gp != victim && com.abilitywar.rpg.RpgManager.isGrand(gp))
+                mult *= com.abilitywar.rpg.RpgManager.GRAND_DAMAGE;
+            if (victim instanceof net.minecraft.entity.player.PlayerEntity vp && com.abilitywar.rpg.RpgManager.isGrand(vp))
+                mult *= com.abilitywar.rpg.RpgManager.GRAND_TAKEN;
             net.minecraft.entity.effect.StatusEffectInstance ag = victim.getStatusEffect(AWEffects.AEGIS);
             if (ag != null) mult *= Math.max(0.4f, 1f - 0.15f * (ag.getAmplifier() + 1));
             amount *= mult;

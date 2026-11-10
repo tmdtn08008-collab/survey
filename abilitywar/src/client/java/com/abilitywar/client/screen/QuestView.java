@@ -64,7 +64,7 @@ final class QuestView {
             ctx.getMatrices().push();
             ctx.getMatrices().translate(x0 + 18, y + 13, 0);
             ctx.getMatrices().scale(0.75f, 0.75f, 1);
-            ctx.drawTextWithShadow(tr, Text.translatable("rpg.abilitywar.status." + s.name().toLowerCase(), RpgClient.jobLevel), 0, 0, col);
+            ctx.drawTextWithShadow(tr, Text.translatable("rpg.abilitywar.status." + s.name().toLowerCase(), RpgClient.requiredLevel(q)), 0, 0, col);
             ctx.getMatrices().pop();
             y += 24;
         }
@@ -96,13 +96,35 @@ final class QuestView {
         // 조건
         ctx.drawTextWithShadow(tr, Text.translatable("rpg.abilitywar.screen.requires"), x, y, RpgUi.GOLD);
         y += 10;
-        boolean lvOk = RpgClient.level >= RpgClient.jobLevel;
+        int need = RpgClient.requiredLevel(q);
+        boolean lvOk = RpgClient.level >= need;
         ctx.drawTextWithShadow(tr, Text.literal(lvOk ? "✔ " : "✖ ").formatted(lvOk ? Formatting.GREEN : Formatting.RED)
-                .append(Text.translatable("rpg.abilitywar.screen.req_level", RpgClient.jobLevel).formatted(Formatting.GRAY)), x + 4, y, 0xFFFFFF);
+                .append(Text.translatable("rpg.abilitywar.screen.req_level", need).formatted(Formatting.GRAY)), x + 4, y, 0xFFFFFF);
         y += 10;
-        boolean clsOk = RpgClient.baseClass.equals(q.base());
+        boolean clsOk;
+        Text req;
+        switch (q.kind()) {
+            case GRAND -> {
+                clsOk = com.abilitywar.client.ClientState.ability.equals(q.base());
+                req = Text.translatable("rpg.abilitywar.screen.req_class2", Text.translatable("ability.abilitywar." + q.base()));
+            }
+            case KING -> {
+                clsOk = q.allows(RpgClient.baseClass);
+                Text names = Text.empty();
+                String[] bs = q.base().split(",");
+                for (int k = 0; k < bs.length; k++) {
+                    if (k > 0) ((net.minecraft.text.MutableText) names).append("·");
+                    ((net.minecraft.text.MutableText) names).append(Text.translatable("ability.abilitywar." + bs[k]));
+                }
+                req = Text.translatable("rpg.abilitywar.screen.req_class", names);
+            }
+            default -> {
+                clsOk = RpgClient.baseClass.equals(q.base());
+                req = Text.translatable("rpg.abilitywar.screen.req_class", Text.translatable("ability.abilitywar." + q.base()));
+            }
+        }
         ctx.drawTextWithShadow(tr, Text.literal(clsOk ? "✔ " : "✖ ").formatted(clsOk ? Formatting.GREEN : Formatting.RED)
-                .append(Text.translatable("rpg.abilitywar.screen.req_class", Text.translatable("ability.abilitywar." + q.base())).formatted(Formatting.GRAY)), x + 4, y, 0xFFFFFF);
+                .append(req.copy().formatted(Formatting.GRAY)), x + 4, y, 0xFFFFFF);
         y += 13;
         // 목표
         ctx.drawTextWithShadow(tr, Text.translatable("rpg.abilitywar.screen.objectives"), x, y, RpgUi.GOLD);
@@ -131,11 +153,13 @@ final class QuestView {
         if (y < y1 - 30) {
             ctx.drawTextWithShadow(tr, Text.translatable("rpg.abilitywar.screen.rewards"), x, y, RpgUi.GOLD);
             y += 10;
-            ctx.drawTextWithShadow(tr, Text.literal("◆ ").formatted(Formatting.GOLD).append(Text.translatable("rpg.abilitywar.screen.reward_class", Text.translatable("ability.abilitywar." + q.reward())).formatted(Formatting.WHITE)), x + 4, y, 0xFFFFFF);
+            Text rc = q.kind() == JobQuests.Kind.GRAND ? Text.translatable("rpg.abilitywar.screen.reward_grand", RpgClient.className(q.reward(), true))
+                    : Text.translatable(q.kind() == JobQuests.Kind.KING ? "rpg.abilitywar.screen.reward_special" : "rpg.abilitywar.screen.reward_class", Text.translatable("ability.abilitywar." + q.reward()));
+            ctx.drawTextWithShadow(tr, Text.literal("◆ ").formatted(Formatting.GOLD).append(rc.copy().formatted(Formatting.WHITE)), x + 4, y, 0xFFFFFF);
             y += 10;
             ctx.drawTextWithShadow(tr, Text.literal("◆ ").formatted(Formatting.GOLD).append(Text.translatable("rpg.abilitywar.screen.reward_xp", q.xp()).formatted(Formatting.GRAY)), x + 4, y, 0xFFFFFF);
             y += 10;
-            ctx.drawTextWithShadow(tr, Text.literal("◆ ").formatted(Formatting.GOLD).append(Text.translatable("rpg.abilitywar.screen.reward_gear").formatted(Formatting.BLUE)), x + 4, y, 0xFFFFFF);
+            ctx.drawTextWithShadow(tr, Text.literal("◆ ").formatted(Formatting.GOLD).append(Text.translatable("rpg.abilitywar.screen.reward_gear_" + q.kind().name().toLowerCase()).formatted(q.kind() == JobQuests.Kind.GRAND ? Formatting.GOLD : q.kind() == JobQuests.Kind.KING ? Formatting.LIGHT_PURPLE : Formatting.BLUE)), x + 4, y, 0xFFFFFF);
         }
     }
 

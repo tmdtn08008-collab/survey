@@ -21,6 +21,8 @@ public class RpgData {
     public String quest = "";
     public final int[] progress = new int[8];
     public final Set<String> completed = new HashSet<>();
+    /** 3차 전직 ("대") 을 했는지. 2차 직업일 때만 효과가 있음. */
+    public boolean grand;
     public boolean dirty = true;
 
     public NbtCompound write() {
@@ -35,6 +37,7 @@ public class RpgData {
         NbtList l = new NbtList();
         for (String s : completed) l.add(NbtString.of(s));
         t.put("Completed", l);
+        t.putBoolean("Grand", grand);
         return t;
     }
 
@@ -50,6 +53,7 @@ public class RpgData {
         for (int i = 0; i < progress.length; i++) progress[i] = i < p.length ? p[i] : 0;
         completed.clear();
         for (NbtElement e : t.getList("Completed", NbtElement.STRING_TYPE)) completed.add(e.asString());
+        grand = t.getBoolean("Grand");
         dirty = true;
     }
 

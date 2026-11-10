@@ -16,20 +16,30 @@ import net.minecraft.text.Text;
 /** 전직 교관 대화: 1차 직업에 이어지는 2차 전직 퀘스트를 받고, 끝내면 전직. */
 public class JobMasterScreen extends Screen {
     final int npc;
+    final String giver;
     final QuestView view = new QuestView();
     ButtonWidget accept, turnIn, close;
     int px, py, pw = 380, ph = 230;
     float typed;
 
     public JobMasterScreen(int npc) {
-        super(Text.translatable("entity.abilitywar.job_master"));
+        super(title(npc));
         this.npc = npc;
+        MinecraftClient mc = MinecraftClient.getInstance();
+        Entity e = mc.world == null ? null : mc.world.getEntityById(npc);
+        this.giver = e instanceof com.abilitywar.rpg.JobMasterEntity jm ? jm.giver() : JobQuests.CLASS_MASTER;
+    }
+
+    static Text title(int npc) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        Entity e = mc.world == null ? null : mc.world.getEntityById(npc);
+        return e != null ? e.getDisplayName() : Text.translatable("entity.abilitywar.job_master");
     }
 
     public static void open(int npc) {
         MinecraftClient mc = MinecraftClient.getInstance();
         if (mc.currentScreen instanceof JobMasterScreen s && s.npc == npc) {
-            s.view.set(QuestScreen.myQuests());
+            s.view.set(RpgClient.questsFor(s.giver));
             s.typed = 0;
             return;
         }
@@ -41,7 +51,7 @@ public class JobMasterScreen extends Screen {
         pw = Math.min(400, width - 16);
         px = (width - pw) / 2;
         py = Math.max(4, (height - ph) / 2);
-        view.set(QuestScreen.myQuests());
+        view.set(RpgClient.questsFor(giver));
         int by = py + ph - 26;
         accept = addDrawableChild(ButtonWidget.builder(Text.translatable("rpg.abilitywar.npc.accept"), b -> {
             JobQuests.Quest q = view.current();
@@ -67,11 +77,31 @@ public class JobMasterScreen extends Screen {
     }
 
     Text line() {
-        int tier = ClassTree.tier(ClientState.ability);
+        String cur = ClientState.ability;
+        int tier = ClassTree.tier(cur);
         JobQuests.Quest a = RpgClient.active();
+        String who = giver.equals(JobQuests.KING) ? "rpg.abilitywar.king.say." : "rpg.abilitywar.npc.say.";
+        if (a != null && a.giver().equals(giver))
+            return Text.translatable(who + (RpgClient.done(a) ? "ready" : "progress"), RpgClient.questName(a));
+        if (a != null) return Text.translatable(who + "busy", RpgClient.questName(a));
+        if (giver.equals(JobQuests.KING)) {
+            JobQuests.Quest pal = JobQuests.ALL.get("king_paladin");
+            RpgClient.Status st = RpgClient.status(pal);
+            if (cur.equals("paladin")) return Text.translatable(RpgClient.grandActive() ? "rpg.abilitywar.king.say.grand_done" : RpgClient.level < RpgClient.grandLevel
+                    ? "rpg.abilitywar.king.say.paladin" : "rpg.abilitywar.king.say.grand", RpgClient.grandLevel);
+            return switch (st) {
+                case WRONG_CLASS -> Text.translatable("rpg.abilitywar.king.say.wrong_class");
+                case LOCKED_LEVEL -> Text.translatable("rpg.abilitywar.king.say.level", pal.minLevel());
+                default -> Text.translatable("rpg.abilitywar.king.say.offer");
+            };
+        }
         if (tier == 0) return Text.translatable("rpg.abilitywar.npc.say.no_class");
-        if (tier >= 2) return Text.translatable("rpg.abilitywar.npc.say.advanced", Text.translatable("ability.abilitywar." + ClientState.ability));
-        if (a != null) return Text.translatable(RpgClient.done(a) ? "rpg.abilitywar.npc.say.ready" : "rpg.abilitywar.npc.say.progress", RpgClient.questName(a));
+        if (tier >= 2) {
+            if (RpgClient.grandActive()) return Text.translatable("rpg.abilitywar.npc.say.grand_done", RpgClient.className(cur, true));
+            if (ClassTree.isSpecial(cur)) return Text.translatable("rpg.abilitywar.npc.say.special");
+            if (RpgClient.level < RpgClient.grandLevel) return Text.translatable("rpg.abilitywar.npc.say.advanced", Text.translatable("ability.abilitywar." + cur), RpgClient.grandLevel);
+            return Text.translatable("rpg.abilitywar.npc.say.grand", Text.translatable("ability.abilitywar." + cur));
+        }
         if (RpgClient.level < RpgClient.jobLevel) return Text.translatable("rpg.abilitywar.npc.say.level", RpgClient.jobLevel);
         return Text.translatable("rpg.abilitywar.npc.say.choose." + RpgClient.baseClass);
     }

@@ -92,6 +92,7 @@ public class AbilityData {
         if (player != null) {
             net.minecraft.entity.attribute.EntityAttributeInstance cdr = player.getAttributeInstance(com.abilitywar.gear.GearAttributes.COOLDOWN);
             if (cdr != null && cdr.getValue() > 0) ticks = Math.max(1, (int) Math.round(ticks * (1 - cdr.getValue())));
+            if (ticks > 20 && com.abilitywar.rpg.RpgManager.isGrand(player)) ticks = Math.round(ticks * com.abilitywar.rpg.RpgManager.GRAND_COOLDOWN);
         }
         cdEnd[slot.ordinal()] = now + ticks;
         cdTotal[slot.ordinal()] = ticks;
@@ -136,6 +137,7 @@ public class AbilityData {
             amount *= sp.getWorld().getGameRules().getInt(AWGameRules.ULT_CHARGE_PERCENT) / 100f;
             net.minecraft.entity.attribute.EntityAttributeInstance uc = sp.getAttributeInstance(com.abilitywar.gear.GearAttributes.ULT_CHARGE);
             if (uc != null) amount *= 1f + (float) uc.getValue();
+            if (com.abilitywar.rpg.RpgManager.isGrand(sp)) amount *= com.abilitywar.rpg.RpgManager.GRAND_ULT;
         }
         float before = ult;
         ult = Math.min(ULT_MAX, ult + amount);

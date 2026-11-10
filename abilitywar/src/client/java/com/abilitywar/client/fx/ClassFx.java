@@ -230,6 +230,19 @@ public final class ClassFx {
             VfxManager.add(new Effects.Flash(at.add(0, 1.2, 0), 5f, PALE_GOLD, 14, Tex.FLARE));
             VfxManager.add(new Ring(w, at, 4f, GOLD, 3));
         }
+        if (lv == -2) {
+            // 3차 전직: 하늘까지 솟는 금빛 기둥 + 큰 고리 두 겹 + 화면 흔들림
+            VfxManager.add(new Ring(w, at, 8f, GOLD, 0));
+            VfxManager.add(new Ring(w, at, 5f, Effects.abilityColor(e), 3));
+            VfxManager.add(new Effects.Flash(at.add(0, 2, 0), 9f, 0xFFF6DC, 18, Tex.FLARE));
+            for (int i = 0; i < 40; i++) {
+                double a = R.nextDouble() * Math.PI * 2;
+                Particles.P pp = Particles.spawn(Kind.STREAK, at.add(Math.cos(a) * 0.6, 0.2, Math.sin(a) * 0.6), new Vec3d(Math.cos(a) * 0.05, rf(0.5f, 0.9f), Math.sin(a) * 0.05), rf(14, 22), 0.09f);
+                pp.color(i % 2 == 0 ? GOLD : 0xFFFFFF, 1f);
+                pp.drag = 0.97f;
+            }
+            CameraController.addShake(0.4f, 12);
+        }
     }
 
     /** 몸을 감싸며 올라가는 금빛 고리 + 빛기둥. */
@@ -238,7 +251,7 @@ public final class ClassFx {
         final boolean job;
 
         LevelUp(int id, boolean job) {
-            super(job ? 50 : 34);
+            super(job ? 60 : 34);
             this.id = id;
             this.job = job;
         }

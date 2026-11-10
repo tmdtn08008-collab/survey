@@ -78,6 +78,7 @@ public final class VfxManager {
                         AbilityWar.LOG.debug("Unknown fx {}", type);
                 }
             }
+            GrandFx.onFx(type, n, w);
         } catch (Exception ex) {
             AbilityWar.LOG.error("FX {} failed", type, ex);
         }
@@ -157,6 +158,7 @@ public final class VfxManager {
         com.abilitywar.client.fx.warlock.WarlockFx.tick(w);
         com.abilitywar.client.fx.angel.AngelFx.tick(w);
         ClassFx.tick(w);
+        GrandFx.tick(w);
         AfterImages.tick();
         Particles.tick();
         Debris.tick();
@@ -172,6 +174,7 @@ public final class VfxManager {
         com.abilitywar.client.fx.warlock.WarlockFx.clear();
         com.abilitywar.client.fx.angel.AngelFx.clear();
         ClassFx.clear();
+        GrandFx.clear();
         EFFECTS.clear();
         Particles.clear();
         Debris.clear();
@@ -207,6 +210,7 @@ public final class VfxManager {
             com.abilitywar.client.fx.warlock.WarlockFx.render(c);
             com.abilitywar.client.fx.angel.AngelFx.render(c);
             ClassFx.render(c);
+            GrandFx.render(c);
             Particles.render(c.imm, c.m, c.camRot, c.cam, c.tickDelta);
             c.imm.draw();
             DamageNumbers.renderWorld(c);

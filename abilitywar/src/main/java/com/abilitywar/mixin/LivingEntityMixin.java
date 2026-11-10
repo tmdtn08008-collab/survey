@@ -43,6 +43,17 @@ public abstract class LivingEntityMixin extends Entity {
         if (com.abilitywar.ability.warlock.Necromancy.isMinion(this)) ci.cancel();
     }
 
+    /** 3차 전직: 내가 거는 (또는 나에게 걸리는) 좋은 효과의 지속 시간 +30%. */
+    @ModifyVariable(method = "addStatusEffect(Lnet/minecraft/entity/effect/StatusEffectInstance;Lnet/minecraft/entity/Entity;)Z", at = @At("HEAD"), argsOnly = true)
+    private net.minecraft.entity.effect.StatusEffectInstance aw$grandBuff(net.minecraft.entity.effect.StatusEffectInstance effect, net.minecraft.entity.effect.StatusEffectInstance original, Entity source) {
+        if (this.getWorld().isClient || effect == null || effect.isInfinite() || effect.getDuration() > 20 * 60 * 10) return effect;
+        if (!effect.getEffectType().isBeneficial()) return effect;
+        Entity giver = source != null ? source : (Object) this instanceof net.minecraft.entity.player.PlayerEntity ? this : null;
+        if (!(giver instanceof net.minecraft.entity.player.PlayerEntity gp) || !com.abilitywar.rpg.RpgManager.isGrand(gp)) return effect;
+        return new net.minecraft.entity.effect.StatusEffectInstance(effect.getEffectType(), Math.round(effect.getDuration() * com.abilitywar.rpg.RpgManager.GRAND_BUFF),
+                effect.getAmplifier(), effect.isAmbient(), effect.shouldShowParticles(), effect.shouldShowIcon());
+    }
+
     @ModifyVariable(method = "damage", at = @At("HEAD"), argsOnly = true)
     private float aw$modifyDamage(float amount, DamageSource source, float originalAmount) {
         if (this.getWorld().isClient) return amount;

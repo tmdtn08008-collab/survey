@@ -128,6 +128,8 @@ public final class CinematicOverlay {
             ctx.drawText(tr, title, -tw / 2, -4, alpha | th.title(), false);
             ctx.getMatrices().pop();
             }
+            // 3차 전직 ("대"): 제목 왼쪽에 붉은 바탕 금테 "大" 도장이 쾅 찍힘
+            if (com.abilitywar.client.fx.GrandFx.isGrand(caster)) grandSeal(ctx, tr, sw / 2f - Math.min(sw * 0.62f, 380f) / 2f - 6, cy - 22, tt, out);
             float sa = Math.min(1, Math.max(0, (tt - 3) / 5f)) * out;
             int sw2 = tr.getWidth(sub);
             float lineW = (sw2 * 1.4f + 40) * Math.min(1, tt / 10f);
@@ -138,6 +140,29 @@ public final class CinematicOverlay {
             ctx.drawTextWithShadow(tr, sub, -sw2 / 2, 0, ((int) (sa * 255) << 24) | th.sub());
             ctx.getMatrices().pop();
         }
+    }
+
+    static void grandSeal(DrawContext ctx, TextRenderer tr, float x, float y, float tt, float out) {
+        float st = tt - 4;
+        if (st < 0) return;
+        float k = Math.min(1, st / 4f);
+        float scale = 1f + 1.4f * (float) Math.pow(1 - k, 3);
+        float a = Math.min(1, st / 2f) * out;
+        ctx.getMatrices().push();
+        ctx.getMatrices().translate(x, y, 0);
+        ctx.getMatrices().scale(scale, scale, 1);
+        ctx.getMatrices().multiply(net.minecraft.util.math.RotationAxis.POSITIVE_Z.rotationDegrees(-8));
+        int s = 18;
+        HudDraw.rect(ctx, -s - 2, -s - 2, s + 2, s + 2, HudDraw.argb(a, 0xFFD86A));
+        HudDraw.rect(ctx, -s, -s, s, s, HudDraw.argb(a, 0xA8141A));
+        HudDraw.rect(ctx, -s + 3, -s + 3, s - 3, -s + 4, HudDraw.argb(a * 0.6f, 0xFFD86A));
+        HudDraw.rect(ctx, -s + 3, s - 4, s - 3, s - 3, HudDraw.argb(a * 0.6f, 0xFFD86A));
+        ctx.getMatrices().scale(2.6f, 2.6f, 1);
+        String ch = "大";
+        ctx.drawText(tr, ch, -tr.getWidth(ch) / 2, -4, ((int) (a * 255) << 24) | 0xFFF0C0, false);
+        ctx.getMatrices().pop();
+        // 찍히는 순간 번쩍임
+        if (st < 3) HudDraw.rect(ctx, x - 40, y - 40, x + 40, y + 40, HudDraw.argb((1 - st / 3f) * 0.35f * out, 0xFFF6DC));
     }
 
     /** 화면 전체에 색을 곱함. */

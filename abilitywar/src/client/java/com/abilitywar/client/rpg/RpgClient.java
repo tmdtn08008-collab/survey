@@ -32,6 +32,9 @@ public final class RpgClient {
     public static int jobLevel = 30;
     public static final Set<String> completed = new HashSet<>();
     public static boolean selfSelect;
+    /** 3차 전직 ("대") 을 했는지 (2차 직업일 때 효과). */
+    public static boolean grand;
+    public static int grandLevel = 60;
 
     /** HUD 연출용. */
     public static float xpShown;
@@ -57,6 +60,8 @@ public final class RpgClient {
         completed.clear();
         for (int i = 0; i < n; i++) completed.add(buf.readString());
         selfSelect = buf.isReadable() && buf.readBoolean();
+        grand = buf.isReadable() && buf.readBoolean();
+        if (buf.isReadable()) grandLevel = buf.readVarInt();
         if (synced && x > xp && lv == level) xpFlash = 14;
         if (synced && pts > points) pointsFlash = 40;
         if (lastLevel >= 0 && lv != level) xpShown = 0;
@@ -86,6 +91,7 @@ public final class RpgClient {
         progressN = 0;
         completed.clear();
         lastLevel = -1;
+        grand = false;
         bannerTicks = 0;
         xpShown = 0;
     }
@@ -110,13 +116,41 @@ public final class RpgClient {
     public enum Status {AVAILABLE, LOCKED_LEVEL, ACTIVE, READY, COMPLETED, OTHER_ACTIVE, ADVANCED, WRONG_CLASS}
 
     public static Status status(JobQuests.Quest q) {
-        if (completed.contains(q.id()) || ClientState.ability.equals(q.reward())) return Status.COMPLETED;
+        String cur = ClientState.ability;
+        if (JobQuests.finished(q, cur, grand, completed)) return Status.COMPLETED;
         if (q.id().equals(quest)) return done(q) ? Status.READY : Status.ACTIVE;
-        if (!baseClass.equals(q.base())) return Status.WRONG_CLASS;
-        if (ClassTree.tier(ClientState.ability) >= 2) return Status.ADVANCED;
-        if (!quest.isEmpty()) return Status.OTHER_ACTIVE;
-        if (level < jobLevel) return Status.LOCKED_LEVEL;
-        return Status.AVAILABLE;
+        String err = JobQuests.check(q, cur, baseClass, level, grand, quest, jobLevel, grandLevel);
+        if (err == null) return Status.AVAILABLE;
+        return switch (err) {
+            case "rpg.abilitywar.err.wrong_class" -> Status.WRONG_CLASS;
+            case "rpg.abilitywar.err.already_advanced", "rpg.abilitywar.err.already_grand" -> Status.ADVANCED;
+            case "rpg.abilitywar.err.has_quest" -> Status.OTHER_ACTIVE;
+            default -> Status.LOCKED_LEVEL;
+        };
+    }
+
+    public static int requiredLevel(JobQuests.Quest q) {
+        return JobQuests.requiredLevel(q, jobLevel, grandLevel);
+    }
+
+    /** 3차 전직 효과가 켜져 있는지 (지금 2차 직업). */
+    public static boolean grandActive() {
+        return grand && ClassTree.tier(ClientState.ability) == 2;
+    }
+
+    /** 직업 이름 (3차면 "대"). */
+    public static MutableText className(String key, boolean grandName) {
+        if (key == null || key.isEmpty()) return Text.translatable("rpg.abilitywar.hud.no_class");
+        return grandName && ClassTree.tier(key) == 2 ? Text.translatable("ability.abilitywar." + key + ".grand") : Text.translatable("ability.abilitywar." + key);
+    }
+
+    /** 이 NPC 가 보여줄 퀘스트 (다른 직업 것은 뺌, 진행 중인 것 먼저). */
+    public static java.util.List<JobQuests.Quest> questsFor(String giver) {
+        java.util.List<JobQuests.Quest> out = new java.util.ArrayList<>();
+        String base = baseClass.isEmpty() ? ClassTree.baseOf(ClientState.ability) : baseClass;
+        for (JobQuests.Quest q : JobQuests.forGiver(giver, ClientState.ability, base, quest))
+            if (q.id().equals(quest) || status(q) != Status.WRONG_CLASS || q.kind() == JobQuests.Kind.JOB) out.add(q);
+        return out;
     }
 
     public static JobQuests.Quest active() {
@@ -134,12 +168,11 @@ public final class RpgClient {
     }
 
     /** NPC 머리 위 표시: 0 없음, 1 = 받을 수 있음(!), 2 = 진행 중(?), 3 = 완료 가능(?). */
-    public static int marker() {
+    public static int marker(String giver) {
         if (!synced) return 0;
         JobQuests.Quest a = active();
-        if (a != null) return done(a) ? 3 : 2;
-        if (ClassTree.tier(ClientState.ability) != 1 || level < jobLevel) return 0;
-        for (JobQuests.Quest q : JobQuests.forBase(baseClass)) if (status(q) == Status.AVAILABLE) return 1;
+        if (a != null) return a.giver().equals(giver) ? (done(a) ? 3 : 2) : 0;
+        for (JobQuests.Quest q : questsFor(giver)) if (status(q) == Status.AVAILABLE) return 1;
         return 0;
     }
 
@@ -155,6 +188,7 @@ public final class RpgClient {
             case HEAL -> Text.translatable("rpg.abilitywar.obj.heal");
             case BUFF -> Text.translatable("rpg.abilitywar.obj.buff");
             case TANK -> Text.translatable("rpg.abilitywar.obj.tank");
+            case BOSS -> Text.translatable("rpg.abilitywar.obj.boss");
         };
     }
 
