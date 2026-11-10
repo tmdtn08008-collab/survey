@@ -11,6 +11,8 @@ public interface AWPlayer {
     byte FLAG_TRANSFORMED = 32;
     /** 혈귀 박쥐 산개 (몸이 박쥐 떼로 흩어짐: 모델을 그리지 않음). */
     byte FLAG_SWARM = 64;
+    /** 천사 비행 모드 (날개 펼침). */
+    byte FLAG_FLYING = (byte) 128;
 
     String aw$getAbilityKey();
 

@@ -64,6 +64,7 @@ public final class ArtSkillBar {
         passive(td, time);
         if ("cantor".equals(ClientState.ability)) cantor(ctx, time);
         if ("warlock".equals(ClientState.ability)) warlock(ctx, time);
+        if ("angel".equals(ClientState.ability)) angel(ctx, time);
         isAdditive = false;
         RenderSystem.defaultBlendFunc();
         TextRenderer tr = mc.textRenderer;
@@ -252,6 +253,22 @@ public final class ArtSkillBar {
         if (s2 != null && raised > 0) corner(ctx, tr, s2, raised + "/6", 0xFF7CFFB0, true);
         float[] s1 = L.slots.get("skill1");
         if (s1 != null && skel) corner(ctx, tr, s1, "☠", 0xFF7CFFB0, true);
+        isAdditive = false;
+        RenderSystem.defaultBlendFunc();
+    }
+
+    /** 천사: T 칸 = 지금 모드 (비행이면 하늘빛으로 빛나고 "비행", 걷기면 "걷기"). */
+    private static void angel(DrawContext ctx, float time) {
+        boolean fly = (ClientState.extra & 1) != 0;
+        TextRenderer tr = MinecraftClient.getInstance().textRenderer;
+        float[] t = L.slots.get("passive");
+        if (t == null) return;
+        if (fly) {
+            additive(true);
+            maskRect(t, 0, 1, 0.55f, 0.82f, 1f, 0.22f + 0.1f * (float) Math.sin(time * 0.2));
+            additive(false);
+        }
+        corner(ctx, tr, t, net.minecraft.text.Text.translatable(fly ? "abilitywar.angel.mode_fly" : "abilitywar.angel.mode_walk").getString(), fly ? 0xFFD8F0FF : 0xFFFFF0C8, true);
         isAdditive = false;
         RenderSystem.defaultBlendFunc();
     }

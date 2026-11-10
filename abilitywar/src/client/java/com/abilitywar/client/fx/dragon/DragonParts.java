@@ -221,14 +221,16 @@ public final class DragonParts {
             float nl = (float) Math.sqrt(nx * nx + nz * nz);
             nx /= nl;
             nz /= nl;
-            ev(vc, m, n, xa, y1, za, r, g, b, alpha, ua, 1, light, nx, 0, nz);
-            ev(vc, m, n, xb, y1, zb, r, g, b, alpha, ub, 1, light, nx, 0, nz);
-            ev(vc, m, n, xb, y0, zb, r, g, b, alpha, ub, 0, light, nx, 0, nz);
-            ev(vc, m, n, xa, y0, za, r, g, b, alpha, ua, 0, light, nx, 0, nz);
-            ev(vc, m, n, xa, y0, za, r, g, b, alpha, ua, 0, light, -nx, 0, -nz);
-            ev(vc, m, n, xb, y0, zb, r, g, b, alpha, ub, 0, light, -nx, 0, -nz);
-            ev(vc, m, n, xb, y1, zb, r, g, b, alpha, ub, 1, light, -nx, 0, -nz);
-            ev(vc, m, n, xa, y1, za, r, g, b, alpha, ua, 1, light, -nx, 0, -nz);
+            // 앞면/뒷면을 법선 쪽으로 아주 살짝 띄움: 같은 면에 겹쳐 그리면 줄무늬(z-fighting)가 생김
+            float ox = nx * 0.004f, oz = nz * 0.004f;
+            ev(vc, m, n, xa + ox, y1, za + oz, r, g, b, alpha, ua, 1, light, nx, 0, nz);
+            ev(vc, m, n, xb + ox, y1, zb + oz, r, g, b, alpha, ub, 1, light, nx, 0, nz);
+            ev(vc, m, n, xb + ox, y0, zb + oz, r, g, b, alpha, ub, 0, light, nx, 0, nz);
+            ev(vc, m, n, xa + ox, y0, za + oz, r, g, b, alpha, ua, 0, light, nx, 0, nz);
+            ev(vc, m, n, xa - ox, y0, za - oz, r, g, b, alpha, ua, 0, light, -nx, 0, -nz);
+            ev(vc, m, n, xb - ox, y0, zb - oz, r, g, b, alpha, ub, 0, light, -nx, 0, -nz);
+            ev(vc, m, n, xb - ox, y1, zb - oz, r, g, b, alpha, ub, 1, light, -nx, 0, -nz);
+            ev(vc, m, n, xa - ox, y1, za - oz, r, g, b, alpha, ua, 1, light, -nx, 0, -nz);
         }
     }
 

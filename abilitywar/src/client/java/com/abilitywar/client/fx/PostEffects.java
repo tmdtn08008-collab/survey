@@ -47,7 +47,7 @@ public final class PostEffects {
                 fire = CameraController.cinematicType().startsWith("dragon");
                 blade = CameraController.cinematicType().startsWith("blade");
                 blood = CameraController.cinematicType().startsWith("blood");
-                holy = CameraController.cinematicType().startsWith("cantor");
+                holy = CameraController.cinematicType().startsWith("cantor") || CameraController.cinematicType().startsWith("angel");
                 necro = CameraController.cinematicType().startsWith("warlock");
                 targetV = Math.max(targetV, fire ? 0.32f : blade ? 0.3f : blood ? 0.42f : holy ? 0.22f : necro ? 0.5f : 0.45f);
             }

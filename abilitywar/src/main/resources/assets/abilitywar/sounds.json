@@ -1269,5 +1269,107 @@
     "volume": 0.8
    }
   ]
+ },
+ "angel.orb": {
+  "subtitle": "subtitles.abilitywar.angel.orb",
+  "sounds": [
+   {
+    "name": "minecraft:block.amethyst_block.chime",
+    "type": "event",
+    "pitch": 1.6,
+    "volume": 0.8
+   },
+   {
+    "name": "minecraft:entity.experience_orb.pickup",
+    "type": "event",
+    "pitch": 1.2,
+    "volume": 0.4
+   }
+  ]
+ },
+ "angel.heal": {
+  "subtitle": "subtitles.abilitywar.angel.heal",
+  "sounds": [
+   {
+    "name": "minecraft:block.beacon.power_select",
+    "type": "event",
+    "pitch": 1.6,
+    "volume": 0.8
+   },
+   {
+    "name": "minecraft:entity.player.levelup",
+    "type": "event",
+    "pitch": 1.8,
+    "volume": 0.4
+   }
+  ]
+ },
+ "angel.bless": {
+  "subtitle": "subtitles.abilitywar.angel.bless",
+  "sounds": [
+   {
+    "name": "minecraft:block.enchantment_table.use",
+    "type": "event",
+    "pitch": 1.2,
+    "volume": 1.0
+   },
+   {
+    "name": "minecraft:block.beacon.activate",
+    "type": "event",
+    "pitch": 1.6,
+    "volume": 0.6
+   }
+  ]
+ },
+ "angel.choir": {
+  "subtitle": "subtitles.abilitywar.angel.choir",
+  "sounds": [
+   {
+    "name": "minecraft:block.beacon.ambient",
+    "type": "event",
+    "pitch": 1.8,
+    "volume": 1.0
+   },
+   {
+    "name": "minecraft:entity.allay.item_given",
+    "type": "event",
+    "pitch": 1.0,
+    "volume": 1.0
+   }
+  ]
+ },
+ "angel.beam": {
+  "subtitle": "subtitles.abilitywar.angel.beam",
+  "sounds": [
+   {
+    "name": "minecraft:block.beacon.deactivate",
+    "type": "event",
+    "pitch": 1.8,
+    "volume": 0.8
+   },
+   {
+    "name": "minecraft:item.trident.return",
+    "type": "event",
+    "pitch": 1.4,
+    "volume": 1.0
+   }
+  ]
+ },
+ "angel.wings": {
+  "subtitle": "subtitles.abilitywar.angel.wings",
+  "sounds": [
+   {
+    "name": "minecraft:item.elytra.flying",
+    "type": "event",
+    "pitch": 1.6,
+    "volume": 0.4
+   },
+   {
+    "name": "minecraft:entity.phantom.flap",
+    "type": "event",
+    "pitch": 1.4,
+    "volume": 0.8
+   }
+  ]
  }
 }

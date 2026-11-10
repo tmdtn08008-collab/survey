@@ -74,7 +74,7 @@ public final class VfxManager {
                     add(new Effects.DashTrail(w, id, color, n.getString("ab"), new Vec3d(n.getFloat("dx"), 0, n.getFloat("dz")), p));
                 }
                 default -> {
-                    if (!com.abilitywar.client.fx.dragon.DragonFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.blade.BladeFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.blood.BloodFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.cantor.CantorFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.warlock.WarlockFx.spawn(type, n, w, p))
+                    if (!com.abilitywar.client.fx.dragon.DragonFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.blade.BladeFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.blood.BloodFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.cantor.CantorFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.warlock.WarlockFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.angel.AngelFx.spawn(type, n, w, p))
                         AbilityWar.LOG.debug("Unknown fx {}", type);
                 }
             }
@@ -155,6 +155,7 @@ public final class VfxManager {
         com.abilitywar.client.fx.blood.BloodFx.tick(w);
         com.abilitywar.client.fx.cantor.CantorFx.tick(w);
         com.abilitywar.client.fx.warlock.WarlockFx.tick(w);
+        com.abilitywar.client.fx.angel.AngelFx.tick(w);
         AfterImages.tick();
         Particles.tick();
         Debris.tick();
@@ -168,6 +169,7 @@ public final class VfxManager {
         com.abilitywar.client.fx.blood.BloodFx.clear();
         com.abilitywar.client.fx.cantor.CantorFx.clear();
         com.abilitywar.client.fx.warlock.WarlockFx.clear();
+        com.abilitywar.client.fx.angel.AngelFx.clear();
         EFFECTS.clear();
         Particles.clear();
         Debris.clear();
@@ -201,6 +203,7 @@ public final class VfxManager {
             com.abilitywar.client.fx.blood.BloodFx.render(c);
             com.abilitywar.client.fx.cantor.CantorFx.render(c);
             com.abilitywar.client.fx.warlock.WarlockFx.render(c);
+            com.abilitywar.client.fx.angel.AngelFx.render(c);
             Particles.render(c.imm, c.m, c.camRot, c.cam, c.tickDelta);
             c.imm.draw();
             DamageNumbers.renderWorld(c);

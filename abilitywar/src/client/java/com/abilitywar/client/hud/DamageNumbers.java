@@ -86,6 +86,11 @@ public final class DamageNumbers {
                 e.scale = 1.0f;
                 e.life = 20;
             }
+            case AWNet.DMG_HEAL -> {
+                e.text = Text.literal("+" + fmt(amount));
+                e.color = 0x6CFF8A;
+                e.scale = 1.2f;
+            }
             case AWNet.DMG_TEXT_IMMUNE -> {
                 e.text = Text.translatable("abilitywar.dmg.immune");
                 e.color = 0xCFCFCF;

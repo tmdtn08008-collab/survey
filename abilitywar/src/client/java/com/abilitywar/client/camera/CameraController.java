@@ -260,6 +260,36 @@ public final class CameraController {
                 look = M.add(0, 1.4, 0);
                 fov = 72 - 3 * k;
             }
+        } else if (cin.type.equals("angel_ult")) {
+            // 마법진: 중앙 = S + 15, 둘레 6개 = 반지름 9, 높이 13~15 (AngelAbility.circle)
+            Vec3d S = cin.start;
+            if (t < 14) {
+                // 정면 로우앵글: 날개를 펼치며 하늘로 손을 드는 천사
+                float k = smooth(t / 14f);
+                double th = Math.toRadians(24 - 10 * k);
+                double rad = 3.0 + 1.2 * k;
+                cam = C.add(F.multiply(Math.cos(th) * rad)).add(R.multiply(Math.sin(th) * rad)).add(0, 0.5, 0);
+                look = C.add(0, 1.6 + 0.8 * k, 0);
+                fov = 62 + 8 * k;
+            } else if (t < 30) {
+                // 하늘에 그려지는 마법진들: 발밑에서 올려다봄 (천사가 떠오름)
+                float k = smooth((t - 14) / 16f);
+                cam = S.add(F.multiply(3.5)).add(R.multiply(2.0)).add(0, 0.6, 0);
+                look = S.add(F.multiply(-1.0)).add(0, 6 + 7 * k, 0);
+                fov = 88;
+            } else if (t < 50) {
+                // 쏟아지는 빛줄기: 멀리 옆에서 넓게
+                float k = smooth((t - 30) / 20f);
+                cam = S.add(R.multiply(16 - 2 * k)).add(F.multiply(9)).add(0, 4.5 + k, 0);
+                look = S.add(F.multiply(2)).add(0, 5.5, 0);
+                fov = 82;
+            } else {
+                // 마무리: 떠 있는 천사 뒤에서 땅을 내려다봄
+                float k = smooth((t - 50) / 20f);
+                cam = C.subtract(F.multiply(4.5 + 1.5 * k)).add(R.multiply(1.8)).add(0, 2.6 + 0.6 * k, 0);
+                look = C.add(F.multiply(8)).add(0, -0.5, 0);
+                fov = 78;
+            }
         } else if (cin.type.equals("cantor_ult")) {
             Vec3d S = cin.start;
             if (t < 16) {

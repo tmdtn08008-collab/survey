@@ -73,7 +73,7 @@ public final class CantorParts {
     }
 
     // ------------------------------------------------------------------ 광륜 (머리 공간, +Y 아래)
-    static void renderHalo(MatrixStack ms, VertexConsumerProvider vcp, float[] col, float now, float boost) {
+    public static void renderHalo(MatrixStack ms, VertexConsumerProvider vcp, float[] col, float now, float boost) {
         Matrix4f m = ms.peek().getPositionMatrix();
         VertexConsumer vc = vcp.getBuffer(AWRenderLayers.ADDITIVE_COLOR);
         float y = -0.66f + 0.015f * MathHelper.sin(now * 0.12f);

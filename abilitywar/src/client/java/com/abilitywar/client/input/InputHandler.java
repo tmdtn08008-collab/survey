@@ -285,7 +285,7 @@ public final class InputHandler {
         PacketByteBuf buf = PacketByteBufs.create();
         buf.writeVarInt(target instanceof LivingEntity ? target.getId() : -1);
         ClientPlayNetworking.send(AWNet.C2S_ATTACK, buf);
-        nextAttack = now + (ab != null ? ab.attackInterval(combo) : (combo == 2 ? 13 : 7));
+        nextAttack = now + AWEffects.attackInterval(p, ab != null ? ab.attackInterval(combo) : (combo == 2 ? 13 : 7));
         lastAttack = now;
         combo = (combo + 1) % 3;
         p.resetLastAttackedTicks();

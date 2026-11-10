@@ -59,6 +59,7 @@ public class AbilityWarClient implements ClientModInitializer {
                 helper.register(new com.abilitywar.client.fx.blood.BloodParts.Feature(pr));
                 helper.register(new com.abilitywar.client.fx.cantor.CantorParts.Feature(pr));
                 helper.register(new com.abilitywar.client.fx.warlock.WarlockParts.Feature(pr));
+                helper.register(new com.abilitywar.client.fx.angel.AngelParts.Feature(pr));
             }
         });
 

@@ -99,6 +99,9 @@ public final class PlayerAnimator {
         st.sneakW = approach(st.sneakW, p.isInSneakingPose() ? 1 : 0, dt, 0.5f);
         st.airW = approach(st.airW, air ? 1 : 0, dt, air ? 0.25f : 0.5f);
         st.blockW = approach(st.blockW, blocking ? 1 : 0, dt, 0.55f);
+        // 비행 모드 (천사): 공중에 있을 때 전용 비행 자세
+        boolean fly = ((AWPlayer) p).aw$hasFlag(AWPlayer.FLAG_FLYING) && !p.isOnGround() && !p.isTouchingWater();
+        st.flyW = approach(st.flyW, fly ? 1 : 0, dt, fly ? 0.3f : 0.4f);
     }
 
     static float approach(float cur, float target, float dt, float rate) {
@@ -175,6 +178,16 @@ public final class PlayerAnimator {
         if (air != null && st.airW > 0.01f) {
             eval(air, air.localTime(now), T1, headYaw, headPitch);
             blendAll(out, T1, st.airW);
+        }
+        AnimClip fly = clip(key, "fly");
+        if (fly != null && st.flyW > 0.01f) {
+            eval(fly, fly.localTime(now), T1, headYaw, headPitch);
+            AnimClip flyMove = clip(key, "fly_move");
+            if (flyMove != null && st.moveW > 0.01f) {
+                eval(flyMove, flyMove.localTime(now), T2, headYaw, headPitch);
+                blendAll(T1, T2, st.moveW);
+            }
+            blendAll(out, T1, st.flyW);
         }
         return true;
     }
@@ -348,6 +361,11 @@ public final class PlayerAnimator {
             if (air != null && air.hasFp() && st.airW > 0.01f) {
                 evalFp(air, air.localTime(now), FP_T1);
                 blendFpAll(FP_OUT, FP_T1, st.airW);
+            }
+            AnimClip fly = clip(key, "fly");
+            if (fly != null && fly.hasFp() && st.flyW > 0.01f) {
+                evalFp(fly, fly.localTime(now), FP_T1);
+                blendFpAll(FP_OUT, FP_T1, st.flyW);
             }
             AnimClip block = clip(key, "block");
             if (block != null && block.hasFp() && st.blockW > 0.01f) {

@@ -227,7 +227,41 @@ def warlock():
     save(out, 'ult_title_warlock.png')
 
 
+def angel():
+    """천사: 한자 天上審判 (흰빛·금빛) + 뒤의 날개 모양 빛살 + 광륜."""
+    W, H = 1024, 300
+    m = text_mask(W, H, '天上審判', KANJI, 176, 30, 3, yoff=-6)
+    out = compose(W, H, m, (255, 255, 255), (255, 244, 200), (226, 180, 80), (60, 40, 8), (255, 236, 170), 18, 51)
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    cx, cy = W / 2, H / 2 - 4
+    # 위에서 내려오는 빛줄기 (하늘의 마법진에서 쏟아지는 빛)
+    r = random.Random(17)
+    beams = np.zeros((H, W), np.float32)
+    for _ in range(11):
+        bx = r.uniform(80, W - 80)
+        bw = r.uniform(6, 18)
+        beams += np.exp(-((xx - bx) / bw) ** 2) * np.clip(1 - yy / (H * r.uniform(0.6, 1.0)), 0, 1) * r.uniform(0.25, 0.5)
+    # 양옆으로 펼친 날개 모양 빛 (깃털 결)
+    wing = np.zeros((H, W), np.float32)
+    for side in (-1, 1):
+        for k in range(9):
+            a = np.radians(8 + k * 7)
+            dx, dy = side * np.cos(a), -np.sin(a)
+            px, py = xx - (cx + side * 300), yy - (cy + 30)
+            along = px * dx + py * dy
+            perp = np.abs(-px * dy + py * dx)
+            L = 200 - k * 12
+            wing += np.exp(-(perp / (6 + along.clip(0) * 0.05)) ** 2) * (along > 0) * np.clip(1 - along / L, 0, 1) * 0.5
+    halo = np.exp(-((np.sqrt((xx - cx) ** 2 + ((yy - cy) * 3.0) ** 2) - 400) / 9) ** 2) * 0.55
+    light = np.clip(beams + wing + halo, 0, 1) * (1 - out[..., 3])
+    for k, c in enumerate((1.0, 0.95, 0.78)):
+        out[..., k] = out[..., k] * (1 - light) + c * light
+    out[..., 3] = np.maximum(out[..., 3], light)
+    save(out, 'ult_title_angel.png')
+
+
 if __name__ == '__main__':
+    angel()
     warlock()
     cantor()
     blood()

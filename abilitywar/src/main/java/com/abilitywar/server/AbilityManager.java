@@ -166,7 +166,7 @@ public final class AbilityManager {
             }
         }
         a.basicAttack(player, d, target);
-        d.nextAttack = now + a.attackInterval(d.combo);
+        d.nextAttack = now + AWEffects.attackInterval(player, a.attackInterval(d.combo));
         d.lastAttack = now;
         d.combo = (d.combo + 1) % 3;
         player.updateLastActionTime();

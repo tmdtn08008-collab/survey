@@ -38,7 +38,7 @@ public final class AnimState {
     }
 
     public final List<Action> actions = new ArrayList<>(3);
-    public float moveW, sprintW, sneakW, airW, blockW;
+    public float moveW, sprintW, sneakW, airW, blockW, flyW;
     public float lastUpdate = -1;
     public int airTicks;
     public long lastSeenTick;

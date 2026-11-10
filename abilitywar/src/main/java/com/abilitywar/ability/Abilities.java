@@ -19,6 +19,7 @@ public final class Abilities {
     public static Ability BLOOD;
     public static Ability CANTOR;
     public static Ability WARLOCK;
+    public static Ability ANGEL;
 
     public static void init() {
         VOID = register(new VoidAbility());
@@ -27,6 +28,7 @@ public final class Abilities {
         BLOOD = register(new com.abilitywar.ability.blood.BloodAbility());
         CANTOR = register(new com.abilitywar.ability.cantor.CantorAbility());
         WARLOCK = register(new com.abilitywar.ability.warlock.WarlockAbility());
+        ANGEL = register(new com.abilitywar.ability.angel.AngelAbility());
     }
 
     public static <T extends Ability> T register(T ability) {

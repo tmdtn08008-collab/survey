@@ -2593,6 +2593,330 @@ write('warlock', W)
 
 
 # =====================================================================================
+#                              천사 (angel) — 힐러
+# =====================================================================================
+A = {}
+AGR = ([7, -13, 8.5], [28, 4, 52])            # 1인칭: 오른손 손바닥 위로 빛 구슬
+AGL = ([-7.5, -16, 6], [16, -4, -50])
+A_PUSH_R = ([3, -10, 15], [10, 6, 24])        # 앞으로 내밂 (구슬 발사)
+A_PUSH_L = ([-3, -10, 14.5], [10, -6, -24])
+A_UP_R = ([6, -3, 7.5], [84, 8, 40])          # 하늘로
+A_UP_L = ([-6, -3, 7], [84, -8, -40])
+A_DOWN_R = ([12, -14, 6], [-6, -40, 80])      # 아래 바깥으로 쓸어냄 (손바닥 아래)
+A_DOWN_L = ([-12, -14, 5.5], [-6, 40, -80])
+A_PRAY_R = ([2, -11, 9], [40, 40, 30])        # 가슴 앞에 모음
+A_PRAY_L = ([-2, -11, 8.5], [40, -40, -30])
+
+
+def AP(**kw):
+    """천사 기본 자세: 곧고 가볍게 선 자세, 오른손은 손바닥 위로 빛 구슬을 받침."""
+    d = {
+        'body': [0, 0, 0], 'head': [-4, 0, 0],
+        'right_arm': [-34, -12, 8], 'left_arm': [-8, 6, -10],
+        'right_leg': [2, 2, 1], 'left_leg': [-2, -2, -1],
+        'root': {'pos': [0, 0, 0], 'rot': [0, 0, 0]},
+    }
+    for k, v in kw.items():
+        if k == 'root':
+            d['root'] = dict(d['root'], **v)
+        else:
+            d[k] = v
+    return d
+
+
+AK = AP()
+
+
+def AF(R=AGR, L=AGL, cam=(0, 0, 0), fov=0):
+    return {'R': R, 'L': L, 'cam': list(cam), 'fov': fov}
+
+
+AFG = AF()
+
+# ================================================================ 이동
+A['angel.idle'] = clip(64, loop=True, bones={
+    'body': {'rot': cyc(64, [0, 0, 0], [1, 0, 0])},
+    'head': {'rot': cyc(64, [-4, 0, 0], [1.5, 4, 0], phase=1.0)},
+    'right_arm': {'rot': cyc(64, [-34, -12, 8], [3, 2, 2], phase=0.3)},
+    'left_arm': {'rot': cyc(64, [-8, 6, -10], [2, 0, -2], phase=0.9)},
+    'right_leg': {'rot': {'0': [2, 2, 1]}},
+    'left_leg': {'rot': {'0': [-2, -2, -1]}},
+    'root': {'pos': cyc(64, [0, 0, 0], [0, -0.25, 0])},
+}, fp={
+    'right_arm': {'pos': cyc(64, AGR[0], [0.2, 0.5, 0.1]), 'rot': cyc(64, AGR[1], [2, 2, 2])},
+    'left_arm': {'pos': cyc(64, AGL[0], [0, 0.4, 0.1], phase=0.9), 'rot': cyc(64, AGL[1], [1.5, 0, -1.5], phase=0.9)},
+})
+A['angel.walk'] = clip(20, loop=True, stride=9.42, bones={
+    'body': {'rot': cyc(20, [1, 0, 0], [0, 4, 0], phase=math.pi)},
+    'head': {'rot': {'0': [-4, 0, 0]}},
+    'right_arm': {'rot': cyc(20, [-32, -12, 8], [10, 0, 0], phase=math.pi)},
+    'left_arm': {'rot': cyc(20, [-4, 6, -10], [24, 0, 0])},
+    'right_leg': {'rot': cyc(20, [0, 0, 1], [30, 0, 0])},
+    'left_leg': {'rot': cyc(20, [0, 0, -1], [30, 0, 0], phase=math.pi)},
+    'root': {'pos': cyc(20, [0, 0, 0], [0, 0, 0], harm=([0, 0.4, 0], -math.pi / 2))},
+}, fp={
+    'right_arm': {'pos': cyc(20, AGR[0], [0.3, 0.6, 0.8], phase=math.pi), 'rot': cyc(20, AGR[1], [3, 0, 0], phase=math.pi)},
+    'left_arm': {'pos': cyc(20, AGL[0], [0.3, 0.7, 0.9]), 'rot': cyc(20, AGL[1], [3, 0, 0])},
+})
+A['angel.run'] = clip(18, loop=True, stride=9.42, bones={
+    'body': {'rot': cyc(18, [14, 0, 0], [0, 7, 0], phase=math.pi, harm=([1.5, 0, 0], 0))},
+    'head': {'rot': {'0': [-12, 0, 0]}},
+    'right_arm': {'rot': cyc(18, [-8, 0, 14], [42, 0, 0], phase=math.pi)},
+    'left_arm': {'rot': cyc(18, [-8, 0, -14], [42, 0, 0])},
+    'right_leg': {'rot': cyc(18, [-6, 0, 2], [52, 0, 0], harm=([-8, 0, 0], 0))},
+    'left_leg': {'rot': cyc(18, [-6, 0, -2], [52, 0, 0], phase=math.pi, harm=([-8, 0, 0], 0))},
+    'root': {'pos': cyc(18, [0, 0.3, 0], [0, 0, 0], harm=([0, 1.0, 0], -math.pi / 2)), 'rot': {'0': [4, 0, 0]}},
+}, fp={
+    'right_arm': {'pos': cyc(18, [8.5, -17, 4.5], [0.4, 1.4, 1.2], phase=math.pi), 'rot': cyc(18, [14, 0, 64], [8, 0, 0], phase=math.pi)},
+    'left_arm': {'pos': cyc(18, [-8.5, -17.5, 4], [0.4, 1.4, 1.2]), 'rot': cyc(18, [12, 0, -64], [8, 0, 0])},
+    'camera': {'rot': cyc(18, [0, 0, 0], [0, 0, 0.6], harm=([0.5, 0, 0], 0))},
+    'fov': {'0': [5, 0, 0]},
+})
+A['angel.sneak'] = clip(50, loop=True, bones={
+    'body': {'rot': cyc(50, [24, 0, 0], [1.2, 0, 0])},
+    'head': {'rot': {'0': [-18, 0, 0]}},
+    'right_arm': {'rot': cyc(50, [-40, -10, 10], [3, 0, 0], phase=0.4)},
+    'left_arm': {'rot': cyc(50, [-20, 8, -12], [3, 0, 0], phase=0.9)},
+    'right_leg': {'rot': {'0': [10, 4, 4]}, 'pos': {'0': [0, 0, -1]}},
+    'left_leg': {'rot': {'0': [-16, -4, -4]}, 'pos': {'0': [0, 0, 1]}},
+    'root': {'pos': {'0': [0, -1.4, 0]}},
+}, fp={
+    'right_arm': {'pos': cyc(50, [7, -14, 8.5], [0, 0.3, 0]), 'rot': cyc(50, [28, 4, 52], [1.5, 0, 0])},
+    'left_arm': {'pos': cyc(50, [-7, -16.5, 6], [0, 0.3, 0], phase=0.6), 'rot': cyc(50, [14, -4, -50], [1.5, 0, 0], phase=0.6)},
+    'fov': {'0': [-3, 0, 0]},
+})
+A['angel.sneak_walk'] = clip(20, loop=True, stride=9.42, bones={
+    'body': {'rot': cyc(20, [24, 0, 0], [0, 4, 0])},
+    'head': {'rot': {'0': [-18, 0, 0]}},
+    'right_arm': {'rot': cyc(20, [-40, -10, 10], [8, 0, 0], phase=math.pi)},
+    'left_arm': {'rot': cyc(20, [-20, 8, -12], [10, 0, 0])},
+    'right_leg': {'rot': cyc(20, [4, 4, 4], [24, 0, 0])},
+    'left_leg': {'rot': cyc(20, [-4, -4, -4], [24, 0, 0], phase=math.pi)},
+    'root': {'pos': cyc(20, [0, -1.4, 0], [0, 0, 0], harm=([0, 0.3, 0], -math.pi / 2))},
+}, fp={
+    'right_arm': {'pos': cyc(20, [7, -14, 8.5], [0.2, 0.4, 0.6], phase=math.pi), 'rot': cyc(20, [28, 4, 52], [2, 0, 0], phase=math.pi)},
+    'left_arm': {'pos': cyc(20, [-7, -16.5, 6], [0.2, 0.4, 0.6]), 'rot': cyc(20, [14, -4, -50], [2, 0, 0])},
+    'fov': {'0': [-3, 0, 0]},
+})
+# 걷기 모드에서 떨어질 때
+A['angel.air'] = clip(24, loop=True, bones={
+    'body': {'rot': cyc(24, [4, 0, 0], [2, 0, 0])},
+    'head': {'rot': {'0': [-8, 0, 0]}},
+    'right_arm': {'rot': cyc(24, [-46, 10, 40], [6, 0, 6])},
+    'left_arm': {'rot': cyc(24, [-40, -10, -44], [6, 0, -6], phase=0.6)},
+    'right_leg': {'rot': {'0': [16, 4, 6]}},
+    'left_leg': {'rot': {'0': [-20, -4, -5]}},
+}, fp={
+    'right_arm': {'pos': cyc(24, [10, -12, 6], [0, 0.6, 0]), 'rot': cyc(24, [44, -14, 70], [3, 0, 0])},
+    'left_arm': {'pos': cyc(24, [-10, -14, 5.5], [0, 0.6, 0], phase=0.6), 'rot': cyc(24, [30, 14, -70], [3, 0, 0], phase=0.6)},
+})
+# 비행 모드: 제자리에 떠 있음 (날갯짓에 맞춰 위아래로), 다리는 모아서 늘어뜨림
+A['angel.fly'] = clip(10, loop=True, blend_in=3, bones={
+    'body': {'rot': cyc(10, [4, 0, 0], [2, 0, 0], n=6)},
+    'head': {'rot': {'0': [-6, 0, 0]}},
+    'right_arm': {'rot': cyc(10, [-24, -4, 26], [4, 0, 6], phase=0.5, n=6)},
+    'left_arm': {'rot': cyc(10, [-14, 4, -28], [4, 0, -6], phase=0.5, n=6)},
+    'right_leg': {'rot': {'0': [12, 2, 3]}},
+    'left_leg': {'rot': {'0': [20, -2, -2]}},
+    'root': {'pos': cyc(10, [0, 0.4, 0], [0, 0.9, 0], phase=math.pi, n=6)},
+}, fp={
+    'right_arm': {'pos': cyc(10, [8, -14, 7], [0, 0.5, 0], phase=0.5, n=6), 'rot': cyc(10, [30, -8, 60], [2, 0, 4], phase=0.5, n=6)},
+    'left_arm': {'pos': cyc(10, [-9, -16, 5], [0, 0.5, 0], phase=0.5, n=6), 'rot': cyc(10, [16, 8, -62], [2, 0, -4], phase=0.5, n=6)},
+    'camera': {'rot': cyc(10, [0, 0, 0], [0.35, 0, 0], phase=math.pi, n=6)},
+})
+# 비행 중 이동: 몸을 앞으로 눕혀 미끄러지듯 (팔은 뒤로)
+A['angel.fly_move'] = clip(20, loop=True, bones={
+    'body': {'rot': {'0': [0, 0, 0]}},
+    'head': {'rot': {'0': [-26, 0, 0]}},
+    'right_arm': {'rot': cyc(20, [16, 0, 16], [4, 0, 2])},
+    'left_arm': {'rot': cyc(20, [16, 0, -16], [4, 0, -2], phase=0.4)},
+    'right_leg': {'rot': cyc(20, [8, 0, 2], [3, 0, 0], phase=1.0)},
+    'left_leg': {'rot': cyc(20, [14, 0, -2], [3, 0, 0], phase=2.0)},
+    'root': {'pos': {'0': [0, 3, 0]}, 'rot': cyc(20, [28, 0, 0], [2, 0, 0])},
+}, fp={
+    'right_arm': {'pos': cyc(20, [9.5, -19, 3], [0, 0.4, 0]), 'rot': cyc(20, [-4, 0, 64], [2, 0, 0])},
+    'left_arm': {'pos': cyc(20, [-9.5, -19, 3], [0, 0.4, 0], phase=0.4), 'rot': cyc(20, [-4, 0, -64], [2, 0, 0], phase=0.4)},
+    'fov': {'0': [6, 0, 0]},
+})
+# 막기: 두 손을 가슴 앞에 모아 빛을 세움
+A_BLK = {'body': [6, 0, 0], 'head': [6, 0, 0], 'right_arm': [-100, -38, 6], 'left_arm': [-96, 40, -6], 'right_leg': [8, 4, 4], 'left_leg': [-10, -4, -4], 'root': {'pos': [0, -0.8, 0], 'rot': [0, 0, 0]}}
+A['angel.block'] = clip(40, loop=True, blend_in=2, bones={
+    'body': {'rot': cyc(40, [6, 0, 0], [1, 0, 0])},
+    'head': {'rot': {'0': [6, 0, 0]}},
+    'right_arm': {'rot': cyc(40, [-100, -38, 6], [2, 0, 0])},
+    'left_arm': {'rot': cyc(40, [-96, 40, -6], [2, 0, 0], phase=0.5)},
+    'right_leg': {'rot': {'0': [8, 4, 4]}},
+    'left_leg': {'rot': {'0': [-10, -4, -4]}},
+    'root': {'pos': {'0': [0, -0.8, 0]}},
+}, fp={
+    'right_arm': {'pos': cyc(40, ([3, -10, 10]), [0, 0.2, 0]), 'rot': cyc(40, [44, 40, 50], [1, 0, 0])},
+    'left_arm': {'pos': cyc(40, ([-3, -10.5, 9.5]), [0, 0.2, 0], phase=0.5), 'rot': cyc(40, [42, -40, -50], [1, 0, 0], phase=0.5)},
+    'fov': {'0': [-4, 0, 0]},
+})
+A['angel.block_hit'] = clip(7, blend_in=0.5, blend_out=3, bones=seq([
+    (0, A_BLK),
+    (1.5, dict(A_BLK, body=[-6, 0, 0], right_arm=[-108, -32, 6], left_arm=[-104, 34, -6], root={'pos': [0, -0.8, -1.6], 'rot': [-4, 0, 0]}), 'outExpo'),
+    (7, A_BLK, 'outCubic'),
+]), fp=fpseq([
+    (0, {'R': ([3, -10, 10], [44, 40, 50]), 'L': ([-3, -10.5, 9.5], [42, -40, -50]), 'cam': [0, 0, 0]}),
+    (1.5, {'R': ([3, -9, 7.5], [50, 40, 50]), 'L': ([-3, -9.5, 7], [48, -40, -50]), 'cam': [-2.5, 0, 1.2]}, 'outExpo'),
+    (7, {'R': ([3, -10, 10], [44, 40, 50]), 'L': ([-3, -10.5, 9.5], [42, -40, -50]), 'cam': [0, 0, 0]}, 'outCubic'),
+]))
+
+
+# ================================================================ 평타: 빛 구슬을 띄워 보냄 (2.5틱)
+def acast(length, hit, arm_w, arm_h, body_w, body_h, fp_w, fp_h, cam, other=None, fov=-1):
+    o = other or {}
+    bones = seq([
+        (0, AK),
+        (hit * 0.5, AP(body=body_w, right_arm=arm_w, **o, root={'pos': [0, 0, -0.3]}), 'outQuad'),
+        (hit, AP(body=body_h, right_arm=arm_h, **o, root={'pos': [0, -0.2, 0.6]}), 'outExpo'),
+        (hit + (length - hit) * 0.5, AP(body=[body_h[0], body_h[1] * 0.8, 0], right_arm=add(arm_h, [4, 0, 0]), **o, root={'pos': [0, -0.1, 0.4]})),
+        (length, AK, 'inOutSine'),
+    ])
+    fp = fpseq([
+        (0, dict(AFG)),
+        (hit * 0.5, {'R': fp_w, 'cam': [-0.3, 0.4, 0.3], 'fov': 1}, 'outQuad'),
+        (hit, {'R': fp_h, 'cam': list(cam), 'fov': fov}, 'outExpo'),
+        (hit + (length - hit) * 0.5, {'R': (fp_h[0], add(fp_h[1], [-3, 0, 0])), 'cam': [x * 0.4 for x in cam], 'fov': fov * 0.4}),
+        (length, dict(AFG), 'inOutSine'),
+    ])
+    return clip(length, bones=bones, fp=fp, blend_in=0.5, blend_out=2.5)
+
+
+A['angel.attack1'] = acast(8, 2.5, [-50, 30, 30], [-96, -6, 4], [0, 14, 0], [4, -12, 0], ([10, -11, 6], [36, -30, 66]), A_PUSH_R, (0.4, -0.6, -0.6))
+A['angel.attack2'] = acast(8, 2.5, [-30, -10, 10], [-30, -12, 8], [0, -10, 0], [4, 14, 0], ([2, -15, 8], [24, 4, 52]), ([6, -14, 10], [24, 4, 52]), (0.4, 0.6, 0.6),
+                           other={'left_arm': [-94, 8, -4]})
+A['angel.attack3'] = clip(12, blend_in=0.5, blend_out=3, bones=seq([
+    (0, AK),
+    (2.5, AP(body=[-6, 0, 0], head=[-10, 0, 0], right_arm=[-40, 30, 40], left_arm=[-40, -30, -40], root={'pos': [0, 0.3, -0.5]}), 'outCubic'),
+    (4, AP(body=[10, 0, 0], head=[0, 0, 0], right_arm=[-92, -12, 4], left_arm=[-92, 12, -4], root={'pos': [0, -0.4, 1.0], 'rot': [2, 0, 0]}), 'outExpo'),
+    (8, AP(body=[8, 0, 0], right_arm=[-88, -12, 6], left_arm=[-88, 12, -6], root={'pos': [0, -0.3, 0.8]})),
+    (12, AK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(AFG)),
+    (2.5, {'R': ([12, -10, 4], [40, -40, 80]), 'L': ([-12, -10, 3.5], [40, 40, -80]), 'cam': [-1.5, 0, 0], 'fov': 3}, 'outCubic'),
+    (4, {'R': A_PUSH_R, 'L': A_PUSH_L, 'cam': [2.5, 0, 0], 'fov': -5}, 'outExpo'),
+    (8, {'R': (A_PUSH_R[0], [8, 6, 24]), 'L': (A_PUSH_L[0], [8, -6, -24]), 'cam': [1, 0, 0], 'fov': -2}),
+    (12, dict(AFG), 'inOutSine'),
+]))
+
+# 1. 치유의 빛: 가슴 앞에 모았다가 (3) 두 손을 아래 바깥으로 활짝 (5)
+A['angel.skill1'] = clip(14, blend_in=0.6, blend_out=4, bones=seq([
+    (0, AK),
+    (3, AP(body=[-4, 0, 0], head=[-8, 0, 0], right_arm=[-70, 40, 20], left_arm=[-70, -40, -20], root={'pos': [0, 0.4, 0]}), 'outCubic'),
+    (5.5, AP(body=[10, 0, 0], head=[10, 0, 0], right_arm=[-36, -10, 60], left_arm=[-36, 10, -60], root={'pos': [0, -1.0, 0]}, right_leg=[-8, 4, 4], left_leg=[10, -4, -4]), 'outExpo'),
+    (9, AP(body=[8, 0, 0], head=[8, 0, 0], right_arm=[-34, -10, 56], left_arm=[-34, 10, -56], root={'pos': [0, -0.8, 0]})),
+    (14, AK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(AFG)),
+    (3, {'R': A_PRAY_R, 'L': A_PRAY_L, 'cam': [-2, 0, 0], 'fov': 2}, 'outCubic'),
+    (5.5, {'R': A_DOWN_R, 'L': A_DOWN_L, 'cam': [5, 0, 0], 'fov': -4}, 'outExpo'),
+    (9, {'R': (A_DOWN_R[0], [-4, -40, 80]), 'L': (A_DOWN_L[0], [-4, 40, -80]), 'cam': [3, 0, 0], 'fov': -2}),
+    (14, dict(AFG), 'inOutSine'),
+]))
+# 2. 천사의 가호: 양팔을 천천히 벌려 (4) 하늘로 활짝 (6)
+A['angel.skill2'] = clip(16, blend_in=0.6, blend_out=4, bones=seq([
+    (0, AK),
+    (4, AP(body=[2, 0, 0], head=[-6, 0, 0], right_arm=[-60, 20, 50], left_arm=[-60, -20, -50], root={'pos': [0, -0.4, 0]}), 'inOutSine'),
+    (6.5, AP(body=[-14, 0, 0], head=[-30, 0, 0], right_arm=[-168, 10, 30], left_arm=[-168, -10, -30], root={'pos': [0, 0.6, 0], 'rot': [-3, 0, 0]}), 'outExpo'),
+    (11, AP(body=[-12, 0, 0], head=[-26, 0, 0], right_arm=[-162, 10, 32], left_arm=[-162, -10, -32], root={'pos': [0, 0.5, 0]})),
+    (16, AK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(AFG)),
+    (4, {'R': ([12, -10, 6], [50, -30, 76]), 'L': ([-12, -10, 5.5], [50, 30, -76]), 'cam': [-1, 0, 0], 'fov': 2}, 'inOutSine'),
+    (6.5, {'R': A_UP_R, 'L': A_UP_L, 'cam': [-7, 0, 0], 'fov': 7}, 'outExpo'),
+    (11, {'cam': [-5, 0, 0], 'fov': 5}),
+    (16, dict(AFG), 'inOutSine'),
+]))
+# 3. 축복: 오른손으로 대상을 가리키고 (3) 왼손을 하늘로, 7 에 오른손을 내려 빛을 떨어뜨림
+A['angel.skill3'] = clip(16, blend_in=0.6, blend_out=4, bones=seq([
+    (0, AK),
+    (3, AP(body=[-2, -10, 0], head=[-8, 4, 0], right_arm=[-110, -10, 4], left_arm=[-170, -10, -16], root={'pos': [0, 0.2, 0.4]}), 'outCubic'),
+    (6, AP(body=[-4, -12, 0], head=[-10, 4, 0], right_arm=[-118, -10, 4], left_arm=[-174, -10, -16], root={'pos': [0, 0.3, 0.4]})),
+    (7.5, AP(body=[8, -8, 0], head=[2, 4, 0], right_arm=[-70, -10, 6], left_arm=[-150, -10, -20], root={'pos': [0, -0.4, 0.6]}), 'outExpo'),
+    (11, AP(body=[6, -6, 0], head=[0, 4, 0], right_arm=[-72, -10, 6], left_arm=[-140, -10, -20], root={'pos': [0, -0.3, 0.5]})),
+    (16, AK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(AFG)),
+    (3, {'R': ([3, -7, 15], [34, 6, 24]), 'L': A_UP_L, 'cam': [-2, 0, 0], 'fov': 2}, 'outCubic'),
+    (6, {'R': ([3, -6.5, 15], [38, 6, 24]), 'cam': [-2.5, 0, 0]}),
+    (7.5, {'R': ([3, -11, 14], [4, 6, 24]), 'L': ([-6, -6, 8], [70, -8, -40]), 'cam': [3, 0, 0], 'fov': -3}, 'outExpo'),
+    (11, {'cam': [1.5, 0, 0], 'fov': -1}),
+    (16, dict(AFG), 'inOutSine'),
+]))
+# 4. 대치유: 두 손을 앞으로 모아 빛을 흘려보내고 (2~9, 떨림) 9 에 활짝
+_hm = [(0, AK), (2, AP(body=[4, 0, 0], right_arm=[-92, -16, 4], left_arm=[-92, 16, -4], root={'pos': [0, -0.3, 0.4]}), 'outCubic')]
+_hf = [(0, dict(AFG)), (2, {'R': A_PUSH_R, 'L': A_PUSH_L, 'cam': [-0.5, 0, 0], 'fov': -2}, 'outCubic')]
+for k in range(3):
+    tk = 3.5 + k * 2
+    sg = 1 if k % 2 == 0 else -1
+    _hm.append((tk, AP(body=[6, sg, 0], right_arm=[-94 + sg, -16, 4], left_arm=[-94 - sg, 16, -4], root={'pos': [0, -0.4, 0.5]})))
+    _hf.append((tk, {'R': (add(A_PUSH_R[0], [0, 0.15 * sg, -0.3]), A_PUSH_R[1]), 'L': (add(A_PUSH_L[0], [0, -0.15 * sg, -0.3]), A_PUSH_L[1]), 'cam': [0.4 * sg, 0.2 * sg, 0], 'fov': -3}))
+_hm += [
+    (9.5, AP(body=[-8, 0, 0], head=[-12, 0, 0], right_arm=[-120, 20, 40], left_arm=[-120, -20, -40], root={'pos': [0, 0.4, 0]}), 'outExpo'),
+    (13, AP(body=[-6, 0, 0], head=[-10, 0, 0], right_arm=[-116, 20, 38], left_arm=[-116, -20, -38], root={'pos': [0, 0.3, 0]})),
+    (18, AK, 'inOutSine'),
+]
+_hf += [
+    (9.5, {'R': ([12, -6, 7], [64, -30, 70]), 'L': ([-12, -6, 6.5], [64, 30, -70]), 'cam': [-3, 0, 0], 'fov': 6}, 'outExpo'),
+    (13, {'cam': [-2, 0, 0], 'fov': 4}),
+    (18, dict(AFG), 'inOutSine'),
+]
+A['angel.skill4'] = clip(18, blend_in=0.6, blend_out=4, bones=seq(_hm), fp=fpseq(_hf))
+
+# R. 천상의 심판 (70틱): 기도 (0~8) → 날개를 펴며 떠오름 (8~22) → 하늘로 두 팔 (22~30) → 빛줄기가 쏟아지는 동안 유지 → 내려옴
+_um = [
+    (0, AK),
+    (6, AP(body=[10, 0, 0], head=[24, 0, 0], right_arm=[-66, 44, 20], left_arm=[-66, -44, -20], root={'pos': [0, -0.4, 0]}), 'outCubic'),
+    (10, AP(body=[10, 0, 0], head=[26, 0, 0], right_arm=[-68, 46, 20], left_arm=[-68, -46, -20], root={'pos': [0, -0.5, 0]})),
+    (16, AP(body=[-6, 0, 0], head=[-16, 0, 0], right_arm=[-40, -10, 80], left_arm=[-40, 10, -80], right_leg=[10, 2, 3], left_leg=[18, -2, -2], root={'pos': [0, 0.6, 0]}), 'outCubic'),
+    (24, AP(body=[-14, 0, 0], head=[-34, 0, 0], right_arm=[-160, 10, 34], left_arm=[-160, -10, -34], right_leg=[12, 2, 3], left_leg=[20, -2, -2], root={'pos': [0, 0.8, 0], 'rot': [-4, 0, 0]}), 'inOutCubic'),
+]
+for k in range(5):
+    tk = 30 + k * 6.5
+    _um.append((tk, AP(body=[-16, 0, 0], head=[-36, 0, 0], right_arm=[-166, 10, 30], left_arm=[-166, -10, -30], right_leg=[12, 2, 3], left_leg=[20, -2, -2], root={'pos': [0, 1.0, 0], 'rot': [-5, 0, 0]}), 'outExpo'))
+    _um.append((tk + 3, AP(body=[-12, 0, 0], head=[-32, 0, 0], right_arm=[-158, 10, 36], left_arm=[-158, -10, -36], right_leg=[12, 2, 3], left_leg=[20, -2, -2], root={'pos': [0, 0.7, 0], 'rot': [-3, 0, 0]})))
+_um += [
+    (63, AP(body=[-10, 0, 0], head=[-26, 0, 0], right_arm=[-150, 10, 40], left_arm=[-150, -10, -40], root={'pos': [0, 0.6, 0]})),
+    (70, AK, 'inOutSine'),
+]
+A['angel.ult'] = clip(70, blend_in=1, blend_out=5, bones=seq(_um), fp=fpseq([
+    (0, dict(AFG)),
+    (6, {'R': A_PRAY_R, 'L': A_PRAY_L, 'cam': [6, 0, 0], 'fov': -3}, 'outCubic'),
+    (16, {'R': ([13, -10, 4], [40, -50, 86]), 'L': ([-13, -10, 3.5], [40, 50, -86]), 'cam': [-6, 0, 0], 'fov': 6}, 'outCubic'),
+    (24, {'R': A_UP_R, 'L': A_UP_L, 'cam': [-14, 0, 0], 'fov': 10}, 'inOutCubic'),
+    (63, {'R': A_UP_R, 'L': A_UP_L, 'cam': [-12, 0, 0], 'fov': 8}),
+    (70, dict(AFG), 'inOutSine'),
+]))
+# T. 날개: 웅크렸다가 (4) 날개를 쳐서 펴짐 (7)
+A['angel.mode'] = clip(14, blend_in=0.5, blend_out=4, bones=seq([
+    (0, AK),
+    (4, AP(body=[22, 0, 0], head=[10, 0, 0], right_arm=[-30, 20, 40], left_arm=[-30, -20, -40], right_leg=[-30, 4, 4], left_leg=[14, -4, -4], root={'pos': [0, -2.4, 0]}), 'outCubic'),
+    (7, AP(body=[-10, 0, 0], head=[-14, 0, 0], right_arm=[-20, 0, 70], left_arm=[-20, 0, -70], right_leg=[10, 2, 3], left_leg=[16, -2, -2], root={'pos': [0, 1.2, 0]}), 'outExpo'),
+    (14, AK, 'inOutSine'),
+]), fp=fpseq([
+    (0, dict(AFG)),
+    (4, {'R': ([10, -16, 6], [20, -20, 70]), 'L': ([-10, -16, 5.5], [20, 20, -70]), 'cam': [4, 0, 0], 'fov': -3}, 'outCubic'),
+    (7, {'R': ([14, -12, 3], [30, -50, 88]), 'L': ([-14, -12, 2.5], [30, 50, -88]), 'cam': [-4, 0, 0], 'fov': 6}, 'outExpo'),
+    (14, dict(AFG), 'inOutSine'),
+]))
+A['angel.select'] = clip(26, blend_in=2, blend_out=5, bones=seq([
+    (0, AP(body=[0, 0, 0], head=[0, 0, 0], right_arm=[0, 0, 0], left_arm=[0, 0, 0], right_leg=[0, 0, 0], left_leg=[0, 0, 0], root={'pos': [0, 0, 0]})),
+    (8, AP(body=[16, 0, 0], head=[22, 0, 0], right_arm=[-66, 44, 20], left_arm=[-66, -44, -20], root={'pos': [0, -0.6, 0]}), 'outCubic'),
+    (14, AP(body=[-12, 0, 0], head=[-24, 0, 0], right_arm=[-40, -10, 80], left_arm=[-40, 10, -80], root={'pos': [0, 0.5, 0]}), 'outExpo'),
+    (26, AK, 'inOutSine'),
+]), fp=fpseq([
+    (0, {'R': LOW_R, 'L': LOW_L, 'cam': [0, 0, 0]}),
+    (8, {'R': A_PRAY_R, 'L': A_PRAY_L}, 'outCubic'),
+    (14, {'R': ([13, -10, 4], [40, -50, 86]), 'L': ([-13, -10, 3.5], [40, 50, -86]), 'cam': [-2, 0, 0]}, 'outExpo'),
+    (26, dict(AFG), 'inOutSine'),
+]))
+
+write('angel', A)
+
+
+# =====================================================================================
 #                        공통 피격 반응 (능력 없는 플레이어 포함)
 # =====================================================================================
 C = {}

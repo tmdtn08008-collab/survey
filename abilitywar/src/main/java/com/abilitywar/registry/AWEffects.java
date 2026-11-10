@@ -39,6 +39,19 @@ public final class AWEffects {
             new AWStatusEffect(StatusEffectCategory.BENEFICIAL, 0x7CFF8A, false)
                     .addAttributeModifier(net.minecraft.entity.attribute.EntityAttributes.GENERIC_MOVEMENT_SPEED,
                             "6f1c2a4e-3b7d-4c55-9a0e-5d1b8c2f7a31", 0.15, net.minecraft.entity.attribute.EntityAttributeModifier.Operation.MULTIPLY_TOTAL));
+    /** 열의 (천사): 공격 속도 +20%/단계 (바닐라 공격 속도 + 능력 평타 간격). */
+    public static final StatusEffect FERVOR = Registry.register(Registries.STATUS_EFFECT, AbilityWar.id("fervor"),
+            new AWStatusEffect(StatusEffectCategory.BENEFICIAL, 0xFFE070, false)
+                    .addAttributeModifier(net.minecraft.entity.attribute.EntityAttributes.GENERIC_ATTACK_SPEED,
+                            "8b2e6c1d-4f3a-4e9b-a7d2-3c5f1e9b6a40", 0.2, net.minecraft.entity.attribute.EntityAttributeModifier.Operation.MULTIPLY_TOTAL));
+
+    /** 평타 간격에 열의를 적용. */
+    public static int attackInterval(LivingEntity e, int base) {
+        net.minecraft.entity.effect.StatusEffectInstance f = e.getStatusEffect(FERVOR);
+        if (f == null) return base;
+        return Math.max(3, Math.round(base / (1f + 0.2f * (f.getAmplifier() + 1))));
+    }
+
     /** 은총: 1초마다 체력 0.5/단계 회복. */
     public static final StatusEffect GRACE = Registry.register(Registries.STATUS_EFFECT, AbilityWar.id("grace"), new GraceEffect());
     /** 침묵: 스킬 사용 불가 (평타·대시는 가능). */

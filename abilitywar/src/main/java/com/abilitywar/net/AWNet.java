@@ -53,6 +53,8 @@ public final class AWNet {
     public static final byte DMG_TEXT_IMMUNE = 12;
     public static final byte DMG_TEXT_CHAIN = 13;
     public static final byte DMG_TEXT_ARMOR = 14;
+    /** 회복량 (초록색 +숫자). */
+    public static final byte DMG_HEAL = 15;
 
     public static void initServer() {
         ServerPlayNetworking.registerGlobalReceiver(C2S_SKILL, (server, player, handler, buf, sender) -> {
