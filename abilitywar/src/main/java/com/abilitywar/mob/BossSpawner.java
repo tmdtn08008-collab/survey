@@ -95,7 +95,7 @@ public final class BossSpawner {
         AbilityWar.LOG.info("[wild bosses] {} entries", ENTRIES.size());
     }
 
-    static final int CONFIG_VERSION = 2;
+    static final int CONFIG_VERSION = 3;
 
     /**
      * 기본 목록: 이 모드 보스 4 + Bosses of Mass Destruction (설치돼 있으면 나옴)
@@ -105,7 +105,7 @@ public final class BossSpawner {
         JsonObject root = new JsonObject();
         root.addProperty("_version", CONFIG_VERSION);
         root.addProperty("_help", "biome: any / cold / hot / mountain / forest / swamp / ocean. weight 0 = off. 다른 모드 보스 id 를 넣으면 그 모드가 있을 때만 나옴. "
-                + "bosses_of_mass_destruction = Bosses of Mass Destruction (dist/boss_mods 에 같이 들어 있음).");
+                + "bosses_of_mass_destruction = Bosses of Mass Destruction (dist/boss_mods 에 같이 들어 있음), soulsweapons = Marium's Soulslike Weaponry, graveyard = The Graveyard.");
         JsonArray a = new JsonArray();
         String[][] def = {
                 {"abilitywar:fallen_king", "10", "any"}, {"abilitywar:ember_colossus", "10", "hot"}, {"abilitywar:frost_witch", "10", "cold"},
@@ -113,6 +113,9 @@ public final class BossSpawner {
                 {"bosses_of_mass_destruction:lich", "8", "cold"}, {"bosses_of_mass_destruction:lich", "3", "any"},
                 {"bosses_of_mass_destruction:gauntlet", "6", "hot"}, {"bosses_of_mass_destruction:obsidilith", "5", "mountain"},
                 {"bosses_of_mass_destruction:void_blossom", "6", "forest"}, {"bosses_of_mass_destruction:void_blossom", "4", "swamp"},
+                {"soulsweapons:accursed_lord_boss", "4", "forest"}, {"soulsweapons:draugr_boss", "4", "cold"}, {"soulsweapons:night_shade", "3", "any"},
+                {"soulsweapons:returning_knight", "3", "any"}, {"soulsweapons:chaos_monarch", "3", "hot"}, {"soulsweapons:moonknight", "3", "mountain"},
+                {"soulsweapons:day_stalker", "3", "hot"}, {"soulsweapons:night_prowler", "3", "any"}, {"graveyard:lich", "5", "any"},
                 {"cataclysm:ignis", "0", "hot"}, {"cataclysm:netherite_monstrosity", "0", "hot"}, {"cataclysm:ender_guardian", "0", "any"},
                 {"cataclysm:the_harbinger", "0", "any"}, {"cataclysm:the_leviathan", "0", "ocean"}, {"cataclysm:ancient_remnant", "0", "hot"},
                 {"cataclysm:maledictus", "0", "cold"}, {"cataclysm:scylla", "0", "ocean"}};

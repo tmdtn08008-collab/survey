@@ -18,6 +18,7 @@ import org.joml.Matrix4f;
 public class JobMasterRenderer extends MobEntityRenderer<JobMasterEntity, PlayerEntityModel<JobMasterEntity>> {
     static final Identifier SKIN = AbilityWar.id("textures/entity/job_master.png");
     static final Identifier KING_SKIN = AbilityWar.id("textures/entity/king.png");
+    static final Identifier CLERK_SKIN = AbilityWar.id("textures/entity/guild_clerk.png");
     final Identifier skin;
 
     public JobMasterRenderer(EntityRendererFactory.Context ctx) {
@@ -31,6 +32,10 @@ public class JobMasterRenderer extends MobEntityRenderer<JobMasterEntity, Player
     }
 
     /** 왕: 붉은 왕의 옷 + 금관. */
+    public static JobMasterRenderer clerk(EntityRendererFactory.Context ctx) {
+        return new JobMasterRenderer(ctx, CLERK_SKIN, false);
+    }
+
     public static JobMasterRenderer king(EntityRendererFactory.Context ctx) {
         return new JobMasterRenderer(ctx, KING_SKIN, true);
     }

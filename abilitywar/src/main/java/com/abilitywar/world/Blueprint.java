@@ -189,6 +189,10 @@ public final class Blueprint {
     public record Spawn(BlockPos pos, Function<ServerWorld, Entity> create) {
     }
 
+    /** 벽 간판 (facing = 간판 앞면이 보는 쪽), 글 줄은 번역 키. */
+    public record Sign(BlockPos pos, Direction facing, String[] lines) {
+    }
+
     public record Chest(BlockPos pos, Direction facing, int tier) {
     }
 
@@ -202,6 +206,7 @@ public final class Blueprint {
     final Map<Long, List<Prim>> buckets = new HashMap<>();
     public final List<Spawn> spawns = new ArrayList<>();
     public final List<Chest> chests = new ArrayList<>();
+    public final List<Sign> signs = new ArrayList<>();
     public final List<Spawner> spawners = new ArrayList<>();
     public final List<Altar> altars = new ArrayList<>();
     int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
@@ -297,6 +302,19 @@ public final class Blueprint {
         List<Prim> list = buckets.get(ChunkPos.toLong(chunkBox.getMinX() >> 4, chunkBox.getMinZ() >> 4));
         if (list != null) for (Prim pr : list) if (pr.box().intersects(chunkBox)) pr.place(p, chunkBox);
         ServerWorld sw = world.toServerWorld();
+        for (Sign sg : signs) {
+            if (!chunkBox.contains(sg.pos)) continue;
+            p.set(sg.pos.getX(), sg.pos.getY(), sg.pos.getZ(), Blocks.DARK_OAK_WALL_SIGN.getDefaultState().with(net.minecraft.block.WallSignBlock.FACING, sg.facing));
+            if (world.getBlockEntity(sg.pos) instanceof net.minecraft.block.entity.SignBlockEntity be) {
+                net.minecraft.block.entity.SignText t = new net.minecraft.block.entity.SignText();
+                for (int i = 0; i < sg.lines.length && i < 4; i++)
+                    t = t.withMessage(i, net.minecraft.text.Text.translatable(sg.lines[i]).formatted(i == 1 ? net.minecraft.util.Formatting.BOLD : net.minecraft.util.Formatting.RESET));
+                t = t.withColor(net.minecraft.util.DyeColor.YELLOW).withGlowing(true);
+                be.setText(t, true);
+                be.setWaxed(true);
+                be.markDirty();
+            }
+        }
         for (Chest c : chests) {
             if (!chunkBox.contains(c.pos)) continue;
             p.set(c.pos.getX(), c.pos.getY(), c.pos.getZ(), Blocks.CHEST.getDefaultState().with(ChestBlock.FACING, c.facing));

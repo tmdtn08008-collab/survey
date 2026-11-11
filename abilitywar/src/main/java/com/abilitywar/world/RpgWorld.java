@@ -120,8 +120,8 @@ public final class RpgWorld {
                     st.markDirty();
                     return;
                 }
-                ow.getChunk(c.x, c.z + 1);
-                int sx = capital.getX(), sz = capital.getZ() + 9;
+                int sx = capital.getX(), sz = capital.getZ() + CapitalPlan.SPAWN_DZ;
+                ow.getChunk(sx >> 4, sz >> 4);
                 int y = ow.getTopY(Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, sx, sz);
                 ow.setSpawnPos(new BlockPos(sx, y, sz), 0);
                 ow.getGameRules().get(GameRules.SPAWN_RADIUS).set(1, server);

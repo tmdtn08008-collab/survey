@@ -44,20 +44,21 @@ public final class LandsPlan {
 
     public static void build(Blueprint b, int cx, int by, int cz, Random r, Blueprint.Heights H) {
         List<Plot> used = new ArrayList<>();
-        used.add(new Plot(cx - 172, cz - 168, cx + 166, cz + 166)); // 수도 (성벽 + 넓은 비탈)
-        // 성벽 둘레 넓은 비탈 (수도 바닥에서 원래 땅까지 40칸에 걸쳐): 수도 쪽 짧은 비탈을 덮어씀
-        b.terraformPolyRing(CapitalPlan.wall(cx, cz), 6, 40, by, s(Blocks.GRASS_BLOCK), s(Blocks.DIRT));
-        int[][] dirs = {{0, 1}, {-1, 0}, {1, 0}};
-        int[][] starts = {{cx, cz + 117}, {cx - 123, cz}, {cx + 117, cz}};
+        int edge = CapitalPlan.R_EDGE + CapitalPlan.MARGIN;
+        used.add(new Plot(cx - edge - 46, cz - edge - 46, cx + edge + 46, cz + edge + 46)); // 수도 (해자 + 넓은 비탈)
+        // 해자 둘레 넓은 비탈 (수도 바닥에서 원래 땅까지 40칸에 걸쳐)
+        b.terraformPolyRing(CapitalPlan.wall(cx, cz), CapitalPlan.MARGIN, 40, by, s(Blocks.GRASS_BLOCK), s(Blocks.DIRT));
+        int[][] dirs = {{0, 1}, {-1, 0}, {1, 0}, {0, -1}};
+        int[][] starts = {{cx, cz + edge}, {cx - edge, cz}, {cx + edge, cz}, {cx, cz - edge}};
         List<double[][]> roads = new ArrayList<>();
-        for (int i = 0; i < 3; i++) roads.add(roadPoints(starts[i], dirs[i], 190, r));
+        for (int i = 0; i < 4; i++) roads.add(roadPoints(starts[i], dirs[i], 180, r));
         for (double[][] pts : roads) {
             road(b, pts, by);
             lamps(b, pts, by, r);
         }
 
         Ctx c = new Ctx(b, H, used, roads, by, r);
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 4; i++) {
             double[][] pts = roads.get(i);
             double total = length(pts);
             boolean mill = false, shrine = false, hamlet = i != 0;

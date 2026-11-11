@@ -44,6 +44,7 @@ import net.minecraft.util.math.Box;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -256,6 +257,7 @@ public final class RpgManager {
     }
 
     static void questKill(ServerPlayerEntity p, LivingEntity dead) {
+        guildKill(p, dead);
         JobQuests.Quest q = active(p);
         if (q == null) return;
         boolean night = p.getWorld().isNight();
@@ -268,6 +270,7 @@ public final class RpgManager {
     }
 
     static void questAmount(ServerPlayerEntity p, JobQuests.Type type, float amount) {
+        guildAmount(p, type, amount);
         JobQuests.Quest q = active(p);
         if (q == null) return;
         for (int i = 0; i < q.objectives().size(); i++) {
@@ -447,6 +450,186 @@ public final class RpgManager {
         r.dirty = true;
     }
 
+    // ================================================================ 모험가 길드
+    @Nullable
+    public static Guild.GQuest guildActive(PlayerEntity p) {
+        RpgData r = rpg(p);
+        return r.guildQuest.isEmpty() ? null : Guild.ALL.get(r.guildQuest);
+    }
+
+    static void guildKill(ServerPlayerEntity p, LivingEntity dead) {
+        Guild.GQuest q = guildActive(p);
+        if (q == null) return;
+        boolean night = p.getWorld().isNight();
+        for (int i = 0; i < q.objectives().size(); i++) {
+            JobQuests.Objective o = q.objectives().get(i);
+            if ((o.type() == JobQuests.Type.KILL || (o.type() == JobQuests.Type.KILL_NIGHT && night)) && matches(o.target(), dead)) guildProgress(p, q, i, 1);
+        }
+    }
+
+    static void guildAmount(ServerPlayerEntity p, JobQuests.Type type, float amount) {
+        Guild.GQuest q = guildActive(p);
+        if (q == null) return;
+        for (int i = 0; i < q.objectives().size(); i++) if (q.objectives().get(i).type() == type) guildProgress(p, q, i, amount);
+    }
+
+    static void guildProgress(ServerPlayerEntity p, Guild.GQuest q, int i, float amount) {
+        RpgData r = rpg(p);
+        JobQuests.Objective o = q.objectives().get(i);
+        int before = r.guildProgress[i];
+        if (before >= o.count()) return;
+        r.guildProgress[i] = Math.min(o.count(), before + Math.max(1, Math.round(amount)));
+        r.dirty = true;
+        if (r.guildProgress[i] >= o.count()) {
+            p.sendMessage(Text.translatable("guild.abilitywar.objective_done").formatted(Formatting.YELLOW), true);
+            p.getServerWorld().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.BLOCK_NOTE_BLOCK_CHIME.value(), SoundCategory.PLAYERS, 0.8f, 1.8f);
+        }
+    }
+
+    public static int guildHave(ServerPlayerEntity p, Guild.GQuest q, int i) {
+        JobQuests.Objective o = q.objectives().get(i);
+        return o.type() == JobQuests.Type.ITEM ? count(p, o.target()) : rpg(p).guildProgress[i];
+    }
+
+    public static boolean guildDone(ServerPlayerEntity p, Guild.GQuest q) {
+        for (int i = 0; i < q.objectives().size(); i++) if (guildHave(p, q, i) < q.objectives().get(i).count()) return false;
+        return true;
+    }
+
+    @Nullable
+    public static String guildJoin(ServerPlayerEntity p) {
+        RpgData r = rpg(p);
+        if (r.guildRank >= 0) return "guild.abilitywar.err.already_member";
+        r.guildRank = 0;
+        r.guildPoints = 0;
+        r.dirty = true;
+        rankTitle(p, 0, "guild.abilitywar.joined_title");
+        return null;
+    }
+
+    @Nullable
+    public static String guildAccept(ServerPlayerEntity p, String id) {
+        Guild.GQuest q = Guild.ALL.get(id);
+        if (q == null) return "rpg.abilitywar.err.no_quest";
+        RpgData r = rpg(p);
+        String err = Guild.check(q, r.guildRank, r.guildQuest);
+        if (err != null) return err;
+        r.guildQuest = id;
+        java.util.Arrays.fill(r.guildProgress, 0);
+        r.dirty = true;
+        p.sendMessage(Text.translatable("guild.abilitywar.accepted", Text.literal("[" + Guild.rankName(q.rank()) + "] ").append(Text.translatable("guild.abilitywar.quest." + id))).formatted(Formatting.AQUA), false);
+        p.getServerWorld().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 1f, 1.2f);
+        return null;
+    }
+
+    @Nullable
+    public static String guildTurnIn(ServerPlayerEntity p) {
+        Guild.GQuest q = guildActive(p);
+        if (q == null) return "rpg.abilitywar.err.no_quest";
+        if (!guildDone(p, q)) return "rpg.abilitywar.err.not_done";
+        for (JobQuests.Objective o : q.objectives()) {
+            if (o.type() != JobQuests.Type.ITEM) continue;
+            Item it = Registries.ITEM.get(new Identifier(o.target()));
+            int left = o.count();
+            for (int i = 0; i < p.getInventory().size() && left > 0; i++) {
+                ItemStack st = p.getInventory().getStack(i);
+                if (!st.isOf(it)) continue;
+                int take = Math.min(left, st.getCount());
+                st.decrement(take);
+                left -= take;
+            }
+        }
+        RpgData r = rpg(p);
+        r.guildQuest = "";
+        java.util.Arrays.fill(r.guildProgress, 0);
+        r.guildPoints += q.points();
+        r.guildDone++;
+        addXp(p, q.xp());
+        give(p, new ItemStack(net.minecraft.item.Items.EMERALD, q.emeralds()));
+        if (p.getRandom().nextFloat() < q.gearChance()) {
+            var list = p.getRandom().nextBoolean() ? GearItems.WEAPONS.get(q.gear()) : null;
+            if (list != null && !list.isEmpty()) give(p, new ItemStack(list.get(p.getRandom().nextInt(list.size()))));
+            else {
+                var sets = com.abilitywar.gear.GearItems.SETS.get(q.gear());
+                if (sets != null && !sets.isEmpty()) {
+                    var set = sets.get(p.getRandom().nextInt(sets.size()));
+                    var pieces = new ArrayList<>(set.pieces().values());
+                    Item piece = GearItems.BY_ID.get(pieces.get(p.getRandom().nextInt(pieces.size())).id());
+                    if (piece != null) give(p, new ItemStack(piece));
+                }
+            }
+        }
+        p.sendMessage(Text.translatable("guild.abilitywar.done", Text.translatable("guild.abilitywar.quest." + q.id()), q.points(), q.xp(), q.emeralds()).formatted(Formatting.GOLD), false);
+        p.getServerWorld().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.8f, 1.3f);
+        if (Guild.checkPromote(r.guildRank, r.guildPoints, r.level) == null)
+            p.sendMessage(Text.translatable("guild.abilitywar.can_promote", Guild.rankName(r.guildRank + 1)).formatted(Formatting.YELLOW, Formatting.BOLD), false);
+        r.dirty = true;
+        return null;
+    }
+
+    static void give(ServerPlayerEntity p, ItemStack st) {
+        if (!p.getInventory().insertStack(st)) p.dropItem(st, false);
+    }
+
+    public static void guildAbandon(ServerPlayerEntity p) {
+        RpgData r = rpg(p);
+        if (r.guildQuest.isEmpty()) return;
+        r.guildQuest = "";
+        java.util.Arrays.fill(r.guildProgress, 0);
+        r.dirty = true;
+        p.sendMessage(Text.translatable("rpg.abilitywar.quest_abandoned").formatted(Formatting.GRAY), false);
+    }
+
+    @Nullable
+    public static String guildPromote(ServerPlayerEntity p) {
+        RpgData r = rpg(p);
+        String err = Guild.checkPromote(r.guildRank, r.guildPoints, r.level);
+        if (err != null) return err;
+        r.guildPoints -= Guild.PROMOTE_POINTS[r.guildRank];
+        r.guildRank++;
+        r.dirty = true;
+        rankTitle(p, r.guildRank, "guild.abilitywar.promoted_title");
+        if (r.guildRank >= 5)
+            p.getServer().getPlayerManager().broadcast(Text.translatable("guild.abilitywar.promoted_broadcast", p.getDisplayName(), Guild.rankName(r.guildRank)).formatted(Formatting.GOLD), false);
+        return null;
+    }
+
+    /** 관리자: 길드 등급 정하기 (-1 = 탈퇴). */
+    public static void setGuildRank(ServerPlayerEntity p, int rank) {
+        RpgData r = rpg(p);
+        r.guildRank = Math.max(-1, Math.min(Guild.TOP, rank));
+        r.guildPoints = 0;
+        if (r.guildRank < 0) r.guildQuest = "";
+        r.dirty = true;
+    }
+
+    public static void addGuildPoints(ServerPlayerEntity p, int n) {
+        RpgData r = rpg(p);
+        if (r.guildRank < 0) return;
+        r.guildPoints = Math.max(0, r.guildPoints + n);
+        r.dirty = true;
+    }
+
+    public static void guildForceProgress(ServerPlayerEntity p) {
+        Guild.GQuest q = guildActive(p);
+        if (q == null) return;
+        RpgData r = rpg(p);
+        for (int i = 0; i < q.objectives().size(); i++) r.guildProgress[i] = q.objectives().get(i).count();
+        r.dirty = true;
+    }
+
+    static void rankTitle(ServerPlayerEntity p, int rank, String key) {
+        int col = Guild.color(rank);
+        p.networkHandler.sendPacket(new TitleFadeS2CPacket(8, 60, 20));
+        p.networkHandler.sendPacket(new TitleS2CPacket(Text.literal(Guild.rankName(rank)).styled(st -> st.withColor(col).withBold(true))));
+        p.networkHandler.sendPacket(new SubtitleS2CPacket(Text.translatable(key, Guild.rankName(rank)).formatted(Formatting.GOLD)));
+        p.getServerWorld().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 0.8f, 1f);
+        NbtCompound n = new NbtCompound();
+        n.putInt("e", p.getId());
+        n.putInt("l", -1);
+        AWNet.fx(p.getServerWorld(), p.getPos(), "level_up", n);
+    }
+
     // ================================================================ 접속 / 틱 / 동기화
 
     public static void onJoin(ServerPlayerEntity p) {
@@ -484,7 +667,7 @@ public final class RpgManager {
         if (r.dirty) {
             r.dirty = false;
             sync(p);
-        } else if (!r.quest.isEmpty() && p.age % 20 == 0) {
+        } else if ((!r.quest.isEmpty() || !r.guildQuest.isEmpty()) && p.age % 20 == 0) {
             sync(p); // 아이템 개수 변화 반영
         }
     }
@@ -512,6 +695,15 @@ public final class RpgManager {
         buf.writeBoolean(p.getWorld().getGameRules().getBoolean(AWGameRules.SELF_SELECT));
         buf.writeBoolean(r.grand);
         buf.writeVarInt(p.getWorld().getGameRules().getInt(AWGameRules.GRAND_LEVEL));
+        // 모험가 길드
+        buf.writeVarInt(r.guildRank);
+        buf.writeVarInt(r.guildPoints);
+        buf.writeVarInt(r.guildDone);
+        buf.writeString(r.guildQuest);
+        Guild.GQuest gq = guildActive(p);
+        int gn = gq == null ? 0 : gq.objectives().size();
+        buf.writeVarInt(gn);
+        for (int i = 0; i < gn; i++) buf.writeVarInt(guildHave(p, gq, i));
         if (ServerPlayNetworking.canSend(p, S2C_RPG)) ServerPlayNetworking.send(p, S2C_RPG, buf);
     }
 
@@ -547,6 +739,31 @@ public final class RpgManager {
                         openNpc(player, npc);
                     }
                     case 3 -> abandon(player);
+                    case 5, 6, 7, 8, 9 -> {
+                        // 모험가 길드 (접수원 가까이에서만): 5 가입, 6 수락, 7 완료, 8 포기, 9 승급
+                        String giver = giverNear(player, npc);
+                        if (!Guild.GIVER.equals(giver)) {
+                            player.sendMessage(Text.translatable("guild.abilitywar.err.far").formatted(Formatting.RED), true);
+                            return;
+                        }
+                        RpgData rd = rpg(player);
+                        String err = switch (action) {
+                            case 5 -> guildJoin(player);
+                            case 6 -> guildAccept(player, arg);
+                            case 7 -> guildTurnIn(player);
+                            case 8 -> {
+                                guildAbandon(player);
+                                yield null;
+                            }
+                            default -> guildPromote(player);
+                        };
+                        if (err != null) {
+                            int lv = rd.guildRank >= 0 && rd.guildRank < Guild.TOP ? Guild.MIN_LEVEL[rd.guildRank + 1] : 0;
+                            int pts = rd.guildRank >= 0 ? Guild.PROMOTE_POINTS[Math.min(rd.guildRank, Guild.TOP)] : 0;
+                            player.sendMessage(Text.translatable(err, lv, pts).formatted(Formatting.RED), false);
+                        }
+                        openNpc(player, npc);
+                    }
                     default -> {
                     }
                 }

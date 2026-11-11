@@ -703,6 +703,70 @@ def king_skin():
     im.save(os.path.join(ENT, 'king.png'))
 
 
+def guild_clerk_skin():
+    """모험가 길드 접수원: 갈색 머리 (뒤로 묶음), 흰 셔츠 + 남색 조끼 + 금 길드 배지, 갈색 바지."""
+    im = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
+    px = im.load()
+    rng = random.Random(23)
+    SKIN = (232, 190, 156)
+    SKIN_D = (196, 150, 118)
+    HAIR = (110, 66, 34)
+    SHIRT = (236, 232, 222)
+    VEST = (42, 74, 122)
+    VEST_D = (28, 50, 88)
+    GOLD = (226, 184, 86)
+    PANTS = (92, 64, 40)
+    BOOT = (54, 36, 22)
+
+    def rect(x, y, w, h, c, noise=6):
+        for i in range(x, x + w):
+            for j in range(y, y + h):
+                n = rng.randint(-noise, noise)
+                px[i, j] = (max(0, min(255, c[0] + n)), max(0, min(255, c[1] + n)), max(0, min(255, c[2] + n)), 255)
+
+    def box(u, v, w, h, d, side, top, bottom, front=None, back=None):
+        rect(u + d, v, w, d, top)
+        rect(u + d + w, v, w, d, bottom)
+        rect(u, v + d, d, h, side)
+        rect(u + d, v + d, w, h, front or side)
+        rect(u + d + w, v + d, d, h, side)
+        rect(u + d + w + d, v + d, w, h, back or side)
+
+    # 머리
+    box(0, 0, 8, 8, 8, HAIR, HAIR, SKIN)
+    rect(8, 8, 8, 8, SKIN)
+    rect(8, 8, 8, 2, HAIR)
+    rect(8, 10, 1, 2, HAIR)
+    rect(15, 10, 1, 2, HAIR)
+    px[9, 12] = px[14, 12] = (250, 250, 250, 255)
+    px[10, 12] = px[13, 12] = (60, 110, 60, 255)
+    rect(11, 13, 2, 1, SKIN_D, 0)
+    rect(10, 14, 4, 1, (200, 110, 110), 0)
+    for (u, w) in [(0, 8), (16, 8), (24, 8)]:
+        rect(u, 8, w, 8, HAIR)
+    rect(26, 12, 4, 4, (90, 52, 26))  # 뒤로 묶은 머리
+    # 몸: 흰 셔츠 + 남색 조끼 + 금 배지
+    box(16, 16, 8, 12, 4, VEST, VEST, VEST, VEST, VEST)
+    rect(22, 20, 4, 12, SHIRT)
+    rect(23, 20, 2, 2, (180, 40, 40), 0)  # 넥타이 매듭
+    rect(23, 22, 2, 4, (160, 30, 30), 2)
+    rect(20, 23, 2, 2, GOLD, 0)  # 길드 배지
+    rect(20, 30, 8, 1, VEST_D, 2)
+    rect(32, 20, 8, 12, VEST_D)
+    # 팔: 흰 셔츠 소매 (걷어 올림)
+    box(40, 16, 4, 12, 4, SHIRT, SHIRT, SKIN)
+    box(32, 48, 4, 12, 4, SHIRT, SHIRT, SKIN)
+    for (u, v) in [(40, 26), (44, 26), (48, 26), (52, 26), (32, 58), (36, 58), (40, 58), (44, 58)]:
+        rect(u, v, 4, 6, SKIN)
+    # 다리
+    box(0, 16, 4, 12, 4, PANTS, PANTS, BOOT)
+    box(16, 48, 4, 12, 4, PANTS, PANTS, BOOT)
+    for (u, v) in [(0, 20), (4, 20), (8, 20), (12, 20), (16, 52), (20, 52), (24, 52), (28, 52)]:
+        rect(u, v + 8, 4, 4, BOOT)
+    os.makedirs(ENT, exist_ok=True)
+    im.save(os.path.join(ENT, 'guild_clerk.png'))
+
+
 if __name__ == '__main__':
     warrior_icons()
     mage_icons()
@@ -713,4 +777,5 @@ if __name__ == '__main__':
     job_master_skin()
     # paladin_icons() / paladin_card(): 성기사는 사용자 그림 (tools/gen_hud.py paladin) 을 씀
     king_skin()
+    guild_clerk_skin()
     print('done')

@@ -38,6 +38,7 @@ public class AbilityWarClient implements ClientModInitializer {
         com.abilitywar.gear.GearItem.CLIENT_LEVEL[0] = () -> com.abilitywar.client.rpg.RpgClient.level;
         EntityRendererRegistry.register(AWEntities.JOB_MASTER, com.abilitywar.client.render.JobMasterRenderer::new);
         EntityRendererRegistry.register(AWEntities.KING, com.abilitywar.client.render.JobMasterRenderer::king);
+        EntityRendererRegistry.register(AWEntities.GUILD_CLERK, com.abilitywar.client.render.JobMasterRenderer::clerk);
         com.abilitywar.client.render.mob.MobRenderers.init();
         com.abilitywar.client.dev.TestDriver.init();
         ClientNet.init();

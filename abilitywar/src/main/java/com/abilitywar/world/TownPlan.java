@@ -202,6 +202,8 @@ public final class TownPlan {
                 int[] o = Build.doorOutside(x0, z0, w, d, door);
                 b.set(o[0], by + 4, o[1] + 1, s(Blocks.LANTERN));
                 b.spawns.add(new Blueprint.Spawn(new BlockPos(x0 + w / 2, by + 1, z0 + d / 2), w2 -> CapitalPlan.villager(w2, VillagerProfession.NONE)));
+                // 모험가 길드 지부 (여관 안 접수원)
+                b.spawns.add(new Blueprint.Spawn(new BlockPos(x0 + 2, by + 1, z0 + 2), w2 -> AWEntities.GUILD_CLERK.create(w2)));
             }
             case 1 -> {
                 Build.house(b, x0, z0, w - 2, d, by, 1, door, Build.STONE, r);

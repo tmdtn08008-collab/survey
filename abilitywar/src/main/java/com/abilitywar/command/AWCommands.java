@@ -113,6 +113,22 @@ public final class AWCommands {
         return 1;
     }
 
+    private static final com.mojang.brigadier.suggestion.SuggestionProvider<ServerCommandSource> GUILD_RANKS = (ctx, b) -> {
+        java.util.List<String> l = new java.util.ArrayList<>(java.util.List.of(com.abilitywar.rpg.Guild.RANKS));
+        l.add("none");
+        return net.minecraft.command.CommandSource.suggestMatching(l, b);
+    };
+
+    private static int guildRank(CommandContext<ServerCommandSource> ctx, Collection<ServerPlayerEntity> ps) {
+        String r = StringArgumentType.getString(ctx, "rank").toUpperCase();
+        int rank = r.equals("NONE") ? -1 : java.util.Arrays.asList(com.abilitywar.rpg.Guild.RANKS).indexOf(r);
+        if (rank < -1 || (rank == -1 && !r.equals("NONE"))) {
+            ctx.getSource().sendError(Text.literal(r + "?"));
+            return 0;
+        }
+        return rpgEach(ps, p -> com.abilitywar.rpg.RpgManager.setGuildRank(p, rank));
+    }
+
     private static int rpgEach(Collection<ServerPlayerEntity> ps, java.util.function.Consumer<ServerPlayerEntity> f) {
         for (ServerPlayerEntity p : ps) f.accept(p);
         return ps.size();
@@ -181,6 +197,26 @@ public final class AWCommands {
                                     com.abilitywar.mob.BossAltar.setBoss(p.getServerWorld(), pos, net.minecraft.command.argument.IdentifierArgumentType.getIdentifier(ctx, "boss"));
                                     return 1;
                                 })))
+                .then(literal("guild").requires(s -> s.hasPermissionLevel(2))
+                        .then(literal("rank").then(argument("rank", StringArgumentType.word()).suggests(GUILD_RANKS)
+                                .executes(ctx -> guildRank(ctx, List.of(ctx.getSource().getPlayerOrThrow())))
+                                .then(argument("targets", EntityArgumentType.players()).executes(ctx -> guildRank(ctx, EntityArgumentType.getPlayers(ctx, "targets"))))))
+                        .then(literal("points").then(argument("amount", com.mojang.brigadier.arguments.IntegerArgumentType.integer())
+                                .executes(ctx -> rpgEach(List.of(ctx.getSource().getPlayerOrThrow()), p -> com.abilitywar.rpg.RpgManager.addGuildPoints(p, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "amount"))))
+                                .then(argument("targets", EntityArgumentType.players()).executes(ctx -> rpgEach(EntityArgumentType.getPlayers(ctx, "targets"),
+                                        p -> com.abilitywar.rpg.RpgManager.addGuildPoints(p, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "amount")))))))
+                        .then(literal("complete").executes(ctx -> rpgEach(List.of(ctx.getSource().getPlayerOrThrow()), com.abilitywar.rpg.RpgManager::guildForceProgress))
+                                .then(argument("targets", EntityArgumentType.players()).executes(ctx -> rpgEach(EntityArgumentType.getPlayers(ctx, "targets"), com.abilitywar.rpg.RpgManager::guildForceProgress))))
+                        .then(literal("clerk").executes(ctx -> {
+                            ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
+                            var npc = com.abilitywar.registry.AWEntities.GUILD_CLERK.create(p.getServerWorld());
+                            if (npc == null) return 0;
+                            npc.refreshPositionAndAngles(p.getX(), p.getY(), p.getZ(), p.getYaw() + 180, 0);
+                            npc.setHeadYaw(p.getYaw() + 180);
+                            npc.setBodyYaw(p.getYaw() + 180);
+                            p.getServerWorld().spawnEntity(npc);
+                            return 1;
+                        })))
                 .then(literal("goto").requires(s -> s.hasPermissionLevel(2))
                         .then(argument("place", StringArgumentType.word()).suggests(PLACES)
                                 .executes(ctx -> gotoPlace(ctx.getSource(), StringArgumentType.getString(ctx, "place")))))

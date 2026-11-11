@@ -54,9 +54,21 @@ public final class RpgHud {
                 : RpgClient.className(ClientState.ability, grand);
         ctx.drawTextWithShadow(tr, cls, tx, y + 1, grand ? lerpColor(0xFFD86A, 0xFFF6DC, 0.5f + 0.5f * MathHelper.sin(time * 0.12f)) : 0xFFFFFF);
         int tierN = com.abilitywar.rpg.ClassTree.tier(ClientState.ability, grand);
+        int gx = tx + tr.getWidth(cls) + 4;
         if (tierN > 0) {
             Text tier = Text.translatable("rpg.abilitywar.tier." + tierN);
-            ctx.drawTextWithShadow(tr, tier, tx + tr.getWidth(cls) + 4, y + 1, 0x9A8D70);
+            ctx.drawTextWithShadow(tr, tier, gx, y + 1, 0x9A8D70);
+            gx += tr.getWidth(tier) + 4;
+        }
+        if (RpgClient.guildRank >= 0) {
+            // 모험가 길드 등급 배지
+            String rk = com.abilitywar.rpg.Guild.rankName(RpgClient.guildRank);
+            int rc = com.abilitywar.rpg.Guild.color(RpgClient.guildRank);
+            if (RpgClient.guildRank >= com.abilitywar.rpg.Guild.TOP) rc = lerpColor(0xFFD040, 0xFFFFFF, 0.5f + 0.5f * MathHelper.sin(time * 0.15f));
+            int rw = tr.getWidth(rk) + 6;
+            HudDraw.rect(ctx, gx, y, gx + rw, y + 10, 0xC0100A04);
+            frame(ctx, gx, y, gx + rw, y + 10, rc);
+            ctx.drawText(tr, rk, gx + 3, y + 1, 0xFF000000 | rc, true);
         }
         // ---- 경험치 막대
         int bw = 110, bh = 5, by = y + 13;
@@ -124,6 +136,35 @@ public final class RpgHud {
             if (ready) {
                 float p = 0.6f + 0.4f * MathHelper.sin(time * 0.2f);
                 ctx.drawTextWithShadow(tr, Text.translatable("rpg.abilitywar.hud.return"), x + 8, oy, lerpColor(0x5AA85A, 0xB8FFB0, p));
+            }
+            ny += qh + 3;
+        }
+        // ---- 길드 퀘스트 추적
+        com.abilitywar.rpg.Guild.GQuest gq = RpgClient.guildActive();
+        if (gq != null) {
+            boolean ready = RpgClient.guildDone(gq);
+            int qw = 170;
+            int lines = gq.objectives().size() + (ready ? 1 : 0);
+            int qh = 14 + lines * 10 + 3;
+            int rc = com.abilitywar.rpg.Guild.color(gq.rank());
+            HudDraw.rect(ctx, x, ny, x + qw, ny + qh, 0x9A0C0806);
+            HudDraw.rect(ctx, x, ny, x + 2, ny + qh, 0xFF000000 | (ready ? 0x7CE87C : rc));
+            ctx.drawTextWithShadow(tr, Text.literal("[" + com.abilitywar.rpg.Guild.rankName(gq.rank()) + "] ").styled(st -> st.withColor(rc))
+                    .append(RpgClient.guildQuestName(gq).formatted(Formatting.WHITE)), x + 6, ny + 3, 0xFFFFFF);
+            int oy = ny + 15;
+            for (int i = 0; i < gq.objectives().size(); i++) {
+                JobQuests.Objective o = gq.objectives().get(i);
+                int have = Math.min(o.count(), RpgClient.guildCount(i));
+                boolean ok = have >= o.count();
+                Text line = Text.literal(ok ? "✔ " : "· ").formatted(ok ? Formatting.GREEN : Formatting.GRAY)
+                        .append(RpgClient.objectiveText(o).formatted(ok ? Formatting.DARK_GRAY : Formatting.GRAY))
+                        .append(Text.literal("  " + have + "/" + o.count()).formatted(ok ? Formatting.GREEN : Formatting.YELLOW));
+                ctx.drawTextWithShadow(tr, line, x + 8, oy, 0xFFFFFF);
+                oy += 10;
+            }
+            if (ready) {
+                float p = 0.6f + 0.4f * MathHelper.sin(time * 0.2f);
+                ctx.drawTextWithShadow(tr, Text.translatable("guild.abilitywar.hud.return"), x + 8, oy, lerpColor(0x5AA85A, 0xB8FFB0, p));
             }
         }
         renderBanner(ctx, td, tr);

@@ -42,11 +42,24 @@ public final class AWEntities {
     public static final net.minecraft.item.Item KING_EGG = Registry.register(Registries.ITEM, AbilityWar.id("king_spawn_egg"),
             new net.minecraft.item.SpawnEggItem(KING, 0x8A1020, 0xF0C860, new net.minecraft.item.Item.Settings()));
 
+    /** 모험가 길드 접수원 NPC. */
+    public static final EntityType<com.abilitywar.rpg.GuildClerkEntity> GUILD_CLERK = Registry.register(Registries.ENTITY_TYPE,
+            AbilityWar.id("guild_clerk"),
+            FabricEntityTypeBuilder.<com.abilitywar.rpg.GuildClerkEntity>create(SpawnGroup.MISC, com.abilitywar.rpg.GuildClerkEntity::new)
+                    .dimensions(EntityDimensions.fixed(0.6f, 1.95f))
+                    .trackRangeBlocks(64)
+                    .fireImmune()
+                    .build());
+    public static final net.minecraft.item.Item GUILD_CLERK_EGG = Registry.register(Registries.ITEM, AbilityWar.id("guild_clerk_spawn_egg"),
+            new net.minecraft.item.SpawnEggItem(GUILD_CLERK, 0x2A4A7A, 0xD8B060, new net.minecraft.item.Item.Settings()));
+
     public static void init() {
         net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(KING, com.abilitywar.rpg.JobMasterEntity.createAttributes());
         net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(net.minecraft.item.ItemGroups.SPAWN_EGGS).register(e -> e.add(KING_EGG));
         net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(JOB_MASTER, com.abilitywar.rpg.JobMasterEntity.createAttributes());
         net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(net.minecraft.item.ItemGroups.SPAWN_EGGS).register(e -> e.add(JOB_MASTER_EGG));
+        net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(GUILD_CLERK, com.abilitywar.rpg.JobMasterEntity.createAttributes());
+        net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(net.minecraft.item.ItemGroups.SPAWN_EGGS).register(e -> e.add(GUILD_CLERK_EGG));
     }
 
     private AWEntities() {

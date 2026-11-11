@@ -23,6 +23,10 @@ public class RpgData {
     public final Set<String> completed = new HashSet<>();
     /** 3차 전직 ("대") 을 했는지. 2차 직업일 때만 효과가 있음. */
     public boolean grand;
+    /** 모험가 길드: 등급 (-1 = 가입 안 함, 0 = F … 8 = SSS), 이 등급에서 모은 포인트, 진행 중인 길드 퀘스트, 끝낸 길드 퀘스트 수. */
+    public int guildRank = -1, guildPoints, guildDone;
+    public String guildQuest = "";
+    public final int[] guildProgress = new int[4];
     public boolean dirty = true;
 
     public NbtCompound write() {
@@ -38,6 +42,11 @@ public class RpgData {
         for (String s : completed) l.add(NbtString.of(s));
         t.put("Completed", l);
         t.putBoolean("Grand", grand);
+        t.putInt("GuildRank", guildRank);
+        t.putInt("GuildPoints", guildPoints);
+        t.putInt("GuildDone", guildDone);
+        t.putString("GuildQuest", guildQuest);
+        t.putIntArray("GuildProgress", guildProgress);
         return t;
     }
 
@@ -54,6 +63,12 @@ public class RpgData {
         completed.clear();
         for (NbtElement e : t.getList("Completed", NbtElement.STRING_TYPE)) completed.add(e.asString());
         grand = t.getBoolean("Grand");
+        guildRank = t.contains("GuildRank") ? t.getInt("GuildRank") : -1;
+        guildPoints = t.getInt("GuildPoints");
+        guildDone = t.getInt("GuildDone");
+        guildQuest = t.getString("GuildQuest");
+        int[] gp = t.getIntArray("GuildProgress");
+        for (int i = 0; i < guildProgress.length; i++) guildProgress[i] = i < gp.length ? gp[i] : 0;
         dirty = true;
     }
 

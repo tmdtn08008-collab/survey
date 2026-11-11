@@ -35,6 +35,11 @@ public final class RpgClient {
     /** 3차 전직 ("대") 을 했는지 (2차 직업일 때 효과). */
     public static boolean grand;
     public static int grandLevel = 60;
+    /** 모험가 길드 (-1 = 가입 안 함). */
+    public static int guildRank = -1, guildPoints, guildDone;
+    public static String guildQuest = "";
+    public static final int[] guildProgress = new int[4];
+    public static int guildProgressN;
 
     /** HUD 연출용. */
     public static float xpShown;
@@ -62,6 +67,17 @@ public final class RpgClient {
         selfSelect = buf.isReadable() && buf.readBoolean();
         grand = buf.isReadable() && buf.readBoolean();
         if (buf.isReadable()) grandLevel = buf.readVarInt();
+        if (buf.isReadable()) {
+            guildRank = buf.readVarInt();
+            guildPoints = buf.readVarInt();
+            guildDone = buf.readVarInt();
+            guildQuest = buf.readString();
+            guildProgressN = buf.readVarInt();
+            for (int i = 0; i < guildProgressN; i++) {
+                int v = buf.readVarInt();
+                if (i < guildProgress.length) guildProgress[i] = v;
+            }
+        }
         if (synced && x > xp && lv == level) xpFlash = 14;
         if (synced && pts > points) pointsFlash = 40;
         if (lastLevel >= 0 && lv != level) xpShown = 0;
@@ -92,6 +108,9 @@ public final class RpgClient {
         completed.clear();
         lastLevel = -1;
         grand = false;
+        guildRank = -1;
+        guildPoints = guildDone = guildProgressN = 0;
+        guildQuest = "";
         bannerTicks = 0;
         xpShown = 0;
     }
@@ -167,9 +186,34 @@ public final class RpgClient {
         return true;
     }
 
+    // ================================================================ 모험가 길드
+    public static com.abilitywar.rpg.Guild.GQuest guildActive() {
+        return guildQuest.isEmpty() ? null : com.abilitywar.rpg.Guild.ALL.get(guildQuest);
+    }
+
+    public static int guildCount(int i) {
+        return i < guildProgressN ? guildProgress[i] : 0;
+    }
+
+    public static boolean guildDone(com.abilitywar.rpg.Guild.GQuest q) {
+        if (!q.id().equals(guildQuest)) return false;
+        for (int i = 0; i < q.objectives().size(); i++) if (guildCount(i) < q.objectives().get(i).count()) return false;
+        return true;
+    }
+
+    public static MutableText guildQuestName(com.abilitywar.rpg.Guild.GQuest q) {
+        return Text.translatable("guild.abilitywar.quest." + q.id());
+    }
+
     /** NPC 머리 위 표시: 0 없음, 1 = 받을 수 있음(!), 2 = 진행 중(?), 3 = 완료 가능(?). */
     public static int marker(String giver) {
         if (!synced) return 0;
+        if (com.abilitywar.rpg.Guild.GIVER.equals(giver)) {
+            if (guildRank < 0) return 1;
+            com.abilitywar.rpg.Guild.GQuest g = guildActive();
+            if (g != null) return guildDone(g) ? 3 : 2;
+            return com.abilitywar.rpg.Guild.checkPromote(guildRank, guildPoints, level) == null ? 3 : 1;
+        }
         JobQuests.Quest a = active();
         if (a != null) return a.giver().equals(giver) ? (done(a) ? 3 : 2) : 0;
         for (JobQuests.Quest q : questsFor(giver)) if (status(q) == Status.AVAILABLE) return 1;

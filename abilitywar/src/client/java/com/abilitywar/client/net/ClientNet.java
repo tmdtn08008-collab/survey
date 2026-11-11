@@ -25,7 +25,11 @@ public final class ClientNet {
         });
         ClientPlayNetworking.registerGlobalReceiver(com.abilitywar.rpg.RpgManager.S2C_OPEN_NPC, (client, handler, buf, sender) -> {
             int npc = buf.readVarInt();
-            client.execute(() -> com.abilitywar.client.screen.JobMasterScreen.open(npc));
+            client.execute(() -> {
+                var e = client.world == null ? null : client.world.getEntityById(npc);
+                if (e instanceof com.abilitywar.rpg.GuildClerkEntity) com.abilitywar.client.screen.GuildScreen.open(npc);
+                else com.abilitywar.client.screen.JobMasterScreen.open(npc);
+            });
         });
         ClientPlayNetworking.registerGlobalReceiver(AWNet.S2C_STATE, (client, handler, buf, sender) -> {
             net.minecraft.network.PacketByteBuf copy = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.copy(buf);

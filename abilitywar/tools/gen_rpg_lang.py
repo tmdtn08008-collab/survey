@@ -301,7 +301,7 @@ t('rpg.abilitywar.capital_tp', '왕도 아르덴으로 이동 (%s, %s)', 'Telepo
 t('rpg.abilitywar.place_not_found', '가까운 곳에서 찾지 못했습니다.', 'None found nearby.')
 t('rpg.abilitywar.goto', '%s (으)로 이동: %s %s %s', 'Teleported to %s: %s %s %s')
 t('region.abilitywar.capital', '왕도 아르덴', 'Royal Capital Arden')
-t('region.abilitywar.capital.sub', '안전 지대 · 왕과 전직 교관이 있는 곳', 'Safe zone · Home of the King and the Class Master')
+t('region.abilitywar.capital.sub', '안전 지대 · 왕궁 · 모험가 길드 · 시장 · 전직 교관', "Safe zone · Palace · Adventurers' Guild · Market · Class Master")
 t('region.abilitywar.capital_lands', '아르덴 왕령', 'Crownlands of Arden')
 t('region.abilitywar.capital_lands.sub', '왕국의 들판 · 밭과 풍차, 목장', 'Fields of the kingdom · farms, windmills and pastures')
 t('region.abilitywar.town', '%s 마을', '%s Village')
@@ -321,6 +321,92 @@ t('region.abilitywar.wyvern_roost', '비룡의 둥지', 'Wyvern Roost')
 t('region.abilitywar.wyvern_roost.sub', '위험 · 보스: 고대 비룡', 'Danger · Boss: Ancient Wyvern')
 t('region.abilitywar.goblin_camp', '고블린 야영지', 'Goblin Camp')
 t('region.abilitywar.goblin_camp.sub', '위험 · 고블린 무리', 'Danger · Goblin warband')
+
+# ================================================================ 모험가 길드
+t('entity.abilitywar.guild_clerk', '모험가 길드 접수원', "Adventurers' Guild Clerk")
+t('item.abilitywar.guild_clerk_spawn_egg', '모험가 길드 접수원 생성 알', 'Guild Clerk Spawn Egg')
+t('guild.abilitywar.err.not_member', '먼저 모험가 길드에 가입하세요.', "Join the Adventurers' Guild first.")
+t('guild.abilitywar.err.already_member', '이미 길드원입니다.', 'You are already a member.')
+t('guild.abilitywar.err.rank', '자기 등급의 의뢰만 받을 수 있습니다.', 'You can only take quests of your own rank.')
+t('guild.abilitywar.err.has_quest', '이미 진행 중인 길드 의뢰가 있습니다.', 'You already have a guild quest.')
+t('guild.abilitywar.err.top', '이미 최고 등급 (SSS) 입니다.', 'You are already the top rank (SSS).')
+t('guild.abilitywar.err.points', '승급하려면 이 등급에서 길드 포인트 %2$s 이 필요합니다.', 'You need %2$s guild points in this rank to be promoted.')
+t('guild.abilitywar.err.level', '승급하려면 레벨 %1$s 이 필요합니다.', 'You need level %1$s to be promoted.')
+t('guild.abilitywar.err.far', '접수원에게 더 가까이 가세요.', 'Get closer to the clerk.')
+t('guild.abilitywar.objective_done', '길드 의뢰 목표 완료!', 'Guild quest objective complete!')
+t('guild.abilitywar.accepted', '길드 의뢰 수락: %s', 'Guild quest accepted: %s')
+t('guild.abilitywar.done', '길드 의뢰 완료: %s (포인트 +%s, 경험치 +%s, 에메랄드 %s)', 'Guild quest complete: %s (+%s points, +%s XP, %s emeralds)')
+t('guild.abilitywar.can_promote', '★ %s 등급 승급 심사를 받을 수 있습니다! 접수원에게 가세요.', '★ You can take the promotion exam for rank %s! Visit the clerk.')
+t('guild.abilitywar.joined_title', '모험가 길드 가입! %s 등급', "Joined the Adventurers' Guild! Rank %s")
+t('guild.abilitywar.promoted_title', '%s 등급으로 승급!', 'Promoted to rank %s!')
+t('guild.abilitywar.promoted_broadcast', '%s 님이 모험가 길드 %s 등급이 되었습니다!', "%s is now a rank %s adventurer!")
+t('guild.abilitywar.btn.join', '길드 가입', 'Join the Guild')
+t('guild.abilitywar.btn.abandon', '포기', 'Abandon')
+t('guild.abilitywar.btn.promote', '승급 심사', 'Promotion Exam')
+t('guild.abilitywar.say.welcome', '모험가 길드에 어서 오세요! 가입하면 F 등급부터 시작해요. 자기 등급의 의뢰만 받을 수 있고, 의뢰를 끝내 포인트를 모으면 승급 심사를 받을 수 있어요. 최고는 SSS 등급!',
+  "Welcome to the Adventurers' Guild! New members start at rank F. You can only take quests of your rank; finish them for points and take the promotion exam. The top rank is SSS!")
+t('guild.abilitywar.say.ready', '「%s」 의뢰를 끝내셨군요! 보고해 주세요.', 'You finished "%s"! Please report.')
+t('guild.abilitywar.say.progress', '「%s」 의뢰는 아직 진행 중이에요. 힘내세요!', '"%s" is still in progress. Good luck!')
+t('guild.abilitywar.say.promote', '축하해요! %s 등급 승급 심사를 받을 수 있어요.', 'Congratulations! You can take the exam for rank %s.')
+t('guild.abilitywar.say.top', 'SSS 등급 모험가님, 길드의 자랑입니다! 어떤 의뢰든 맡겨 주세요.', 'A rank SSS adventurer, the pride of the guild! Any quest is yours.')
+t('guild.abilitywar.say.board', '%s 등급 의뢰 게시판이에요. 하나 골라 보세요.', 'Here is the rank %s quest board. Pick one.')
+t('guild.abilitywar.screen.rank', '길드 등급', 'Guild Rank')
+t('guild.abilitywar.screen.not_member', '아직 길드원이 아니에요. 아래 [길드 가입] 을 누르세요.', 'Not a member yet. Press [Join the Guild].')
+t('guild.abilitywar.screen.points', '포인트 %s / %s', 'Points %s / %s')
+t('guild.abilitywar.screen.next', '다음 등급: %s', 'Next rank: %s')
+t('guild.abilitywar.screen.req_points', '포인트 %s', '%s points')
+t('guild.abilitywar.screen.top', '최고 등급!', 'Top rank!')
+t('guild.abilitywar.screen.done', '끝낸 의뢰 %s개', '%s quests done')
+t('guild.abilitywar.screen.join_first', '가입하면 의뢰 목록이 보여요.', 'Join to see the quest board.')
+t('guild.abilitywar.screen.rank_only', '%s 등급 의뢰만 받을 수 있어요.', 'Only rank %s quests.')
+t('guild.abilitywar.screen.reward_points', '길드 포인트 +%s', '+%s guild points')
+t('guild.abilitywar.screen.reward_emeralds', '에메랄드 %s개', '%s emeralds')
+t('guild.abilitywar.screen.reward_gear', '%s 등급 장비 (%s%% 확률)', '%s gear (%s%% chance)')
+t('guild.abilitywar.hud.return', '접수원에게 보고하세요!', 'Report to the clerk!')
+GQ = [
+  ('g_f1', '마을 주변의 좀비', 'Zombies Near Town', '밤마다 마을 근처를 어슬렁거리는 좀비를 처치해 주세요.', 'Defeat the zombies that wander near town at night.'),
+  ('g_f2', '거미 소탕', 'Spider Sweep', '들판에 거미가 늘었어요. 처치해 주세요.', 'Spiders are multiplying in the fields. Clear them out.'),
+  ('g_f3', '밀 납품', 'Wheat Delivery', '빵집에서 밀이 필요해요.', 'The bakery needs wheat.'),
+  ('g_f4', '고블린 퇴치', 'Goblin Trouble', '고블린이 창고를 털어 갔어요!', 'Goblins raided the storehouse!'),
+  ('g_e1', '해골 사냥', 'Skeleton Hunt', '길을 막는 해골 궁수를 처치하세요.', 'Defeat the skeleton archers on the roads.'),
+  ('g_e2', '크리퍼 처리반', 'Creeper Squad', '밭을 날려 버리는 크리퍼를 처리해 주세요.', 'Deal with the creepers blowing up the fields.'),
+  ('g_e3', '가죽 납품', 'Leather Delivery', '방어구 장인이 가죽을 찾고 있어요.', 'The armorer needs leather.'),
+  ('g_e4', '고블린 소굴', 'Goblin Den', '고블린 무리를 크게 소탕하세요.', 'Wipe out a goblin warband.'),
+  ('g_d1', '밤의 언데드', 'Undead of the Night', '밤에 나오는 언데드를 처치하세요.', 'Defeat undead that rise at night.'),
+  ('g_d2', '오크 전사 토벌', 'Orc Warriors', '오크 전사가 상단을 습격했어요.', 'Orc warriors attacked a caravan.'),
+  ('g_d3', '철 납품', 'Iron Delivery', '성벽 수리에 철이 필요해요.', 'The wall repairs need iron.'),
+  ('g_d4', '마녀 사냥', 'Witch Hunt', '늪의 마녀가 저주를 퍼뜨려요.', 'Swamp witches are spreading curses.'),
+  ('g_c1', '해골 기사단', 'Skeleton Knights', '갑옷 입은 해골 기사를 처치하세요.', 'Defeat the armored skeleton knights.'),
+  ('g_c2', '엔더맨 조사', 'Enderman Survey', '엔더맨을 처치해 표본을 모아 주세요.', 'Defeat endermen for the scholars.'),
+  ('g_c3', '도깨비불 퇴치', 'Wisp Banishing', '여행자를 홀리는 도깨비불을 없애 주세요.', 'Banish the wisps that lure travelers.'),
+  ('g_c4', '금 납품', 'Gold Delivery', '왕실 금고에 금을 바쳐 주세요.', 'Deliver gold to the royal treasury.'),
+  ('g_b1', '블레이즈 토벌', 'Blaze Hunt', '네더의 블레이즈를 처치하세요.', 'Defeat blazes in the Nether.'),
+  ('g_b2', '오크 대토벌', 'Orc Purge', '오크 부족을 크게 토벌하세요.', 'Purge an orc tribe.'),
+  ('g_b3', '몬스터 대청소', 'Monster Sweep', '왕국 곳곳의 몬스터를 처치하세요.', 'Defeat monsters across the kingdom.'),
+  ('g_b4', '다이아몬드 납품', 'Diamond Delivery', '왕관 수리에 다이아몬드가 필요해요.', 'The crown needs diamonds.'),
+  ('g_a1', '위더 스켈레톤 토벌', 'Wither Skeletons', '네더 요새의 위더 스켈레톤을 처치하세요.', 'Defeat wither skeletons in a Nether fortress.'),
+  ('g_a2', '보스 토벌', 'Boss Hunt', '보스를 하나 쓰러뜨리세요.', 'Defeat a boss.'),
+  ('g_a3', '가스트 격추', 'Ghast Downing', '네더 하늘의 가스트를 떨어뜨리세요.', 'Shoot down ghasts in the Nether.'),
+  ('g_a4', '엔더 진주 납품', 'Ender Pearl Delivery', '마법사 탑에 엔더 진주가 필요해요.', "The mages' tower needs ender pearls."),
+  ('g_s1', '보스 사냥꾼', 'Boss Hunter', '보스를 둘 쓰러뜨리세요.', 'Defeat two bosses.'),
+  ('g_s2', '타락한 기사왕 토벌', 'The Fallen King', '몰락한 요새의 타락한 기사왕을 쓰러뜨리세요.', 'Defeat the Fallen King of the ruined fortress.'),
+  ('g_s3', '대토벌', 'Great Purge', '적대적인 몹을 대량으로 처치하세요.', 'Defeat a great number of hostile mobs.'),
+  ('g_s4', '서리 마녀 토벌', 'The Frost Witch', '서리 신전의 마녀를 쓰러뜨리세요.', 'Defeat the witch of the Frost Temple.'),
+  ('g_ss1', '보스 셋', 'Three Bosses', '보스를 셋 쓰러뜨리세요.', 'Defeat three bosses.'),
+  ('g_ss2', '고대 비룡 토벌', 'The Ancient Wyvern', '비룡의 둥지의 고대 비룡을 쓰러뜨리세요.', 'Defeat the Ancient Wyvern of the roost.'),
+  ('g_ss3', '화염 거인 토벌', 'The Ember Colossus', '잿불 제단의 화염 거인을 쓰러뜨리세요.', 'Defeat the Ember Colossus of the altar.'),
+  ('g_ss4', '고대 잔해 납품', 'Ancient Debris', '전설의 대장장이가 네더라이트 파편을 찾아요.', 'The legendary smith needs netherite scrap.'),
+  ('g_sss1', '위더 토벌', 'The Wither', '위더를 쓰러뜨리세요.', 'Defeat the Wither.'),
+  ('g_sss2', '엔더 드래곤 토벌', 'The Ender Dragon', '엔드의 드래곤을 쓰러뜨리세요.', 'Defeat the Ender Dragon.'),
+  ('g_sss3', '전설의 사냥꾼', 'Legendary Hunter', '보스를 다섯 쓰러뜨리세요.', 'Defeat five bosses.'),
+  ('g_sss4', '워든 토벌', 'The Warden', '고대 도시의 워든을 쓰러뜨리세요.', 'Defeat the Warden of the ancient city.'),
+]
+for qid, ko, en, dko, den in GQ:
+    t(f'guild.abilitywar.quest.{qid}', ko, en)
+    t(f'guild.abilitywar.quest.{qid}.desc', dko, den)
+for k, ko, en in [('market', '시장', 'Market'), ('guild', '모험가 길드', "Adventurers' Guild"), ('guild_board', '의뢰 게시판', 'Quest Board'),
+                  ('class_master', '전직 교관', 'Class Master'), ('temple', '신전', 'Temple'), ('inn', '여관', 'Inn'), ('smithy', '대장간', 'Smithy')]:
+    t(f'sign.abilitywar.{k}', ko, en)
 
 def apply(fname, idx):
     p = os.path.join(LANG, fname)
