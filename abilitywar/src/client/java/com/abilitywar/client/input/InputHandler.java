@@ -39,7 +39,7 @@ import java.util.Map;
  */
 public final class InputHandler {
     public static final String CATEGORY = "key.categories.abilitywar";
-    public static KeyBinding SKILL1, SKILL2, SKILL3, SKILL4, ULTIMATE, PASSIVE, BLOCK, SELECT, DASH, GRIMOIRE, STATS, QUESTS;
+    public static KeyBinding SKILL1, SKILL2, SKILL3, SKILL4, ULTIMATE, PASSIVE, BLOCK, SELECT, DASH, GRIMOIRE, STATS, QUESTS, ACCEPT, DECLINE;
     private static KeyBinding[] SLOT_KEYS;
 
     private static boolean blockHeld;
@@ -65,6 +65,8 @@ public final class InputHandler {
         GRIMOIRE = reg("key.abilitywar.grimoire", GLFW.GLFW_KEY_G);
         STATS = reg("key.abilitywar.stats", GLFW.GLFW_KEY_K);
         QUESTS = reg("key.abilitywar.quests", GLFW.GLFW_KEY_J);
+        ACCEPT = reg("key.abilitywar.accept", GLFW.GLFW_KEY_Y);
+        DECLINE = reg("key.abilitywar.decline", GLFW.GLFW_KEY_N);
         SLOT_KEYS = new KeyBinding[]{SKILL1, SKILL2, SKILL3, SKILL4, ULTIMATE, PASSIVE};
     }
 
@@ -111,6 +113,13 @@ public final class InputHandler {
         if (QUESTS.matchesKey(key, scancode)) {
             if (action == GLFW.GLFW_PRESS) mc.setScreen(new com.abilitywar.client.screen.QuestScreen());
             return true;
+        }
+        // 받은 요청 (파티 초대 · 거래): Y 수락, N 거절 (요청이 있을 때만 키를 가로챔)
+        if (!com.abilitywar.client.social.SocialClient.requests.isEmpty()) {
+            if (ACCEPT.matchesKey(key, scancode) || DECLINE.matchesKey(key, scancode)) {
+                if (action == GLFW.GLFW_PRESS) com.abilitywar.client.social.SocialClient.answer(ACCEPT.matchesKey(key, scancode));
+                return true;
+            }
         }
         if (!active()) return false;
         if (GRIMOIRE.matchesKey(key, scancode) && "warlock".equals(ClientState.ability)) {

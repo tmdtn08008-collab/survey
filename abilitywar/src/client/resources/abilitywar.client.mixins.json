@@ -16,7 +16,9 @@
     "MouseMixin",
     "PlayerEntityModelMixin",
     "PlayerEntityRendererMixin",
-    "TooltipBackgroundRendererMixin"
+    "TooltipBackgroundRendererMixin",
+    "BossBarHudAccessor",
+    "LivingEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

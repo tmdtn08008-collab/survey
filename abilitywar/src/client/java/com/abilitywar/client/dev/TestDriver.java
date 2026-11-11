@@ -41,6 +41,8 @@ public final class TestDriver {
         }
     }
 
+    static String waitScreen;
+
     public static boolean active() {
         return lines != null;
     }
@@ -48,7 +50,7 @@ public final class TestDriver {
     public static void tick(MinecraftClient mc) {
         if (lines == null) return;
         if (mc.player == null || mc.world == null) return;
-        if (mc.currentScreen != null && worldTicks > 0 && !(mc.currentScreen instanceof com.abilitywar.client.screen.GrimoireScreen) && !(mc.currentScreen instanceof com.abilitywar.client.screen.AbilitySelectScreen) && !mc.currentScreen.getClass().getPackageName().equals("com.abilitywar.client.screen") && !(mc.currentScreen instanceof net.minecraft.client.gui.screen.ingame.HandledScreen<?>)) mc.setScreen(null);
+        if (mc.currentScreen != null && worldTicks > 0 && !(mc.currentScreen instanceof com.abilitywar.client.screen.GrimoireScreen) && !(mc.currentScreen instanceof com.abilitywar.client.screen.AbilitySelectScreen) && !mc.currentScreen.getClass().getPackageName().equals("com.abilitywar.client.screen") && !mc.currentScreen.getClass().getPackageName().equals("com.abilitywar.client.social") && !(mc.currentScreen instanceof net.minecraft.client.gui.screen.ingame.HandledScreen<?>)) mc.setScreen(null);
         worldTicks++;
         if (!started) {
             if (worldTicks < 60) return;
@@ -62,6 +64,10 @@ public final class TestDriver {
             waitTicks--;
             return;
         }
+        if (waitScreen != null) {
+            if (mc.currentScreen == null || !mc.currentScreen.getClass().getSimpleName().equals(waitScreen)) return;
+            waitScreen = null;
+        }
         if (waitChat != null) {
             boolean found = false;
             for (String m : CHAT) if (m.contains(waitChat)) found = true;
@@ -69,7 +75,7 @@ public final class TestDriver {
             CHAT.clear();
             waitChat = null;
         }
-        while (idx < lines.size() && waitTicks == 0 && waitChat == null) {
+        while (idx < lines.size() && waitTicks == 0 && waitChat == null && waitScreen == null) {
             String line = lines.get(idx++).trim();
             if (line.isEmpty() || line.startsWith("#")) continue;
             String[] a = line.split("\\s+", 2);
@@ -112,6 +118,10 @@ public final class TestDriver {
                         com.abilitywar.client.camera.CameraController.debugOrbit = o;
                     }
                 }
+                case "waitscreen" -> {
+                    waitScreen = arg;
+                    return;
+                }
                 case "waitchat" -> {
                     waitChat = arg;
                     waitTicks = 0;
@@ -121,6 +131,27 @@ public final class TestDriver {
                 // 흑마법서 화면 테스트: 열기 / 칸 빠른 이동 / 영혼 동작 / 닫기
                 case "grimoire" -> net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(com.abilitywar.net.AWNet.C2S_GRIMOIRE,
                         net.fabricmc.fabric.api.networking.v1.PacketByteBufs.empty());
+                // 플레이어끼리 테스트: 가장 가까운 다른 플레이어 우클릭 (웅크리면 메뉴) / 키 누르기 / 거래 G
+                case "useplayer" -> {
+                    net.minecraft.entity.player.PlayerEntity best = null;
+                    for (net.minecraft.entity.player.PlayerEntity o : mc.world.getPlayers())
+                        if (o != mc.player && (best == null || o.squaredDistanceTo(mc.player) < best.squaredDistanceTo(mc.player))) best = o;
+                    if (best != null) {
+                        // 실제 우클릭과 같은 순서: 맞은 위치로 먼저, 안 되면 그냥
+                        var hit = new net.minecraft.util.hit.EntityHitResult(best, best.getPos().add(0, 1, 0));
+                        if (!mc.interactionManager.interactEntityAtLocation(mc.player, best, hit, net.minecraft.util.Hand.MAIN_HAND).isAccepted())
+                            mc.interactionManager.interactEntity(mc.player, best, net.minecraft.util.Hand.MAIN_HAND);
+                    }
+                }
+                // 진짜 우클릭 (조준한 대상에게: 바닐라 doItemUse 경로)
+                case "rightclick" -> net.minecraft.client.option.KeyBinding.onKeyPressed(net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper.getBoundKeyOf(mc.options.useKey));
+                case "key" -> {
+                    int k = Integer.parseInt(arg);
+                    int sc = org.lwjgl.glfw.GLFW.glfwGetKeyScancode(k);
+                    mc.keyboard.onKey(mc.getWindow().getHandle(), k, sc, org.lwjgl.glfw.GLFW.GLFW_PRESS, 0);
+                    mc.keyboard.onKey(mc.getWindow().getHandle(), k, sc, org.lwjgl.glfw.GLFW.GLFW_RELEASE, 0);
+                }
+                case "tradegold" -> com.abilitywar.client.social.SocialClient.send(4, 0, Long.parseLong(arg));
                 case "quickmove" -> {
                     if (mc.player.currentScreenHandler != null && mc.interactionManager != null)
                         mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId, Integer.parseInt(arg), 0,
@@ -163,8 +194,9 @@ public final class TestDriver {
                     String[] p4 = arg.split(" ");
                     if (mc.currentScreen != null) {
                         double cx = Double.parseDouble(p4[0]), cy = Double.parseDouble(p4[1]);
-                        mc.currentScreen.mouseClicked(cx, cy, 0);
-                        mc.currentScreen.mouseReleased(cx, cy, 0);
+                        var scr = mc.currentScreen;
+                        scr.mouseClicked(cx, cy, 0);
+                        scr.mouseReleased(cx, cy, 0);
                     }
                 }
                 case "talk" -> {

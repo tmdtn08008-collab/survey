@@ -145,6 +145,12 @@ public abstract class BossEntity extends HostileEntity {
     protected void mobTick() {
         super.mobTick();
         bar.setPercent(getHealth() / getMaxHealth());
+        // 보스 막대 이름에 남은 HP 숫자 (바뀔 때만)
+        int hpNow = (int) Math.ceil(getHealth());
+        if (hpNow != barHp) {
+            barHp = hpNow;
+            bar.setName(barName());
+        }
         if (!(getWorld() instanceof ServerWorld sw)) return;
         if (!introDone && age > 2) {
             introDone = true;
@@ -278,7 +284,15 @@ public abstract class BossEntity extends HostileEntity {
     @Override
     public void setCustomName(@Nullable Text name) {
         super.setCustomName(name);
-        bar.setName(getDisplayName());
+        bar.setName(barName());
+    }
+
+    int barHp = -1;
+
+    /** "이름  ❤ 340 / 400". */
+    net.minecraft.text.Text barName() {
+        return getDisplayName().copy().append(net.minecraft.text.Text.literal("   ❤ " + (int) Math.ceil(getHealth()) + " / " + (int) Math.ceil(getMaxHealth()))
+                .formatted(net.minecraft.util.Formatting.WHITE));
     }
 
     @Override
@@ -363,6 +377,6 @@ public abstract class BossEntity extends HostileEntity {
         if (nbt.contains("Home")) home = NbtHelper.toBlockPos(nbt.getCompound("Home"));
         wild = nbt.getBoolean("Wild");
         introDone = nbt.getBoolean("Intro");
-        bar.setName(getDisplayName());
+        bar.setName(barName());
     }
 }

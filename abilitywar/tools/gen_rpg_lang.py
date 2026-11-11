@@ -506,6 +506,62 @@ t('gear.abilitywar.ui.enhance_armor', '강화 보너스: 방어력 +%s, 최대 �
 t('guild.abilitywar.screen.reward_stones', '강화석 %s개', 'Enhancement Stone ×%s')
 t('sign.abilitywar.apothecary', '물약', 'Potions')
 
+# ---------------------------------------------------------------- 플레이어끼리: 파티 · 거래 · 요청
+for k, ko, en in [
+    ('key.abilitywar.accept', '요청 수락', 'Accept request'), ('key.abilitywar.decline', '요청 거절', 'Decline request'),
+    ('social.abilitywar.party', '파티', 'Party'),
+    ('social.abilitywar.party_joined', '%s 님이 파티에 들어왔습니다.', '%s joined the party.'),
+    ('social.abilitywar.party_left_you', '파티에서 나왔습니다.', 'You left the party.'),
+    ('social.abilitywar.party_left', '%s 님이 파티에서 나갔습니다.', '%s left the party.'),
+    ('social.abilitywar.party_disbanded', '파티가 해산되었습니다.', 'The party was disbanded.'),
+    ('social.abilitywar.party_list', '파티 (%s/%s): %s', 'Party (%s/%s): %s'),
+    ('social.abilitywar.err.already_party', '이미 파티에 들어가 있습니다.', 'Already in a party.'),
+    ('social.abilitywar.err.party_full', '파티가 가득 찼습니다 (최대 5명).', 'The party is full (max 5).'),
+    ('social.abilitywar.err.no_party', '파티에 들어가 있지 않습니다.', 'You are not in a party.'),
+    ('social.abilitywar.err.self', '자기 자신에게는 보낼 수 없습니다.', 'You cannot send that to yourself.'),
+    ('social.abilitywar.err.far', '너무 멀리 있습니다.', 'Too far away.'),
+    ('social.abilitywar.err.target_in_party', '그 플레이어는 이미 파티에 있습니다.', 'That player is already in a party.'),
+    ('social.abilitywar.err.busy', '이미 거래 중입니다.', 'Already trading.'),
+    ('social.abilitywar.err.already_sent', '이미 요청을 보냈습니다.', 'Request already sent.'),
+    ('social.abilitywar.err.no_request', '받은 요청이 없습니다.', 'No pending request.'),
+    ('social.abilitywar.err.offline', '요청을 보낸 플레이어가 접속해 있지 않습니다.', 'That player is offline.'),
+    ('social.abilitywar.err.trade_gold', '돈 (G) 이 모자라서 거래가 취소되었습니다.', 'Trade cancelled: not enough G.'),
+    ('social.abilitywar.req.party', '%s 님이 파티에 초대했습니다.', '%s invited you to a party.'),
+    ('social.abilitywar.req.trade', '%s 님이 거래를 요청했습니다.', '%s wants to trade.'),
+    ('social.abilitywar.btn.accept', '수락', 'Accept'), ('social.abilitywar.btn.decline', '거절', 'Decline'),
+    ('social.abilitywar.req_sent.party', '%s 님에게 파티 초대를 보냈습니다.', 'Party invite sent to %s.'),
+    ('social.abilitywar.req_sent.trade', '%s 님에게 거래 요청을 보냈습니다.', 'Trade request sent to %s.'),
+    ('social.abilitywar.declined.party', '%s 님이 파티 초대를 거절했습니다.', '%s declined your party invite.'),
+    ('social.abilitywar.declined.trade', '%s 님이 거래를 거절했습니다.', '%s declined your trade request.'),
+    ('social.abilitywar.you_declined', '거절했습니다.', 'Declined.'),
+    ('social.abilitywar.trade_done', '%s 님과 거래했습니다!', 'Trade with %s complete!'),
+    ('social.abilitywar.trade_cancelled', '거래가 취소되었습니다 (%s).', 'Trade cancelled (%s).'),
+    ('social.abilitywar.hint', 'Shift + 우클릭: 거래 · 파티', 'Shift + Right-click: Trade · Party'),
+    ('social.abilitywar.card.party', '⚑ %s 님의 파티 초대', '⚑ Party invite from %s'),
+    ('social.abilitywar.card.trade', '⇄ %s 님의 거래 요청', '⇄ Trade request from %s'),
+    ('social.abilitywar.card.keys', '[%s] 수락    [%s] 거절', '[%s] Accept    [%s] Decline'),
+    ('social.abilitywar.party_hud', '파티 (%s명)', 'Party (%s)'),
+    ('social.abilitywar.offline', '접속 안 함', 'Offline'),
+    ('social.abilitywar.menu', '플레이어', 'Player'),
+    ('social.abilitywar.btn.trade', '거래 요청', 'Request Trade'),
+    ('social.abilitywar.btn.party', '파티 초대', 'Invite to Party'),
+    ('social.abilitywar.btn.leave', '파티 나가기', 'Leave Party'),
+    ('trade.abilitywar.title', '%s 님과 거래', 'Trade with %s'),
+    ('trade.abilitywar.header', '거래', 'Trade'),
+    ('trade.abilitywar.me', '나', 'Me'),
+    ('trade.abilitywar.set_gold', 'G 올리기', 'Set G'),
+    ('trade.abilitywar.ready', '준비', 'Ready'), ('trade.abilitywar.unready', '준비 취소', 'Unready'),
+    ('trade.abilitywar.confirm', '거래 확정', 'Confirm'), ('trade.abilitywar.cancel', '취소', 'Cancel'),
+    ('trade.abilitywar.have', '가진 돈: %s G', 'Money: %s G'),
+    ('trade.abilitywar.state.place', '줄 물건을 왼쪽 칸에 넣고, G 를 적어 [G 올리기] 한 뒤 [준비] 를 누르세요.', 'Put items on the left, set G, then press [Ready].'),
+    ('trade.abilitywar.state.wait_ready', '상대가 준비하기를 기다리는 중…', 'Waiting for the other player to be ready…'),
+    ('trade.abilitywar.state.both_ready', '둘 다 준비 완료! 확인하고 [거래 확정] 을 누르세요.', 'Both ready! Check and press [Confirm].'),
+    ('trade.abilitywar.state.wait_confirm', '상대의 확정을 기다리는 중…', 'Waiting for the other player to confirm…'),
+    ('trade.abilitywar.mark.not_ready', '준비 안 됨', 'Not ready'),
+    ('trade.abilitywar.mark.ready', '✔ 준비', '✔ Ready'),
+    ('trade.abilitywar.mark.confirmed', '✔✔ 확정', '✔✔ Confirmed')]:
+    t(k, ko, en)
+
 def apply(fname, idx):
     p = os.path.join(LANG, fname)
     d = json.load(open(p, encoding='utf-8'))

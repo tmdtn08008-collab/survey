@@ -80,6 +80,8 @@ public class AbilityWarClient implements ClientModInitializer {
                 ClientClock.tick();
                 ClientState.tick();
                 com.abilitywar.client.rpg.RpgClient.tick();
+                com.abilitywar.client.hud.HealthBars.tick();
+                com.abilitywar.client.social.SocialClient.tick();
                 com.abilitywar.client.fx.BossFx.tickHud();
                 CameraController.tick();
                 DamageNumbers.tick();
@@ -95,8 +97,22 @@ public class AbilityWarClient implements ClientModInitializer {
             SkillHud.renderShadowHint(ctx, td);
             SkillHud.render(ctx, td);
             com.abilitywar.client.hud.RpgHud.render(ctx, td);
+            if (!net.minecraft.client.MinecraftClient.getInstance().options.hudHidden && !CameraController.isCinematic()) {
+                com.abilitywar.client.hud.TargetHud.render(ctx, td);
+                com.abilitywar.client.social.SocialHud.render(ctx, td);
+            }
             com.abilitywar.client.hud.BossIntroHud.render(ctx, td);
             DamageNumbers.renderHud(ctx, td);
+        });
+        // 플레이어끼리: 요청 · 파티 패킷, 거래 창, 다른 플레이어를 Shift + 우클릭 → 메뉴
+        com.abilitywar.client.social.SocialClient.init();
+        net.minecraft.client.gui.screen.ingame.HandledScreens.register(com.abilitywar.social.TradeScreenHandler.TYPE, com.abilitywar.client.social.TradeScreen::new);
+        net.fabricmc.fabric.api.event.player.UseEntityCallback.EVENT.register((player, world, hand, entity, hit) -> {
+            if (world.isClient && hand == net.minecraft.util.Hand.MAIN_HAND && player.isSneaking() && entity instanceof net.minecraft.entity.player.PlayerEntity && entity != player) {
+                net.minecraft.client.MinecraftClient.getInstance().setScreen(new com.abilitywar.client.social.PlayerMenuScreen(entity.getId()));
+                return net.minecraft.util.ActionResult.SUCCESS;
+            }
+            return net.minecraft.util.ActionResult.PASS;
         });
         WorldRenderEvents.AFTER_SETUP.register(VfxManager::beginFrame);
         WorldRenderEvents.AFTER_TRANSLUCENT.register(VfxManager::renderWorld);
@@ -108,6 +124,8 @@ public class AbilityWarClient implements ClientModInitializer {
     static void reset() {
         ClientState.reset();
         com.abilitywar.client.rpg.RpgClient.reset();
+        com.abilitywar.client.hud.HealthBars.reset();
+        com.abilitywar.client.social.SocialClient.reset();
         PlayerAnimator.clear();
         VfxManager.clear();
         DamageNumbers.clear();

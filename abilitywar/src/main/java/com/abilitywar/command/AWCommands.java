@@ -65,6 +65,14 @@ public final class AWCommands {
         return n;
     }
 
+    /** /aw request accept|decline party|trade [보낸 사람] */
+    static int request(com.mojang.brigadier.context.CommandContext<ServerCommandSource> ctx, String from) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        boolean accept = StringArgumentType.getString(ctx, "answer").equals("accept");
+        var type = StringArgumentType.getString(ctx, "type").equals("trade") ? com.abilitywar.social.Requests.Type.TRADE : com.abilitywar.social.Requests.Type.PARTY;
+        com.abilitywar.social.Requests.respond(ctx.getSource().getPlayerOrThrow(), type, accept, from);
+        return 1;
+    }
+
     /** /aw gold add|set|take <양> [플레이어] */
     static int goldOp(com.mojang.brigadier.context.CommandContext<ServerCommandSource> ctx, java.util.Collection<ServerPlayerEntity> targets) {
         String op = StringArgumentType.getString(ctx, "op");
@@ -242,6 +250,31 @@ public final class AWCommands {
                             p.getServerWorld().spawnEntity(npc);
                             return 1;
                         })))
+                .then(literal("party")
+                        .then(literal("invite").then(argument("player", EntityArgumentType.player()).executes(ctx -> {
+                            String err = com.abilitywar.social.Requests.send(ctx.getSource().getPlayerOrThrow(), EntityArgumentType.getPlayer(ctx, "player"),
+                                    com.abilitywar.social.Requests.Type.PARTY);
+                            if (err != null) ctx.getSource().sendError(Text.translatable(err));
+                            return err == null ? 1 : 0;
+                        })))
+                        .then(literal("leave").executes(ctx -> {
+                            com.abilitywar.social.Party.leave(ctx.getSource().getPlayerOrThrow());
+                            return 1;
+                        }))
+                        .then(literal("list").executes(ctx -> {
+                            com.abilitywar.social.Party.list(ctx.getSource().getPlayerOrThrow());
+                            return 1;
+                        })))
+                .then(literal("trade").then(argument("player", EntityArgumentType.player()).executes(ctx -> {
+                    String err = com.abilitywar.social.Requests.send(ctx.getSource().getPlayerOrThrow(), EntityArgumentType.getPlayer(ctx, "player"),
+                            com.abilitywar.social.Requests.Type.TRADE);
+                    if (err != null) ctx.getSource().sendError(Text.translatable(err));
+                    return err == null ? 1 : 0;
+                })))
+                .then(literal("request").then(argument("answer", StringArgumentType.word()).suggests((c, sb) -> net.minecraft.command.CommandSource.suggestMatching(List.of("accept", "decline"), sb))
+                        .then(argument("type", StringArgumentType.word()).suggests((c, sb) -> net.minecraft.command.CommandSource.suggestMatching(List.of("party", "trade"), sb))
+                                .executes(ctx -> request(ctx, null))
+                                .then(argument("from", StringArgumentType.word()).executes(ctx -> request(ctx, StringArgumentType.getString(ctx, "from")))))))
                 .then(literal("npc").requires(s -> s.hasPermissionLevel(2))
                         .then(argument("type", StringArgumentType.word()).suggests((c, sb) -> net.minecraft.command.CommandSource.suggestMatching(NPCS.keySet(), sb))
                                 .executes(ctx -> {
