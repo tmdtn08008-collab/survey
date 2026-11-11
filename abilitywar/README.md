@@ -14,7 +14,7 @@
 - 🆕 **파티 · 거래**: 다른 플레이어를 바라보고 **Shift + 우클릭** → [거래 요청] [파티 초대]. 받은 쪽은 **Y 수락 / N 거절** (채팅의 [수락] 도 됨). 파티원 HP 가 화면 왼쪽에, 거래는 물건 9 칸 + G 를 서로 올리고 [준비] → [거래 확정].
 - 🆕 **HP 표시**: 다친 몹 · 보스 머리 위에 **HP 막대 + 숫자**, 바라보는 대상은 화면 위에 이름 · HP, 보스 막대에도 **❤ 250 / 400**.
 - 🆕 **돈 = G**: 에메랄드 대신 **G** 를 씁니다. 화면 **오른쪽 위에 가진 돈** 이 늘 보이고, 몬스터 · 보스 · 길드 의뢰로 법니다.
-- 🆕 **보스 모드 4개** 를 `dist/boss_mods/` 에 같이 넣어 두었습니다: **Bosses of Mass Destruction** (보스 4) + **Marium's Soulslike Weaponry** (보스 8 + 전설 무기) + **The Graveyard** (묘지 · 지하 묘실 · 언데드 + 리치) + **Archon** (원소 마법 · 강령술 + 원소 보스 5). 야생 보스 · 던전 제단 · "보스 처치" 에 바로 함께 쓰입니다.
+- 🆕 **보스 모드 8개** 를 `dist/boss_mods/` 에 같이 넣어 두었습니다: **Bosses of Mass Destruction** (보스 4) + **Marium's Soulslike Weaponry** (보스 8 + 전설 무기) + **The Graveyard** (묘지 · 언데드 + 리치) + **Archon** (원소 보스 5) + **AdventureZ · VoidZ** (블랙스톤 골렘 · 디 아이 · 공허의 그림자 + 중간 보스) + **Dungeon Now Loading** (던전 + 보스 3) + **Withering Heights** (위더 강화) + **Ender Dragon Fight Remastered** (엔더 드래곤 강화). 야생 보스 · 던전 제단 · "보스 처치" 에 바로 함께 쓰입니다.
   **Ultris: Boss Expansion** (보스 8) 도 호환됩니다 (라이선스 때문에 [공식 페이지](https://modrinth.com/datapack/ultris) 에서 직접 받아 넣기).
 - **레벨 (최대 100) · 경험치 · 스탯 포인트 (힘·민첩·지능·체력·지혜)**, **전직 교관 NPC**, 퀘스트 창, 직업 트리 화면
 - RPG 를 위한 **8등급 장비 (무기 470개 + 갑옷 470세트)** — 등급마다 착용 레벨이 있습니다.
@@ -288,8 +288,8 @@
 ## 설치
 
 1. Fabric Loader(1.20.1)를 설치합니다.
-2. `mods` 폴더에 **Fabric API** 와 **`dist/abilitywar-2.6.0.jar`** 를 넣습니다.
-   보스 모드도 쓰려면 **`dist/boss_mods/` 의 jar 12개**도 같이 넣습니다 (설명: `dist/boss_mods/README.md`).
+2. `mods` 폴더에 **Fabric API** 와 **`dist/abilitywar-2.7.0.jar`** 를 넣습니다.
+   보스 모드도 쓰려면 **`dist/boss_mods/` 의 jar 17개**도 같이 넣습니다 (설명: `dist/boss_mods/README.md`).
 3. 게임 실행 → 월드 접속 → 처음 들어오면 **1차 직업 선택 화면**이 뜹니다 (전사·마법사·탱커·힐러).
    관리자는 `/aw set <직업>` 으로 아무 직업이나 바로 지정할 수 있습니다: `warrior` `mage` `tank` `healer` / `void` `dragon` `blade` `blood` `cantor` `warlock` `angel` `guardian`
 
@@ -607,9 +607,9 @@ RPG 의 버퍼 역할. 찬가로 **자신과 같은 팀**(`/team`)을 강화하�
 > L_Ender's Cataclysm 은 Forge/NeoForge 전용이라 이 모드 (Fabric) 와 함께 쓸 수 없습니다. 그래서 보스를 직접 만들었고,
 > Fabric 1.20.1 보스 모드 **Bosses of Mass Destruction** · **Marium's Soulslike Weaponry** · **The Graveyard** · **Archon** 을 같이 넣어 두었습니다.
 
-### 🆕 같이 넣은 보스 모드 4개
+### 🆕 같이 넣은 보스 모드 8개
 
-`dist/boss_mods/` 의 **jar 12개를 전부** 서버와 플레이어 `mods` 폴더에 넣으면 됩니다 (**Fabric Loader 0.19.5 이상** 필요). 하나만 쓰고 싶으면 `dist/boss_mods/README.md` 에 무엇이 어느 모드용인지 적어 두었습니다.
+`dist/boss_mods/` 의 **jar 17개를 전부** 서버와 플레이어 `mods` 폴더에 넣으면 됩니다 (**Fabric Loader 0.19.5 이상** 필요). 하나만 쓰고 싶으면 `dist/boss_mods/README.md` 에 무엇이 어느 모드용인지 적어 두었습니다.
 
 **Bosses of Mass Destruction** (LGPL, 보스마다 전용 경기장 구조물)
 
@@ -655,6 +655,18 @@ RPG 의 버퍼 역할. 찬가로 **자신과 같은 팀**(`/team`)을 강화하�
 | 널 (Null, 엔드, 가장 셈) | 엔더 진주 · 엔드 수정 · 엔드 정수 2 | 소환 제단으로만 (야생은 기본 꺼짐, `weight` 로 켤 수 있음) |
 
 - Archon 의 마나 표시 위치는 Archon 설정 파일에서 바꿀 수 있습니다 (능력대전쟁 HUD 와 겹치면).
+
+**🆕 AdventureZ + VoidZ** (GPL, 새 몬스터 30여 종 + 보스)
+
+| 보스 | 나오는 곳 | 능력대전쟁에서 더 |
+|---|---|---|
+| 블랙스톤 골렘 (아주 셈) | 네더 | 야생 보스 (더운 곳), 잿불 제단 |
+| 디 아이 | 엔드 | — |
+| 공허의 그림자 | VoidZ 의 공허 차원 | — |
+
+**🆕 Dungeon Now Loading** (MIT/CC0, 크고 어려운 던전 + 끝의 보스): 혼돈의 스포너, 쌍둥이 페어키퍼 보로스 · 우로스 (던전에서만).
+
+**🆕 Withering Heights** · **Ender Dragon Fight Remastered**: 위더 · 엔더 드래곤을 진짜 보스로 (새 기술 · 체력 · 2 페이즈 · 보스 음악). 잡으면 보스의 영혼 3 개.
 
 **🆕 수도 · 마을 보호** (보스 모드와 상관없이 항상)
 - 수도와 왕령 (반지름 약 370 블록) 에는 **다른 지상 구조물** 이 생기지 않습니다: 바닐라 마을 · 약탈자 전초기지 · 폐허 차원문, 다른 모드의 묘지 · 탑 · 경기장 등. (요새 · 폐광 · 고대 도시 같은 지하 구조물은 그대로)
@@ -946,7 +958,7 @@ RPG 를 위한 무기와 방어구입니다. 등급은 8개이고, 등급마다 
 ## 개발자용
 
 ```
-./gradlew build          # build/libs/abilitywar-2.6.0.jar
+./gradlew build          # build/libs/abilitywar-2.7.0.jar
 ./gradlew runClient      # 개발 클라이언트
 python3 tools/gen_textures.py     # 이펙트/아이콘 텍스처 다시 생성
 python3 tools/gen_animations.py   # 애니메이션 JSON 다시 생성

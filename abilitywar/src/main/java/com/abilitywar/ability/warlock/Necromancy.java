@@ -138,6 +138,7 @@ public final class Necromancy {
     public static boolean isBoss(Entity e) {
         return e instanceof EnderDragonEntity || e instanceof WitherEntity || e instanceof WardenEntity || e instanceof ElderGuardianEntity
                 || e.getType().isIn(net.minecraft.registry.tag.TagKey.of(net.minecraft.registry.RegistryKeys.ENTITY_TYPE, new Identifier("c", "bosses")))
+                || e.getType().isIn(com.abilitywar.rpg.RpgManager.BOSSES)
                 || com.abilitywar.compat.UltrisCompat.isUltrisBoss(e);
     }
 

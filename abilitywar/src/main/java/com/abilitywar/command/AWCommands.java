@@ -100,7 +100,9 @@ public final class AWCommands {
                     "bosses_of_mass_destruction:lich", "bosses_of_mass_destruction:obsidilith", "bosses_of_mass_destruction:gauntlet", "bosses_of_mass_destruction:void_blossom",
                     "soulsweapons:accursed_lord_boss", "soulsweapons:draugr_boss", "soulsweapons:night_shade", "soulsweapons:returning_knight", "soulsweapons:chaos_monarch",
                     "soulsweapons:moonknight", "soulsweapons:day_stalker", "soulsweapons:night_prowler", "graveyard:lich",
-                    "archon:tar", "archon:ayla", "archon:leven", "archon:inigo", "archon:null")
+                    "archon:tar", "archon:ayla", "archon:leven", "archon:inigo", "archon:null",
+                    "adventurez:blackstone_golem", "adventurez:the_eye", "adventurez:void_shadow",
+                    "dungeonnowloading:chaos_spawner", "dungeonnowloading:fairkeeper_boros", "dungeonnowloading:fairkeeper_ouros")
                     .filter(id -> net.minecraft.registry.Registries.ENTITY_TYPE.containsId(new net.minecraft.util.Identifier(id))).toList(), b);
 
     private static final com.mojang.brigadier.suggestion.SuggestionProvider<ServerCommandSource> PLACES = (ctx, b) ->

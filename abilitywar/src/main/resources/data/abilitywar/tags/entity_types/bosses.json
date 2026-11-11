@@ -112,6 +112,30 @@
     {
       "id": "archon:null",
       "required": false
+    },
+    {
+      "id": "adventurez:blackstone_golem",
+      "required": false
+    },
+    {
+      "id": "adventurez:the_eye",
+      "required": false
+    },
+    {
+      "id": "adventurez:void_shadow",
+      "required": false
+    },
+    {
+      "id": "dungeonnowloading:chaos_spawner",
+      "required": false
+    },
+    {
+      "id": "dungeonnowloading:fairkeeper_boros",
+      "required": false
+    },
+    {
+      "id": "dungeonnowloading:fairkeeper_ouros",
+      "required": false
     }
   ]
 }

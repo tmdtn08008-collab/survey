@@ -1,14 +1,18 @@
-# 보스 모드: Bosses of Mass Destruction (BOMD) + Marium's Soulslike Weaponry + The Graveyard + Archon
+# 보스 모드: Bosses of Mass Destruction (BOMD) + Marium's Soulslike Weaponry + The Graveyard + Archon + AdventureZ (+ VoidZ) + Dungeon Now Loading + Withering Heights + Ender Dragon Fight Remastered
 
-Fabric 1.20.1 용 보스 모드 4개입니다.
+Fabric 1.20.1 용 보스 모드 8개 (+ 애드온) 입니다.
 - **Bosses of Mass Destruction**: Fabric 보스 모드 중 가장 많이 쓰이는 모드 (Modrinth 다운로드 800만 이상). L_Ender's Cataclysm 처럼 보스마다 전용 경기장 구조물이 있습니다. (Cataclysm 은 Forge 전용이라 대신 골랐습니다.)
 - **Marium's Soulslike Weaponry**: 소울라이크 보스 8 + 보스가 떨어뜨리는 전설 무기 40개 이상 (Modrinth 다운로드 400만 이상).
 - **The Graveyard**: 묘지 · 지하 묘실 · 유령의 집 · 언데드에게 먹힌 마을 · 리치의 감옥 같은 구조물 + 언데드 몹 + 보스 리치 (Modrinth 다운로드 500만 이상).
+- 🆕 **AdventureZ** (+ **VoidZ**): 새 몬스터 30여 종 + 보스 — 블랙스톤 골렘 (네더의 최종 보스급), 디 아이 (엔드), 공허의 그림자 (VoidZ 의 공허 차원), 그리고 피글린 비스트 · 영혼 수확자 · 시든 강령술사 같은 중간 보스 (다운로드 740만 이상).
+- 🆕 **Dungeon Now Loading**: 크고 어려운 던전 + 끝의 보스 — 혼돈의 스포너, 쌍둥이 보스 페어키퍼 보로스 · 우로스 (다운로드 190만 이상).
+- 🆕 **Withering Heights**: 위더를 진짜 보스로 — 폭발 · 혼돈 기술 여러 개, 체력 늘림, 보스 음악.
+- 🆕 **Ender Dragon Fight Remastered**: 엔더 드래곤 강화 — 공격 여러 개 추가, 체력 500, 반피에 2 페이즈, 보스 음악 (다운로드 300만 이상).
 - **Archon** (Archon Renewed): 원소 마법 · 마나 · 강령술 · 원소 무기 + 소환 제단으로 부르는 원소 보스 5 (원작 Archon 다운로드 130만 이상, Renewed 는 원작의 버그를 고친 후속판).
 
 ## 넣는 법
 
-이 폴더의 **jar 12개를 전부** `mods` 폴더에 넣으세요 (능력대전쟁 jar · Fabric API 와 같이). **서버와 모든 플레이어 둘 다** 넣어야 합니다.
+이 폴더의 **jar 17개를 전부** `mods` 폴더에 넣으세요 (능력대전쟁 jar · Fabric API 와 같이). **서버와 모든 플레이어 둘 다** 넣어야 합니다.
 **Fabric Loader 0.19.5 이상**, **Fabric API 0.92.2 이상** 이 필요합니다 (Soulslike Weaponry 때문). 런처에서 Fabric Loader 를 새로 설치하면 됩니다.
 
 | 파일 | 무엇 | 라이선스 | 출처 (소스) |
@@ -24,12 +28,17 @@ Fabric 1.20.1 용 보스 모드 4개입니다.
 | `fabric-language-kotlin-1.13.14+kotlin.2.4.20.jar` | Fabric Language Kotlin (BOMD 가 필요로 함) | Apache-2.0 | [Modrinth](https://modrinth.com/mod/fabric-language-kotlin) · [GitHub](https://github.com/FabricMC/fabric-language-kotlin) |
 | `AttributeFix-Fabric-1.20.1-21.0.5.jar` | AttributeFix (Soulslike Weaponry 가 필요로 함) | LGPL-2.1 | [Modrinth](https://modrinth.com/mod/attributefix) · [GitHub](https://github.com/Darkhax-Minecraft/AttributeFix) |
 | `ranged_weapon_api-fabric-2.3.4+1.20.1.jar` | Ranged Weapon API (Soulslike Weaponry 가 필요로 함) | MIT | [Modrinth](https://modrinth.com/mod/ranged-weapon-api) · [GitHub](https://github.com/FabricExtras/RangedWeaponAPI) |
+| `adventurez-1.4.20.jar` | AdventureZ 1.4.20 (모드 본체, Cloth Config 필요) | GPL-3.0 | [Modrinth](https://modrinth.com/mod/adventurez) · [GitHub (소스)](https://github.com/Globox1997/AdventureZ) |
+| `voidz-1.0.11.jar` | VoidZ 1.0.11 (AdventureZ 애드온: 공허 차원 + 공허의 그림자) | GPL-3.0 | [Modrinth](https://modrinth.com/mod/voidz) · [GitHub (소스)](https://github.com/Globox1997/VoidZ) |
+| `dungeon-now-loading-fabric-1.20.1-2.2.jar` | Dungeon Now Loading 2.2 (모드 본체, 파일 이름만 띄어쓰기 없이 바꿈) | CC0-1.0 (Modrinth 표기 MIT) | [Modrinth](https://modrinth.com/mod/dungeon-now-loading) · [GitHub](https://github.com/hexnowloading/DungeonNowLoading) |
+| `withering-heights-alpha-1.jar` | Withering Heights alpha-1 (위더 강화, 데이터팩 모드) | MIT (licenses/ 폴더) | [Modrinth](https://modrinth.com/datapack/withering-heights) |
+| `edf-remastered-4.3.jar` | Ender Dragon Fight Remastered 4.3 (엔더 드래곤 강화 + 보스 음악) | GPL-3.0 (licenses/ 폴더) | [Modrinth](https://modrinth.com/datapack/edf-remastered) · [GitHub (소스)](https://github.com/MrGenie151/Ender-Dragon-Fight-Remastered) |
 | `villagertradingplus-fabric-mc1.20.1-1.1.1.jar` | VillagersTradingPlus (주민 거래 라이브러리, The Graveyard 가 필요로 함) | GPL-3.0 | [Modrinth](https://modrinth.com/mod/villagerstradingplus) · [GitHub (소스)](https://github.com/finallion/VillagersTradingPlus) |
 
 모두 Modrinth 에 올라온 원래 파일 그대로입니다 (고치지 않음, sha512 를 Modrinth 와 맞춰 봄). 라이선스 파일은 각 jar 안에 들어 있고, jar 안에 없는 AttributeFix · Ranged Weapon API 는 `licenses/` 폴더에 넣어 두었습니다. 새 버전은 위 링크에서 받을 수 있습니다.
-GPL 모드 (The Graveyard · VillagersTradingPlus · Archon) 의 소스는 위 GitHub 링크에 있습니다.
+GPL 모드 (The Graveyard · VillagersTradingPlus · Archon · AdventureZ · VoidZ · Ender Dragon Fight Remastered) 의 소스는 위 GitHub 링크에 있습니다.
 ⚠️ Spell Power 는 **0.12.0** 을 쓰세요: 최신 1.6.x 는 Archon 이 쓰는 부분이 바뀌어서 Archon 이 켜지다 멈출 수 있습니다 (jar 를 열어 맞춰 봄).
-일부만 쓰려면: BOMD = BOMD · GeckoLib · Cloth Config · Cardinal Components · Fabric Language Kotlin / Soulslike = Soulslike · GeckoLib · AttributeFix · Ranged Weapon API / Graveyard = Graveyard · GeckoLib · VillagersTradingPlus / Archon = Archon · Spell Power.
+일부만 쓰려면: BOMD = BOMD · GeckoLib · Cloth Config · Cardinal Components · Fabric Language Kotlin / Soulslike = Soulslike · GeckoLib · AttributeFix · Ranged Weapon API / Graveyard = Graveyard · GeckoLib · VillagersTradingPlus / Archon = Archon · Spell Power / AdventureZ = AdventureZ · Cloth Config (+ VoidZ) / Dungeon Now Loading · Withering Heights · Ender Dragon Fight Remastered = 그 jar 하나.
 
 ## BOMD 보스 4
 
@@ -73,6 +82,30 @@ GPL 모드 (The Graveyard · VillagersTradingPlus · Archon) 의 소스는 위 G
 | 널 (Null, 엔드, 가장 셈) | `archon:null` | 엔더 진주 · 엔드 수정 · 엔드 정수 2 | 소환 제단으로만 (야생 `weight` 0 = 꺼짐) |
 
 - Archon 의 마나 표시 위치는 Archon 설정 파일에서 바꿀 수 있습니다. Archon 키는 `.` (원소 갑옷 터뜨리기) 하나라 능력대전쟁 키와 겹치지 않습니다.
+
+## 🆕 AdventureZ · VoidZ 보스
+
+| 보스 | id | 원래 나오는 곳 | 능력대전쟁에서 더 |
+|---|---|---|---|
+| 블랙스톤 골렘 | `adventurez:blackstone_golem` | 네더의 폐허 (아주 셈) | 야생 보스 (더운 곳), 잿불 제단 |
+| 디 아이 | `adventurez:the_eye` | 엔드 | (야생 꺼짐) |
+| 공허의 그림자 | `adventurez:void_shadow` | VoidZ 의 공허 차원 | (야생 꺼짐) |
+
+- 피글린 비스트 · 영혼 수확자 · 시든 강령술사 · 소환사 · 블레이즈 수호자 같은 중간 보스와 매머드 · 사슴 · 이구아나 등 새 동물 · 몬스터도 들어옵니다 (보스로는 안 셈).
+
+## 🆕 Dungeon Now Loading 보스
+
+| 보스 | id | 나오는 곳 |
+|---|---|---|
+| 혼돈의 스포너 | `dungeonnowloading:chaos_spawner` | Dungeon Now Loading 의 던전 끝 |
+| 페어키퍼 보로스 · 우로스 (쌍둥이) | `dungeonnowloading:fairkeeper_boros` · `fairkeeper_ouros` | 던전 끝 |
+
+- 던전에 묶인 보스라 야생 · 제단에는 안 나옵니다 (설정의 `weight` 로 켤 수는 있음).
+
+## 🆕 더 세진 바닐라 보스
+- **Withering Heights**: 위더가 폭발 · 혼돈 기술을 쓰고 더 단단해집니다. 설정: `/function wither_rework:config`
+- **Ender Dragon Fight Remastered**: 엔더 드래곤 체력 500 + 새 공격 + 반피에 2 페이즈 + 보스 음악.
+- 둘 다 능력대전쟁의 HP 표시 · "보스 처치" · 보스 전리품 (보스의 영혼 3 개) 이 그대로 적용됩니다.
 
 ## 따로 받아서 넣는 모드: Ultris: Boss Expansion
 

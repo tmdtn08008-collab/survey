@@ -58,12 +58,12 @@ public final class BossAltar {
      * 다른 모드 보스 (설치돼 있을 때만): 제단에 가끔 이 보스들 중 하나가 대신 나옴.
      * 설치된 대체 보스가 1 마리면 3번에 1번, 2 마리 이상이면 2번에 1번 (그중 하나를 고름).
      * Bosses of Mass Destruction: 리치 · 건틀릿 · 옵시딜리스. Soulslike Weaponry: 썩어가는 왕 · 귀환한 기사 · 옛 챔피언의 유해 · 혼돈의 군주 · 낮의 추적자 · 타락한 성상.
-     * Archon: 타르 · 레벤 · 이니고 · 아일라.
+     * Archon: 타르 · 레벤 · 이니고 · 아일라. AdventureZ: 블랙스톤 골렘.
      */
     static final java.util.Map<String, java.util.List<String>> ALT = java.util.Map.of(
             "abilitywar:fallen_king", java.util.List.of("bosses_of_mass_destruction:lich", "soulsweapons:accursed_lord_boss", "soulsweapons:returning_knight", "archon:tar"),
             "abilitywar:frost_witch", java.util.List.of("bosses_of_mass_destruction:lich", "soulsweapons:draugr_boss", "archon:leven"),
-            "abilitywar:ember_colossus", java.util.List.of("bosses_of_mass_destruction:gauntlet", "soulsweapons:chaos_monarch", "soulsweapons:day_stalker", "archon:inigo"),
+            "abilitywar:ember_colossus", java.util.List.of("bosses_of_mass_destruction:gauntlet", "soulsweapons:chaos_monarch", "soulsweapons:day_stalker", "archon:inigo", "adventurez:blackstone_golem"),
             "abilitywar:ancient_wyvern", java.util.List.of("bosses_of_mass_destruction:obsidilith", "soulsweapons:moonknight", "archon:ayla"));
     /** 제단이 부른 다른 모드 보스 → 제단 자리 (죽으면 제단 대기 시간). */
     static final java.util.Map<UUID, net.minecraft.util.math.GlobalPos> ALT_HOMES = new java.util.concurrent.ConcurrentHashMap<>();
