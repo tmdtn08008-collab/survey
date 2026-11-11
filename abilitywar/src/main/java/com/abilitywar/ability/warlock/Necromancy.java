@@ -137,7 +137,8 @@ public final class Necromancy {
 
     public static boolean isBoss(Entity e) {
         return e instanceof EnderDragonEntity || e instanceof WitherEntity || e instanceof WardenEntity || e instanceof ElderGuardianEntity
-                || e.getType().isIn(net.minecraft.registry.tag.TagKey.of(net.minecraft.registry.RegistryKeys.ENTITY_TYPE, new Identifier("c", "bosses")));
+                || e.getType().isIn(net.minecraft.registry.tag.TagKey.of(net.minecraft.registry.RegistryKeys.ENTITY_TYPE, new Identifier("c", "bosses")))
+                || com.abilitywar.compat.UltrisCompat.isUltrisBoss(e);
     }
 
     // ================================================================ 집중 대상 (주인이 때린 적)

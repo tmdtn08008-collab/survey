@@ -58,6 +58,15 @@ GPL 모드 (The Graveyard · VillagersTradingPlus) 의 소스는 위 GitHub 링�
 - 야생에 얼마나 나올지는 `config/abilitywar_wild_bosses.json` 의 `weight` 로 바꿉니다 (0 = 안 나옴).
 - 관리자: `/aw boss soulsweapons:moonknight` 처럼 바로 불러낼 수 있습니다.
 
+## 따로 받아서 넣는 모드: Ultris: Boss Expansion
+
+**Ultris: Boss Expansion** (LimeSplatus 제작) 도 능력대전쟁과 같이 쓸 수 있게 해 두었습니다. 다만 Ultris 라이선스는 "공개된 곳에 다시 올리기 금지" 라서 **이 폴더에는 넣지 않았습니다**.
+공식 페이지 **https://modrinth.com/datapack/ultris** 에서 Fabric 1.20.1 용 `ultris-v5.6.9c.jar` 를 받아 `mods` 에 넣으세요 (Fabric API 만 필요).
+
+- 보스 8: 타락한 엔더맨 · 블레이즈 왕 · 울트라 위더 · 성소의 수호자 · 거인 · 팬텀 떼 · 환술사 · 셜커 돌
+- 쓰러뜨리면 (보스가 사라질 때 근처에 있던 모두) "보스 처치" 와 보스 경험치. Ultris 의 점수판 `kills_*` 이 오를 때 셉니다.
+- Ultris 가 플레이어 근처에 보스를 불러내는 이벤트는 수도 · 마을 안에서는 막습니다.
+
 ## The Graveyard
 
 | 보스 | id | 원래 나오는 곳 | 능력대전쟁에서 더 나오는 곳 |

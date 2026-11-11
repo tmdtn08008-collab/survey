@@ -66,6 +66,7 @@ public final class AWMobs {
         BiomeModifications.addSpawn(BiomeSelectors.includeByKey(BiomeKeys.SWAMP, BiomeKeys.MANGROVE_SWAMP, BiomeKeys.DARK_FOREST, BiomeKeys.TAIGA,
                 BiomeKeys.OLD_GROWTH_SPRUCE_TAIGA), SpawnGroup.MONSTER, WISP, 20, 1, 2);
         BossSpawner.init();
+        com.abilitywar.compat.UltrisCompat.init();
         BossAltar.init();
     }
 

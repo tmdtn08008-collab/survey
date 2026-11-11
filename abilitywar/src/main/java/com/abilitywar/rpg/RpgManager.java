@@ -75,7 +75,14 @@ public final class RpgManager {
             net.minecraft.registry.tag.TagKey.of(net.minecraft.registry.RegistryKeys.ENTITY_TYPE, com.abilitywar.AbilityWar.id("bosses"));
 
     public static boolean isBoss(LivingEntity e) {
-        return e.getType().isIn(BOSSES) || e instanceof WitherEntity || e instanceof EnderDragonEntity || e instanceof WardenEntity || e instanceof ElderGuardianEntity;
+        return e.getType().isIn(BOSSES) || e instanceof WitherEntity || e instanceof EnderDragonEntity || e instanceof WardenEntity || e instanceof ElderGuardianEntity
+                || com.abilitywar.compat.UltrisCompat.isUltrisBoss(e);
+    }
+
+    /** 보스 하나를 쓰러뜨린 것으로 셈 (다른 모드 보스 호환용): 경험치 + 전직 · 왕 · 길드 퀘스트의 "보스 처치". */
+    public static void creditBoss(ServerPlayerEntity p, int xp) {
+        addXp(p, xp);
+        questAmount(p, JobQuests.Type.BOSS, 1);
     }
 
     public static int mobXp(LivingEntity e) {
@@ -136,7 +143,7 @@ public final class RpgManager {
     /** 몹이 죽음: 막타 친 플레이어 (또는 하수인의 주인) 와 근처 같은 팀에게 경험치, 퀘스트 처치 수. */
     public static void onDeath(LivingEntity dead, net.minecraft.entity.damage.DamageSource source) {
         if (dead.getWorld().isClient) return;
-        if (isBoss(dead) && dead.getWorld() instanceof ServerWorld sw) {
+        if (isBoss(dead) && !com.abilitywar.compat.UltrisCompat.isUltrisBoss(dead) && dead.getWorld() instanceof ServerWorld sw) {
             com.abilitywar.mob.BossAltar.onAnyBossDeath(dead);
             // 보스: 가까이서 싸운 모두가 경험치 + 퀘스트 (마지막 한 방이 누구든)
             int xp = mobXp(dead);
@@ -156,6 +163,11 @@ public final class RpgManager {
             if (owner != null && dead.getServer() != null) killer = dead.getServer().getPlayerManager().getPlayer(owner);
         }
         if (killer == null || killer == dead) return;
+        // Ultris 보스: 경험치 · "보스 처치" 는 점수판으로 셈 (UltrisCompat), 여기서는 "이 몹 처치" 퀘스트만
+        if (com.abilitywar.compat.UltrisCompat.isUltrisBoss(dead)) {
+            questKill(killer, dead);
+            return;
+        }
         final ServerPlayerEntity k = killer;
         int xp = mobXp(dead);
         addXp(k, xp);

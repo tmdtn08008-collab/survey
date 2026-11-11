@@ -738,5 +738,13 @@
  "sign.abilitywar.class_master": "전직 교관",
  "sign.abilitywar.temple": "신전",
  "sign.abilitywar.inn": "여관",
- "sign.abilitywar.smithy": "대장간"
+ "sign.abilitywar.smithy": "대장간",
+ "compat.abilitywar.ultris.ender": "타락한 엔더맨",
+ "compat.abilitywar.ultris.blazeking": "블레이즈 왕",
+ "compat.abilitywar.ultris.giant": "거인",
+ "compat.abilitywar.ultris.illusioner": "환술사",
+ "compat.abilitywar.ultris.keeper": "성소의 수호자",
+ "compat.abilitywar.ultris.phantom": "팬텀 떼",
+ "compat.abilitywar.ultris.shulker": "셜커 돌",
+ "compat.abilitywar.ultris.ultrawither": "울트라 위더"
 }

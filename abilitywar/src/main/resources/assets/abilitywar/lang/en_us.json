@@ -738,5 +738,13 @@
  "sign.abilitywar.class_master": "Class Master",
  "sign.abilitywar.temple": "Temple",
  "sign.abilitywar.inn": "Inn",
- "sign.abilitywar.smithy": "Smithy"
+ "sign.abilitywar.smithy": "Smithy",
+ "compat.abilitywar.ultris.ender": "Corrupted Enderman",
+ "compat.abilitywar.ultris.blazeking": "Blaze King",
+ "compat.abilitywar.ultris.giant": "Giant",
+ "compat.abilitywar.ultris.illusioner": "Illusioner",
+ "compat.abilitywar.ultris.keeper": "Sanctum Keeper",
+ "compat.abilitywar.ultris.phantom": "Phantom Swarm",
+ "compat.abilitywar.ultris.shulker": "Shulker Stone",
+ "compat.abilitywar.ultris.ultrawither": "Ultra Wither"
 }

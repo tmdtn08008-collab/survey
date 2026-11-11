@@ -11,6 +11,7 @@
   집 수백 채로 꽉 찬 동네, **시장 광장**, **모험가 길드**. 성벽 밖 **「아르덴 왕령」** 에는 길 · 밭 · 풍차 · 목장 · 외곽 마을. 월드 곳곳에 **마을** 과 **던전 5종 (보스 제단)**.
 - 🆕 **모험가 길드**: 접수원에게 가입하면 **F 등급** → E · D · C · B · A · S · SS · **SSS**. **자기 등급의 의뢰만** 받을 수 있고, 의뢰로 포인트를 모아 승급 심사.
 - 🆕 **보스 모드 3개** 를 `dist/boss_mods/` 에 같이 넣어 두었습니다: **Bosses of Mass Destruction** (보스 4) + **Marium's Soulslike Weaponry** (보스 8 + 전설 무기) + **The Graveyard** (묘지 · 지하 묘실 · 언데드 + 리치). 야생 보스 · 던전 제단 · "보스 처치" 에 바로 함께 쓰입니다.
+  **Ultris: Boss Expansion** (보스 8) 도 호환됩니다 (라이선스 때문에 [공식 페이지](https://modrinth.com/datapack/ultris) 에서 직접 받아 넣기).
 - **레벨 (최대 100) · 경험치 · 스탯 포인트 (힘·민첩·지능·체력·지혜)**, **전직 교관 NPC**, 퀘스트 창, 직업 트리 화면
 - RPG 를 위한 **8등급 장비 (무기 470개 + 갑옷 470세트)** — 등급마다 착용 레벨이 있습니다.
 앞으로 알려주시는 능력들을 같은 구조로 계속 추가할 수 있게 만들어 두었습니다.
@@ -249,7 +250,7 @@
 ## 설치
 
 1. Fabric Loader(1.20.1)를 설치합니다.
-2. `mods` 폴더에 **Fabric API** 와 **`dist/abilitywar-2.2.2.jar`** 를 넣습니다.
+2. `mods` 폴더에 **Fabric API** 와 **`dist/abilitywar-2.2.3.jar`** 를 넣습니다.
    보스 모드도 쓰려면 **`dist/boss_mods/` 의 jar 10개**도 같이 넣습니다 (설명: `dist/boss_mods/README.md`).
 3. 게임 실행 → 월드 접속 → 처음 들어오면 **1차 직업 선택 화면**이 뜹니다 (전사·마법사·탱커·힐러).
    관리자는 `/aw set <직업>` 으로 아무 직업이나 바로 지정할 수 있습니다: `warrior` `mage` `tank` `healer` / `void` `dragon` `blade` `blood` `cantor` `warlock` `angel` `guardian`
@@ -607,6 +608,21 @@ RPG 의 버퍼 역할. 찬가로 **자신과 같은 팀**(`/team`)을 강화하�
 - 수도와 왕령 (반지름 약 370 블록) 에는 **다른 지상 구조물** 이 생기지 않습니다: 바닐라 마을 · 약탈자 전초기지 · 폐허 차원문, 다른 모드의 묘지 · 탑 · 경기장 등. (요새 · 폐광 · 고대 도시 같은 지하 구조물은 그대로)
 - 수도 · 마을 안에는 **순찰대** (약탈자 순찰대, The Graveyard 의 언데드 무리 등) 가 생기지 않습니다.
 
+**🆕 Ultris: Boss Expansion** (LimeSplatus 제작, 보스 8 + 구조물 · 아이템) — ⚠️ **직접 받아서 넣어야 합니다**
+
+Ultris 는 라이선스가 "다른 곳에 다시 올리기 금지" 라서 이 저장소에는 넣지 않았습니다. **공식 페이지에서 받아** `mods` 폴더에 넣으면 됩니다 (Fabric API 만 있으면 됨):
+👉 **https://modrinth.com/datapack/ultris** → Versions 에서 Fabric 1.20.1 용 `ultris-v5.6.9c.jar`
+
+| 보스 | 나오는 곳 |
+|---|---|
+| 타락한 엔더맨 · 환술사 | 가끔 플레이어 근처에 나타남 (Ultris 방식) |
+| 블레이즈 왕 | 네더의 블레이즈 탑 |
+| 거인 · 성소의 수호자 · 팬텀 떼 · 셜커 돌 · 울트라 위더 | Ultris 방식 (자세히는 [Ultris 위키](https://github.com/SpluoSplatus/Ultris/wiki)) |
+
+- Ultris 보스를 쓰러뜨리면 (보스가 사라질 때 근처에 있던 모두) **"보스 처치"** (3차 전직 · 왕 퀘스트 · 길드 의뢰) 와 보스 경험치가 들어옵니다.
+- Ultris 가 플레이어 근처에 보스를 불러내는 이벤트는 **수도 · 마을 안에서는 안 일어납니다**.
+- 관리자: `/function 1_splatus:ultris/admin_menu` (Ultris 설정 · 보스 불러내기).
+
 ## 🗺 RPG 맵 — 왕도 아르덴 · 마을 · 던전
 
 **새 월드** 를 만들면 자동으로 생깁니다 (이미 있던 월드는 아직 생성되지 않은 먼 곳에만 마을·던전이 생기고, 수도는 안 생김).
@@ -766,7 +782,7 @@ RPG 를 위한 무기와 방어구입니다. 등급은 8개이고, 등급마다 
 ## 개발자용
 
 ```
-./gradlew build          # build/libs/abilitywar-2.2.2.jar
+./gradlew build          # build/libs/abilitywar-2.2.3.jar
 ./gradlew runClient      # 개발 클라이언트
 python3 tools/gen_textures.py     # 이펙트/아이콘 텍스처 다시 생성
 python3 tools/gen_animations.py   # 애니메이션 JSON 다시 생성
