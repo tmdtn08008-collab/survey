@@ -16,6 +16,15 @@ public abstract class MobEntityMixin extends LivingEntity {
         super(entityType, world);
     }
 
+    /** 수도 · 마을 안에는 순찰대 (약탈자 순찰대 · The Graveyard 의 언데드 무리 등) 가 생기지 않는다. */
+    @Inject(method = "initialize", at = @At("HEAD"))
+    private void aw$noPatrolsInTowns(net.minecraft.world.ServerWorldAccess world, net.minecraft.world.LocalDifficulty difficulty, net.minecraft.entity.SpawnReason reason,
+                                     net.minecraft.entity.EntityData data, net.minecraft.nbt.NbtCompound nbt,
+                                     org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable<net.minecraft.entity.EntityData> cir) {
+        if (reason != net.minecraft.entity.SpawnReason.PATROL || !(this instanceof net.minecraft.entity.mob.Monster)) return;
+        if (com.abilitywar.world.RpgWorld.noPatrols(world.toServerWorld(), this.getBlockPos())) this.addCommandTag(com.abilitywar.world.RpgWorld.NO_SPAWN_TAG);
+    }
+
     /** 흑마법사 하수인은 주인 / 같은 편을 노리지 않는다. */
     @Inject(method = "setTarget", at = @At("HEAD"), cancellable = true)
     private void aw$minionTarget(LivingEntity target, CallbackInfo ci) {

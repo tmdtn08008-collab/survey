@@ -9,6 +9,8 @@
     "PlayerEntityMixin",
     "ItemStackMixin",
     "ChunkGeneratorMixin",
+    "StructureMixin",
+    "ServerWorldMixin",
     "StructurePlacementCalculatorAccessor"
   ],
   "injectors": {

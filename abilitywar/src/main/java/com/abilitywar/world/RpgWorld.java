@@ -70,6 +70,14 @@ public final class RpgWorld {
         return best;
     }
 
+    /** 순찰대 (약탈자 순찰대 · The Graveyard 의 언데드 무리) 가 생기면 안 되는 곳: 수도 · 마을. */
+    public static boolean noPatrols(ServerWorld w, BlockPos pos) {
+        return inSafeZone(w, pos) || (w.getRegistryKey() == World.OVERWORLD && kindAt(w, pos) == RpgStructures.Kind.TOWN);
+    }
+
+    /** 이 꼬리표가 붙은 몹은 월드에 안 들어감 (ServerWorldMixin). */
+    public static final String NO_SPAWN_TAG = "abilitywar_no_spawn";
+
     public static RpgStructures.Kind kindAt(ServerWorld w, BlockPos pos) {
         var start = structureAt(w, pos);
         return start == null ? null : ((RpgStructures.RpgStructure) start.getStructure()).kind;

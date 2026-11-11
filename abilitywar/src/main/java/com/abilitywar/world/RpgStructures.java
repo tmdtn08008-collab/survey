@@ -333,6 +333,15 @@ public final class RpgStructures {
     static final Map<net.minecraft.world.biome.source.BiomeSource, java.util.Set<net.minecraft.world.gen.feature.PlacedFeature>> VEGETATION =
             java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
 
+    /** 수도 둘레 (반지름 23청크) 안인지. 지상 세계 (보통 · 큰 생물군계 · 증폭) 에서만. */
+    public static boolean nearCapital(Structure.Context ctx) {
+        if (!(ctx.chunkGenerator() instanceof net.minecraft.world.gen.chunk.NoiseChunkGenerator ng)) return false;
+        if (!ng.matchesSettings(net.minecraft.world.gen.chunk.ChunkGeneratorSettings.OVERWORLD) && !ng.matchesSettings(net.minecraft.world.gen.chunk.ChunkGeneratorSettings.LARGE_BIOMES)
+                && !ng.matchesSettings(net.minecraft.world.gen.chunk.ChunkGeneratorSettings.AMPLIFIED)) return false;
+        ChunkPos cap = CapitalPlacement.locate(ctx.seed(), ctx.biomeSource(), ctx.noiseConfig().getMultiNoiseSampler());
+        return Math.max(Math.abs(cap.x - ctx.chunkPos().x), Math.abs(cap.z - ctx.chunkPos().z)) < 23;
+    }
+
     public static boolean suppressFeature(net.minecraft.world.chunk.Chunk chunk, net.minecraft.world.gen.feature.PlacedFeature f, ChunkGenerator gen) {
         boolean rpg = false;
         for (Structure st : chunk.getStructureReferences().keySet())

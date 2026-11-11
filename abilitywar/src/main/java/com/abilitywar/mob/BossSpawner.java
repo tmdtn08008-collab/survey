@@ -105,7 +105,7 @@ public final class BossSpawner {
         JsonObject root = new JsonObject();
         root.addProperty("_version", CONFIG_VERSION);
         root.addProperty("_help", "biome: any / cold / hot / mountain / forest / swamp / ocean. weight 0 = off. 다른 모드 보스 id 를 넣으면 그 모드가 있을 때만 나옴. "
-                + "bosses_of_mass_destruction = Bosses of Mass Destruction (dist/boss_mods 에 같이 들어 있음), soulsweapons = Marium's Soulslike Weaponry (dist/boss_mods 에 같이 들어 있음), graveyard = The Graveyard.");
+                + "bosses_of_mass_destruction = Bosses of Mass Destruction (dist/boss_mods 에 같이 들어 있음), soulsweapons = Marium's Soulslike Weaponry (dist/boss_mods 에 같이 들어 있음), graveyard = The Graveyard (dist/boss_mods 에 같이 들어 있음).");
         JsonArray a = new JsonArray();
         String[][] def = {
                 {"abilitywar:fallen_king", "10", "any"}, {"abilitywar:ember_colossus", "10", "hot"}, {"abilitywar:frost_witch", "10", "cold"},
