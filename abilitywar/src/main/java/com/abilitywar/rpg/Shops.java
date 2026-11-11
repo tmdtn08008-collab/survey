@@ -40,32 +40,43 @@ import java.util.function.Supplier;
 public final class Shops {
     public static final Identifier S2C_ENHANCE = com.abilitywar.AbilityWar.id("enhance_result");
 
-    /** 파는 물건: id (번역 · 버튼용), 물건, 값 (에메랄드). */
-    public record Offer(String id, Supplier<ItemStack> stack, int price) {
+    /** 파는 물건: id (번역 · 버튼용), 물건, 값 (G). sell 이면 반대로 상인에게 이 물건을 팔고 값을 받음. */
+    public record Offer(String id, Supplier<ItemStack> stack, int price, boolean sell) {
+        Offer(String id, Supplier<ItemStack> stack, int price) {
+            this(id, stack, price, false);
+        }
     }
+
+    /** 예전 화폐 에메랄드는 상인에게 1 개 10 G 에 팔 수 있음. */
+    public static final int EMERALD_G = 10;
 
     static ItemStack potion(Potion p) {
         return PotionUtil.setPotion(new ItemStack(Items.POTION), p);
     }
 
     public static final List<Offer> POTIONS = List.of(
-            new Offer("health_potion_small", () -> new ItemStack(RpgItems.HEALTH_POTION_SMALL), 2),
-            new Offer("health_potion", () -> new ItemStack(RpgItems.HEALTH_POTION), 5),
-            new Offer("health_potion_large", () -> new ItemStack(RpgItems.HEALTH_POTION_LARGE), 12),
-            new Offer("regeneration", () -> potion(Potions.REGENERATION), 6),
-            new Offer("swiftness", () -> potion(Potions.SWIFTNESS), 5),
-            new Offer("strength", () -> potion(Potions.STRENGTH), 10),
-            new Offer("fire_resistance", () -> potion(Potions.FIRE_RESISTANCE), 6),
-            new Offer("night_vision", () -> potion(Potions.NIGHT_VISION), 3),
-            new Offer("water_breathing", () -> potion(Potions.WATER_BREATHING), 4),
-            new Offer("invisibility", () -> potion(Potions.INVISIBILITY), 8),
-            new Offer("slow_falling", () -> potion(Potions.SLOW_FALLING), 4),
-            new Offer("leaping", () -> potion(Potions.LEAPING), 3));
+            new Offer("health_potion_small", () -> new ItemStack(RpgItems.HEALTH_POTION_SMALL), 30),
+            new Offer("health_potion", () -> new ItemStack(RpgItems.HEALTH_POTION), 80),
+            new Offer("health_potion_large", () -> new ItemStack(RpgItems.HEALTH_POTION_LARGE), 200),
+            new Offer("regeneration", () -> potion(Potions.REGENERATION), 80),
+            new Offer("swiftness", () -> potion(Potions.SWIFTNESS), 60),
+            new Offer("strength", () -> potion(Potions.STRENGTH), 150),
+            new Offer("fire_resistance", () -> potion(Potions.FIRE_RESISTANCE), 80),
+            new Offer("night_vision", () -> potion(Potions.NIGHT_VISION), 40),
+            new Offer("water_breathing", () -> potion(Potions.WATER_BREATHING), 50),
+            new Offer("invisibility", () -> potion(Potions.INVISIBILITY), 120),
+            new Offer("slow_falling", () -> potion(Potions.SLOW_FALLING), 50),
+            new Offer("leaping", () -> potion(Potions.LEAPING), 40),
+            new Offer("sell_emerald", () -> new ItemStack(Items.EMERALD), EMERALD_G, true));
 
     public static final List<Offer> SMITH = List.of(
-            new Offer("enhance_stone", () -> new ItemStack(RpgItems.ENHANCE_STONE), 3),
-            new Offer("protection_scroll", () -> new ItemStack(RpgItems.PROTECTION_SCROLL), 24),
-            new Offer("promotion_stone", () -> new ItemStack(RpgItems.PROMOTION_STONE), 48));
+            new Offer("enhance_stone", () -> new ItemStack(RpgItems.ENHANCE_STONE), 40),
+            new Offer("protection_scroll", () -> new ItemStack(RpgItems.PROTECTION_SCROLL), 400),
+            new Offer("promotion_stone", () -> new ItemStack(RpgItems.PROMOTION_STONE), 800),
+            new Offer("crystal_good", () -> new ItemStack(RpgItems.CRYSTAL_GOOD), 150),
+            new Offer("crystal_rare", () -> new ItemStack(RpgItems.CRYSTAL_RARE), 400),
+            new Offer("crystal_hero", () -> new ItemStack(RpgItems.CRYSTAL_HERO), 1000),
+            new Offer("sell_emerald", () -> new ItemStack(Items.EMERALD), EMERALD_G, true));
 
     public static List<Offer> offers(String kind) {
         return ShopNpcEntity.BLACKSMITH.equals(kind) ? SMITH : POTIONS;
@@ -101,18 +112,32 @@ public final class Shops {
         Offer o = null;
         for (Offer x : offers(kind)) if (x.id().equals(offerId)) o = x;
         if (o == null) return "shop.abilitywar.err.unknown";
-        amount = Math.max(1, Math.min(16, amount));
-        int cost = o.price() * amount;
         PlayerInventory inv = p.getInventory();
-        if (!p.getAbilities().creativeMode) {
-            if (count(inv, Items.EMERALD) < cost) return "shop.abilitywar.err.emeralds";
-            take(inv, Items.EMERALD, cost);
+        if (o.sell()) {
+            // 팔기: 1 개, Shift 면 가진 것 모두
+            Item it = o.stack().get().getItem();
+            int have = count(inv, it);
+            if (have <= 0) return "shop.abilitywar.err.nothing_to_sell";
+            int n = amount > 1 ? have : 1;
+            take(inv, it, n);
+            RpgManager.addGold(p, (long) o.price() * n);
+            p.getWorld().playSound(null, p.getBlockPos(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.6f, 0.9f);
+            p.sendMessage(Text.translatable("shop.abilitywar.sold", o.stack().get().getName(), n, fmt((long) o.price() * n)).formatted(Formatting.GREEN), true);
+            return null;
         }
+        amount = Math.max(1, Math.min(16, amount));
+        long cost = (long) o.price() * amount;
+        if (!RpgManager.takeGold(p, cost)) return "shop.abilitywar.err.gold";
         for (int i = 0; i < amount; i++) give(p, o.stack().get());
         p.getWorld().playSound(null, p.getBlockPos(), SoundEvents.ENTITY_VILLAGER_YES, SoundCategory.NEUTRAL, 0.6f, 1.1f);
         p.getWorld().playSound(null, p.getBlockPos(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.5f, 1.2f);
-        p.sendMessage(Text.translatable("shop.abilitywar.bought", o.stack().get().getName(), amount, cost).formatted(Formatting.GREEN), true);
+        p.sendMessage(Text.translatable("shop.abilitywar.bought", o.stack().get().getName(), amount, fmt(cost)).formatted(Formatting.GREEN), true);
         return null;
+    }
+
+    /** 1234567 → "1,234,567". */
+    public static String fmt(long g) {
+        return String.format("%,d", g);
     }
 
     // ================================================================ 강화 · 승급
@@ -145,15 +170,15 @@ public final class Shops {
         if (g == null) return "smith.abilitywar.err.no_item";
         int lv = GearEnhance.level(st);
         if (lv >= GearEnhance.MAX) return "smith.abilitywar.err.max";
-        int stones = GearEnhance.stoneCost(g, lv), ems = GearEnhance.emeraldCost(g, lv);
+        int stones = GearEnhance.stoneCost(g, lv), cost = GearEnhance.goldCost(g, lv);
         boolean useScroll = protect && GearEnhance.failDrops(lv);
         boolean free = p.getAbilities().creativeMode;
         if (!free) {
             if (count(inv, RpgItems.ENHANCE_STONE) < stones) return "smith.abilitywar.err.stones";
-            if (count(inv, Items.EMERALD) < ems) return "smith.abilitywar.err.emeralds";
+            if (RpgManager.gold(p) < cost) return "smith.abilitywar.err.gold";
             if (useScroll && count(inv, RpgItems.PROTECTION_SCROLL) < 1) return "smith.abilitywar.err.scroll";
             take(inv, RpgItems.ENHANCE_STONE, stones);
-            take(inv, Items.EMERALD, ems);
+            RpgManager.takeGold(p, cost);
             if (useScroll) take(inv, RpgItems.PROTECTION_SCROLL, 1);
         }
         ServerWorld w = p.getServerWorld();
@@ -192,16 +217,17 @@ public final class Shops {
         if (!GearEnhance.canPromote(g)) return "smith.abilitywar.err.top_grade";
         int lv = GearEnhance.level(st);
         if (lv < GearEnhance.promoteMin(g)) return "smith.abilitywar.err.promote_level";
-        int stones = GearEnhance.promoteStones(g), ems = GearEnhance.promoteEmeralds(g);
+        List<GearEnhance.Mat> mats = GearEnhance.promoteMats(g);
+        int cost = GearEnhance.promoteGold(g);
         ServerWorld w = p.getServerWorld();
         Item next = st.getItem() instanceof GearWeaponItem wi ? GearEnhance.promotedWeapon(wi.def, w.getRandom())
                 : st.getItem() instanceof GearArmorItem ai ? GearEnhance.promotedArmor(ai, w.getRandom()) : null;
         if (next == null) return "smith.abilitywar.err.top_grade";
         if (!p.getAbilities().creativeMode) {
-            if (count(inv, RpgItems.PROMOTION_STONE) < stones) return "smith.abilitywar.err.promotion_stones";
-            if (count(inv, Items.EMERALD) < ems) return "smith.abilitywar.err.emeralds";
-            take(inv, RpgItems.PROMOTION_STONE, stones);
-            take(inv, Items.EMERALD, ems);
+            for (GearEnhance.Mat m : mats) if (count(inv, m.item()) < m.count()) return "smith.abilitywar.err.materials";
+            if (RpgManager.gold(p) < cost) return "smith.abilitywar.err.gold";
+            for (GearEnhance.Mat m : mats) take(inv, m.item(), m.count());
+            RpgManager.takeGold(p, cost);
         }
         ItemStack out = new ItemStack(next);
         GearEnhance.set(out, lv / 2);
@@ -226,23 +252,46 @@ public final class Shops {
 
     // ================================================================ 재료 얻기
 
-    /** 몬스터를 잡음: 가끔 강화석. 보스: 강화석 여러 개 + 승급석 (절반 확률). */
+    /**
+     * 몬스터를 잡음: 가끔 강화석 (4%) · 초록 마정석 (3%) · 푸른 마정석 (1.2%), 센 몬스터 (최대 체력 40 이상) 는 보랏빛 마정석 (2%).
+     * 보스: 강화석 3~6 + 승급석 (2번에 1번) + 세기에 맞는 마정석 1 (+ 40% 로 한 단계 아래 하나).
+     */
     public static void drops(net.minecraft.entity.LivingEntity dead, boolean boss) {
         if (!(dead.getWorld() instanceof ServerWorld w)) return;
         var r = w.getRandom();
         if (boss) {
             dead.dropStack(new ItemStack(RpgItems.ENHANCE_STONE, 3 + r.nextInt(4)));
             if (r.nextBoolean()) dead.dropStack(new ItemStack(RpgItems.PROMOTION_STONE));
-        } else if (dead instanceof net.minecraft.entity.mob.Monster && r.nextInt(100) < 4) {
-            dead.dropStack(new ItemStack(RpgItems.ENHANCE_STONE));
+            GearGrade cg = bossCrystal(dead);
+            dead.dropStack(new ItemStack(RpgItems.crystal(cg)));
+            if (r.nextInt(100) < 40) dead.dropStack(new ItemStack(RpgItems.crystal(GearGrade.values()[Math.max(1, cg.tier() - 1)])));
+            if (endgame(dead) && r.nextInt(100) < 35) dead.dropStack(new ItemStack(RpgItems.CHAOS_SHARD));
+        } else if (dead instanceof net.minecraft.entity.mob.Monster) {
+            if (r.nextInt(100) < 4) dead.dropStack(new ItemStack(RpgItems.ENHANCE_STONE));
+            if (r.nextInt(1000) < 30) dead.dropStack(new ItemStack(RpgItems.CRYSTAL_GOOD));
+            if (r.nextInt(1000) < 12) dead.dropStack(new ItemStack(RpgItems.CRYSTAL_RARE));
+            if (dead.getMaxHealth() >= 40 && r.nextInt(100) < 2) dead.dropStack(new ItemStack(RpgItems.CRYSTAL_HERO));
         }
     }
 
-    /** 다른 모드 보스 (몸이 없음): 바로 인벤토리로. */
-    public static void bossRewardDirect(ServerPlayerEntity p) {
+    static boolean endgame(net.minecraft.entity.LivingEntity e) {
+        return e instanceof net.minecraft.entity.boss.WitherEntity || e instanceof net.minecraft.entity.boss.dragon.EnderDragonEntity
+                || e instanceof net.minecraft.entity.mob.WardenEntity;
+    }
+
+    /** 보스가 떨어뜨리는 마정석 등급: 최대 체력 300 미만 보랏빛, 450 미만 황금, 700 미만 붉은, 그 위는 청록 (위더 · 엔더 드래곤 · 워든은 청록). */
+    static GearGrade bossCrystal(net.minecraft.entity.LivingEntity e) {
+        if (endgame(e)) return GearGrade.SECRET;
+        float hp = e.getMaxHealth();
+        return hp < 300 ? GearGrade.HERO : hp < 450 ? GearGrade.LEGENDARY : hp < 700 ? GearGrade.MYTHIC : GearGrade.SECRET;
+    }
+
+    /** 다른 모드 보스 (몸이 없음): 바로 인벤토리로. 마정석 등급은 보스 경험치로. */
+    public static void bossRewardDirect(ServerPlayerEntity p, int xp) {
         var r = p.getRandom();
         give(p, new ItemStack(RpgItems.ENHANCE_STONE, 3 + r.nextInt(4)));
         if (r.nextBoolean()) give(p, new ItemStack(RpgItems.PROMOTION_STONE));
+        give(p, new ItemStack(RpgItems.crystal(xp < 500 ? GearGrade.HERO : xp < 800 ? GearGrade.LEGENDARY : GearGrade.MYTHIC)));
     }
 
     private Shops() {

@@ -24,20 +24,21 @@ public final class Guild {
     public static final int[] COLORS = {0xA8A8A8, 0x6ACB5A, 0x4FC3C3, 0x5A8CFF, 0xB070FF, 0xFF9A3A, 0xFF4A4A, 0xFFD040, 0xFFF0A0};
 
     /** 길드 퀘스트: 목표는 전직 퀘스트와 같은 종류. 보상: 포인트 · 경험치 · 에메랄드 · 장비 (확률). */
-    public record GQuest(String id, int rank, List<JobQuests.Objective> objectives, int points, int xp, int emeralds, GearGrade gear, float gearChance) {
+    public record GQuest(String id, int rank, List<JobQuests.Objective> objectives, int points, int xp, int gold, GearGrade gear, float gearChance) {
     }
 
     public static final Map<String, GQuest> ALL = new LinkedHashMap<>();
 
     static final int[] POINTS = {10, 12, 15, 20, 25, 30, 40, 50, 60};
     static final int[] XP = {80, 200, 400, 700, 1100, 1600, 2400, 3500, 5000};
-    static final int[] EMERALDS = {3, 5, 8, 12, 16, 24, 32, 48, 64};
+    /** 보상 돈 (G). */
+    static final int[] GOLD = {60, 120, 200, 320, 480, 700, 1000, 1500, 2400};
     static final GearGrade[] GEAR = {GearGrade.COMMON, GearGrade.GOOD, GearGrade.GOOD, GearGrade.RARE, GearGrade.RARE, GearGrade.HERO, GearGrade.LEGENDARY, GearGrade.MYTHIC, GearGrade.SECRET};
     static final float[] GEAR_CHANCE = {0.25f, 0.3f, 0.35f, 0.4f, 0.45f, 0.5f, 0.6f, 0.7f, 0.8f};
 
     static void q(int rank, int n, JobQuests.Objective... obj) {
         String id = "g_" + RANKS[rank].toLowerCase() + n;
-        ALL.put(id, new GQuest(id, rank, List.of(obj), POINTS[rank], XP[rank], EMERALDS[rank], GEAR[rank], GEAR_CHANCE[rank]));
+        ALL.put(id, new GQuest(id, rank, List.of(obj), POINTS[rank], XP[rank], GOLD[rank], GEAR[rank], GEAR_CHANCE[rank]));
     }
 
     static JobQuests.Objective kill(String t, int n) {
@@ -107,6 +108,12 @@ public final class Guild {
     /** 길드 의뢰 보상: 강화석 (등급 + 1). */
     public static int stones(int rank) {
         return rank + 1;
+    }
+
+    /** 길드 의뢰 보상 마정석의 등급: F~D 초록, C · B 푸른, A 보랏빛, S 황금, SS 붉은, SSS 청록. */
+    public static GearGrade crystal(int rank) {
+        return new GearGrade[]{GearGrade.GOOD, GearGrade.GOOD, GearGrade.GOOD, GearGrade.RARE, GearGrade.RARE, GearGrade.HERO,
+                GearGrade.LEGENDARY, GearGrade.MYTHIC, GearGrade.SECRET}[Math.max(0, Math.min(TOP, rank))];
     }
 
     /** 길드 의뢰 보상: 승급석 (C 등급부터 1, S 부터 2). */

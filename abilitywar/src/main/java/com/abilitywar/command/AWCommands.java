@@ -65,6 +65,22 @@ public final class AWCommands {
         return n;
     }
 
+    /** /aw gold add|set|take <양> [플레이어] */
+    static int goldOp(com.mojang.brigadier.context.CommandContext<ServerCommandSource> ctx, java.util.Collection<ServerPlayerEntity> targets) {
+        String op = StringArgumentType.getString(ctx, "op");
+        long amount = com.mojang.brigadier.arguments.LongArgumentType.getLong(ctx, "amount");
+        for (ServerPlayerEntity p : targets) {
+            switch (op) {
+                case "set" -> com.abilitywar.rpg.RpgManager.setGold(p, amount);
+                case "take" -> com.abilitywar.rpg.RpgManager.setGold(p, Math.max(0, com.abilitywar.rpg.RpgManager.gold(p) - amount));
+                default -> com.abilitywar.rpg.RpgManager.addGold(p, amount);
+            }
+            ctx.getSource().sendFeedback(() -> Text.literal(p.getEntityName() + ": ").append(Text.translatable("gold.abilitywar.have",
+                    com.abilitywar.rpg.Shops.fmt(com.abilitywar.rpg.RpgManager.gold(p)))), true);
+        }
+        return targets.size();
+    }
+
     /** /aw npc 로 놓을 수 있는 NPC. */
     static final java.util.Map<String, net.minecraft.entity.EntityType<?>> NPCS = java.util.Map.of(
             "apothecary", com.abilitywar.registry.AWEntities.APOTHECARY, "blacksmith", com.abilitywar.registry.AWEntities.BLACKSMITH,
@@ -240,6 +256,16 @@ public final class AWCommands {
                                     p.getServerWorld().spawnEntity(npc);
                                     return 1;
                                 })))
+                .then(literal("gold").executes(ctx -> {
+                            ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
+                            ctx.getSource().sendFeedback(() -> Text.translatable("gold.abilitywar.have", com.abilitywar.rpg.Shops.fmt(com.abilitywar.rpg.RpgManager.gold(p))), false);
+                            return 1;
+                        })
+                        .then(argument("op", StringArgumentType.word()).requires(s -> s.hasPermissionLevel(2))
+                                .suggests((c, sb) -> net.minecraft.command.CommandSource.suggestMatching(List.of("add", "set", "take"), sb))
+                                .then(argument("amount", com.mojang.brigadier.arguments.LongArgumentType.longArg(0, 999_999_999L))
+                                        .executes(ctx -> goldOp(ctx, List.of(ctx.getSource().getPlayerOrThrow())))
+                                        .then(argument("targets", EntityArgumentType.players()).executes(ctx -> goldOp(ctx, EntityArgumentType.getPlayers(ctx, "targets")))))))
                 .then(literal("enhance").requires(s -> s.hasPermissionLevel(2))
                         .then(argument("level", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, com.abilitywar.gear.GearEnhance.MAX)).executes(ctx -> {
                             ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();

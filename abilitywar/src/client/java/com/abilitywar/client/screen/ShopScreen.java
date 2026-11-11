@@ -1,5 +1,6 @@
 package com.abilitywar.client.screen;
 
+import com.abilitywar.client.hud.GoldHud;
 import com.abilitywar.client.hud.HudDraw;
 import com.abilitywar.client.rpg.RpgClient;
 import com.abilitywar.rpg.ShopNpcEntity;
@@ -24,7 +25,7 @@ import java.util.List;
 public class ShopScreen extends Screen {
     final int npc;
     final String kind;
-    int px, py, pw = 420, ph = 240;
+    int px, py, pw = 420, ph = 264;
     float typed;
     int flash = -1;
     float flashT;
@@ -110,40 +111,33 @@ public class ShopScreen extends Screen {
         int n = Math.min(full.length(), (int) (typed + delta * 1.6f));
         RpgUi.wrapped(ctx, textRenderer, Text.literal(full.substring(0, n)), px + 64, py + 26, pw - 74, 0xE8DCC0, py + 68);
 
-        int emeralds = mc.player == null ? 0 : Shops.count(mc.player.getInventory(), Items.EMERALD);
+        long gold = RpgClient.gold;
         List<Shops.Offer> l = offers();
         ItemStack hover = null;
         for (int i = 0; i < l.size(); i++) {
             Shops.Offer o = l.get(i);
             int[] c = cell(i);
             boolean h = RpgUi.in(mx, my, c[0], c[1], c[2], c[3]);
-            boolean afford = emeralds >= o.price();
+            boolean afford = o.sell() || gold >= o.price();
             float f = i == flash ? Math.max(0, 1 - flashT / 8f) : 0;
             HudDraw.rect(ctx, c[0], c[1], c[2], c[3], h ? 0x50584018 : 0x40000000);
             if (f > 0) HudDraw.rect(ctx, c[0], c[1], c[2], c[3], HudDraw.argb(0.45f * f, 0x7CFF8A));
             com.abilitywar.client.hud.RpgHud.frame(ctx, c[0], c[1], c[2], c[3], h ? 0x8A6A28 : 0x3A2C12);
             ItemStack st = o.stack().get();
             ctx.drawItem(st, c[0] + 2, c[1] + 2);
-            Text name = st.getName();
-            String nm = textRenderer.trimToWidth(name.getString(), cellW() - 70);
-            ctx.drawTextWithShadow(textRenderer, Text.literal(nm).setStyle(name.getStyle()), c[0] + 21, c[1] + 6, 0xFFFFFF);
-            String price = String.valueOf(o.price());
+            Text name = o.sell() ? Text.translatable("shop.abilitywar.sell", st.getName()) : st.getName();
+            String nm = textRenderer.trimToWidth(name.getString(), cellW() - 80);
+            ctx.drawTextWithShadow(textRenderer, Text.literal(nm).setStyle(name.getStyle()), c[0] + 21, c[1] + 6, o.sell() ? 0xB8F0B8 : 0xFFFFFF);
+            String price = (o.sell() ? "+" : "") + GoldHud.fmt(o.price()) + " G";
             int pxr = c[2] - 6 - textRenderer.getWidth(price);
-            ctx.getMatrices().push();
-            ctx.getMatrices().translate(pxr - 13, c[1] + 4, 0);
-            ctx.getMatrices().scale(0.75f, 0.75f, 1);
-            ctx.drawItem(new ItemStack(Items.EMERALD), 0, 0);
-            ctx.getMatrices().pop();
-            ctx.drawTextWithShadow(textRenderer, price, pxr, c[1] + 6, afford ? 0x7CE87C : 0xFF6A6A);
+            GoldHud.coin(ctx, pxr - 12, c[1] + 5, 10);
+            ctx.drawTextWithShadow(textRenderer, price, pxr, c[1] + 6, o.sell() ? 0x7CFF8A : afford ? 0xFFE9A8 : 0xFF6A6A);
             if (h) hover = st;
         }
         if (flash >= 0) flashT += delta;
         int fy = py + ph - 22;
-        ctx.getMatrices().push();
-        ctx.getMatrices().translate(px + 12, fy - 1, 0);
-        ctx.drawItem(new ItemStack(Items.EMERALD), 0, 0);
-        ctx.getMatrices().pop();
-        ctx.drawTextWithShadow(textRenderer, Text.translatable("shop.abilitywar.have", emeralds), px + 30, fy + 3, 0x7CE87C);
+        GoldHud.coin(ctx, px + 12, fy + 1, 13);
+        ctx.drawTextWithShadow(textRenderer, Text.translatable("shop.abilitywar.have", GoldHud.fmt(gold)), px + 30, fy + 3, 0xFFE9A8);
         ctx.drawTextWithShadow(textRenderer, Text.translatable("shop.abilitywar.hint").formatted(Formatting.GRAY), px + 30, fy + 13, 0x9A8D70);
         super.render(ctx, mx, my, delta);
         if (hover != null) ctx.drawItemTooltip(textRenderer, hover, mx, my);

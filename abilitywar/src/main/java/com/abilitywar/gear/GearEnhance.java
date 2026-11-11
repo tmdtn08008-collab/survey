@@ -65,8 +65,9 @@ public final class GearEnhance {
         return (1 + level / 3) * (1 + g.tier() / 2);
     }
 
-    public static int emeraldCost(GearGrade g, int level) {
-        return (2 + level) * (1 + g.tier());
+    /** 강화 값 (G). */
+    public static int goldCost(GearGrade g, int level) {
+        return (2 + level) * (1 + g.tier()) * 10;
     }
 
     public static int promoteMin(GearGrade g) {
@@ -77,12 +78,27 @@ public final class GearEnhance {
         return g.tier() < GearGrade.UNKNOWN.tier();
     }
 
-    public static int promoteStones(GearGrade g) {
-        return g.tier() + 1;
+    /** 승급 재료 한 줄. */
+    public record Mat(net.minecraft.item.Item item, int count) {
     }
 
-    public static int promoteEmeralds(GearGrade g) {
-        return 20 * (g.tier() + 1);
+    /** 이 등급에서 다음 등급으로 승급할 때 드는 재료: 승급석 + 다음 등급 마정석 3 + 바닐라 재료. */
+    public static List<Mat> promoteMats(GearGrade g) {
+        GearGrade n = next(g);
+        List<Mat> l = new ArrayList<>();
+        l.add(new Mat(com.abilitywar.item.RpgItems.PROMOTION_STONE, g.tier() + 1));
+        l.add(new Mat(com.abilitywar.item.RpgItems.crystal(n), 3));
+        net.minecraft.item.Item[] vanilla = {net.minecraft.item.Items.IRON_INGOT, net.minecraft.item.Items.GOLD_INGOT, net.minecraft.item.Items.DIAMOND,
+                net.minecraft.item.Items.DIAMOND, net.minecraft.item.Items.NETHERITE_SCRAP, net.minecraft.item.Items.NETHER_STAR, net.minecraft.item.Items.NETHER_STAR};
+        int[] vc = {8, 8, 2, 6, 2, 1, 2};
+        int t = Math.min(g.tier(), vanilla.length - 1);
+        l.add(new Mat(vanilla[t], vc[t]));
+        return l;
+    }
+
+    /** 승급 값 (G). */
+    public static int promoteGold(GearGrade g) {
+        return new int[]{200, 500, 1200, 3000, 6000, 12000, 25000, 25000}[g.tier()];
     }
 
     public static GearGrade next(GearGrade g) {

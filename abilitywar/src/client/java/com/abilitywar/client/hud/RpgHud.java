@@ -23,6 +23,7 @@ public final class RpgHud {
         if (mc.player == null || mc.options.hudHidden || !RpgClient.synced || CameraController.isCinematic() || mc.options.debugEnabled) return;
         TextRenderer tr = mc.textRenderer;
         float time = mc.player.age + td;
+        GoldHud.render(ctx, td);
         int x = 6, y = 6;
         // ---- 레벨 배지
         int bs = 24;

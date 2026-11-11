@@ -1,5 +1,6 @@
 package com.abilitywar.client.screen;
 
+import com.abilitywar.client.hud.GoldHud;
 import com.abilitywar.client.hud.HudDraw;
 import com.abilitywar.client.hud.RpgHud;
 import com.abilitywar.client.rpg.RpgClient;
@@ -36,7 +37,7 @@ import java.util.Map;
  */
 public class EnhanceScreen extends Screen {
     final int npc;
-    int px, py, pw = 440, ph = 250;
+    int px, py, pw = 440, ph = 268;
     int selected = -1, scroll;
     ButtonWidget enhance, promote, shop, close;
     CheckboxWidget protect;
@@ -119,10 +120,11 @@ public class EnhanceScreen extends Screen {
         GearGrade g = has ? ((GearItem) s.getItem()).grade() : GearGrade.COMMON;
         boolean creative = MinecraftClient.getInstance().player != null && MinecraftClient.getInstance().player.getAbilities().creativeMode;
         enhance.active = has && lv < GearEnhance.MAX && (creative || (Shops.count(inv, RpgItems.ENHANCE_STONE) >= GearEnhance.stoneCost(g, lv)
-                && Shops.count(inv, Items.EMERALD) >= GearEnhance.emeraldCost(g, lv)));
+                && RpgClient.gold >= GearEnhance.goldCost(g, lv)));
         protect.visible = has && GearEnhance.failDrops(lv) && lv < GearEnhance.MAX;
-        promote.active = has && GearEnhance.canPromote(g) && lv >= GearEnhance.promoteMin(g) && (creative || (Shops.count(inv, RpgItems.PROMOTION_STONE) >= GearEnhance.promoteStones(g)
-                && Shops.count(inv, Items.EMERALD) >= GearEnhance.promoteEmeralds(g)));
+        boolean mats = true;
+        if (has && GearEnhance.canPromote(g)) for (GearEnhance.Mat m : GearEnhance.promoteMats(g)) mats &= Shops.count(inv, m.item()) >= m.count();
+        promote.active = has && GearEnhance.canPromote(g) && lv >= GearEnhance.promoteMin(g) && (creative || (mats && RpgClient.gold >= GearEnhance.promoteGold(g)));
         promote.visible = has && GearEnhance.canPromote(g);
         MinecraftClient mc = MinecraftClient.getInstance();
         Entity e = mc.world == null ? null : mc.world.getEntityById(npc);
@@ -157,14 +159,22 @@ public class EnhanceScreen extends Screen {
         return true;
     }
 
+    int mouseX, mouseY;
+
     @Override
     public void render(DrawContext ctx, int mx, int my, float delta) {
+        mouseX = mx;
+        mouseY = my;
         renderBackground(ctx);
         RpgUi.panel(ctx, px, py, px + pw, py + ph);
         MinecraftClient mc = MinecraftClient.getInstance();
         PlayerInventory inv = inv();
         RpgUi.header(ctx, textRenderer, Text.translatable("smith.abilitywar.title"), px + pw / 2, py + 8);
         ctx.drawTextWithShadow(textRenderer, Text.translatable("smith.abilitywar.say"), px + 12, py + 32, 0xB8AC90);
+        String money = GoldHud.fmt(RpgClient.gold) + " G";
+        int mw = textRenderer.getWidth(money);
+        GoldHud.coin(ctx, px + pw - 14 - mw - 13, py + 30, 11);
+        ctx.drawTextWithShadow(textRenderer, money, px + pw - 12 - mw, py + 32, 0xFFE9A8);
 
         // ---- 내 장비
         int lx0 = px + 10, lx1 = px + 150, ly0 = py + 48, ly1 = py + ph - 30;
@@ -240,7 +250,7 @@ public class EnhanceScreen extends Screen {
                 // 재료
                 int cy = py + 124;
                 cost(ctx, rx0 + 8, cy, new ItemStack(RpgItems.ENHANCE_STONE), Shops.count(inv, RpgItems.ENHANCE_STONE), GearEnhance.stoneCost(g, lv), true);
-                cost(ctx, rx0 + 150, cy, new ItemStack(Items.EMERALD), Shops.count(inv, Items.EMERALD), GearEnhance.emeraldCost(g, lv), true);
+                goldCost(ctx, rx0 + 150, cy, GearEnhance.goldCost(g, lv));
                 if (protect.visible) {
                     int have = Shops.count(inv, RpgItems.PROTECTION_SCROLL);
                     ctx.drawItem(new ItemStack(RpgItems.PROTECTION_SCROLL), rx0 + 26, py + 149);
@@ -259,24 +269,40 @@ public class EnhanceScreen extends Screen {
                 ctx.drawTextWithShadow(textRenderer, Text.translatable("smith.abilitywar.promote_top").formatted(Formatting.GRAY), rx0 + 8, pz0 + 8, 0xFFFFFF);
             } else {
                 GearGrade ng = GearEnhance.next(g);
-                ctx.drawTextWithShadow(textRenderer, Text.translatable("smith.abilitywar.promote_to").append(" ").append(ng.displayName().copy().styled(s -> s.withColor(ng.color).withBold(true))),
-                        rx0 + 8, pz0 + 6, 0xFFE9A8);
+                Text title = Text.translatable("smith.abilitywar.promote_to").append(" ").append(ng.displayName().copy().styled(s -> s.withColor(ng.color).withBold(true)));
+                ctx.drawTextWithShadow(textRenderer, title, rx0 + 8, pz0 + 6, 0xFFE9A8);
                 int need = GearEnhance.promoteMin(g);
                 boolean lvOk = lv >= need;
                 ctx.drawTextWithShadow(textRenderer, Text.literal(lvOk ? "✔ " : "✖ ").formatted(lvOk ? Formatting.GREEN : Formatting.RED)
-                        .append(Text.translatable("smith.abilitywar.promote_req", need, lv).formatted(Formatting.GRAY)), rx0 + 8, pz0 + 18, 0xFFFFFF);
-                cost(ctx, rx1 - 92, pz0 + 6, new ItemStack(RpgItems.PROMOTION_STONE), Shops.count(inv, RpgItems.PROMOTION_STONE), GearEnhance.promoteStones(g), false);
-                cost(ctx, rx1 - 92, pz0 + 24, new ItemStack(Items.EMERALD), Shops.count(inv, Items.EMERALD), GearEnhance.promoteEmeralds(g), false);
+                        .append(Text.translatable("smith.abilitywar.promote_req", need, lv).formatted(Formatting.GRAY)), rx0 + 16 + textRenderer.getWidth(title), pz0 + 6, 0xFFFFFF);
+                // 재료: 승급석 · 마정석 · 바닐라 재료 + 돈
+                int mx0 = rx0 + 8;
+                for (GearEnhance.Mat m : GearEnhance.promoteMats(g)) {
+                    ItemStack icon = new ItemStack(m.item());
+                    int have = Shops.count(inv, m.item());
+                    ctx.drawItem(icon, mx0, pz0 + 18);
+                    String t = have + "/" + m.count();
+                    ctx.drawTextWithShadow(textRenderer, t, mx0 + 18, pz0 + 23, have >= m.count() ? 0x7CE87C : 0xFF6A6A);
+                    if (RpgUi.in(mouseX, mouseY, mx0, pz0 + 18, mx0 + 16, pz0 + 34)) hover = icon;
+                    mx0 += 18 + textRenderer.getWidth(t) + 10;
+                }
+                goldCost(ctx, mx0 + 2, pz0 + 22, GearEnhance.promoteGold(g));
                 ctx.getMatrices().push();
-                ctx.getMatrices().translate(rx0 + 8, pz0 + 30, 0);
+                ctx.getMatrices().translate(rx0 + 8, pz0 + 40, 0);
                 ctx.getMatrices().scale(0.75f, 0.75f, 1);
-                RpgUi.wrapped(ctx, textRenderer, Text.translatable("smith.abilitywar.promote_note", lv / 2).formatted(Formatting.GRAY), 0, 0, (int) ((rx1 - 100 - rx0 - 8) / 0.75f), 0xFFFFFF, 30);
+                ctx.drawTextWithShadow(textRenderer, Text.translatable("smith.abilitywar.promote_note", lv / 2).formatted(Formatting.GRAY), 0, 0, 0xFFFFFF);
                 ctx.getMatrices().pop();
             }
         }
         super.render(ctx, mx, my, delta);
         renderResult(ctx, delta);
         if (hover != null) ctx.drawItemTooltip(textRenderer, hover, mx, my);
+    }
+
+    /** 동전 + "120 G" (가진 돈이 모자라면 빨강). */
+    void goldCost(DrawContext ctx, int x, int y, long cost) {
+        GoldHud.coin(ctx, x, y - 1, 11);
+        ctx.drawTextWithShadow(textRenderer, GoldHud.fmt(cost) + " G", x + 14, y + 1, RpgClient.gold >= cost ? 0xFFE9A8 : 0xFF6A6A);
     }
 
     /** "아이콘 가진 수 / 필요 수" (모자라면 빨강). */

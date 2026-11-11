@@ -41,6 +41,20 @@ public final class RpgClient {
     public static final int[] guildProgress = new int[4];
     public static int guildProgressN;
 
+    /** 가진 돈 (G) + HUD 에 떠오르는 변화량. */
+    public static long gold;
+    public static int goldFlash;
+    public static final class GoldPop {
+        public final long delta;
+        public int ticks = 40;
+
+        GoldPop(long delta) {
+            this.delta = delta;
+        }
+    }
+
+    public static final java.util.List<GoldPop> goldPops = new java.util.ArrayList<>();
+
     /** HUD 연출용. */
     public static float xpShown;
     public static int xpFlash, pointsFlash;
@@ -78,6 +92,15 @@ public final class RpgClient {
                 if (i < guildProgress.length) guildProgress[i] = v;
             }
         }
+        if (buf.isReadable()) {
+            long g = buf.readVarLong();
+            if (synced && g != gold) {
+                goldPops.add(0, new GoldPop(g - gold));
+                while (goldPops.size() > 4) goldPops.remove(goldPops.size() - 1);
+                if (g > gold) goldFlash = 12;
+            }
+            gold = g;
+        }
         if (synced && x > xp && lv == level) xpFlash = 14;
         if (synced && pts > points) pointsFlash = 40;
         if (lastLevel >= 0 && lv != level) xpShown = 0;
@@ -93,6 +116,8 @@ public final class RpgClient {
         xpShown += (target - xpShown) * 0.2f;
         if (Math.abs(target - xpShown) < 0.001f) xpShown = target;
         if (xpFlash > 0) xpFlash--;
+        if (goldFlash > 0) goldFlash--;
+        goldPops.removeIf(p -> --p.ticks <= 0);
         if (pointsFlash > 0) pointsFlash--;
         if (bannerTicks > 0) bannerTicks--;
     }

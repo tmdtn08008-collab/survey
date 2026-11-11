@@ -256,6 +256,71 @@ def blacksmith(rect, box, px):
         rect(u, v + 8, 4, 4, (80, 80, 86))
 
 
+def crystal(light, mid, dark, shine=(255, 255, 255, 255)):
+    """마정석: 위아래로 긴 육각 보석 (등급 색)."""
+    pal = {'o': (20, 16, 26, 255), 'L': light, 'm': mid, 'd': dark, 'w': shine}
+    rows = ["................",
+            ".......oo.......",
+            "......oLmo......",
+            ".....oLwmmo.....",
+            "....oLwLmmdo....",
+            "....oLLmmmdo....",
+            "...oLLmmmmddo...",
+            "...oLmmmmmddo...",
+            "...oLmmmmmddo...",
+            "...oLmmmmdddo...",
+            "....oLmmmddo....",
+            "....oLmmmddo....",
+            ".....oLmddo.....",
+            "......omdo......",
+            ".......oo.......",
+            "................"]
+    return grid(rows, pal)
+
+
+def chaos_shard():
+    pal = {'o': (10, 6, 14, 255), 'a': (255, 80, 240, 255), 'b': (90, 255, 245, 255), 'k': (40, 20, 60, 255), 'w': (255, 255, 255, 255), 'g': (120, 120, 130, 255)}
+    rows = ["................",
+            ".........o......",
+            "........oao.....",
+            ".......oawko....",
+            "...o..oakkbo....",
+            "..obo.okbkko....",
+            "..okbookkkao....",
+            "...okbkkwkao....",
+            "....okkkkbo.....",
+            "....okakkko.....",
+            "...okkkbkgo.....",
+            "...oakkkko......",
+            "....obkko.......",
+            ".....oko........",
+            "......o.........",
+            "................"]
+    return grid(rows, pal)
+
+
+def coin():
+    """G 동전 (16x16, GUI 용)."""
+    pal = {'o': (90, 56, 10, 255), 'y': (255, 206, 70, 255), 'Y': (255, 236, 150, 255), 'd': (214, 150, 30, 255), 'G': (140, 86, 14, 255)}
+    rows = ["................",
+            ".....oooooo.....",
+            "...ooYYYYyyoo...",
+            "..oYYyyyyyyddo..",
+            "..oYyyGGGGyydo..",
+            ".oYyyGGyyyGyddo.",
+            ".oYyGGyyyyyyddo.",
+            ".oYyGGyyGGGyddo.",
+            ".oYyGGyyyGGyddo.",
+            ".oyyGGyyyGGyddo.",
+            ".oyyyGGGGGyyddo.",
+            "..oyyyyyyyyddo..",
+            "..oddyyyyyddddo.",
+            "...oodddddddoo..",
+            ".....oooooo.....",
+            "................"]
+    return grid(rows, pal)
+
+
 def main():
     os.makedirs(ITEM, exist_ok=True)
     os.makedirs(MODEL, exist_ok=True)
@@ -268,6 +333,18 @@ def main():
         'protection_scroll': protection_scroll(),
         'promotion_stone': promotion_stone(),
     }
+    items.update({
+        'crystal_good': crystal((170, 255, 170, 255), (80, 210, 90, 255), (30, 120, 50, 255)),
+        'crystal_rare': crystal((170, 215, 255, 255), (70, 150, 255, 255), (30, 70, 170, 255)),
+        'crystal_hero': crystal((225, 180, 255, 255), (170, 90, 255, 255), (90, 40, 160, 255)),
+        'crystal_legendary': crystal((255, 236, 160, 255), (255, 180, 40, 255), (170, 100, 10, 255)),
+        'crystal_mythic': crystal((255, 170, 160, 255), (240, 60, 60, 255), (140, 20, 30, 255)),
+        'crystal_secret': crystal((190, 255, 240, 255), (50, 230, 200, 255), (20, 120, 120, 255), (255, 240, 160, 255)),
+        'chaos_shard': chaos_shard(),
+    })
+    gui = os.path.join(ASSETS, 'textures', 'gui')
+    os.makedirs(gui, exist_ok=True)
+    coin().save(os.path.join(gui, 'coin.png'))
     for name, im in items.items():
         im.save(os.path.join(ITEM, name + '.png'))
         with open(os.path.join(MODEL, name + '.json'), 'w') as f:

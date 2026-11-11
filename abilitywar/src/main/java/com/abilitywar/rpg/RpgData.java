@@ -27,6 +27,8 @@ public class RpgData {
     public int guildRank = -1, guildPoints, guildDone;
     public String guildQuest = "";
     public final int[] guildProgress = new int[4];
+    /** 돈 (G). */
+    public long gold;
     public boolean dirty = true;
 
     public NbtCompound write() {
@@ -47,6 +49,7 @@ public class RpgData {
         t.putInt("GuildDone", guildDone);
         t.putString("GuildQuest", guildQuest);
         t.putIntArray("GuildProgress", guildProgress);
+        t.putLong("Gold", gold);
         return t;
     }
 
@@ -69,6 +72,7 @@ public class RpgData {
         guildQuest = t.getString("GuildQuest");
         int[] gp = t.getIntArray("GuildProgress");
         for (int i = 0; i < guildProgress.length; i++) guildProgress[i] = i < gp.length ? gp[i] : 0;
+        gold = Math.max(0, t.getLong("Gold"));
         dirty = true;
     }
 

@@ -79,11 +79,48 @@ public final class RpgManager {
                 || com.abilitywar.compat.UltrisCompat.isUltrisBoss(e);
     }
 
+    // ================================================================ 돈 (G)
+
+    public static long gold(ServerPlayerEntity p) {
+        return rpg(p).gold;
+    }
+
+    public static void addGold(ServerPlayerEntity p, long amount) {
+        if (amount == 0) return;
+        RpgData r = rpg(p);
+        r.gold = Math.max(0, Math.min(999_999_999L, r.gold + amount));
+        r.dirty = true;
+    }
+
+    /** 돈을 냄 (모자라면 false, 창조 모드는 공짜). */
+    public static boolean takeGold(ServerPlayerEntity p, long amount) {
+        if (p.getAbilities().creativeMode) return true;
+        RpgData r = rpg(p);
+        if (r.gold < amount) return false;
+        r.gold -= amount;
+        r.dirty = true;
+        return true;
+    }
+
+    public static void setGold(ServerPlayerEntity p, long amount) {
+        RpgData r = rpg(p);
+        r.gold = Math.max(0, Math.min(999_999_999L, amount));
+        r.dirty = true;
+    }
+
+    /** 몬스터를 잡고 받는 돈: 최대 체력의 40% (보스는 1.5 배, 최소 150). */
+    public static long goldFor(LivingEntity e) {
+        if (isBoss(e)) return Math.max(150, Math.round(e.getMaxHealth() * 1.5));
+        if (!(e instanceof Monster) || com.abilitywar.ability.warlock.Necromancy.isMinion(e)) return 0;
+        return Math.max(1, Math.round(e.getMaxHealth() * 0.4));
+    }
+
     /** 보스 하나를 쓰러뜨린 것으로 셈 (다른 모드 보스 호환용): 경험치 + 전직 · 왕 · 길드 퀘스트의 "보스 처치". */
     public static void creditBoss(ServerPlayerEntity p, int xp) {
         addXp(p, xp);
         questAmount(p, JobQuests.Type.BOSS, 1);
-        Shops.bossRewardDirect(p);
+        addGold(p, Math.max(150, xp / 2));
+        Shops.bossRewardDirect(p, xp);
     }
 
     public static int mobXp(LivingEntity e) {
@@ -149,8 +186,10 @@ public final class RpgManager {
             Shops.drops(dead, true);
             // 보스: 가까이서 싸운 모두가 경험치 + 퀘스트 (마지막 한 방이 누구든)
             int xp = mobXp(dead);
+            long g = goldFor(dead);
             for (ServerPlayerEntity o : sw.getEntitiesByClass(ServerPlayerEntity.class, dead.getBoundingBox().expand(48), o -> !o.isSpectator() && o.isAlive())) {
                 addXp(o, xp);
+                addGold(o, g);
                 questAmount(o, JobQuests.Type.BOSS, 1);
                 questKill(o, dead);
                 o.sendMessage(Text.translatable("rpg.abilitywar.boss_down", dead.getDisplayName()).formatted(Formatting.GOLD), false);
@@ -174,6 +213,7 @@ public final class RpgManager {
         Shops.drops(dead, false);
         int xp = mobXp(dead);
         addXp(k, xp);
+        addGold(k, goldFor(dead));
         questKill(k, dead);
         if (k.getScoreboardTeam() != null) {
             for (ServerPlayerEntity o : k.getServerWorld().getEntitiesByClass(ServerPlayerEntity.class, new Box(k.getBlockPos()).expand(32), o -> o != k && o.isTeammate(k))) {
@@ -560,10 +600,12 @@ public final class RpgManager {
         r.guildPoints += q.points();
         r.guildDone++;
         addXp(p, q.xp());
-        give(p, new ItemStack(net.minecraft.item.Items.EMERALD, q.emeralds()));
-        // 강화 재료: 강화석 (등급 + 1), C 등급부터 승급석 1
+        addGold(p, q.gold());
+        // 강화 재료: 강화석 (등급 + 1), C 등급부터 승급석, 등급에 맞는 마정석 1 (SSS 는 혼돈의 파편도)
         give(p, new ItemStack(com.abilitywar.item.RpgItems.ENHANCE_STONE, Guild.stones(q.rank())));
         if (Guild.promotionStones(q.rank()) > 0) give(p, new ItemStack(com.abilitywar.item.RpgItems.PROMOTION_STONE, Guild.promotionStones(q.rank())));
+        give(p, new ItemStack(com.abilitywar.item.RpgItems.crystal(Guild.crystal(q.rank()))));
+        if (q.rank() >= Guild.TOP) give(p, new ItemStack(com.abilitywar.item.RpgItems.CHAOS_SHARD));
         if (p.getRandom().nextFloat() < q.gearChance()) {
             var list = p.getRandom().nextBoolean() ? GearItems.WEAPONS.get(q.gear()) : null;
             if (list != null && !list.isEmpty()) give(p, new ItemStack(list.get(p.getRandom().nextInt(list.size()))));
@@ -577,7 +619,7 @@ public final class RpgManager {
                 }
             }
         }
-        p.sendMessage(Text.translatable("guild.abilitywar.done", Text.translatable("guild.abilitywar.quest." + q.id()), q.points(), q.xp(), q.emeralds()).formatted(Formatting.GOLD), false);
+        p.sendMessage(Text.translatable("guild.abilitywar.done", Text.translatable("guild.abilitywar.quest." + q.id()), q.points(), q.xp(), String.format("%,d", q.gold())).formatted(Formatting.GOLD), false);
         p.getServerWorld().playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.8f, 1.3f);
         if (Guild.checkPromote(r.guildRank, r.guildPoints, r.level) == null)
             p.sendMessage(Text.translatable("guild.abilitywar.can_promote", Guild.rankName(r.guildRank + 1)).formatted(Formatting.YELLOW, Formatting.BOLD), false);
@@ -722,6 +764,7 @@ public final class RpgManager {
         int gn = gq == null ? 0 : gq.objectives().size();
         buf.writeVarInt(gn);
         for (int i = 0; i < gn; i++) buf.writeVarInt(guildHave(p, gq, i));
+        buf.writeVarLong(r.gold);
         if (ServerPlayNetworking.canSend(p, S2C_RPG)) ServerPlayNetworking.send(p, S2C_RPG, buf);
     }
 
