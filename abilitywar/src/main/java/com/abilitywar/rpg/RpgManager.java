@@ -83,6 +83,7 @@ public final class RpgManager {
     public static void creditBoss(ServerPlayerEntity p, int xp) {
         addXp(p, xp);
         questAmount(p, JobQuests.Type.BOSS, 1);
+        Shops.bossRewardDirect(p);
     }
 
     public static int mobXp(LivingEntity e) {
@@ -145,6 +146,7 @@ public final class RpgManager {
         if (dead.getWorld().isClient) return;
         if (isBoss(dead) && !com.abilitywar.compat.UltrisCompat.isUltrisBoss(dead) && dead.getWorld() instanceof ServerWorld sw) {
             com.abilitywar.mob.BossAltar.onAnyBossDeath(dead);
+            Shops.drops(dead, true);
             // 보스: 가까이서 싸운 모두가 경험치 + 퀘스트 (마지막 한 방이 누구든)
             int xp = mobXp(dead);
             for (ServerPlayerEntity o : sw.getEntitiesByClass(ServerPlayerEntity.class, dead.getBoundingBox().expand(48), o -> !o.isSpectator() && o.isAlive())) {
@@ -169,6 +171,7 @@ public final class RpgManager {
             return;
         }
         final ServerPlayerEntity k = killer;
+        Shops.drops(dead, false);
         int xp = mobXp(dead);
         addXp(k, xp);
         questKill(k, dead);
@@ -558,6 +561,9 @@ public final class RpgManager {
         r.guildDone++;
         addXp(p, q.xp());
         give(p, new ItemStack(net.minecraft.item.Items.EMERALD, q.emeralds()));
+        // 강화 재료: 강화석 (등급 + 1), C 등급부터 승급석 1
+        give(p, new ItemStack(com.abilitywar.item.RpgItems.ENHANCE_STONE, Guild.stones(q.rank())));
+        if (Guild.promotionStones(q.rank()) > 0) give(p, new ItemStack(com.abilitywar.item.RpgItems.PROMOTION_STONE, Guild.promotionStones(q.rank())));
         if (p.getRandom().nextFloat() < q.gearChance()) {
             var list = p.getRandom().nextBoolean() ? GearItems.WEAPONS.get(q.gear()) : null;
             if (list != null && !list.isEmpty()) give(p, new ItemStack(list.get(p.getRandom().nextInt(list.size()))));
@@ -775,6 +781,22 @@ public final class RpgManager {
                             player.sendMessage(Text.translatable(err, lv, pts).formatted(Formatting.RED), false);
                         }
                         openNpc(player, npc);
+                    }
+                    case 10, 11, 12 -> {
+                        // 상점 · 대장장이 (가까이에서만): 10 사기 ("물건:개수"), 11 강화 ("칸:보호"), 12 승급 ("칸")
+                        Entity e = player.getWorld().getEntityById(npc);
+                        if (!(e instanceof ShopNpcEntity shop) || e.squaredDistanceTo(player) > 10 * 10
+                                || (action != 10 && !ShopNpcEntity.BLACKSMITH.equals(shop.kind()))) {
+                            player.sendMessage(Text.translatable("shop.abilitywar.err.far").formatted(Formatting.RED), true);
+                            return;
+                        }
+                        String[] a = arg.split(":");
+                        String err = switch (action) {
+                            case 10 -> Shops.buy(player, shop.kind(), a[0], a.length > 1 ? parseInt(a[1]) : 1);
+                            case 11 -> Shops.enhance(player, parseInt(a[0]), a.length > 1 && a[1].equals("1"));
+                            default -> Shops.promote(player, parseInt(a[0]));
+                        };
+                        if (err != null) player.sendMessage(Text.translatable(err).formatted(Formatting.RED), true);
                     }
                     default -> {
                     }

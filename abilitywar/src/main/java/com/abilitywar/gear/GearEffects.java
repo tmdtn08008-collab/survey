@@ -247,7 +247,7 @@ public final class GearEffects {
     /** 레벨이 모자란 무기는 능력치를 0 으로 (같은 크기의 반대 수정치), 갑옷은 벗김. */
     static void levelChecks(ServerPlayerEntity p, boolean armorToo) {
         ItemStack hand = p.getMainHandStack();
-        String lock = hand.getItem() instanceof GearWeaponItem w && !levelOk(p, w) ? w.def.id() : null;
+        String lock = hand.getItem() instanceof GearWeaponItem w && !levelOk(p, w) ? w.def.id() + "+" + GearEnhance.level(hand) : null;
         String prev = LOCKED.get(p.getUuid());
         if (!java.util.Objects.equals(lock, prev)) {
             for (GearStat st : GearStat.values()) {
@@ -256,7 +256,7 @@ public final class GearEffects {
             }
             if (lock != null) {
                 GearWeaponItem w = (GearWeaponItem) hand.getItem();
-                for (Map.Entry<GearStat, Double> e : w.def.stats().entrySet()) {
+                for (Map.Entry<GearStat, Double> e : GearEnhance.weaponStats(w.def, GearEnhance.level(hand)).entrySet()) {
                     EntityAttributeInstance inst = p.getAttributeInstance(e.getKey().attribute());
                     if (inst != null) inst.addTemporaryModifier(new EntityAttributeModifier(GearUuids.of("lock", e.getKey()), "Gear level lock",
                             -e.getKey().modifierValue(e.getValue()), e.getKey().operation()));

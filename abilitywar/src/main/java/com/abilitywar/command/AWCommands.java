@@ -65,6 +65,12 @@ public final class AWCommands {
         return n;
     }
 
+    /** /aw npc 로 놓을 수 있는 NPC. */
+    static final java.util.Map<String, net.minecraft.entity.EntityType<?>> NPCS = java.util.Map.of(
+            "apothecary", com.abilitywar.registry.AWEntities.APOTHECARY, "blacksmith", com.abilitywar.registry.AWEntities.BLACKSMITH,
+            "guild_clerk", com.abilitywar.registry.AWEntities.GUILD_CLERK, "job_master", com.abilitywar.registry.AWEntities.JOB_MASTER,
+            "king", com.abilitywar.registry.AWEntities.KING);
+
     private static final com.mojang.brigadier.suggestion.SuggestionProvider<ServerCommandSource> BOSSES = (ctx, b) ->
             net.minecraft.command.CommandSource.suggestMatching(java.util.stream.Stream.of("abilitywar:fallen_king", "abilitywar:ember_colossus", "abilitywar:frost_witch", "abilitywar:ancient_wyvern",
                     "bosses_of_mass_destruction:lich", "bosses_of_mass_destruction:obsidilith", "bosses_of_mass_destruction:gauntlet", "bosses_of_mass_destruction:void_blossom",
@@ -218,6 +224,32 @@ public final class AWCommands {
                             npc.setHeadYaw(p.getYaw() + 180);
                             npc.setBodyYaw(p.getYaw() + 180);
                             p.getServerWorld().spawnEntity(npc);
+                            return 1;
+                        })))
+                .then(literal("npc").requires(s -> s.hasPermissionLevel(2))
+                        .then(argument("type", StringArgumentType.word()).suggests((c, sb) -> net.minecraft.command.CommandSource.suggestMatching(NPCS.keySet(), sb))
+                                .executes(ctx -> {
+                                    ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
+                                    var type = NPCS.get(StringArgumentType.getString(ctx, "type"));
+                                    if (type == null) return 0;
+                                    var npc = type.create(p.getServerWorld());
+                                    if (npc == null) return 0;
+                                    npc.refreshPositionAndAngles(p.getX(), p.getY(), p.getZ(), p.getYaw() + 180, 0);
+                                    npc.setHeadYaw(p.getYaw() + 180);
+                                    if (npc instanceof net.minecraft.entity.LivingEntity le) le.setBodyYaw(p.getYaw() + 180);
+                                    p.getServerWorld().spawnEntity(npc);
+                                    return 1;
+                                })))
+                .then(literal("enhance").requires(s -> s.hasPermissionLevel(2))
+                        .then(argument("level", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, com.abilitywar.gear.GearEnhance.MAX)).executes(ctx -> {
+                            ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
+                            var st = p.getMainHandStack();
+                            if (!(st.getItem() instanceof com.abilitywar.gear.GearItem)) {
+                                ctx.getSource().sendError(Text.translatable("smith.abilitywar.err.no_item"));
+                                return 0;
+                            }
+                            com.abilitywar.gear.GearEnhance.set(st, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "level"));
+                            ctx.getSource().sendFeedback(() -> st.getName(), false);
                             return 1;
                         })))
                 .then(literal("goto").requires(s -> s.hasPermissionLevel(2))

@@ -19,6 +19,16 @@ public class JobMasterRenderer extends MobEntityRenderer<JobMasterEntity, Player
     static final Identifier SKIN = AbilityWar.id("textures/entity/job_master.png");
     static final Identifier KING_SKIN = AbilityWar.id("textures/entity/king.png");
     static final Identifier CLERK_SKIN = AbilityWar.id("textures/entity/guild_clerk.png");
+    static final Identifier APOTHECARY_SKIN = AbilityWar.id("textures/entity/apothecary.png");
+    static final Identifier BLACKSMITH_SKIN = AbilityWar.id("textures/entity/blacksmith.png");
+
+    public static JobMasterRenderer apothecary(EntityRendererFactory.Context ctx) {
+        return new JobMasterRenderer(ctx, APOTHECARY_SKIN, false);
+    }
+
+    public static JobMasterRenderer blacksmith(EntityRendererFactory.Context ctx) {
+        return new JobMasterRenderer(ctx, BLACKSMITH_SKIN, false);
+    }
     final Identifier skin;
 
     public JobMasterRenderer(EntityRendererFactory.Context ctx) {

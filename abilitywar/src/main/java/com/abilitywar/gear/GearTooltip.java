@@ -62,15 +62,29 @@ public final class GearTooltip {
         return t.append(c(Text.translatable("gear.abilitywar.effect." + e.id() + ".desc", c, sec, pw), 0xF0DFA8));
     }
 
-    public static void weapon(GearWeaponItem item, List<Text> out) {
+    /** 강화 줄: "강화 +7 / 15 ★★★★★★★☆☆…" + 다음 승급 안내. */
+    static void enhanceLine(ItemStack stack, GearGrade g, List<Text> out) {
+        int lv = GearEnhance.level(stack);
+        if (lv <= 0) return;
+        MutableText stars = Text.literal("");
+        for (int i = 1; i <= GearEnhance.MAX; i++) {
+            int col = i <= lv ? GearEnhance.color(i) : 0x3A3A44;
+            stars.append(Text.literal(i <= lv ? "★" : "☆").styled(s -> s.withColor(TextColor.fromRgb(col))));
+            if (i % 5 == 0 && i < GearEnhance.MAX) stars.append(Text.literal(" "));
+        }
+        out.add(c(Text.translatable("gear.abilitywar.ui.enhance", lv, GearEnhance.MAX), GearEnhance.color(lv)).append(Text.literal(" ")).append(stars));
+    }
+
+    public static void weapon(GearWeaponItem item, ItemStack stack, List<Text> out) {
         GearDefs.Weapon d = item.def;
         boolean unk = d.grade() == GearGrade.UNKNOWN;
         out.add(header(d.grade(), Text.translatable("gear.abilitywar.type." + d.type())));
         levelLine(d.grade(), out);
+        enhanceLine(stack, d.grade(), out);
         lore(item.getTranslationKey() + ".lore", out);
         out.add(Text.empty());
         out.add(c(Text.translatable("gear.abilitywar.ui.held"), 0xA0A0AC));
-        stats(d.stats(), unk, out, STAT);
+        stats(GearEnhance.weaponStats(d, GearEnhance.level(stack)), unk, out, STAT);
         if (!d.effects().isEmpty()) {
             out.add(c(Text.translatable("gear.abilitywar.ui.on_hit"), GOLD));
             for (GearDefs.Effect e : d.effects()) out.add(effect(e, false));
@@ -78,15 +92,19 @@ public final class GearTooltip {
         out.add(c(Text.translatable("gear.abilitywar.ui.ability_hint"), DIM));
     }
 
-    public static void armor(GearArmorItem item, List<Text> out) {
+    public static void armor(GearArmorItem item, ItemStack stack, List<Text> out) {
         GearDefs.ArmorSet set = item.set;
         boolean unk = set.grade() == GearGrade.UNKNOWN;
         out.add(header(set.grade(), Text.translatable("gear.abilitywar.piece." + item.piece.slot())));
         levelLine(set.grade(), out);
+        enhanceLine(stack, set.grade(), out);
         lore(item.getTranslationKey() + ".lore", out);
         out.add(Text.empty());
         out.add(c(Text.translatable("gear.abilitywar.ui.worn"), 0xA0A0AC));
         stats(item.piece.stats(), unk, out, STAT);
+        int lv = GearEnhance.level(stack);
+        if (lv > 0) out.add(lit(" ", ON).append(c(Text.translatable("gear.abilitywar.ui.enhance_armor",
+                GearStat.trim(GearEnhance.armorBonus(item.getProtection(), lv)), GearStat.trim(GearEnhance.healthBonus(lv))), ON)));
         if (set.setStats().isEmpty() && set.setEffects().isEmpty()) return;
         int worn = wornCount(set.id());
         boolean active = worn >= 4;

@@ -104,6 +104,16 @@ public final class Guild {
         q(8, 4, kill("minecraft:warden", 1));
     }
 
+    /** 길드 의뢰 보상: 강화석 (등급 + 1). */
+    public static int stones(int rank) {
+        return rank + 1;
+    }
+
+    /** 길드 의뢰 보상: 승급석 (C 등급부터 1, S 부터 2). */
+    public static int promotionStones(int rank) {
+        return rank >= 6 ? 2 : rank >= 3 ? 1 : 0;
+    }
+
     public static List<GQuest> forRank(int rank) {
         List<GQuest> out = new ArrayList<>();
         for (GQuest q : ALL.values()) if (q.rank() == rank) out.add(q);

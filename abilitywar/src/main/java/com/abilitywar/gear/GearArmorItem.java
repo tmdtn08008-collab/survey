@@ -51,9 +51,17 @@ public class GearArmorItem extends ArmorItem implements GearItem {
         return slot == this.type.getEquipmentSlot() ? modifiers : ImmutableMultimap.of();
     }
 
+    /** 강화된 갑옷: 방어력 · 체력이 더 붙음. */
+    @Override
+    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(ItemStack stack, EquipmentSlot slot) {
+        int lv = GearEnhance.level(stack);
+        if (slot != this.type.getEquipmentSlot() || lv <= 0) return getAttributeModifiers(slot);
+        return GearEnhance.armorModifiers(this, modifiers, lv);
+    }
+
     @Override
     public Text getName(ItemStack stack) {
-        return GearItem.name(set.grade(), getTranslationKey());
+        return GearEnhance.name(stack, GearItem.name(set.grade(), getTranslationKey()));
     }
 
     @Override
@@ -63,6 +71,6 @@ public class GearArmorItem extends ArmorItem implements GearItem {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        GearTooltip.armor(this, tooltip);
+        GearTooltip.armor(this, stack, tooltip);
     }
 }

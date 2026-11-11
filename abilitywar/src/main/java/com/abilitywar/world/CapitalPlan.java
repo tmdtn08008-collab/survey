@@ -410,7 +410,9 @@ public final class CapitalPlan {
                     Block[] wl = wools[n % wools.length];
                     Build.stall(b, sx, sz, by, wl[0], wl[1], r);
                     VillagerProfession pr = trades[n % trades.length];
-                    b.spawns.add(new Blueprint.Spawn(new BlockPos(sx + 1, by + 1, sz + 2), w -> villager(w, pr)));
+                    // 첫 노점 = 물약 상인 (회복 물약 · 물약)
+                    if (n == 0) b.spawns.add(new Blueprint.Spawn(new BlockPos(sx + 1, by + 1, sz + 2), w -> named(AWEntities.APOTHECARY.create(w), 0)));
+                    else b.spawns.add(new Blueprint.Spawn(new BlockPos(sx + 1, by + 1, sz + 2), w -> villager(w, pr)));
                     n++;
                 }
         for (int k = 0; k < 10; k++) {
@@ -437,6 +439,9 @@ public final class CapitalPlan {
         b.spawns.add(new Blueprint.Spawn(new BlockPos(mx, by + 1, hz0 + 6), w -> named(AWEntities.GUILD_CLERK.create(w), 180)));
         b.fill(x0 + 2, by + 2, hz0 + 7, x0 + 2, by + 3, hz0 + 11, s(Blocks.BOOKSHELF));
         b.fill(x1 - 2, by + 1, hz0 + 7, x1 - 2, by + 1, hz0 + 11, s(Blocks.BARREL));
+        // 길드 안 물약 상인 (통 옆)
+        b.set(x1 - 2, by + 2, hz0 + 9, s(Blocks.BREWING_STAND));
+        b.spawns.add(new Blueprint.Spawn(new BlockPos(x1 - 3, by + 1, hz0 + 9), w -> named(AWEntities.APOTHECARY.create(w), 90)));
         // 앞마당: 게시판 (판자 + 등) + 깃발 + 간판
         b.fn(x0, by, z0, x1, by, hz0 - 1, (x, y, z) -> CapitalPlan.streetBlock(x, y, z));
         b.fill(mx - 6, by + 1, z0 + 1, mx - 6, by + 3, z0 + 1, Build.log(Blocks.DARK_OAK_LOG, Direction.Axis.Y));
@@ -544,7 +549,10 @@ public final class CapitalPlan {
         b.set(ox, by + 1, z0 + 5, s(Blocks.LAVA_CAULDRON));
         b.set(ox, by + 1, z0 + 7, s(Blocks.GRINDSTONE));
         b.set(ox, by + 1, z0 + 9, s(Blocks.SMITHING_TABLE));
-        b.spawns.add(new Blueprint.Spawn(new BlockPos(ox - 1, by + 1, z0 + 4), w -> villager(w, VillagerProfession.WEAPONSMITH)));
+        // 대장장이 (강화 · 승급) + 무기 대장장이 주민
+        // (집 벽은 x1 - 3 까지: 작업장 = 모루 줄 (ox) 옆 바깥 칸)
+        b.spawns.add(new Blueprint.Spawn(new BlockPos(ox + 1, by + 1, z0 + 2), w -> named(AWEntities.BLACKSMITH.create(w), 90)));
+        b.spawns.add(new Blueprint.Spawn(new BlockPos(ox + 1, by + 1, z0 + 8), w -> villager(w, VillagerProfession.WEAPONSMITH)));
         sign(b, x0 - 1, by + 3, (z0 + z1) / 2 - 1, Direction.WEST, "sign.abilitywar.smithy");
         reserve(res, x0 - 1, z0 - 1, x1 + 1, z1 + 1);
     }

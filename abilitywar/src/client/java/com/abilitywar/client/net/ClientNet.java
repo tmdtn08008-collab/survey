@@ -28,8 +28,15 @@ public final class ClientNet {
             client.execute(() -> {
                 var e = client.world == null ? null : client.world.getEntityById(npc);
                 if (e instanceof com.abilitywar.rpg.GuildClerkEntity) com.abilitywar.client.screen.GuildScreen.open(npc);
-                else com.abilitywar.client.screen.JobMasterScreen.open(npc);
+                else if (e instanceof com.abilitywar.rpg.ShopNpcEntity shop) {
+                    if (com.abilitywar.rpg.ShopNpcEntity.BLACKSMITH.equals(shop.kind())) com.abilitywar.client.screen.EnhanceScreen.open(npc);
+                    else com.abilitywar.client.screen.ShopScreen.open(npc, shop.kind());
+                } else com.abilitywar.client.screen.JobMasterScreen.open(npc);
             });
+        });
+        ClientPlayNetworking.registerGlobalReceiver(com.abilitywar.rpg.Shops.S2C_ENHANCE, (client, handler, buf, sender) -> {
+            int code = buf.readByte(), level = buf.readVarInt(), slot = buf.readVarInt();
+            client.execute(() -> com.abilitywar.client.screen.EnhanceScreen.onResult(code, level, slot));
         });
         ClientPlayNetworking.registerGlobalReceiver(AWNet.S2C_STATE, (client, handler, buf, sender) -> {
             net.minecraft.network.PacketByteBuf copy = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.copy(buf);

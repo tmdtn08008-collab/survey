@@ -39,6 +39,8 @@ public class AbilityWarClient implements ClientModInitializer {
         EntityRendererRegistry.register(AWEntities.JOB_MASTER, com.abilitywar.client.render.JobMasterRenderer::new);
         EntityRendererRegistry.register(AWEntities.KING, com.abilitywar.client.render.JobMasterRenderer::king);
         EntityRendererRegistry.register(AWEntities.GUILD_CLERK, com.abilitywar.client.render.JobMasterRenderer::clerk);
+        EntityRendererRegistry.register(AWEntities.APOTHECARY, com.abilitywar.client.render.JobMasterRenderer::apothecary);
+        EntityRendererRegistry.register(AWEntities.BLACKSMITH, com.abilitywar.client.render.JobMasterRenderer::blacksmith);
         com.abilitywar.client.render.mob.MobRenderers.init();
         com.abilitywar.client.dev.TestDriver.init();
         ClientNet.init();

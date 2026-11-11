@@ -52,6 +52,22 @@ public class GearWeaponItem extends Item implements GearItem {
         return slot == EquipmentSlot.MAINHAND ? modifiers : super.getAttributeModifiers(slot);
     }
 
+    /** 강화된 무기: 강화 수치에 맞는 능력치 (Fabric 의 아이템마다 능력치). */
+    @Override
+    public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(ItemStack stack, EquipmentSlot slot) {
+        int lv = GearEnhance.level(stack);
+        if (slot != EquipmentSlot.MAINHAND || lv <= 0) return getAttributeModifiers(slot);
+        return GearEnhance.weaponModifiers(this, lv);
+    }
+
+    static UUID attackDamageId() {
+        return ATTACK_DAMAGE_MODIFIER_ID;
+    }
+
+    static UUID attackSpeedId() {
+        return ATTACK_SPEED_MODIFIER_ID;
+    }
+
     @Override
     public boolean canMine(BlockState state, World world, BlockPos pos, PlayerEntity miner) {
         return !miner.isCreative();
@@ -64,7 +80,7 @@ public class GearWeaponItem extends Item implements GearItem {
 
     @Override
     public Text getName(ItemStack stack) {
-        return GearItem.name(def.grade(), getTranslationKey());
+        return GearEnhance.name(stack, GearItem.name(def.grade(), getTranslationKey()));
     }
 
     @Override
@@ -74,6 +90,6 @@ public class GearWeaponItem extends Item implements GearItem {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        GearTooltip.weapon(this, tooltip);
+        GearTooltip.weapon(this, stack, tooltip);
     }
 }

@@ -204,6 +204,8 @@ public final class TownPlan {
                 b.spawns.add(new Blueprint.Spawn(new BlockPos(x0 + w / 2, by + 1, z0 + d / 2), w2 -> CapitalPlan.villager(w2, VillagerProfession.NONE)));
                 // 모험가 길드 지부 (여관 안 접수원)
                 b.spawns.add(new Blueprint.Spawn(new BlockPos(x0 + 2, by + 1, z0 + 2), w2 -> AWEntities.GUILD_CLERK.create(w2)));
+                // 물약 상인 (여관 안 반대쪽 구석)
+                b.spawns.add(new Blueprint.Spawn(new BlockPos(x0 + w - 3, by + 1, z0 + d - 3), w2 -> AWEntities.APOTHECARY.create(w2)));
             }
             case 1 -> {
                 Build.house(b, x0, z0, w - 2, d, by, 1, door, Build.STONE, r);
@@ -219,7 +221,8 @@ public final class TownPlan {
                 b.fill(ox + 1, by + 1, z0 + d - 1, ox + 1, by + 3, z0 + d - 1, Build.log(Blocks.SPRUCE_LOG, Direction.Axis.Y));
                 b.fill(ox, by + 4, z0, ox + 1, by + 4, z0 + d - 1, s(Blocks.SPRUCE_SLAB));
                 b.spawns.add(new Blueprint.Spawn(new BlockPos(x0 + 2, by + 1, z0 + d / 2), w2 -> CapitalPlan.villager(w2, VillagerProfession.WEAPONSMITH)));
-                b.spawns.add(new Blueprint.Spawn(new BlockPos(x0 + 3, by + 1, z0 + d / 2), w2 -> CapitalPlan.villager(w2, VillagerProfession.ARMORER)));
+                // 대장장이 (강화 · 승급)
+                b.spawns.add(new Blueprint.Spawn(new BlockPos(x0 + 3, by + 1, z0 + d / 2), w2 -> AWEntities.BLACKSMITH.create(w2)));
             }
             case 2 -> {
                 Build.Palette chapel = new Build.Palette(Blocks.WHITE_TERRACOTTA, Blocks.STRIPPED_BIRCH_LOG, Blocks.BIRCH_PLANKS, Blocks.STONE_BRICK_STAIRS, Blocks.STONE_BRICKS,

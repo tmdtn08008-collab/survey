@@ -53,6 +53,28 @@ public final class AWEntities {
     public static final net.minecraft.item.Item GUILD_CLERK_EGG = Registry.register(Registries.ITEM, AbilityWar.id("guild_clerk_spawn_egg"),
             new net.minecraft.item.SpawnEggItem(GUILD_CLERK, 0x2A4A7A, 0xD8B060, new net.minecraft.item.Item.Settings()));
 
+    /** 물약 상인 NPC (시장 · 길드 · 마을 여관). */
+    public static final EntityType<com.abilitywar.rpg.ShopNpcEntity> APOTHECARY = Registry.register(Registries.ENTITY_TYPE,
+            AbilityWar.id("apothecary"),
+            FabricEntityTypeBuilder.<com.abilitywar.rpg.ShopNpcEntity>create(SpawnGroup.MISC, com.abilitywar.rpg.ShopNpcEntity::apothecary)
+                    .dimensions(EntityDimensions.fixed(0.6f, 1.95f))
+                    .trackRangeBlocks(64)
+                    .fireImmune()
+                    .build());
+    public static final net.minecraft.item.Item APOTHECARY_EGG = Registry.register(Registries.ITEM, AbilityWar.id("apothecary_spawn_egg"),
+            new net.minecraft.item.SpawnEggItem(APOTHECARY, 0x3A6A3A, 0xE04040, new net.minecraft.item.Item.Settings()));
+
+    /** 대장장이 NPC: 장비 강화 · 승급 (수도 대장간 · 마을 대장간). */
+    public static final EntityType<com.abilitywar.rpg.ShopNpcEntity> BLACKSMITH = Registry.register(Registries.ENTITY_TYPE,
+            AbilityWar.id("blacksmith"),
+            FabricEntityTypeBuilder.<com.abilitywar.rpg.ShopNpcEntity>create(SpawnGroup.MISC, com.abilitywar.rpg.ShopNpcEntity::blacksmith)
+                    .dimensions(EntityDimensions.fixed(0.6f, 1.95f))
+                    .trackRangeBlocks(64)
+                    .fireImmune()
+                    .build());
+    public static final net.minecraft.item.Item BLACKSMITH_EGG = Registry.register(Registries.ITEM, AbilityWar.id("blacksmith_spawn_egg"),
+            new net.minecraft.item.SpawnEggItem(BLACKSMITH, 0x4A3A2A, 0xFF8A30, new net.minecraft.item.Item.Settings()));
+
     public static void init() {
         net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(KING, com.abilitywar.rpg.JobMasterEntity.createAttributes());
         net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(net.minecraft.item.ItemGroups.SPAWN_EGGS).register(e -> e.add(KING_EGG));
@@ -60,6 +82,12 @@ public final class AWEntities {
         net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(net.minecraft.item.ItemGroups.SPAWN_EGGS).register(e -> e.add(JOB_MASTER_EGG));
         net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(GUILD_CLERK, com.abilitywar.rpg.JobMasterEntity.createAttributes());
         net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(net.minecraft.item.ItemGroups.SPAWN_EGGS).register(e -> e.add(GUILD_CLERK_EGG));
+        for (var t : java.util.List.of(APOTHECARY, BLACKSMITH))
+            net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(t, com.abilitywar.rpg.JobMasterEntity.createAttributes());
+        net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(net.minecraft.item.ItemGroups.SPAWN_EGGS).register(e -> {
+            e.add(APOTHECARY_EGG);
+            e.add(BLACKSMITH_EGG);
+        });
     }
 
     private AWEntities() {
