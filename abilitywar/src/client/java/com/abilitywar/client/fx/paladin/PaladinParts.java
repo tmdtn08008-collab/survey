@@ -37,37 +37,42 @@ public final class PaladinParts {
 
     /** 칼 공간: 손잡이 끝이 원점, 날은 -Z 쪽. L = 날 길이. */
     public static void renderSword(MatrixStack ms, VertexConsumerProvider vcp, float L, float W, float glow) {
+        renderSword(ms, vcp, L, W, glow, new float[]{0.9f, 0.92f, 0.98f}, new float[]{1f, 0.84f, 0.4f}, new float[]{1f, 0.86f, 0.45f}, new float[]{0.55f, 0.85f, 1f});
+    }
+
+    /** 색을 바꾼 칼 (보스 대검 등): blade 날, trim 가드·폼멜, glowC 홈 빛, gem 보석. */
+    public static void renderSword(MatrixStack ms, VertexConsumerProvider vcp, float L, float W, float glow, float[] blade, float[] trim, float[] glowC, float[] gem) {
         Matrix4f m = ms.peek().getPositionMatrix();
         VertexConsumer s = vcp.getBuffer(AWRenderLayers.SOLID_COLOR);
         float T = W * 0.22f;
         // 손잡이 (짙은 남색 가죽) + 금 고리
         box(s, m, -W * 0.13f, W * 0.13f, -T * 1.1f, T * 1.1f, 0.02f, 0.2f, 0.12f, 0.16f, 0.34f);
-        box(s, m, -W * 0.16f, W * 0.16f, -T * 1.3f, T * 1.3f, 0.09f, 0.11f, 0.95f, 0.78f, 0.34f);
+        box(s, m, -W * 0.16f, W * 0.16f, -T * 1.3f, T * 1.3f, 0.09f, 0.11f, trim[0] * 0.95f, trim[1] * 0.93f, trim[2] * 0.85f);
         // 폼멜 (금 + 보석)
-        box(s, m, -W * 0.22f, W * 0.22f, -W * 0.22f, W * 0.22f, 0.2f, 0.27f, 0.95f, 0.8f, 0.36f);
+        box(s, m, -W * 0.22f, W * 0.22f, -W * 0.22f, W * 0.22f, 0.2f, 0.27f, trim[0] * 0.95f, trim[1] * 0.95f, trim[2] * 0.9f);
         // 가드: 가로 금 막대 + 양 끝 날개처럼 올라간 장식
-        box(s, m, -W * 1.4f, W * 1.4f, -T * 1.6f, T * 1.6f, -0.02f, 0.03f, 1f, 0.84f, 0.4f);
-        box(s, m, -W * 1.55f, -W * 1.2f, -T * 1.5f, T * 1.5f, -0.1f, 0.0f, 1f, 0.84f, 0.4f);
-        box(s, m, W * 1.2f, W * 1.55f, -T * 1.5f, T * 1.5f, -0.1f, 0.0f, 1f, 0.84f, 0.4f);
-        box(s, m, -W * 0.3f, W * 0.3f, -T * 2f, T * 2f, -0.06f, 0.04f, 0.55f, 0.85f, 1f); // 가운데 보석
+        box(s, m, -W * 1.4f, W * 1.4f, -T * 1.6f, T * 1.6f, -0.02f, 0.03f, trim[0], trim[1], trim[2]);
+        box(s, m, -W * 1.55f, -W * 1.2f, -T * 1.5f, T * 1.5f, -0.1f, 0.0f, trim[0], trim[1], trim[2]);
+        box(s, m, W * 1.2f, W * 1.55f, -T * 1.5f, T * 1.5f, -0.1f, 0.0f, trim[0], trim[1], trim[2]);
+        box(s, m, -W * 0.3f, W * 0.3f, -T * 2f, T * 2f, -0.06f, 0.04f, gem[0], gem[1], gem[2]); // 가운데 보석
         // 날: 넓은 몸통 + 끝으로 갈수록 좁아짐 (마디 6개)
         int seg = 6;
         for (int i = 0; i < seg; i++) {
             float z0 = -0.03f - L * i / seg, z1 = -0.03f - L * (i + 1) / seg;
             float k0 = i < seg - 2 ? 1f : (seg - i) / 2.5f, k1 = i + 1 < seg - 2 ? 1f : Math.max(0.05f, (seg - i - 1) / 2.5f);
             float w0 = W * 0.5f * k0, w1 = W * 0.5f * k1;
-            taper(s, m, w0, w1, T, z0, z1, 0.9f, 0.92f, 0.98f);
+            taper(s, m, w0, w1, T, z0, z1, blade[0], blade[1], blade[2]);
         }
         // 날 가운데 금빛 홈 + 빛
         VertexConsumer g = vcp.getBuffer(AWRenderLayers.ADDITIVE_COLOR);
         float a = glow;
         for (int side = -1; side <= 1; side += 2) {
             float x = side * (T + 0.002f);
-            quadYZ(g, m, x, -W * 0.09f, W * 0.09f, -0.06f, -0.06f - L * 0.8f, 1f, 0.86f, 0.45f, a);
+            quadYZ(g, m, x, -W * 0.09f, W * 0.09f, -0.06f, -0.06f - L * 0.8f, glowC[0], glowC[1], glowC[2], a);
         }
         // 날 둘레 은은한 빛
-        quadXZ(g, m, 0, -W * 0.95f, W * 0.95f, -0.04f, -0.04f - L, 1f, 0.92f, 0.65f, a * 0.25f);
-        quadYZ2(g, m, -W * 0.95f, W * 0.95f, -0.04f, -0.04f - L, 1f, 0.92f, 0.65f, a * 0.25f);
+        quadXZ(g, m, 0, -W * 0.95f, W * 0.95f, -0.04f, -0.04f - L, glowC[0], glowC[1], glowC[2], a * 0.25f);
+        quadYZ2(g, m, -W * 0.95f, W * 0.95f, -0.04f, -0.04f - L, glowC[0], glowC[1], glowC[2], a * 0.25f);
     }
 
     static void box(VertexConsumer vc, Matrix4f m, float x0, float x1, float y0, float y1, float z0, float z1, float r, float g, float b) {

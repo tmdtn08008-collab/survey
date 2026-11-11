@@ -280,6 +280,20 @@ ability('paladin', '성기사', 'Paladin',
 t('abilitywar.ult.paladin.title', '聖劍降臨', 'HOLY SWORD')
 t('abilitywar.ult.paladin.subtitle', '성검강림', 'Descent of the Holy Sword')
 
+# ================================================================ 몹 · 보스
+for k, ko, en in [('goblin', '고블린', 'Goblin'), ('orc', '오크 전사', 'Orc Warrior'), ('skeleton_knight', '해골 기사', 'Skeleton Knight'),
+                  ('wisp', '도깨비불', 'Will-o\'-Wisp'), ('fallen_king', '타락한 기사왕', 'The Fallen King'), ('ember_colossus', '화염 거인', 'Ember Colossus'),
+                  ('frost_witch', '서리 마녀', 'Frost Witch'), ('ancient_wyvern', '고대 비룡', 'Ancient Wyvern')]:
+    t(f'entity.abilitywar.{k}', ko, en)
+    t(f'item.abilitywar.{k}_spawn_egg', f'{ko} 생성 알', f'{en} Spawn Egg')
+t('boss.abilitywar.fallen_king.sub', '— 왕좌를 잃은 자 —', '— He Who Lost the Throne —')
+t('boss.abilitywar.ember_colossus.sub', '— 대지를 태우는 거인 —', '— Giant Who Burns the Earth —')
+t('boss.abilitywar.frost_witch.sub', '— 영원한 겨울의 주인 —', '— Mistress of Endless Winter —')
+t('boss.abilitywar.ancient_wyvern.sub', '— 하늘을 찢는 날개 —', '— Wings That Tear the Sky —')
+t('boss.abilitywar.appeared', '⚠ %s 이(가) 나타났다!', '⚠ %s has appeared!')
+t('boss.abilitywar.wild', '⚠ 야생 보스 %s 이(가) 근처에 나타났다! (%s, %s)', '⚠ A wild boss, %s, appeared nearby! (%s, %s)')
+t('block.abilitywar.boss_altar', '보스 제단', 'Boss Altar')
+
 
 def apply(fname, idx):
     p = os.path.join(LANG, fname)

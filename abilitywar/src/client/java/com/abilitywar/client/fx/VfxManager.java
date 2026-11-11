@@ -74,7 +74,7 @@ public final class VfxManager {
                     add(new Effects.DashTrail(w, id, color, n.getString("ab"), new Vec3d(n.getFloat("dx"), 0, n.getFloat("dz")), p));
                 }
                 default -> {
-                    if (!com.abilitywar.client.fx.dragon.DragonFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.blade.BladeFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.blood.BloodFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.cantor.CantorFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.warlock.WarlockFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.angel.AngelFx.spawn(type, n, w, p) && !ClassFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.paladin.PaladinFx.spawn(type, n, w, p))
+                    if (!com.abilitywar.client.fx.dragon.DragonFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.blade.BladeFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.blood.BloodFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.cantor.CantorFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.warlock.WarlockFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.angel.AngelFx.spawn(type, n, w, p) && !ClassFx.spawn(type, n, w, p) && !com.abilitywar.client.fx.paladin.PaladinFx.spawn(type, n, w, p) && !BossFx.spawn(type, n, w, p))
                         AbilityWar.LOG.debug("Unknown fx {}", type);
                 }
             }
@@ -160,6 +160,7 @@ public final class VfxManager {
         ClassFx.tick(w);
         GrandFx.tick(w);
         com.abilitywar.client.fx.paladin.PaladinFx.tick(w);
+        BossFx.tick(w);
         AfterImages.tick();
         Particles.tick();
         Debris.tick();
@@ -177,6 +178,7 @@ public final class VfxManager {
         ClassFx.clear();
         GrandFx.clear();
         com.abilitywar.client.fx.paladin.PaladinFx.clear();
+        BossFx.clear();
         EFFECTS.clear();
         Particles.clear();
         Debris.clear();
@@ -200,6 +202,7 @@ public final class VfxManager {
         c.tickDelta = ctx.tickDelta();
         try {
             BlackHoleFx.render(c);
+            BossFx.render(c);
             for (Fx f : EFFECTS) f.render(c);
             Debris.render(c);
             c.imm.draw();

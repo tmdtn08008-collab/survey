@@ -150,11 +150,11 @@ public final class PaladinFx {
     }
 
     // ================================================================ 빛기둥 (평타 막타 · 심판)
-    static final class Pillar extends Fx {
+    public static final class Pillar extends Fx {
         final Vec3d p;
         final float s;
 
-        Pillar(ClientWorld w, Vec3d at, float s) {
+        public Pillar(ClientWorld w, Vec3d at, float s) {
             super(16);
             Vec3d gnd = Effects.ground(w, at.add(0, 0.6, 0), 3);
             this.p = gnd != null ? gnd : at;

@@ -65,6 +65,9 @@ public final class AWCommands {
         return n;
     }
 
+    private static final com.mojang.brigadier.suggestion.SuggestionProvider<ServerCommandSource> BOSSES = (ctx, b) ->
+            net.minecraft.command.CommandSource.suggestMatching(java.util.List.of("abilitywar:fallen_king", "abilitywar:ember_colossus", "abilitywar:frost_witch", "abilitywar:ancient_wyvern"), b);
+
     private static int rpgEach(Collection<ServerPlayerEntity> ps, java.util.function.Consumer<ServerPlayerEntity> f) {
         for (ServerPlayerEntity p : ps) f.accept(p);
         return ps.size();
@@ -116,6 +119,23 @@ public final class AWCommands {
                                 .executes(ctx -> rpgEach(List.of(ctx.getSource().getPlayerOrThrow()), p -> com.abilitywar.rpg.RpgManager.setGrand(p, com.mojang.brigadier.arguments.BoolArgumentType.getBool(ctx, "on"))))
                                 .then(argument("targets", EntityArgumentType.players())
                                         .executes(ctx -> rpgEach(EntityArgumentType.getPlayers(ctx, "targets"), p -> com.abilitywar.rpg.RpgManager.setGrand(p, com.mojang.brigadier.arguments.BoolArgumentType.getBool(ctx, "on")))))))
+                .then(literal("boss").requires(s -> s.hasPermissionLevel(2))
+                        .then(argument("boss", net.minecraft.command.argument.IdentifierArgumentType.identifier()).suggests(BOSSES)
+                                .executes(ctx -> {
+                                    ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
+                                    var id = net.minecraft.command.argument.IdentifierArgumentType.getIdentifier(ctx, "boss");
+                                    var e = com.abilitywar.mob.BossSpawner.spawnNear(p.getServerWorld(), p, id);
+                                    return e == null ? 0 : 1;
+                                })))
+                .then(literal("altar").requires(s -> s.hasPermissionLevel(2))
+                        .then(argument("boss", net.minecraft.command.argument.IdentifierArgumentType.identifier()).suggests(BOSSES)
+                                .executes(ctx -> {
+                                    ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
+                                    var pos = p.getBlockPos().down();
+                                    p.getServerWorld().setBlockState(pos, com.abilitywar.mob.BossAltar.BLOCK.getDefaultState());
+                                    com.abilitywar.mob.BossAltar.setBoss(p.getServerWorld(), pos, net.minecraft.command.argument.IdentifierArgumentType.getIdentifier(ctx, "boss"));
+                                    return 1;
+                                })))
                 .then(literal("king").requires(s -> s.hasPermissionLevel(2)).executes(ctx -> {
                     ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
                     var npc = com.abilitywar.registry.AWEntities.KING.create(p.getServerWorld());

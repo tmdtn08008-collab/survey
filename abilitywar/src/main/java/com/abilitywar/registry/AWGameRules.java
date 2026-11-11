@@ -28,6 +28,12 @@ public final class AWGameRules {
     /** 3차 전직 ("대") 퀘스트를 받을 수 있는 레벨. */
     public static final GameRules.Key<GameRules.IntRule> GRAND_LEVEL =
             GameRuleRegistry.register("abilitywarGrandLevel", GameRules.Category.PLAYER, GameRuleFactory.createIntRule(60, 1, 100));
+    /** 야생 보스가 나타나는지. */
+    public static final GameRules.Key<GameRules.BooleanRule> WILD_BOSSES =
+            GameRuleRegistry.register("abilitywarWildBosses", GameRules.Category.SPAWNING, GameRuleFactory.createBooleanRule(true));
+    /** 5분마다 플레이어마다 야생 보스가 나올 확률 (%). */
+    public static final GameRules.Key<GameRules.IntRule> WILD_BOSS_CHANCE =
+            GameRuleRegistry.register("abilitywarWildBossChance", GameRules.Category.SPAWNING, GameRuleFactory.createIntRule(15, 0, 100));
     /** 경험치 배율 (%). */
     public static final GameRules.Key<GameRules.IntRule> XP_RATE =
             GameRuleRegistry.register("abilitywarXpRate", GameRules.Category.PLAYER, GameRuleFactory.createIntRule(100, 0, 100000));
