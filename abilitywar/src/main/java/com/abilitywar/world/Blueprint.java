@@ -310,8 +310,12 @@ public final class Blueprint {
                 for (int i = 0; i < sg.lines.length && i < 4; i++)
                     t = t.withMessage(i, net.minecraft.text.Text.translatable(sg.lines[i]).formatted(i == 1 ? net.minecraft.util.Formatting.BOLD : net.minecraft.util.Formatting.RESET));
                 t = t.withColor(net.minecraft.util.DyeColor.YELLOW).withGlowing(true);
-                be.setText(t, true);
-                be.setWaxed(true);
+                // 생성 중에는 setText 가 월드를 부르므로 NBT 로 넣음
+                net.minecraft.nbt.NbtCompound n = new net.minecraft.nbt.NbtCompound();
+                var enc = net.minecraft.block.entity.SignText.CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, t).result();
+                if (enc.isPresent()) n.put("front_text", enc.get());
+                n.putBoolean("is_waxed", true);
+                be.readNbt(n);
                 be.markDirty();
             }
         }

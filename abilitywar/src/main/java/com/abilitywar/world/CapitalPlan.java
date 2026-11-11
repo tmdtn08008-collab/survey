@@ -425,8 +425,8 @@ public final class CapitalPlan {
 
     /** 모험가 길드: 큰 3층 목조 회관 + 앞마당 게시판 + 접수원. 문은 북쪽 (동쪽 큰길). */
     static void guildHall(Blueprint b, int x0, int z0, int x1, int z1, int by, Random r, List<Rect> res) {
-        Build.Palette pal = new Build.Palette(Blocks.SPRUCE_PLANKS, Blocks.DARK_OAK_LOG, Blocks.DARK_OAK_PLANKS, Blocks.WAXED_CUT_COPPER_STAIRS, Blocks.WAXED_CUT_COPPER,
-                Blocks.GLASS_PANE, Blocks.DARK_OAK_DOOR, Blocks.STONE_BRICKS);
+        Build.Palette pal = new Build.Palette(Blocks.WHITE_TERRACOTTA, Blocks.DARK_OAK_LOG, Blocks.DARK_OAK_PLANKS, Blocks.WAXED_CUT_COPPER_STAIRS, Blocks.WAXED_CUT_COPPER,
+                Blocks.YELLOW_STAINED_GLASS_PANE, Blocks.DARK_OAK_DOOR, Blocks.STONE_BRICKS);
         int hz0 = z0 + 4;
         Build.house(b, x0, hz0, x1 - x0 + 1, z1 - hz0 + 1, by, 3, Direction.NORTH, pal, r);
         int mx = (x0 + x1) / 2;
@@ -448,6 +448,11 @@ public final class CapitalPlan {
             b.set(sx, by + 5, z0 + 2, s(Blocks.YELLOW_WOOL));
         }
         sign(b, mx, by + 4, hz0 - 1, Direction.NORTH, "sign.abilitywar.guild");
+        // 정면 큰 깃발 (파랑 · 금 · 칼 문양 대신 노랑 줄)
+        for (int fx : new int[]{mx - 5, mx + 5}) {
+            b.fill(fx, by + 4, hz0 - 1, fx, by + 10, hz0 - 1, s(Blocks.BLUE_WOOL));
+            b.fill(fx, by + 7, hz0 - 1, fx, by + 7, hz0 - 1, s(Blocks.YELLOW_WOOL));
+        }
         sign(b, mx - 8, by + 4, z0, Direction.NORTH, "sign.abilitywar.guild_board");
         reserve(res, x0 - 1, z0 - 1, x1 + 1, z1 + 1);
     }
@@ -573,15 +578,20 @@ public final class CapitalPlan {
             }
         int placed = 0;
         int[][] bands = {{R_B0, R_B1}, {R_A0, R_A1}};
+        // 여러 번 훑으며 (점점 촘촘하게, 점점 작은 집) 빈 땅을 채움
+        double[][] passes = {{7, 7.5, 0}, {3.5, 4, 0}, {2, 2.5, 1}};
+        for (double[] pass : passes)
         for (int[] band : bands) {
             boolean noble = band[0] == R_A0;
-            for (double rr = band[1] - 4; rr >= band[0] + 3; rr -= 7) {
-                double step = 7.5 / rr;
+            boolean small = pass[2] > 0;
+            for (double rr = band[1] - 3; rr >= band[0] + 2; rr -= pass[0]) {
+                double step = pass[1] / rr;
                 double off = r.nextDouble() * step;
                 for (double a = off; a < Math.PI * 2; a += step) {
                     int hx = (int) Math.round(Math.cos(a) * rr), hz = (int) Math.round(Math.sin(a) * rr);
                     // 크기를 큰 것부터 줄여 가며 맞춰 봄
-                    int[][] sizes = r.nextBoolean() ? new int[][]{{8, 7}, {7, 8}, {7, 6}, {6, 7}, {6, 6}, {5, 6}, {6, 5}, {5, 5}}
+                    int[][] sizes = small ? new int[][]{{5, 5}, {5, 4}, {4, 5}, {4, 4}}
+                            : r.nextBoolean() ? new int[][]{{8, 7}, {7, 8}, {7, 6}, {6, 7}, {6, 6}, {5, 6}, {6, 5}, {5, 5}}
                             : new int[][]{{7, 8}, {8, 7}, {6, 7}, {7, 6}, {6, 6}, {6, 5}, {5, 6}, {5, 5}};
                     for (int[] sz : sizes) {
                         int w = sz[0], d = sz[1];
@@ -589,7 +599,7 @@ public final class CapitalPlan {
                         if (!free(occ, x0, z0, w, d)) continue;
                         // 문: 가까운 길 쪽
                         Direction door = doorTowardStreet(x0, z0, w, d);
-                        int floors = noble ? (r.nextFloat() < 0.6f ? 3 : 2) : (r.nextFloat() < 0.25f ? 1 : r.nextFloat() < 0.75f ? 2 : 3);
+                        int floors = small ? (r.nextFloat() < 0.5f ? 1 : 2) : noble ? (r.nextFloat() < 0.6f ? 3 : 2) : (r.nextFloat() < 0.25f ? 1 : r.nextFloat() < 0.75f ? 2 : 3);
                         Build.house(b, cx + x0, cz + z0, w, d, by, floors, door, randomPalette(r, noble), r);
                         mark(occ, x0 - 1, z0 - 1, w + 2, d + 2);
                         int[] o = Build.doorOutside(cx + x0, cz + z0, w, d, door);
@@ -612,7 +622,7 @@ public final class CapitalPlan {
             }
         }
         // 남은 빈 땅: 나무 · 꽃
-        for (int k = 0; k < 140; k++) {
+        for (int k = 0; k < 90; k++) {
             int x = r.nextInt(N) - R_EDGE, z = r.nextInt(N) - R_EDGE;
             if (!free(occ, x - 1, z - 1, 3, 3)) continue;
             if (r.nextFloat() < 0.35f) {

@@ -29,3 +29,12 @@ Cataclysm 은 Forge 전용이라 이 모드팩 (Fabric) 에서 못 쓰기 때문
 - 이 보스들을 잡아도 3차 전직 · 왕 퀘스트의 **"보스 처치"** 로 인정되고, 보스 경험치도 들어옵니다.
 - 야생에 얼마나 나올지는 `config/abilitywar_wild_bosses.json` 의 `weight` 로 바꿉니다 (0 = 안 나옴). 예전 설정 파일이 있으면 새 항목이 자동으로 덧붙습니다.
 - 관리자: `/aw boss bosses_of_mass_destruction:lich` 처럼 바로 불러낼 수 있습니다.
+
+## 다른 보스 모드 (넣으면 바로 같이 쓰임)
+
+능력대전쟁은 아래 Fabric 1.20.1 보스 모드의 보스 id 도 미리 알고 있습니다 (야생 보스 목록 · "보스 처치" 인정). 모드를 안 넣으면 그냥 건너뜁니다. 이 폴더에는 들어 있지 않으니 링크에서 받아 `mods` 에 넣으세요.
+
+| 모드 | 보스 | 받는 곳 |
+|---|---|---|
+| Marium's Soulslike Weaponry (CC0) | `soulsweapons:accursed_lord_boss` · `draugr_boss` · `night_shade` · `returning_knight` · `chaos_monarch` · `moonknight` · `day_stalker` · `night_prowler` | [Modrinth](https://modrinth.com/mod/mariums-soulslike-weaponry) |
+| The Graveyard (GPL-3.0) | `graveyard:lich` (타락한 챔피언) | [Modrinth](https://modrinth.com/mod/the-graveyard-fabric) |
