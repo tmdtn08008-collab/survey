@@ -288,6 +288,8 @@
 ## 설치
 
 1. Fabric Loader(1.20.1)를 설치합니다.
+💡 **모드팩 파일 (가장 쉬움)**: [`dist/abilitywar-rpg-2.7.0.mrpack`](dist/abilitywar-rpg-2.7.0.mrpack) 를 **Modrinth 앱** (또는 Prism Launcher · ATLauncher 등) 에서 *파일에서 가져오기* 로 열면 마인크래프트 1.20.1 + Fabric Loader 0.19.5 + 능력대전쟁 + 보스 모드 (Ultris 포함) + Fabric API 가 한 번에 설치됩니다. 모드 파일은 Modrinth 공식 주소에서 받아집니다.
+
 💡 **한 번에 받기 (Windows)**: PowerShell 을 열고 아래 한 줄을 붙여넣으면 능력대전쟁 + 보스 모드 17 개 + Fabric API 가 **바탕화면\mod 모음** 폴더에 다 받아집니다.
 ```powershell
 irm https://raw.githubusercontent.com/tmdtn08008-collab/survey/claude/blissful-carson-s8snwp/abilitywar/dist/download_mods.ps1 | iex
