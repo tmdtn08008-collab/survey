@@ -65,6 +65,17 @@ public final class BossSpawner {
         try {
             if (!Files.exists(f)) Files.writeString(f, defaults());
             JsonObject root = GSON.fromJson(Files.readString(f), JsonObject.class);
+            // 예전 설정 파일: 새로 들어간 기본 항목 (다른 모드 보스) 을 덧붙임
+            if (!root.has("_version") || root.get("_version").getAsInt() < CONFIG_VERSION) {
+                java.util.Set<String> have = new java.util.HashSet<>();
+                for (JsonElement el : root.getAsJsonArray("bosses")) have.add(el.getAsJsonObject().get("id").getAsString());
+                JsonObject def = GSON.fromJson(defaults(), JsonObject.class);
+                for (JsonElement el : def.getAsJsonArray("bosses"))
+                    if (!have.contains(el.getAsJsonObject().get("id").getAsString())) root.getAsJsonArray("bosses").add(el);
+                root.addProperty("_version", CONFIG_VERSION);
+                root.add("_help", def.get("_help"));
+                Files.writeString(f, GSON.toJson(root));
+            }
             for (JsonElement el : root.getAsJsonArray("bosses")) {
                 JsonObject o = el.getAsJsonObject();
                 Identifier id = new Identifier(o.get("id").getAsString());
@@ -84,14 +95,24 @@ public final class BossSpawner {
         AbilityWar.LOG.info("[wild bosses] {} entries", ENTRIES.size());
     }
 
-    /** 기본 목록: 이 모드 보스 4 + (설치돼 있으면) L_Ender's Cataclysm 의 보스들 (무게 0 = 꺼짐, 숫자를 올리면 켜짐). */
+    static final int CONFIG_VERSION = 2;
+
+    /**
+     * 기본 목록: 이 모드 보스 4 + Bosses of Mass Destruction (설치돼 있으면 나옴)
+     * + L_Ender's Cataclysm 의 보스들 (Forge 전용이라 무게 0 = 꺼짐).
+     */
     static String defaults() {
         JsonObject root = new JsonObject();
-        root.addProperty("_help", "biome: any / cold / hot / mountain / forest / swamp / ocean. weight 0 = off. 다른 모드 보스 id 를 넣으면 그 모드가 있을 때만 나옴.");
+        root.addProperty("_version", CONFIG_VERSION);
+        root.addProperty("_help", "biome: any / cold / hot / mountain / forest / swamp / ocean. weight 0 = off. 다른 모드 보스 id 를 넣으면 그 모드가 있을 때만 나옴. "
+                + "bosses_of_mass_destruction = Bosses of Mass Destruction (dist/boss_mods 에 같이 들어 있음).");
         JsonArray a = new JsonArray();
         String[][] def = {
                 {"abilitywar:fallen_king", "10", "any"}, {"abilitywar:ember_colossus", "10", "hot"}, {"abilitywar:frost_witch", "10", "cold"},
                 {"abilitywar:ancient_wyvern", "8", "mountain"}, {"abilitywar:ancient_wyvern", "3", "any"},
+                {"bosses_of_mass_destruction:lich", "8", "cold"}, {"bosses_of_mass_destruction:lich", "3", "any"},
+                {"bosses_of_mass_destruction:gauntlet", "6", "hot"}, {"bosses_of_mass_destruction:obsidilith", "5", "mountain"},
+                {"bosses_of_mass_destruction:void_blossom", "6", "forest"}, {"bosses_of_mass_destruction:void_blossom", "4", "swamp"},
                 {"cataclysm:ignis", "0", "hot"}, {"cataclysm:netherite_monstrosity", "0", "hot"}, {"cataclysm:ender_guardian", "0", "any"},
                 {"cataclysm:the_harbinger", "0", "any"}, {"cataclysm:the_leviathan", "0", "ocean"}, {"cataclysm:ancient_remnant", "0", "hot"},
                 {"cataclysm:maledictus", "0", "cold"}, {"cataclysm:scylla", "0", "ocean"}};

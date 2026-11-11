@@ -52,15 +52,22 @@ public final class RpgWorld {
     static final java.util.Map<java.util.UUID, String> REGION = new java.util.HashMap<>();
     static final int TOWN_NAMES = 16;
 
-    /** 이 위치의 RPG 구조물 (없으면 null). */
+    /** 이 위치의 RPG 구조물 (없으면 null). 겹치면 왕령보다 수도·마을·던전이 먼저. */
     public static net.minecraft.structure.StructureStart structureAt(ServerWorld w, BlockPos pos) {
         var acc = w.getStructureAccessor();
+        net.minecraft.structure.StructureStart best = null;
+        int bestPri = -1;
         for (var st : acc.getStructureReferences(pos).keySet()) {
-            if (!(st instanceof RpgStructures.RpgStructure)) continue;
+            if (!(st instanceof RpgStructures.RpgStructure rs)) continue;
             var start = acc.getStructureAt(pos, st);
-            if (start != null && start.hasChildren()) return start;
+            if (start == null || !start.hasChildren()) continue;
+            int pri = rs.kind == RpgStructures.Kind.CAPITAL_LANDS ? 0 : 1;
+            if (pri > bestPri) {
+                best = start;
+                bestPri = pri;
+            }
         }
-        return null;
+        return best;
     }
 
     public static RpgStructures.Kind kindAt(ServerWorld w, BlockPos pos) {

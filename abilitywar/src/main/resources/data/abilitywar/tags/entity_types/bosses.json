@@ -5,13 +5,53 @@
     "abilitywar:ember_colossus",
     "abilitywar:frost_witch",
     "abilitywar:ancient_wyvern",
-    {"id": "cataclysm:ignis", "required": false},
-    {"id": "cataclysm:netherite_monstrosity", "required": false},
-    {"id": "cataclysm:ender_guardian", "required": false},
-    {"id": "cataclysm:the_harbinger", "required": false},
-    {"id": "cataclysm:the_leviathan", "required": false},
-    {"id": "cataclysm:ancient_remnant", "required": false},
-    {"id": "cataclysm:maledictus", "required": false},
-    {"id": "cataclysm:scylla", "required": false}
+    {
+      "id": "bosses_of_mass_destruction:void_blossom",
+      "required": false
+    },
+    {
+      "id": "bosses_of_mass_destruction:gauntlet",
+      "required": false
+    },
+    {
+      "id": "bosses_of_mass_destruction:obsidilith",
+      "required": false
+    },
+    {
+      "id": "bosses_of_mass_destruction:lich",
+      "required": false
+    },
+    {
+      "id": "cataclysm:ignis",
+      "required": false
+    },
+    {
+      "id": "cataclysm:netherite_monstrosity",
+      "required": false
+    },
+    {
+      "id": "cataclysm:ender_guardian",
+      "required": false
+    },
+    {
+      "id": "cataclysm:the_harbinger",
+      "required": false
+    },
+    {
+      "id": "cataclysm:the_leviathan",
+      "required": false
+    },
+    {
+      "id": "cataclysm:ancient_remnant",
+      "required": false
+    },
+    {
+      "id": "cataclysm:maledictus",
+      "required": false
+    },
+    {
+      "id": "cataclysm:scylla",
+      "required": false
+    }
   ]
 }

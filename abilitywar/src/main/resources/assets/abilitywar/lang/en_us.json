@@ -618,5 +618,7 @@
  "region.abilitywar.goblin_camp.sub": "Danger · Goblin warband",
  "rpg.abilitywar.place_not_found": "None found nearby.",
  "rpg.abilitywar.goto": "Teleported to %s: %s %s %s",
- "region.abilitywar.town.generic": "Village"
+ "region.abilitywar.town.generic": "Village",
+ "region.abilitywar.capital_lands": "Crownlands of Arden",
+ "region.abilitywar.capital_lands.sub": "Fields of the kingdom · farms, windmills and pastures"
 }

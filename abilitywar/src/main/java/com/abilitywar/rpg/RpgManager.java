@@ -136,6 +136,7 @@ public final class RpgManager {
     public static void onDeath(LivingEntity dead, net.minecraft.entity.damage.DamageSource source) {
         if (dead.getWorld().isClient) return;
         if (isBoss(dead) && dead.getWorld() instanceof ServerWorld sw) {
+            com.abilitywar.mob.BossAltar.onAnyBossDeath(dead);
             // 보스: 가까이서 싸운 모두가 경험치 + 퀘스트 (마지막 한 방이 누구든)
             int xp = mobXp(dead);
             for (ServerPlayerEntity o : sw.getEntitiesByClass(ServerPlayerEntity.class, dead.getBoundingBox().expand(48), o -> !o.isSpectator() && o.isAlive())) {

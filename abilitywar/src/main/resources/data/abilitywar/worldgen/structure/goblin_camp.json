@@ -3,6 +3,6 @@
   "kind": "goblin_camp",
   "biomes": "#abilitywar:has_structure/goblin_camp",
   "step": "top_layer_modification",
-  "terrain_adaptation": "beard_thin",
+  "terrain_adaptation": "none",
   "spawn_overrides": {}
 }

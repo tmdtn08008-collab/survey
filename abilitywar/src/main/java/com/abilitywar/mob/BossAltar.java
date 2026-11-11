@@ -54,6 +54,30 @@ public final class BossAltar {
         }
     }
 
+    /**
+     * 다른 모드 보스 (설치돼 있을 때만): 제단마다 가끔 (3번에 1번) 이 보스가 대신 나옴.
+     * Bosses of Mass Destruction: 몰락한 요새·서리 신전 → 밤의 리치, 잿불 제단 → 네더 건틀릿, 비룡의 둥지 → 옵시딜리스.
+     */
+    static final java.util.Map<String, String> ALT = java.util.Map.of(
+            "abilitywar:fallen_king", "bosses_of_mass_destruction:lich",
+            "abilitywar:frost_witch", "bosses_of_mass_destruction:lich",
+            "abilitywar:ember_colossus", "bosses_of_mass_destruction:gauntlet",
+            "abilitywar:ancient_wyvern", "bosses_of_mass_destruction:obsidilith");
+    /** 제단이 부른 다른 모드 보스 → 제단 자리 (죽으면 제단 대기 시간). */
+    static final java.util.Map<UUID, net.minecraft.util.math.GlobalPos> ALT_HOMES = new java.util.concurrent.ConcurrentHashMap<>();
+
+    static Identifier pick(String boss, net.minecraft.util.math.random.Random random) {
+        String alt = ALT.get(boss);
+        if (alt != null && Registries.ENTITY_TYPE.containsId(new Identifier(alt)) && random.nextInt(3) == 0) return new Identifier(alt);
+        return new Identifier(boss);
+    }
+
+    /** 아무 보스나 죽음 (RpgManager): 제단이 부른 다른 모드 보스면 제단 대기 시간 시작. */
+    public static void onAnyBossDeath(net.minecraft.entity.LivingEntity dead) {
+        var home = ALT_HOMES.remove(dead.getUuid());
+        if (home != null && dead.getWorld() instanceof ServerWorld sw && sw.getRegistryKey() == home.getDimension()) onBossDied(sw, home.getPos());
+    }
+
     static void onBossDied(ServerWorld w, BlockPos home) {
         if (w.getBlockEntity(home) instanceof AltarEntity a) {
             a.cooldownUntil = w.getTime() + COOLDOWN;
@@ -112,13 +136,14 @@ public final class BossAltar {
                 break;
             }
             if (near == null) return;
-            EntityType<?> type = Registries.ENTITY_TYPE.get(new Identifier(boss));
+            EntityType<?> type = Registries.ENTITY_TYPE.get(pick(boss, w.getRandom()));
             Entity e = type.create(w);
             if (e == null) return;
             Vec3d at = Vec3d.ofBottomCenter(pos.up(e instanceof AncientWyvernEntity ? 8 : 1));
             e.refreshPositionAndAngles(at.x, at.y, at.z, near.getYaw() + 180, 0);
             if (e instanceof MobEntity m) m.initialize(w, w.getLocalDifficulty(pos), SpawnReason.STRUCTURE, null, null);
             if (e instanceof BossEntity b) b.setHome(pos);
+            else ALT_HOMES.put(e.getUuid(), net.minecraft.util.math.GlobalPos.create(w.getRegistryKey(), pos.toImmutable()));
             w.spawnEntity(e);
             NbtCompound n = new NbtCompound();
             n.putFloat("s", 2f);

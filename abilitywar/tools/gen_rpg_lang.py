@@ -302,6 +302,8 @@ t('rpg.abilitywar.place_not_found', '가까운 곳에서 찾지 못했습니다.
 t('rpg.abilitywar.goto', '%s (으)로 이동: %s %s %s', 'Teleported to %s: %s %s %s')
 t('region.abilitywar.capital', '왕도 아르덴', 'Royal Capital Arden')
 t('region.abilitywar.capital.sub', '안전 지대 · 왕과 전직 교관이 있는 곳', 'Safe zone · Home of the King and the Class Master')
+t('region.abilitywar.capital_lands', '아르덴 왕령', 'Crownlands of Arden')
+t('region.abilitywar.capital_lands.sub', '왕국의 들판 · 밭과 풍차, 목장', 'Fields of the kingdom · farms, windmills and pastures')
 t('region.abilitywar.town', '%s 마을', '%s Village')
 t('region.abilitywar.town.generic', '마을', 'Village')
 t('region.abilitywar.town.sub', '안전 지대 · 전직 교관이 있습니다', 'Safe zone · A Class Master lives here')

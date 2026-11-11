@@ -62,7 +62,13 @@ public final class Build {
     public static final Palette SPRUCE = new Palette(Blocks.SPRUCE_PLANKS, Blocks.STRIPPED_SPRUCE_LOG, Blocks.OAK_PLANKS, Blocks.DEEPSLATE_TILE_STAIRS, Blocks.DEEPSLATE_TILES, Blocks.GLASS_PANE, Blocks.SPRUCE_DOOR, Blocks.COBBLESTONE);
     public static final Palette STONE = new Palette(Blocks.STONE_BRICKS, Blocks.POLISHED_ANDESITE, Blocks.SPRUCE_PLANKS, Blocks.SPRUCE_STAIRS, Blocks.SPRUCE_PLANKS, Blocks.GLASS_PANE, Blocks.SPRUCE_DOOR, Blocks.STONE_BRICKS);
     public static final Palette BIRCH = new Palette(Blocks.BIRCH_PLANKS, Blocks.BIRCH_LOG, Blocks.OAK_PLANKS, Blocks.MUD_BRICK_STAIRS, Blocks.MUD_BRICKS, Blocks.GLASS_PANE, Blocks.BIRCH_DOOR, Blocks.COBBLESTONE);
+    public static final Palette BRICK = new Palette(Blocks.BRICKS, Blocks.SPRUCE_LOG, Blocks.SPRUCE_PLANKS, Blocks.DEEPSLATE_TILE_STAIRS, Blocks.DEEPSLATE_TILES, Blocks.GLASS_PANE, Blocks.SPRUCE_DOOR, Blocks.STONE_BRICKS);
+    public static final Palette DARK = new Palette(Blocks.DARK_OAK_PLANKS, Blocks.STRIPPED_DARK_OAK_LOG, Blocks.SPRUCE_PLANKS, Blocks.STONE_BRICK_STAIRS, Blocks.STONE_BRICKS, Blocks.GLASS_PANE, Blocks.DARK_OAK_DOOR, Blocks.COBBLESTONE);
+    public static final Palette PLASTER = new Palette(Blocks.SMOOTH_SANDSTONE, Blocks.DARK_OAK_LOG, Blocks.OAK_PLANKS, Blocks.SPRUCE_STAIRS, Blocks.SPRUCE_PLANKS, Blocks.GLASS_PANE, Blocks.OAK_DOOR, Blocks.COBBLESTONE);
+    public static final Palette NOBLE = new Palette(Blocks.POLISHED_DIORITE, Blocks.STRIPPED_BIRCH_LOG, Blocks.DARK_OAK_PLANKS, Blocks.DEEPSLATE_TILE_STAIRS, Blocks.DEEPSLATE_TILES, Blocks.GLASS_PANE, Blocks.BIRCH_DOOR, Blocks.POLISHED_ANDESITE);
     public static final Palette[] HOUSES = {OAK, WHITE, SPRUCE, STONE, BIRCH};
+    public static final Palette[] CITY = {OAK, WHITE, SPRUCE, BIRCH, BRICK, DARK, PLASTER, WHITE, BRICK};
+    public static final Palette[] GRAND = {STONE, WHITE, NOBLE, BRICK, NOBLE};
 
     /**
      * 집: (x0, z0) 에서 가로 w (x), 세로 d (z), 층 floors (층마다 4칸), 문은 door 쪽 벽 가운데.
@@ -250,6 +256,79 @@ public final class Build {
             if ((across == 0 || across == t - 1) && Math.floorMod(along, 2) == 0) return weather(s(mat), x, y, z, weatherPct);
             return null;
         });
+    }
+
+    // ================================================================ 다각형 (성벽 모양)
+    /** 점에서 선분까지 거리. */
+    public static double segDist(double px, double pz, double ax, double az, double bx, double bz) {
+        double dx = bx - ax, dz = bz - az, l2 = dx * dx + dz * dz;
+        double t = l2 == 0 ? 0 : Math.max(0, Math.min(1, ((px - ax) * dx + (pz - az) * dz) / l2));
+        double qx = ax + t * dx - px, qz = az + t * dz - pz;
+        return Math.sqrt(qx * qx + qz * qz);
+    }
+
+    public static boolean polyInside(int[][] pts, double x, double z) {
+        boolean in = false;
+        for (int i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+            double xi = pts[i][0], zi = pts[i][1], xj = pts[j][0], zj = pts[j][1];
+            if ((zi > z) != (zj > z) && x < (xj - xi) * (z - zi) / (zj - zi) + xi) in = !in;
+        }
+        return in;
+    }
+
+    public static double polyDist(int[][] pts, double x, double z) {
+        double d = Double.MAX_VALUE;
+        for (int i = 0, j = pts.length - 1; i < pts.length; j = i++) d = Math.min(d, segDist(x, z, pts[j][0], pts[j][1], pts[i][0], pts[i][1]));
+        return d;
+    }
+
+    /** 안쪽이면 +거리, 바깥이면 -거리. */
+    public static double polySigned(int[][] pts, double x, double z) {
+        double d = polyDist(pts, x, z);
+        return polyInside(pts, x, z) ? d : -d;
+    }
+
+    /** 다각형 성벽 (두께 t, 높이 h): 위는 걷는 길 + 양쪽 성가퀴. */
+    public static void polyWall(Blueprint b, int[][] pts, int base, int h, int t, Block mat, int weatherPct) {
+        double half = t / 2.0;
+        for (int i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+            int ax = pts[j][0], az = pts[j][1], bx = pts[i][0], bz = pts[i][1];
+            int x0 = Math.min(ax, bx) - t, x1 = Math.max(ax, bx) + t, z0 = Math.min(az, bz) - t, z1 = Math.max(az, bz) + t;
+            b.fn(x0, base, z0, x1, base + h + 1, z1, (x, y, z) -> {
+                double d = segDist(x, z, ax, az, bx, bz);
+                if (d > half) return null;
+                int ly = y - base;
+                if (ly <= h) return ly == h && d < half - 1 ? s(Blocks.POLISHED_ANDESITE) : weather(s(mat), x, y, z, weatherPct);
+                return d >= half - 1 && Math.floorMod(x + z, 2) == 0 ? weather(s(mat), x, y, z, weatherPct) : null;
+            });
+        }
+    }
+
+    /** 네모 탑: 속 빈 탑 + 층 + 사다리, 위는 성가퀴 (roof = false) 또는 피라미드 지붕. */
+    public static void squareTower(Blueprint b, int cx, int cz, int base, int half, int h, Block wall, Block roofStairs, Block roofBlock, boolean roof, int weatherPct) {
+        int roofH = roof ? half + 2 : 1;
+        b.fn(cx - half - 1, base, cz - half - 1, cx + half + 1, base + h + roofH, cz + half + 1, (x, y, z) -> {
+            int dx = Math.abs(x - cx), dz = Math.abs(z - cz), ly = y - base, d = Math.max(dx, dz);
+            if (ly <= h) {
+                if (d > half) return null;
+                boolean shell = d == half;
+                if (!shell) return ly == 0 || (ly % 6 == 0) ? s(Blocks.SPRUCE_PLANKS) : s(Blocks.AIR);
+                if (dx == half && dz == half) return s(Blocks.POLISHED_ANDESITE);
+                if (ly % 6 == 3 && (dx == 0 || dz == 0)) return s(Blocks.AIR);
+                return weather(s(wall), x, y, z, weatherPct);
+            }
+            int i = ly - h - 1;
+            if (!roof) return d == half && Math.floorMod(x + z, 2) == 0 ? weather(s(wall), x, y, z, weatherPct) : null;
+            int ring = half + 1 - i;
+            if (ring < 0) return null;
+            if (ring == 0) return d == 0 ? s(roofBlock) : null;
+            if (d != ring) return d < ring ? (i == 0 ? s(Blocks.SPRUCE_PLANKS) : null) : null;
+            if (dx == ring && dz == ring) return s(roofBlock);
+            Direction f = dx == ring ? (x > cx ? Direction.WEST : Direction.EAST) : (z > cz ? Direction.NORTH : Direction.SOUTH);
+            return stairs(roofStairs, f, false);
+        });
+        for (int y = base + 1; y < base + h; y++) b.set(cx, y, cz - half + 1, s(Blocks.LADDER).with(LadderBlock.FACING, Direction.SOUTH));
+        b.set(cx + 1, base + h - 2, cz + 1, s(Blocks.LANTERN));
     }
 
     // ================================================================ 소품

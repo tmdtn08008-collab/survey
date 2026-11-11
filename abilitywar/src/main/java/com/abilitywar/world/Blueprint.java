@@ -77,6 +77,49 @@ public final class Blueprint {
         public int top(int x, int z) {
             return world.getTopY(net.minecraft.world.Heightmap.Type.WORLD_SURFACE_WG, x, z) - 1;
         }
+
+        /** 지금 실제로 놓인 땅의 맨 위 (풀·꽃·나뭇잎·통나무·눈 층은 건너뜀). from 부터 아래로 찾음. 물이면 물 표면. */
+        public int surface(int x, int z, int from) {
+            for (int y = from; y > world.getBottomY(); y--) {
+                BlockState s = get(x, y, z);
+                if (s.isAir()) continue;
+                if (!s.getFluidState().isEmpty()) return y;
+                if (s.isIn(net.minecraft.registry.tag.BlockTags.LEAVES) || s.isIn(net.minecraft.registry.tag.BlockTags.LOGS)) continue;
+                if (s.getCollisionShape(world, m).isEmpty() || s.isOf(Blocks.SNOW)) continue;
+                return y;
+            }
+            return world.getBottomY();
+        }
+
+        public boolean water(int x, int y, int z) {
+            return !get(x, y, z).getFluidState().isEmpty();
+        }
+
+        public boolean inChunk(int x, int z) {
+            return x >= chunk.getMinX() && x <= chunk.getMaxX() && z >= chunk.getMinZ() && z <= chunk.getMaxZ();
+        }
+    }
+
+    /** 땅 위에 놓기: 기둥마다 불림 (p.top / p.surface 로 높이를 직접 찾음). */
+    public interface SurfaceFn {
+        void at(Placer p, int x, int z);
+    }
+
+    record Surface(BlockBox box, SurfaceFn fn) implements Prim {
+        @Override
+        public void place(Placer p, BlockBox clip) {
+            for (int x = Math.max(box.getMinX(), clip.getMinX()); x <= Math.min(box.getMaxX(), clip.getMaxX()); x++)
+                for (int z = Math.max(box.getMinZ(), clip.getMinZ()); z <= Math.min(box.getMaxZ(), clip.getMaxZ()); z++) fn.at(p, x, z);
+        }
+    }
+
+    /** 계획할 때 쓰는 원래 땅 높이 (노이즈로 계산, 청크를 만들지 않음). */
+    public interface Heights {
+        /** 땅 (또는 물 바닥 위 수면) 맨 위 블록의 y. */
+        int ground(int x, int z);
+
+        /** 물 (바다·강·호수) 인지. */
+        boolean water(int x, int z);
     }
 
     record Fill(BlockBox box, BlockState state) implements Prim {
@@ -109,14 +152,14 @@ public final class Blueprint {
      * 땅 고르기: 안쪽 (경계에서 blend 칸 이상) 은 바닥 높이 baseY 로 평평하게, 가장자리 blend 칸은 원래 땅으로 부드럽게 이어지는 비탈.
      * 위는 비우고 (안쪽은 clear 칸까지, 물도), 바닥은 ground, 그 밑은 땅까지 흙/돌로 채움 (뜬 곳 없게).
      */
-    record Terraform(BlockBox box, int baseY, int clear, BlockState ground, BlockState sub, EdgeFn edge, int blend) implements Prim {
+    record Terraform(BlockBox box, int baseY, int clear, BlockState ground, BlockState sub, EdgeFn edge, int blend, boolean ringOnly) implements Prim {
         @Override
         public void place(Placer p, BlockBox clip) {
             BlockState air = Blocks.AIR.getDefaultState();
             for (int x = Math.max(box.getMinX(), clip.getMinX()); x <= Math.min(box.getMaxX(), clip.getMaxX()); x++)
                 for (int z = Math.max(box.getMinZ(), clip.getMinZ()); z <= Math.min(box.getMaxZ(), clip.getMaxZ()); z++) {
                     double e = edge.inside(x, z);
-                    if (e < 0) continue;
+                    if (e < 0 || (ringOnly && e >= blend)) continue;
                     int natural = p.top(x, z);
                     int target = baseY, top;
                     BlockState g = ground;
@@ -128,14 +171,15 @@ public final class Blueprint {
                         double t = e / blend;
                         t = t * t * (3 - 2 * t);
                         target = (int) Math.round(natural + (baseY - natural) * t);
-                        top = Math.max(natural, target) + 2;
+                        // 띠 (왕령): 수도 쪽에서 먼저 쌓인 흙이 남지 않게 수도 바닥 높이까지 비움
+                        top = Math.max(Math.max(natural, target), ringOnly ? baseY : target) + 2;
                     } else top = Math.max(natural, baseY + clear);
                     for (int y = target + 1; y <= Math.min(top, clip.getMaxY()); y++) p.set(x, y, z, air);
                     if (g != null) p.set(x, target, z, g);
                     for (int y = target - 1; y >= target - 48 && y >= clip.getMinY(); y--) {
                         BlockState s = p.get(x, y, z);
                         if (y < target - 3 && s.isSolidBlock(p.world, p.m) && s.getFluidState().isEmpty()) break;
-                        p.set(x, y, z, y >= target - 3 ? sub : Blocks.STONE.getDefaultState());
+                        p.set(x, y, z, y >= target - 3 || ringOnly ? sub : Blocks.STONE.getDefaultState());
                     }
                 }
         }
@@ -189,14 +233,47 @@ public final class Blueprint {
     public void terraformCircle(int cx, int cz, int r, int blend, int baseY, int clear, BlockState ground, BlockState sub) {
         int R = r + blend;
         add(new Terraform(BlockBox.create(new BlockPos(cx - R, baseY - 48, cz - R), new BlockPos(cx + R, baseY + clear, cz + R)), baseY, clear, ground, sub,
-                (x, z) -> R - Math.sqrt((double) (x - cx) * (x - cx) + (double) (z - cz) * (z - cz)), blend));
+                (x, z) -> R - Math.sqrt((double) (x - cx) * (x - cx) + (double) (z - cz) * (z - cz)), blend, false));
+    }
+
+    /** 다각형 (pts, 반시계든 시계든): 안 + margin 칸은 평평, 그 바깥 blend 칸은 비탈. */
+    public void terraformPoly(int[][] pts, int margin, int blend, int baseY, int clear, BlockState ground, BlockState sub) {
+        int minX = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
+        for (int[] q : pts) {
+            minX = Math.min(minX, q[0]);
+            minZ = Math.min(minZ, q[1]);
+            maxX = Math.max(maxX, q[0]);
+            maxZ = Math.max(maxZ, q[1]);
+        }
+        int e = margin + blend;
+        add(new Terraform(BlockBox.create(new BlockPos(minX - e, baseY - 48, minZ - e), new BlockPos(maxX + e, baseY + clear, maxZ + e)), baseY, clear, ground, sub,
+                (x, z) -> Build.polySigned(pts, x, z) + e, blend, false));
+    }
+
+    /** 다각형 바깥 띠만: 다각형에서 inner 칸 바깥부터 blend 칸 동안 baseY 에서 원래 땅으로 비탈 (안쪽은 건드리지 않음). */
+    public void terraformPolyRing(int[][] pts, int inner, int blend, int baseY, BlockState ground, BlockState sub) {
+        int minX = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
+        for (int[] q : pts) {
+            minX = Math.min(minX, q[0]);
+            minZ = Math.min(minZ, q[1]);
+            maxX = Math.max(maxX, q[0]);
+            maxZ = Math.max(maxZ, q[1]);
+        }
+        int e = inner + blend;
+        add(new Terraform(BlockBox.create(new BlockPos(minX - e, baseY - 48, minZ - e), new BlockPos(maxX + e, baseY + 2, maxZ + e)), baseY, 0, ground, sub,
+                (x, z) -> Build.polySigned(pts, x, z) + e, blend, true));
+    }
+
+    /** 땅 위 기둥마다 fn (높이 y0..y1 은 대충의 범위: 청크 겹침 판단용). */
+    public void surface(int x0, int z0, int x1, int z1, int y0, int y1, SurfaceFn fn) {
+        add(new Surface(BlockBox.create(new BlockPos(x0, y0, z0), new BlockPos(x1, y1, z1)), fn));
     }
 
     /** 사각형: 안은 평평, 바깥 blend 칸은 비탈. */
     public void terraformRect(int x0, int z0, int x1, int z1, int blend, int baseY, int clear, BlockState ground, BlockState sub) {
         int X0 = x0 - blend, Z0 = z0 - blend, X1 = x1 + blend, Z1 = z1 + blend;
         add(new Terraform(BlockBox.create(new BlockPos(X0, baseY - 48, Z0), new BlockPos(X1, baseY + clear, Z1)), baseY, clear, ground, sub,
-                (x, z) -> Math.min(Math.min(x - X0, X1 - x), Math.min(z - Z0, Z1 - z)), blend));
+                (x, z) -> Math.min(Math.min(x - X0, X1 - x), Math.min(z - Z0, Z1 - z)), blend, false));
     }
 
     public BlockBox bounds() {

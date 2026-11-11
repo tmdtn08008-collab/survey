@@ -3,6 +3,6 @@
   "kind": "frost_temple",
   "biomes": "#abilitywar:has_structure/frost_temple",
   "step": "top_layer_modification",
-  "terrain_adaptation": "beard_box",
+  "terrain_adaptation": "none",
   "spawn_overrides": {}
 }

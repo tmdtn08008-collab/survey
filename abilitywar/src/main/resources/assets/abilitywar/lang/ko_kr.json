@@ -618,5 +618,7 @@
  "region.abilitywar.goblin_camp.sub": "위험 · 고블린 무리",
  "rpg.abilitywar.place_not_found": "가까운 곳에서 찾지 못했습니다.",
  "rpg.abilitywar.goto": "%s (으)로 이동: %s %s %s",
- "region.abilitywar.town.generic": "마을"
+ "region.abilitywar.town.generic": "마을",
+ "region.abilitywar.capital_lands": "아르덴 왕령",
+ "region.abilitywar.capital_lands.sub": "왕국의 들판 · 밭과 풍차, 목장"
 }
