@@ -711,7 +711,6 @@ if __name__ == '__main__':
     # guardian_icons(): 수호기사는 사용자 그림 (tools/gen_hud.py guardian) 을 씀
     cards()
     job_master_skin()
-    paladin_icons()
-    paladin_card()
+    # paladin_icons() / paladin_card(): 성기사는 사용자 그림 (tools/gen_hud.py paladin) 을 씀
     king_skin()
     print('done')
