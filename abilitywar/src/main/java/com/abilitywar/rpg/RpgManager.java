@@ -601,11 +601,9 @@ public final class RpgManager {
         r.guildDone++;
         addXp(p, q.xp());
         addGold(p, q.gold());
-        // 강화 재료: 강화석 (등급 + 1), C 등급부터 승급석, 등급에 맞는 마정석 1 (SSS 는 혼돈의 파편도)
+        // 강화석 (등급 + 1), A 등급부터 보스의 영혼
         give(p, new ItemStack(com.abilitywar.item.RpgItems.ENHANCE_STONE, Guild.stones(q.rank())));
-        if (Guild.promotionStones(q.rank()) > 0) give(p, new ItemStack(com.abilitywar.item.RpgItems.PROMOTION_STONE, Guild.promotionStones(q.rank())));
-        give(p, new ItemStack(com.abilitywar.item.RpgItems.crystal(Guild.crystal(q.rank()))));
-        if (q.rank() >= Guild.TOP) give(p, new ItemStack(com.abilitywar.item.RpgItems.CHAOS_SHARD));
+        if (Guild.bossSouls(q.rank()) > 0) give(p, new ItemStack(com.abilitywar.item.RpgItems.BOSS_SOUL, Guild.bossSouls(q.rank())));
         if (p.getRandom().nextFloat() < q.gearChance()) {
             var list = p.getRandom().nextBoolean() ? GearItems.WEAPONS.get(q.gear()) : null;
             if (list != null && !list.isEmpty()) give(p, new ItemStack(list.get(p.getRandom().nextInt(list.size()))));

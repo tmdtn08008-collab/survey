@@ -33,7 +33,7 @@ import java.util.function.Supplier;
  * 상점과 대장장이.
  * <ul>
  *   <li>물약 상인: 회복 물약 3 + 바닐라 물약 (에메랄드로 삼).</li>
- *   <li>대장장이: 강화석 · 보호 주문서 · 승급석을 팔고, 장비 강화 (+15 까지) · 승급 (다음 등급) 을 해 줌.</li>
+ *   <li>대장장이: 강화석 · 보호 주문서를 팔고, 장비 강화 (+15 까지) · 승급 (다음 등급) 을 해 줌.</li>
  * </ul>
  * 서버가 값 · 재료를 모두 다시 확인함 (클라이언트는 고른 것만 보냄).
  */
@@ -72,10 +72,6 @@ public final class Shops {
     public static final List<Offer> SMITH = List.of(
             new Offer("enhance_stone", () -> new ItemStack(RpgItems.ENHANCE_STONE), 40),
             new Offer("protection_scroll", () -> new ItemStack(RpgItems.PROTECTION_SCROLL), 400),
-            new Offer("promotion_stone", () -> new ItemStack(RpgItems.PROMOTION_STONE), 800),
-            new Offer("crystal_good", () -> new ItemStack(RpgItems.CRYSTAL_GOOD), 150),
-            new Offer("crystal_rare", () -> new ItemStack(RpgItems.CRYSTAL_RARE), 400),
-            new Offer("crystal_hero", () -> new ItemStack(RpgItems.CRYSTAL_HERO), 1000),
             new Offer("sell_emerald", () -> new ItemStack(Items.EMERALD), EMERALD_G, true));
 
     public static List<Offer> offers(String kind) {
@@ -253,25 +249,28 @@ public final class Shops {
     // ================================================================ 재료 얻기
 
     /**
-     * 몬스터를 잡음: 가끔 강화석 (4%) · 초록 마정석 (3%) · 푸른 마정석 (1.2%), 센 몬스터 (최대 체력 40 이상) 는 보랏빛 마정석 (2%).
-     * 보스: 강화석 3~6 + 승급석 (2번에 1번) + 세기에 맞는 마정석 1 (+ 40% 로 한 단계 아래 하나).
+     * 몬스터를 잡음 (플레이어가): 가끔 강화석 (4%), 이 모드 몬스터는 전리품 (고블린의 귀 50% · 오크의 송곳니 40% · 도깨비불 정수 40% · 해골 기사의 문장 35%).
+     * 보스: 강화석 3~6 + 보스의 영혼 (위더 · 엔더 드래곤 · 워든은 3) + 이 모드 보스는 자기 전리품 1 (30% 로 하나 더).
      */
     public static void drops(net.minecraft.entity.LivingEntity dead, boolean boss) {
         if (!(dead.getWorld() instanceof ServerWorld w)) return;
         var r = w.getRandom();
         if (boss) {
             dead.dropStack(new ItemStack(RpgItems.ENHANCE_STONE, 3 + r.nextInt(4)));
-            if (r.nextBoolean()) dead.dropStack(new ItemStack(RpgItems.PROMOTION_STONE));
-            GearGrade cg = bossCrystal(dead);
-            dead.dropStack(new ItemStack(RpgItems.crystal(cg)));
-            if (r.nextInt(100) < 40) dead.dropStack(new ItemStack(RpgItems.crystal(GearGrade.values()[Math.max(1, cg.tier() - 1)])));
-            if (endgame(dead) && r.nextInt(100) < 35) dead.dropStack(new ItemStack(RpgItems.CHAOS_SHARD));
-        } else if (dead instanceof net.minecraft.entity.mob.Monster) {
-            if (r.nextInt(100) < 4) dead.dropStack(new ItemStack(RpgItems.ENHANCE_STONE));
-            if (r.nextInt(1000) < 30) dead.dropStack(new ItemStack(RpgItems.CRYSTAL_GOOD));
-            if (r.nextInt(1000) < 12) dead.dropStack(new ItemStack(RpgItems.CRYSTAL_RARE));
-            if (dead.getMaxHealth() >= 40 && r.nextInt(100) < 2) dead.dropStack(new ItemStack(RpgItems.CRYSTAL_HERO));
+            dead.dropStack(new ItemStack(RpgItems.BOSS_SOUL, endgame(dead) ? 3 : 1));
+            Item trophy = dead instanceof com.abilitywar.mob.FallenKingEntity ? RpgItems.CROWN_SHARD
+                    : dead instanceof com.abilitywar.mob.FrostWitchEntity ? RpgItems.FROST_HEART
+                    : dead instanceof com.abilitywar.mob.EmberColossusEntity ? RpgItems.EMBER_CORE
+                    : dead instanceof com.abilitywar.mob.AncientWyvernEntity ? RpgItems.WYVERN_SCALE : null;
+            if (trophy != null) dead.dropStack(new ItemStack(trophy, r.nextInt(100) < 30 ? 2 : 1));
+            return;
         }
+        if (!(dead instanceof net.minecraft.entity.mob.Monster)) return;
+        if (r.nextInt(100) < 4) dead.dropStack(new ItemStack(RpgItems.ENHANCE_STONE));
+        if (dead instanceof com.abilitywar.mob.GoblinEntity && r.nextInt(100) < 50) dead.dropStack(new ItemStack(RpgItems.GOBLIN_EAR));
+        if (dead instanceof com.abilitywar.mob.OrcEntity && r.nextInt(100) < 40) dead.dropStack(new ItemStack(RpgItems.ORC_TUSK));
+        if (dead instanceof com.abilitywar.mob.WispEntity && r.nextInt(100) < 40) dead.dropStack(new ItemStack(RpgItems.WISP_ESSENCE));
+        if (dead instanceof com.abilitywar.mob.SkeletonKnightEntity && r.nextInt(100) < 35) dead.dropStack(new ItemStack(RpgItems.KNIGHT_CREST));
     }
 
     static boolean endgame(net.minecraft.entity.LivingEntity e) {
@@ -279,19 +278,11 @@ public final class Shops {
                 || e instanceof net.minecraft.entity.mob.WardenEntity;
     }
 
-    /** 보스가 떨어뜨리는 마정석 등급: 최대 체력 300 미만 보랏빛, 450 미만 황금, 700 미만 붉은, 그 위는 청록 (위더 · 엔더 드래곤 · 워든은 청록). */
-    static GearGrade bossCrystal(net.minecraft.entity.LivingEntity e) {
-        if (endgame(e)) return GearGrade.SECRET;
-        float hp = e.getMaxHealth();
-        return hp < 300 ? GearGrade.HERO : hp < 450 ? GearGrade.LEGENDARY : hp < 700 ? GearGrade.MYTHIC : GearGrade.SECRET;
-    }
-
-    /** 다른 모드 보스 (몸이 없음): 바로 인벤토리로. 마정석 등급은 보스 경험치로. */
+    /** 다른 모드 보스 (몸이 없음): 바로 인벤토리로. */
     public static void bossRewardDirect(ServerPlayerEntity p, int xp) {
         var r = p.getRandom();
         give(p, new ItemStack(RpgItems.ENHANCE_STONE, 3 + r.nextInt(4)));
-        if (r.nextBoolean()) give(p, new ItemStack(RpgItems.PROMOTION_STONE));
-        give(p, new ItemStack(RpgItems.crystal(xp < 500 ? GearGrade.HERO : xp < 800 ? GearGrade.LEGENDARY : GearGrade.MYTHIC)));
+        give(p, new ItemStack(RpgItems.BOSS_SOUL));
     }
 
     private Shops() {

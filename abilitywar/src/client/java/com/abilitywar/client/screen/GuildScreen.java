@@ -253,10 +253,9 @@ public class GuildScreen extends Screen {
                     Text.translatable("guild.abilitywar.screen.reward_points", q.points()).formatted(Formatting.YELLOW),
                     Text.translatable("rpg.abilitywar.screen.reward_xp", q.xp()).formatted(Formatting.GRAY),
                     Text.translatable("guild.abilitywar.screen.reward_gold", com.abilitywar.client.hud.GoldHud.fmt(q.gold())).formatted(Formatting.GOLD),
-                    Text.translatable("guild.abilitywar.screen.reward_crystal", new ItemStack(com.abilitywar.item.RpgItems.crystal(Guild.crystal(q.rank()))).getName()).formatted(Formatting.LIGHT_PURPLE),
                     Text.translatable("guild.abilitywar.screen.reward_gear", q.gear().displayName(), Math.round(q.gearChance() * 100)).styled(st -> st.withColor(gradeCol)),
                     Text.translatable("guild.abilitywar.screen.reward_stones", Guild.stones(q.rank())).formatted(Formatting.AQUA),
-                    Guild.promotionStones(q.rank()) > 0 ? Text.translatable("guild.abilitywar.screen.reward_promotion", Guild.promotionStones(q.rank())).formatted(Formatting.LIGHT_PURPLE) : null};
+                    Guild.bossSouls(q.rank()) > 0 ? Text.translatable("guild.abilitywar.screen.reward_soul", Guild.bossSouls(q.rank())).formatted(Formatting.LIGHT_PURPLE) : null};
             for (Text t : rewards) {
                 if (t == null) continue;
                 if (dy > ly1 - 10) break;

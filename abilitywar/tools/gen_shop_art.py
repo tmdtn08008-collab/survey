@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 상점 · 대장장이 그림:
-  textures/item/{health_potion_small,health_potion,health_potion_large,enhance_stone,protection_scroll,promotion_stone}.png (16x16 도트)
+  textures/item/{health_potion_small,health_potion,health_potion_large,enhance_stone,protection_scroll}.png + 승급 재료 (몬스터 · 보스 전리품) (16x16 도트)
   textures/entity/{apothecary,blacksmith}.png (64x64 NPC 피부)
   models/item/<위 아이템>.json, apothecary_spawn_egg.json, blacksmith_spawn_egg.json
 사용: python3 tools/gen_shop_art.py
@@ -131,28 +131,6 @@ def protection_scroll():
     return grid(rows, pal)
 
 
-def promotion_stone():
-    pal = {'o': (50, 20, 60, 255), 'y': (255, 210, 80, 255), 'Y': (255, 240, 170, 255), 'd': (200, 120, 30, 255),
-           'v': (170, 80, 230, 255), 'V': (220, 150, 255, 255), 'w': (255, 255, 255, 255)}
-    rows = ["................",
-            ".......oo.......",
-            "......oYyo......",
-            "......oYyo......",
-            ".ooooovYyvooooo.",
-            ".oYYyyvwVvyyddo.",
-            "..oYyyVVVvyddo..",
-            "...ooyvVvvydoo..",
-            "....oyvvvvydo...",
-            "...oyyvvvvyddo..",
-            "...oYyoddoyddo..",
-            "..oYyo....oddo..",
-            "..oyo......odo..",
-            "..oo........oo..",
-            "................",
-            "................"]
-    return grid(rows, pal)
-
-
 # ================================================================ NPC 피부 (64x64, 플레이어 모양)
 def skin(name, seed, parts):
     im = Image.new('RGBA', (64, 64), T)
@@ -256,47 +234,155 @@ def blacksmith(rect, box, px):
         rect(u, v + 8, 4, 4, (80, 80, 86))
 
 
-def crystal(light, mid, dark, shine=(255, 255, 255, 255)):
-    """마정석: 위아래로 긴 육각 보석 (등급 색)."""
-    pal = {'o': (20, 16, 26, 255), 'L': light, 'm': mid, 'd': dark, 'w': shine}
-    rows = ["................",
-            ".......oo.......",
-            "......oLmo......",
-            ".....oLwmmo.....",
-            "....oLwLmmdo....",
-            "....oLLmmmdo....",
-            "...oLLmmmmddo...",
-            "...oLmmmmmddo...",
-            "...oLmmmmmddo...",
-            "...oLmmmmdddo...",
-            "....oLmmmddo....",
-            "....oLmmmddo....",
-            ".....oLmddo.....",
-            "......omdo......",
-            ".......oo.......",
-            "................"]
-    return grid(rows, pal)
-
-
-def chaos_shard():
-    pal = {'o': (10, 6, 14, 255), 'a': (255, 80, 240, 255), 'b': (90, 255, 245, 255), 'k': (40, 20, 60, 255), 'w': (255, 255, 255, 255), 'g': (120, 120, 130, 255)}
-    rows = ["................",
-            ".........o......",
-            "........oao.....",
-            ".......oawko....",
-            "...o..oakkbo....",
-            "..obo.okbkko....",
-            "..okbookkkao....",
-            "...okbkkwkao....",
-            "....okkkkbo.....",
-            "....okakkko.....",
-            "...okkkbkgo.....",
-            "...oakkkko......",
-            "....obkko.......",
-            ".....oko........",
-            "......o.........",
-            "................"]
-    return grid(rows, pal)
+def loot_items():
+    """승급 재료: 몬스터 · 보스 전리품 (16x16)."""
+    o = (22, 16, 14, 255)
+    out = {}
+    out['goblin_ear'] = grid(["................",
+                              "................",
+                              "..........oo....",
+                              ".........oGgo...",
+                              "........oGggo...",
+                              ".......oGgpgo...",
+                              "......oGggpgo...",
+                              ".....oGggppgo...",
+                              "....oGggppgo....",
+                              "...oGggppggo....",
+                              "..oGgggggdo.....",
+                              "..oggggddo......",
+                              "...oddddo.......",
+                              "....oooo........",
+                              "................",
+                              "................"], {'o': o, 'G': (150, 210, 90, 255), 'g': (110, 170, 60, 255), 'p': (200, 130, 120, 255), 'd': (70, 120, 40, 255)})
+    out['orc_tusk'] = grid(["................",
+                            "............oo..",
+                            "...........oWo..",
+                            "..........oWwo..",
+                            ".........oWwo...",
+                            "........oWwwo...",
+                            ".......oWwwo....",
+                            "......oWwwgo....",
+                            ".....oWwwgo.....",
+                            "....oWwwgo......",
+                            "...oWwwgo.......",
+                            "..oBbbgo........",
+                            "..oBbbo.........",
+                            "...ooo..........",
+                            "................",
+                            "................"], {'o': o, 'W': (255, 250, 230, 255), 'w': (236, 226, 196, 255), 'g': (190, 176, 140, 255), 'B': (120, 80, 50, 255), 'b': (90, 60, 36, 255)})
+    out['wisp_essence'] = grid(["................",
+                                "......o..o......",
+                                ".....oco.oco....",
+                                "....ocCoocCo....",
+                                "....oCWCCWCo....",
+                                "...ocCWWWWCco...",
+                                "...oCWWwwWWCo...",
+                                "...oCWwwwwWCo...",
+                                "...oCWwwwwWCo...",
+                                "...ocCWwwWCco...",
+                                "....ocCWWCco....",
+                                ".....occcco.....",
+                                "......oooo......",
+                                "................",
+                                "................",
+                                "................"], {'o': (10, 30, 50, 255), 'c': (60, 160, 220, 255), 'C': (120, 210, 255, 255), 'W': (200, 240, 255, 255), 'w': (255, 255, 255, 255)})
+    out['knight_crest'] = grid(["................",
+                                "..oooooooooooo..",
+                                "..oSSSSSSSSSSo..",
+                                "..oSsppppppsSo..",
+                                "..oSpPPyyPPpSo..",
+                                "..oSpPyyyyPpSo..",
+                                "..oSpPPyyPPpSo..",
+                                "..oSpPPyyPPpSo..",
+                                "..oSspPyyPpsSo..",
+                                "...oSspPPpsSo...",
+                                "....oSsppsSo....",
+                                ".....oSssSo.....",
+                                "......oSSo......",
+                                ".......oo.......",
+                                "................",
+                                "................"], {'o': o, 'S': (190, 190, 200, 255), 's': (130, 130, 140, 255), 'p': (90, 40, 120, 255), 'P': (130, 60, 170, 255), 'y': (230, 200, 90, 255)})
+    out['crown_shard'] = grid(["................",
+                               "................",
+                               "...o......o.....",
+                               "..oYo....oYo....",
+                               "..oYyo..oYyo....",
+                               "..oYyyooYyyo....",
+                               "..oYyyyyyyyo.o..",
+                               "..oYyRRyyyyooYo.",
+                               "..oYyRRyyyyyyyo.",
+                               "..oddddddddddo..",
+                               "..oYyyyyyyyyo...",
+                               "...ooooooooo....",
+                               "................",
+                               "................",
+                               "................",
+                               "................"], {'o': (60, 36, 6, 255), 'Y': (255, 230, 120, 255), 'y': (230, 180, 50, 255), 'd': (170, 120, 20, 255), 'R': (220, 30, 50, 255)})
+    out['frost_heart'] = grid(["................",
+                               "................",
+                               "...ooo....ooo...",
+                               "..oWwco..oCwco..",
+                               ".oWwccco.oCcccdo",
+                               ".oWccccooocccddo",
+                               ".oWcccccccccdddo",
+                               ".ocCccccccccddo.",
+                               "..ocCcccccccddo.",
+                               "...ocCcccccddo..",
+                               "....ocCcccddo...",
+                               ".....ocCcddo....",
+                               "......ocddo.....",
+                               ".......ooo......",
+                               "................",
+                               "................"], {'o': (14, 30, 60, 255), 'W': (240, 252, 255, 255), 'w': (200, 240, 255, 255), 'c': (120, 200, 250, 255), 'C': (170, 225, 255, 255), 'd': (60, 130, 210, 255)})
+    out['ember_core'] = grid(["................",
+                              ".....oooooo.....",
+                              "...ooRRrrrroo...",
+                              "..oRRYYrrrrddo..",
+                              "..oRYYWYrrrddo..",
+                              ".oRrYWWYrkrrddo.",
+                              ".oRrrYYrrkkrddo.",
+                              ".orrrrrrkrrrddo.",
+                              ".orkrrrrrrrrddo.",
+                              ".orkkrrrrrrddko.",
+                              "..orkrrrrrddkdo.",
+                              "..oddrrrrdddddo.",
+                              "...ooddddddoo...",
+                              ".....oooooo.....",
+                              "................",
+                              "................"], {'o': (40, 10, 6, 255), 'R': (255, 140, 40, 255), 'r': (230, 80, 20, 255), 'd': (150, 30, 10, 255), 'Y': (255, 220, 100, 255), 'W': (255, 255, 220, 255), 'k': (60, 20, 14, 255)})
+    out['wyvern_scale'] = grid(["................",
+                                "......oooo......",
+                                "....ooTttToo....",
+                                "...oTttLLttTo...",
+                                "..oTtLLttttdTo..",
+                                "..otLttttttdto..",
+                                ".oTtLttttttdtTo.",
+                                ".otLttttttttdto.",
+                                ".otLtttttttddto.",
+                                ".otttttttttddto.",
+                                "..otttttttdddo..",
+                                "..oddtttttddo...",
+                                "...oodddddoo....",
+                                ".....oooooo.....",
+                                "................",
+                                "................"], {'o': (8, 30, 30, 255), 'T': (40, 120, 110, 255), 't': (50, 170, 150, 255), 'L': (150, 240, 220, 255), 'd': (30, 100, 90, 255)})
+    out['boss_soul'] = grid(["................",
+                             ".......o........",
+                             "......oPo.......",
+                             ".....oPpo..o....",
+                             "....oPppo.oPo...",
+                             "...oPpWpoPppo...",
+                             "...oPpWWppppo...",
+                             "..oPppWwWpppPo..",
+                             "..oPpWwwwWppPo..",
+                             "..oPpWwwwWppPo..",
+                             "..oPpWwwwWpPo...",
+                             "...oPpWWWppo....",
+                             "....oPpppPo.....",
+                             ".....ooooo......",
+                             "................",
+                             "................"], {'o': (24, 8, 40, 255), 'P': (150, 70, 220, 255), 'p': (190, 120, 250, 255), 'W': (230, 200, 255, 255), 'w': (255, 255, 255, 255)})
+    return out
 
 
 def coin():
@@ -331,17 +417,8 @@ def main():
         'health_potion_large': potion(2, *red, ((226, 184, 86, 255), (255, 230, 140, 255))),
         'enhance_stone': enhance_stone(),
         'protection_scroll': protection_scroll(),
-        'promotion_stone': promotion_stone(),
     }
-    items.update({
-        'crystal_good': crystal((170, 255, 170, 255), (80, 210, 90, 255), (30, 120, 50, 255)),
-        'crystal_rare': crystal((170, 215, 255, 255), (70, 150, 255, 255), (30, 70, 170, 255)),
-        'crystal_hero': crystal((225, 180, 255, 255), (170, 90, 255, 255), (90, 40, 160, 255)),
-        'crystal_legendary': crystal((255, 236, 160, 255), (255, 180, 40, 255), (170, 100, 10, 255)),
-        'crystal_mythic': crystal((255, 170, 160, 255), (240, 60, 60, 255), (140, 20, 30, 255)),
-        'crystal_secret': crystal((190, 255, 240, 255), (50, 230, 200, 255), (20, 120, 120, 255), (255, 240, 160, 255)),
-        'chaos_shard': chaos_shard(),
-    })
+    items.update(loot_items())
     gui = os.path.join(ASSETS, 'textures', 'gui')
     os.makedirs(gui, exist_ok=True)
     coin().save(os.path.join(gui, 'coin.png'))

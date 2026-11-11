@@ -110,15 +110,9 @@ public final class Guild {
         return rank + 1;
     }
 
-    /** 길드 의뢰 보상 마정석의 등급: F~D 초록, C · B 푸른, A 보랏빛, S 황금, SS 붉은, SSS 청록. */
-    public static GearGrade crystal(int rank) {
-        return new GearGrade[]{GearGrade.GOOD, GearGrade.GOOD, GearGrade.GOOD, GearGrade.RARE, GearGrade.RARE, GearGrade.HERO,
-                GearGrade.LEGENDARY, GearGrade.MYTHIC, GearGrade.SECRET}[Math.max(0, Math.min(TOP, rank))];
-    }
-
-    /** 길드 의뢰 보상: 승급석 (C 등급부터 1, S 부터 2). */
-    public static int promotionStones(int rank) {
-        return rank >= 6 ? 2 : rank >= 3 ? 1 : 0;
+    /** 길드 의뢰 보상: 보스의 영혼 (A · S 등급 1, SS 2, SSS 3). */
+    public static int bossSouls(int rank) {
+        return rank >= 8 ? 3 : rank >= 7 ? 2 : rank >= 5 ? 1 : 0;
     }
 
     public static List<GQuest> forRank(int rank) {

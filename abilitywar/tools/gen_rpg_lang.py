@@ -369,7 +369,6 @@ t('guild.abilitywar.screen.done', '끝낸 의뢰 %s개', '%s quests done')
 t('guild.abilitywar.screen.join_first', '가입하면 의뢰 목록이 보여요.', 'Join to see the quest board.')
 t('guild.abilitywar.screen.rank_only', '%s 등급 의뢰만 받을 수 있어요.', 'Only rank %s quests.')
 t('guild.abilitywar.screen.reward_points', '길드 포인트 +%s', '+%s guild points')
-t('guild.abilitywar.screen.reward_emeralds', '에메랄드 %s개', '%s emeralds')
 t('guild.abilitywar.screen.reward_gear', '%s 등급 장비 (%s%% 확률)', '%s gear (%s%% chance)')
 t('guild.abilitywar.hud.return', '접수원에게 보고하세요!', 'Report to the clerk!')
 GQ = [
@@ -434,9 +433,6 @@ t('item.abilitywar.enhance_stone.desc', '대장장이에게 장비 강화를 맡
 t('item.abilitywar.protection_scroll', '보호 주문서', 'Protection Scroll')
 t('item.abilitywar.protection_scroll.desc', '+10 이상 강화가 실패해도 강화 수치가 내려가지 않게 지켜 줌 (1장 씀)',
   'Keeps the enhancement level from dropping when a +10 or higher enhancement fails (uses 1)')
-t('item.abilitywar.promotion_stone', '승급석', 'Promotion Stone')
-t('item.abilitywar.promotion_stone.desc', '+10 이상 강화한 장비를 다음 등급으로 승급할 때 씀 (마정석 · 재료와 함께). 보스 · C 등급 이상 길드 의뢰 · 대장장이 상점',
-  'Promotes +10 or higher gear to the next grade. From bosses, rank C+ guild quests and the blacksmith shop')
 t('shop.abilitywar.say.apothecary', '어서 오시게, 모험가! 상처엔 회복 물약이 최고지. 필요한 만큼 골라 가게.',
   'Welcome, adventurer! Nothing beats a health potion for those wounds. Take what you need.')
 t('shop.abilitywar.say.blacksmith', '강화 재료는 여기 있네. 돌만 넉넉하면 장비를 얼마든지 두들겨 주지!',
@@ -449,21 +445,24 @@ t('shop.abilitywar.sell', '%s 팔기', 'Sell %s')
 t('shop.abilitywar.err.gold', '돈 (G) 이 모자랍니다.', 'Not enough G.')
 t('shop.abilitywar.err.nothing_to_sell', '팔 물건이 없습니다.', 'Nothing to sell.')
 t('gold.abilitywar.have', '가진 돈: %s G', 'Money: %s G')
+# 승급 재료: 몬스터 · 보스 전리품
+for k, ko, en, dko, den in [
+    ('goblin_ear', '고블린의 귀', 'Goblin Ear', '고블린 (50%) · 희귀 승급 재료', 'Goblins (50%) · Rare promotion material'),
+    ('orc_tusk', '오크의 송곳니', 'Orc Tusk', '오크 (40%) · 영웅 승급 재료', 'Orcs (40%) · Hero promotion material'),
+    ('wisp_essence', '도깨비불 정수', 'Wisp Essence', '도깨비불 (40%) · 영웅 승급 재료', 'Wisps (40%) · Hero promotion material'),
+    ('knight_crest', '해골 기사의 문장', 'Skeleton Knight Crest', '해골 기사 (35%) · 전설 승급 재료', 'Skeleton Knights (35%) · Legendary promotion material'),
+    ('crown_shard', '기사왕의 왕관 조각', "Fallen King's Crown Shard", '보스 타락한 기사왕 · 전설 승급 재료', 'Boss: the Fallen King · Legendary promotion material'),
+    ('frost_heart', '서리 마녀의 얼음 심장', "Frost Witch's Ice Heart", '보스 서리 마녀 · 신화 승급 재료', 'Boss: the Frost Witch · Mythic promotion material'),
+    ('ember_core', '화염 거인의 핵', 'Ember Colossus Core', '보스 화염 거인 · 신화 승급 재료', 'Boss: the Ember Colossus · Mythic promotion material'),
+    ('wyvern_scale', '고대 비룡의 비늘', 'Ancient Wyvern Scale', '보스 고대 비룡 · 시크릿 승급 재료', 'Boss: the Ancient Wyvern · Secret promotion material'),
+    ('boss_soul', '보스의 영혼', 'Boss Soul', '모든 보스 (다른 모드 보스도, 위더 · 엔더 드래곤 · 워든은 3) · A 등급 이상 길드 의뢰 · 시크릿 · ? 승급 재료',
+     'Every boss (other mods too; Wither, Ender Dragon, Warden give 3) · rank A+ guild quests · Secret and ? promotion material')]:
+    t(f'item.abilitywar.{k}', ko, en)
+    t(f'item.abilitywar.{k}.desc', dko, den)
+t('guild.abilitywar.screen.reward_soul', '보스의 영혼 %s개', 'Boss Soul ×%s')
 t('smith.abilitywar.err.gold', '돈 (G) 이 모자랍니다.', 'Not enough G.')
-t('smith.abilitywar.err.materials', '승급 재료가 모자랍니다.', 'Not enough promotion materials.')
-t('item.abilitywar.crystal_good', '초록 마정석', 'Green Mana Crystal')
-t('item.abilitywar.crystal_rare', '푸른 마정석', 'Blue Mana Crystal')
-t('item.abilitywar.crystal_hero', '보랏빛 마정석', 'Violet Mana Crystal')
-t('item.abilitywar.crystal_legendary', '황금 마정석', 'Golden Mana Crystal')
-t('item.abilitywar.crystal_mythic', '붉은 마정석', 'Crimson Mana Crystal')
-t('item.abilitywar.crystal_secret', '청록 마정석', 'Teal Mana Crystal')
-t('item.abilitywar.chaos_shard', '혼돈의 파편', 'Chaos Shard')
-t('item.abilitywar.crystal.desc', '같은 색 등급으로 장비를 승급할 때 쓰는 재료 (초록 = 좋음 · 푸른 = 희귀 · 보랏빛 = 영웅 · 황금 = 전설 · 붉은 = 신화 · 청록 = 시크릿)',
-  'Promotion material for the grade of the same colour (green = Good, blue = Rare, violet = Hero, gold = Legendary, crimson = Mythic, teal = Secret)')
-t('item.abilitywar.chaos_shard.desc', '시크릿 장비를 ? 등급으로 승급할 때 쓰는 파편. 위더 · 엔더 드래곤 · 워든 · SSS 의뢰에서 얻음',
-  'Used to promote Secret gear to the ? grade. From the Wither, Ender Dragon, Warden and SSS quests')
+t('smith.abilitywar.err.materials', '승급 재료 (광물 · 몬스터 · 보스 전리품) 가 모자랍니다.', 'Not enough promotion materials (ores, monster and boss loot).')
 t('guild.abilitywar.screen.reward_gold', '%s G', '%s G')
-t('guild.abilitywar.screen.reward_crystal', '%s 1개', '%s ×1')
 t('shop.abilitywar.err.unknown', '그런 물건은 없습니다.', 'No such item.')
 t('shop.abilitywar.err.emeralds', '에메랄드가 모자랍니다.', 'Not enough emeralds.')
 t('shop.abilitywar.err.far', '상인에게서 너무 멀리 있습니다.', 'You are too far from the merchant.')
@@ -502,11 +501,9 @@ t('smith.abilitywar.err.emeralds', '에메랄드가 모자랍니다.', 'Not enou
 t('smith.abilitywar.err.scroll', '보호 주문서가 없습니다.', 'You have no Protection Scroll.')
 t('smith.abilitywar.err.top_grade', '더 승급할 수 없는 장비입니다.', 'This gear cannot be promoted further.')
 t('smith.abilitywar.err.promote_level', '승급하려면 강화 수치가 더 높아야 합니다.', 'Enhance it further before promoting.')
-t('smith.abilitywar.err.promotion_stones', '승급석이 모자랍니다.', 'Not enough Promotion Stones.')
 t('gear.abilitywar.ui.enhance', '강화 +%s / %s', 'Enhanced +%s / %s')
 t('gear.abilitywar.ui.enhance_armor', '강화 보너스: 방어력 +%s, 최대 체력 +%s', 'Enhancement: Armor +%s, Max Health +%s')
 t('guild.abilitywar.screen.reward_stones', '강화석 %s개', 'Enhancement Stone ×%s')
-t('guild.abilitywar.screen.reward_promotion', '승급석 %s개', 'Promotion Stone ×%s')
 t('sign.abilitywar.apothecary', '물약', 'Potions')
 
 def apply(fname, idx):

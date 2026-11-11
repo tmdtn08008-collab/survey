@@ -275,7 +275,7 @@ public class EnhanceScreen extends Screen {
                 boolean lvOk = lv >= need;
                 ctx.drawTextWithShadow(textRenderer, Text.literal(lvOk ? "✔ " : "✖ ").formatted(lvOk ? Formatting.GREEN : Formatting.RED)
                         .append(Text.translatable("smith.abilitywar.promote_req", need, lv).formatted(Formatting.GRAY)), rx0 + 16 + textRenderer.getWidth(title), pz0 + 6, 0xFFFFFF);
-                // 재료: 승급석 · 마정석 · 바닐라 재료 + 돈
+                // 재료: 광물 · 몬스터 · 보스 전리품 + 돈
                 int mx0 = rx0 + 8;
                 for (GearEnhance.Mat m : GearEnhance.promoteMats(g)) {
                     ItemStack icon = new ItemStack(m.item());

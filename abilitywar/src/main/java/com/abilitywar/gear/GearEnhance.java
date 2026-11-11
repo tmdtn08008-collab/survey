@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *   <li>무기: 강화 1 마다 공격력 +5% (기본값 기준), 능력 피해 +2%p.</li>
  *   <li>갑옷: 강화 1 마다 방어력 +5% (부위 기본값 기준, 최소 +0.25), 최대 체력 +0.5.</li>
  *   <li>성공 확률: +0~4 → 100%, +5 → 90% … +14 → 20%. 실패하면 +0~9 는 그대로, +10 부터는 1 내려감 (보호 주문서가 있으면 그대로).</li>
- *   <li>승급: +10 이상 (시크릿 → ? 는 +15) 이면 승급석으로 다음 등급의 같은 종류 장비로 바뀜. 강화 수치는 절반만 남음.</li>
+ *   <li>승급: +10 이상 (시크릿 → ? 는 +15) 이면 광물 + 몬스터 · 보스 전리품으로 다음 등급의 같은 종류 장비로 바뀜. 강화 수치는 절반만 남음.</li>
  * </ul>
  * 강화 수치는 아이템 NBT "AWEnhance".
  */
@@ -82,18 +82,28 @@ public final class GearEnhance {
     public record Mat(net.minecraft.item.Item item, int count) {
     }
 
-    /** 이 등급에서 다음 등급으로 승급할 때 드는 재료: 승급석 + 다음 등급 마정석 3 + 바닐라 재료. */
+    /**
+     * 이 등급에서 다음 등급으로 승급할 때 드는 재료 (최대 4 가지): 광물 + 몬스터 전리품 + 보스 전리품.
+     * 좋음 ← 철 · 뼈 · 썩은 살점 / 희귀 ← 금 · 거미 눈 · 화약 · 고블린의 귀 / 영웅 ← 다이아몬드 · 엔더 진주 · 오크의 송곳니 · 도깨비불 정수
+     * 전설 ← 다이아몬드 · 블레이즈 막대 · 해골 기사의 문장 · 기사왕의 왕관 조각 / 신화 ← 네더라이트 파편 · 위더 스켈레톤 해골 · 얼음 심장 · 화염 거인의 핵
+     * 시크릿 ← 네더라이트 주괴 · 셜커 껍데기 · 고대 비룡의 비늘 · 보스의 영혼 / ? ← 네더의 별 · 메아리 조각 · 드래곤의 숨결 · 보스의 영혼 10
+     */
     public static List<Mat> promoteMats(GearGrade g) {
-        GearGrade n = next(g);
-        List<Mat> l = new ArrayList<>();
-        l.add(new Mat(com.abilitywar.item.RpgItems.PROMOTION_STONE, g.tier() + 1));
-        l.add(new Mat(com.abilitywar.item.RpgItems.crystal(n), 3));
-        net.minecraft.item.Item[] vanilla = {net.minecraft.item.Items.IRON_INGOT, net.minecraft.item.Items.GOLD_INGOT, net.minecraft.item.Items.DIAMOND,
-                net.minecraft.item.Items.DIAMOND, net.minecraft.item.Items.NETHERITE_SCRAP, net.minecraft.item.Items.NETHER_STAR, net.minecraft.item.Items.NETHER_STAR};
-        int[] vc = {8, 8, 2, 6, 2, 1, 2};
-        int t = Math.min(g.tier(), vanilla.length - 1);
-        l.add(new Mat(vanilla[t], vc[t]));
-        return l;
+        return switch (next(g)) {
+            case COMMON, GOOD -> List.of(new Mat(net.minecraft.item.Items.IRON_INGOT, 8), new Mat(net.minecraft.item.Items.BONE, 16), new Mat(net.minecraft.item.Items.ROTTEN_FLESH, 16));
+            case RARE -> List.of(new Mat(net.minecraft.item.Items.GOLD_INGOT, 8), new Mat(net.minecraft.item.Items.SPIDER_EYE, 8), new Mat(net.minecraft.item.Items.GUNPOWDER, 8),
+                    new Mat(com.abilitywar.item.RpgItems.GOBLIN_EAR, 6));
+            case HERO -> List.of(new Mat(net.minecraft.item.Items.DIAMOND, 2), new Mat(net.minecraft.item.Items.ENDER_PEARL, 4), new Mat(com.abilitywar.item.RpgItems.ORC_TUSK, 6),
+                    new Mat(com.abilitywar.item.RpgItems.WISP_ESSENCE, 4));
+            case LEGENDARY -> List.of(new Mat(net.minecraft.item.Items.DIAMOND, 6), new Mat(net.minecraft.item.Items.BLAZE_ROD, 8), new Mat(com.abilitywar.item.RpgItems.KNIGHT_CREST, 4),
+                    new Mat(com.abilitywar.item.RpgItems.CROWN_SHARD, 1));
+            case MYTHIC -> List.of(new Mat(net.minecraft.item.Items.NETHERITE_SCRAP, 4), new Mat(net.minecraft.item.Items.WITHER_SKELETON_SKULL, 1),
+                    new Mat(com.abilitywar.item.RpgItems.FROST_HEART, 1), new Mat(com.abilitywar.item.RpgItems.EMBER_CORE, 1));
+            case SECRET -> List.of(new Mat(net.minecraft.item.Items.NETHERITE_INGOT, 1), new Mat(net.minecraft.item.Items.SHULKER_SHELL, 4),
+                    new Mat(com.abilitywar.item.RpgItems.WYVERN_SCALE, 2), new Mat(com.abilitywar.item.RpgItems.BOSS_SOUL, 3));
+            case UNKNOWN -> List.of(new Mat(net.minecraft.item.Items.NETHER_STAR, 2), new Mat(net.minecraft.item.Items.ECHO_SHARD, 4),
+                    new Mat(net.minecraft.item.Items.DRAGON_BREATH, 4), new Mat(com.abilitywar.item.RpgItems.BOSS_SOUL, 10));
+        };
     }
 
     /** 승급 값 (G). */
