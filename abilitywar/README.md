@@ -288,6 +288,11 @@
 ## 설치
 
 1. Fabric Loader(1.20.1)를 설치합니다.
+💡 **한 번에 받기 (Windows)**: PowerShell 을 열고 아래 한 줄을 붙여넣으면 능력대전쟁 + 보스 모드 17 개 + Fabric API 가 **바탕화면\mod 모음** 폴더에 다 받아집니다.
+```powershell
+irm https://raw.githubusercontent.com/tmdtn08008-collab/survey/claude/blissful-carson-s8snwp/abilitywar/dist/download_mods.ps1 | iex
+```
+
 2. `mods` 폴더에 **Fabric API** 와 **`dist/abilitywar-2.7.0.jar`** 를 넣습니다.
    보스 모드도 쓰려면 **`dist/boss_mods/` 의 jar 17개**도 같이 넣습니다 (설명: `dist/boss_mods/README.md`).
 3. 게임 실행 → 월드 접속 → 처음 들어오면 **1차 직업 선택 화면**이 뜹니다 (전사·마법사·탱커·힐러).
