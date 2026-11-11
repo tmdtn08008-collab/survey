@@ -1,13 +1,14 @@
-# 보스 모드: Bosses of Mass Destruction (BOMD) + Marium's Soulslike Weaponry + The Graveyard
+# 보스 모드: Bosses of Mass Destruction (BOMD) + Marium's Soulslike Weaponry + The Graveyard + Archon
 
-Fabric 1.20.1 용 보스 모드 3개입니다.
+Fabric 1.20.1 용 보스 모드 4개입니다.
 - **Bosses of Mass Destruction**: Fabric 보스 모드 중 가장 많이 쓰이는 모드 (Modrinth 다운로드 800만 이상). L_Ender's Cataclysm 처럼 보스마다 전용 경기장 구조물이 있습니다. (Cataclysm 은 Forge 전용이라 대신 골랐습니다.)
 - **Marium's Soulslike Weaponry**: 소울라이크 보스 8 + 보스가 떨어뜨리는 전설 무기 40개 이상 (Modrinth 다운로드 400만 이상).
 - **The Graveyard**: 묘지 · 지하 묘실 · 유령의 집 · 언데드에게 먹힌 마을 · 리치의 감옥 같은 구조물 + 언데드 몹 + 보스 리치 (Modrinth 다운로드 500만 이상).
+- **Archon** (Archon Renewed): 원소 마법 · 마나 · 강령술 · 원소 무기 + 소환 제단으로 부르는 원소 보스 5 (원작 Archon 다운로드 130만 이상, Renewed 는 원작의 버그를 고친 후속판).
 
 ## 넣는 법
 
-이 폴더의 **jar 10개를 전부** `mods` 폴더에 넣으세요 (능력대전쟁 jar · Fabric API 와 같이). **서버와 모든 플레이어 둘 다** 넣어야 합니다.
+이 폴더의 **jar 12개를 전부** `mods` 폴더에 넣으세요 (능력대전쟁 jar · Fabric API 와 같이). **서버와 모든 플레이어 둘 다** 넣어야 합니다.
 **Fabric Loader 0.19.5 이상**, **Fabric API 0.92.2 이상** 이 필요합니다 (Soulslike Weaponry 때문). 런처에서 Fabric Loader 를 새로 설치하면 됩니다.
 
 | 파일 | 무엇 | 라이선스 | 출처 (소스) |
@@ -15,7 +16,9 @@ Fabric 1.20.1 용 보스 모드 3개입니다.
 | `BOMD-1.7.5-1.20.1.jar` | Bosses of Mass Destruction 1.7.5 (보스 모드 본체) | LGPL-3.0 | [Modrinth](https://modrinth.com/mod/bosses-of-mass-destruction) · [GitHub](https://github.com/miyo6032/bosses-of-mass-destruction) |
 | `soulslike-weaponry-1.4.10-1.20.1-fabric.jar` | Marium's Soulslike Weaponry 1.4.10 (보스 모드 본체) | CC0-1.0 | [Modrinth](https://modrinth.com/mod/mariums-soulslike-weaponry) · [GitHub](https://github.com/mariumbacchus/Soulslike-Weaponry) |
 | `graveyard-FABRIC-4.0.1+mc1.20.1.jar` | The Graveyard 4.0.1 (모드 본체) | GPL-3.0 | [Modrinth](https://modrinth.com/mod/the-graveyard-fabric) · [GitHub (소스)](https://github.com/finallion/The_Graveyard) |
-| `geckolib-fabric-1.20.1-4.8.4.jar` | GeckoLib (보스 모델·애니메이션, **세 모드 다** 필요로 함) | MIT | [Modrinth](https://modrinth.com/mod/geckolib) · [GitHub](https://github.com/bernie-g/geckolib) |
+| `Archon-1.1.5.jar` | Archon Renewed 1.1.5 (모드 본체, 원작: Safro) | GPL-3.0 | [Modrinth](https://modrinth.com/mod/archon-renewed) · [GitHub (소스)](https://github.com/Stalemated/Archon-Renewed) · [원작](https://modrinth.com/mod/archon) |
+| `spell_power-0.12.0+1.20.1.jar` | Spell Power Attributes 0.12.0 (Archon 이 필요로 함) | LGPL-3.0 | [Modrinth](https://modrinth.com/mod/spell-power) · [GitHub](https://github.com/ZsoltMolnarrr/SpellPower) |
+| `geckolib-fabric-1.20.1-4.8.4.jar` | GeckoLib (보스 모델·애니메이션, BOMD · Soulslike · Graveyard 가 필요로 함) | MIT | [Modrinth](https://modrinth.com/mod/geckolib) · [GitHub](https://github.com/bernie-g/geckolib) |
 | `cloth-config-11.1.136-fabric.jar` | Cloth Config (설정 화면, BOMD 가 필요로 함) | LGPL-3.0 | [Modrinth](https://modrinth.com/mod/cloth-config) · [GitHub](https://github.com/shedaniel/ClothConfig) |
 | `cardinal-components-api-5.2.3.jar` | Cardinal Components API (BOMD 가 필요로 함) | MIT | [Modrinth](https://modrinth.com/mod/cardinal-components-api) · [GitHub](https://github.com/Ladysnake/Cardinal-Components-API) |
 | `fabric-language-kotlin-1.13.14+kotlin.2.4.20.jar` | Fabric Language Kotlin (BOMD 가 필요로 함) | Apache-2.0 | [Modrinth](https://modrinth.com/mod/fabric-language-kotlin) · [GitHub](https://github.com/FabricMC/fabric-language-kotlin) |
@@ -24,8 +27,9 @@ Fabric 1.20.1 용 보스 모드 3개입니다.
 | `villagertradingplus-fabric-mc1.20.1-1.1.1.jar` | VillagersTradingPlus (주민 거래 라이브러리, The Graveyard 가 필요로 함) | GPL-3.0 | [Modrinth](https://modrinth.com/mod/villagerstradingplus) · [GitHub (소스)](https://github.com/finallion/VillagersTradingPlus) |
 
 모두 Modrinth 에 올라온 원래 파일 그대로입니다 (고치지 않음, sha512 를 Modrinth 와 맞춰 봄). 라이선스 파일은 각 jar 안에 들어 있고, jar 안에 없는 AttributeFix · Ranged Weapon API 는 `licenses/` 폴더에 넣어 두었습니다. 새 버전은 위 링크에서 받을 수 있습니다.
-GPL 모드 (The Graveyard · VillagersTradingPlus) 의 소스는 위 GitHub 링크에 있습니다.
-일부만 쓰려면: BOMD = BOMD · GeckoLib · Cloth Config · Cardinal Components · Fabric Language Kotlin / Soulslike = Soulslike · GeckoLib · AttributeFix · Ranged Weapon API / Graveyard = Graveyard · GeckoLib · VillagersTradingPlus.
+GPL 모드 (The Graveyard · VillagersTradingPlus · Archon) 의 소스는 위 GitHub 링크에 있습니다.
+⚠️ Spell Power 는 **0.12.0** 을 쓰세요: 최신 1.6.x 는 Archon 이 쓰는 부분이 바뀌어서 Archon 이 켜지다 멈출 수 있습니다 (jar 를 열어 맞춰 봄).
+일부만 쓰려면: BOMD = BOMD · GeckoLib · Cloth Config · Cardinal Components · Fabric Language Kotlin / Soulslike = Soulslike · GeckoLib · AttributeFix · Ranged Weapon API / Graveyard = Graveyard · GeckoLib · VillagersTradingPlus / Archon = Archon · Spell Power.
 
 ## BOMD 보스 4
 
@@ -57,6 +61,18 @@ GPL 모드 (The Graveyard · VillagersTradingPlus) 의 소스는 위 GitHub 링�
 - 이 보스들을 잡아도 3차 전직 · 왕 퀘스트 · 길드 의뢰의 **"보스 처치"** 로 인정되고, 보스 경험치도 들어옵니다.
 - 야생에 얼마나 나올지는 `config/abilitywar_wild_bosses.json` 의 `weight` 로 바꿉니다 (0 = 안 나옴).
 - 관리자: `/aw boss soulsweapons:moonknight` 처럼 바로 불러낼 수 있습니다.
+
+## Archon 보스 5
+
+| 보스 | id | 원래 부르는 법 (소환 제단에 넣기) | 능력대전쟁에서 더 나오는 곳 |
+|---|---|---|---|
+| 타르 (Tar, 대지) | `archon:tar` | 심층암 · 대지 정수 2 · 에메랄드 | 야생 보스 (어디든), 몰락한 요새 제단 |
+| 아일라 (Ayla, 하늘) | `archon:ayla` | 깃털 · 금 주괴 · 하늘 정수 2 | 야생 보스 (산), 비룡의 둥지 제단 |
+| 레벤 (Leven, 물) | `archon:leven` | 다시마 · 복어 · 물 정수 2 | 야생 보스 (바다), 서리 신전 제단 |
+| 이니고 (Inigo, 불) | `archon:inigo` | 마그마 크림 · 블레이즈 가루 · 불 정수 2 | 야생 보스 (더운 곳), 잿불 제단 |
+| 널 (Null, 엔드, 가장 셈) | `archon:null` | 엔더 진주 · 엔드 수정 · 엔드 정수 2 | 소환 제단으로만 (야생 `weight` 0 = 꺼짐) |
+
+- Archon 의 마나 표시 위치는 Archon 설정 파일에서 바꿀 수 있습니다. Archon 키는 `.` (원소 갑옷 터뜨리기) 하나라 능력대전쟁 키와 겹치지 않습니다.
 
 ## 따로 받아서 넣는 모드: Ultris: Boss Expansion
 

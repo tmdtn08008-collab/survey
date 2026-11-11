@@ -92,6 +92,26 @@
     {
       "id": "graveyard:lich",
       "required": false
+    },
+    {
+      "id": "archon:tar",
+      "required": false
+    },
+    {
+      "id": "archon:ayla",
+      "required": false
+    },
+    {
+      "id": "archon:leven",
+      "required": false
+    },
+    {
+      "id": "archon:inigo",
+      "required": false
+    },
+    {
+      "id": "archon:null",
+      "required": false
     }
   ]
 }
