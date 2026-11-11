@@ -55,20 +55,25 @@ public final class BossAltar {
     }
 
     /**
-     * 다른 모드 보스 (설치돼 있을 때만): 제단마다 가끔 (3번에 1번) 이 보스가 대신 나옴.
-     * Bosses of Mass Destruction: 몰락한 요새·서리 신전 → 밤의 리치, 잿불 제단 → 네더 건틀릿, 비룡의 둥지 → 옵시딜리스.
+     * 다른 모드 보스 (설치돼 있을 때만): 제단에 가끔 이 보스들 중 하나가 대신 나옴.
+     * 설치된 대체 보스가 n 마리면 n/(n+2) 확률 (1 마리 → 3번에 1번, 2 마리 → 2번에 1번).
+     * Bosses of Mass Destruction: 리치 · 건틀릿 · 옵시딜리스. Soulslike Weaponry: 썩어가는 왕 · 귀환한 기사 · 옛 챔피언의 유해 · 혼돈의 군주 · 낮의 추적자 · 타락한 성상.
      */
-    static final java.util.Map<String, String> ALT = java.util.Map.of(
-            "abilitywar:fallen_king", "bosses_of_mass_destruction:lich",
-            "abilitywar:frost_witch", "bosses_of_mass_destruction:lich",
-            "abilitywar:ember_colossus", "bosses_of_mass_destruction:gauntlet",
-            "abilitywar:ancient_wyvern", "bosses_of_mass_destruction:obsidilith");
+    static final java.util.Map<String, java.util.List<String>> ALT = java.util.Map.of(
+            "abilitywar:fallen_king", java.util.List.of("bosses_of_mass_destruction:lich", "soulsweapons:accursed_lord_boss", "soulsweapons:returning_knight"),
+            "abilitywar:frost_witch", java.util.List.of("bosses_of_mass_destruction:lich", "soulsweapons:draugr_boss"),
+            "abilitywar:ember_colossus", java.util.List.of("bosses_of_mass_destruction:gauntlet", "soulsweapons:chaos_monarch", "soulsweapons:day_stalker"),
+            "abilitywar:ancient_wyvern", java.util.List.of("bosses_of_mass_destruction:obsidilith", "soulsweapons:moonknight"));
     /** 제단이 부른 다른 모드 보스 → 제단 자리 (죽으면 제단 대기 시간). */
     static final java.util.Map<UUID, net.minecraft.util.math.GlobalPos> ALT_HOMES = new java.util.concurrent.ConcurrentHashMap<>();
 
     static Identifier pick(String boss, net.minecraft.util.math.random.Random random) {
-        String alt = ALT.get(boss);
-        if (alt != null && Registries.ENTITY_TYPE.containsId(new Identifier(alt)) && random.nextInt(3) == 0) return new Identifier(alt);
+        java.util.List<Identifier> have = new java.util.ArrayList<>();
+        for (String alt : ALT.getOrDefault(boss, java.util.List.of())) {
+            Identifier id = new Identifier(alt);
+            if (Registries.ENTITY_TYPE.containsId(id)) have.add(id);
+        }
+        if (!have.isEmpty() && random.nextInt(have.size() + 2) < have.size()) return have.get(random.nextInt(have.size()));
         return new Identifier(boss);
     }
 
