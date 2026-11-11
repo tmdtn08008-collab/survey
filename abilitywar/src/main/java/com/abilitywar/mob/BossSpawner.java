@@ -134,6 +134,11 @@ public final class BossSpawner {
         // 이미 근처에 보스가 있거나 마을 (수도) 안이면 안 나옴
         if (!w.getEntitiesByClass(MobEntity.class, new Box(p.getBlockPos()).expand(128), e -> com.abilitywar.rpg.RpgManager.isBoss(e)).isEmpty()) return null;
         if (forced == null && com.abilitywar.world.RpgWorld.inSafeZone(w, p.getBlockPos())) return null;
+        if (forced == null) {
+            // 마을 · 던전 안 (또는 그 근처) 에서는 야생 보스가 안 나옴
+            var k = com.abilitywar.world.RpgWorld.kindAt(w, p.getBlockPos());
+            if (k != null) return null;
+        }
         double a = w.getRandom().nextDouble() * Math.PI * 2;
         double d = 30 + w.getRandom().nextDouble() * 15;
         int x = MathHelper.floor(p.getX() + Math.cos(a) * d), z = MathHelper.floor(p.getZ() + Math.sin(a) * d);

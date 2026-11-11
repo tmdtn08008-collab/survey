@@ -30,6 +30,7 @@ public class AbilityWar implements ModInitializer {
         AWEffects.init();
         AWEntities.init();
         com.abilitywar.mob.AWMobs.init();
+        com.abilitywar.world.RpgStructures.init();
         AWGameRules.init();
         com.abilitywar.gear.GearAttributes.init();
         com.abilitywar.gear.GearItems.init();

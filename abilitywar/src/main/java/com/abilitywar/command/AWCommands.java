@@ -68,6 +68,49 @@ public final class AWCommands {
     private static final com.mojang.brigadier.suggestion.SuggestionProvider<ServerCommandSource> BOSSES = (ctx, b) ->
             net.minecraft.command.CommandSource.suggestMatching(java.util.List.of("abilitywar:fallen_king", "abilitywar:ember_colossus", "abilitywar:frost_witch", "abilitywar:ancient_wyvern"), b);
 
+    private static final com.mojang.brigadier.suggestion.SuggestionProvider<ServerCommandSource> PLACES = (ctx, b) ->
+            net.minecraft.command.CommandSource.suggestMatching(java.util.Arrays.stream(com.abilitywar.world.RpgStructures.Kind.values()).map(k -> k.name().toLowerCase()).toList(), b);
+
+    /** /aw goto <장소>: 가장 가까운 RPG 구조물 앞으로 순간이동 (수도는 광장). */
+    private static int gotoPlace(ServerCommandSource src, String kind) throws CommandSyntaxException {
+        ServerPlayerEntity p = src.getPlayerOrThrow();
+        com.abilitywar.world.RpgStructures.Kind k;
+        try {
+            k = com.abilitywar.world.RpgStructures.Kind.valueOf(kind.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            src.sendError(Text.literal(kind + "?"));
+            return 0;
+        }
+        var ow = src.getServer().getOverworld();
+        int x, z;
+        if (k == com.abilitywar.world.RpgStructures.Kind.CAPITAL) {
+            if (com.abilitywar.world.RpgWorld.capital == null) {
+                src.sendError(Text.translatable("rpg.abilitywar.no_capital"));
+                return 0;
+            }
+            x = ow.getSpawnPos().getX();
+            z = ow.getSpawnPos().getZ();
+        } else {
+            var reg = ow.getRegistryManager().get(net.minecraft.registry.RegistryKeys.STRUCTURE);
+            var entry = reg.getEntry(net.minecraft.registry.RegistryKey.of(net.minecraft.registry.RegistryKeys.STRUCTURE, com.abilitywar.AbilityWar.id(kind)));
+            if (entry.isEmpty()) return 0;
+            var from = p.getWorld() == ow ? p.getBlockPos() : ow.getSpawnPos();
+            var res = ow.getChunkManager().getChunkGenerator().locateStructure(ow, net.minecraft.registry.entry.RegistryEntryList.of(entry.get()), from, 100, false);
+            if (res == null) {
+                src.sendError(Text.translatable("rpg.abilitywar.place_not_found"));
+                return 0;
+            }
+            x = res.getFirst().getX() + 8;
+            z = res.getFirst().getZ() + 8 + k.radius - 6;
+        }
+        ow.getChunk(x >> 4, z >> 4);
+        int y = ow.getTopY(net.minecraft.world.Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, x, z);
+        p.teleport(ow, x + 0.5, y, z + 0.5, 180f, 10f);
+        int fx = x, fz = z;
+        src.sendFeedback(() -> Text.translatable("rpg.abilitywar.goto", Text.translatable(k == com.abilitywar.world.RpgStructures.Kind.TOWN ? "region.abilitywar.town.generic" : "region.abilitywar." + kind), fx, y, fz), false);
+        return 1;
+    }
+
     private static int rpgEach(Collection<ServerPlayerEntity> ps, java.util.function.Consumer<ServerPlayerEntity> f) {
         for (ServerPlayerEntity p : ps) f.accept(p);
         return ps.size();
@@ -136,6 +179,22 @@ public final class AWCommands {
                                     com.abilitywar.mob.BossAltar.setBoss(p.getServerWorld(), pos, net.minecraft.command.argument.IdentifierArgumentType.getIdentifier(ctx, "boss"));
                                     return 1;
                                 })))
+                .then(literal("goto").requires(s -> s.hasPermissionLevel(2))
+                        .then(argument("place", StringArgumentType.word()).suggests(PLACES)
+                                .executes(ctx -> gotoPlace(ctx.getSource(), StringArgumentType.getString(ctx, "place")))))
+                .then(literal("capital").requires(s -> s.hasPermissionLevel(2)).executes(ctx -> {
+                    ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
+                    var cap = com.abilitywar.world.RpgWorld.capital;
+                    if (cap == null) {
+                        ctx.getSource().sendError(Text.translatable("rpg.abilitywar.no_capital"));
+                        return 0;
+                    }
+                    var ow = ctx.getSource().getServer().getOverworld();
+                    var sp = ow.getSpawnPos();
+                    p.teleport(ow, sp.getX() + 0.5, sp.getY(), sp.getZ() + 0.5, 180f, 0f);
+                    ctx.getSource().sendFeedback(() -> Text.translatable("rpg.abilitywar.capital_tp", cap.getX(), cap.getZ()), false);
+                    return 1;
+                }))
                 .then(literal("king").requires(s -> s.hasPermissionLevel(2)).executes(ctx -> {
                     ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
                     var npc = com.abilitywar.registry.AWEntities.KING.create(p.getServerWorld());

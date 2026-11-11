@@ -1,0 +1,8 @@
+{
+  "type": "abilitywar:rpg",
+  "kind": "frost_temple",
+  "biomes": "#abilitywar:has_structure/frost_temple",
+  "step": "top_layer_modification",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {}
+}

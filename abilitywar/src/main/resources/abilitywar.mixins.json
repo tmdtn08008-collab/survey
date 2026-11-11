@@ -7,7 +7,9 @@
     "LivingEntityMixin",
     "MobEntityMixin",
     "PlayerEntityMixin",
-    "ItemStackMixin"
+    "ItemStackMixin",
+    "ChunkGeneratorMixin",
+    "StructurePlacementCalculatorAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

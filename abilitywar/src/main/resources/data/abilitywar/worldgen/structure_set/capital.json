@@ -1,0 +1,11 @@
+{
+  "structures": [
+    {
+      "structure": "abilitywar:capital",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "abilitywar:capital"
+  }
+}

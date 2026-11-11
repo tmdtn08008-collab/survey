@@ -295,6 +295,31 @@ t('boss.abilitywar.wild', '⚠ 야생 보스 %s 이(가) 근처에 나타났다!
 t('block.abilitywar.boss_altar', '보스 제단', 'Boss Altar')
 
 
+# ================================================================ 맵 (지역 이름)
+t('rpg.abilitywar.no_capital', '이 월드에는 수도가 없습니다 (모드를 넣기 전에 만든 월드).', 'This world has no capital (it was created before the mod).')
+t('rpg.abilitywar.capital_tp', '왕도 아르덴으로 이동 (%s, %s)', 'Teleported to the Royal Capital Arden (%s, %s)')
+t('rpg.abilitywar.place_not_found', '가까운 곳에서 찾지 못했습니다.', 'None found nearby.')
+t('rpg.abilitywar.goto', '%s (으)로 이동: %s %s %s', 'Teleported to %s: %s %s %s')
+t('region.abilitywar.capital', '왕도 아르덴', 'Royal Capital Arden')
+t('region.abilitywar.capital.sub', '안전 지대 · 왕과 전직 교관이 있는 곳', 'Safe zone · Home of the King and the Class Master')
+t('region.abilitywar.town', '%s 마을', '%s Village')
+t('region.abilitywar.town.generic', '마을', 'Village')
+t('region.abilitywar.town.sub', '안전 지대 · 전직 교관이 있습니다', 'Safe zone · A Class Master lives here')
+for i, (ko, en) in enumerate([('에델', 'Edel'), ('로웬', 'Rowen'), ('하벤', 'Haven'), ('미르', 'Mir'), ('카렌', 'Karen'), ('실바', 'Silva'), ('테론', 'Theron'),
+                              ('엘름', 'Elm'), ('리벤', 'Riven'), ('오크힐', 'Oakhill'), ('스톤브룩', 'Stonebrook'), ('브라이튼', 'Brighton'), ('윈터홀', 'Winterhall'),
+                              ('솔레아', 'Solea'), ('마렌', 'Maren'), ('펠리아', 'Pelia')]):
+    t(f'region.abilitywar.town_name.{i}', ko, en)
+t('region.abilitywar.fallen_fortress', '몰락한 요새', 'Fallen Fortress')
+t('region.abilitywar.fallen_fortress.sub', '위험 · 보스: 타락한 기사왕', 'Danger · Boss: The Fallen King')
+t('region.abilitywar.ember_altar', '잿불 제단', 'Ember Altar')
+t('region.abilitywar.ember_altar.sub', '위험 · 보스: 화염 거인', 'Danger · Boss: Ember Colossus')
+t('region.abilitywar.frost_temple', '서리 신전', 'Frost Temple')
+t('region.abilitywar.frost_temple.sub', '위험 · 보스: 서리 마녀', 'Danger · Boss: Frost Witch')
+t('region.abilitywar.wyvern_roost', '비룡의 둥지', 'Wyvern Roost')
+t('region.abilitywar.wyvern_roost.sub', '위험 · 보스: 고대 비룡', 'Danger · Boss: Ancient Wyvern')
+t('region.abilitywar.goblin_camp', '고블린 야영지', 'Goblin Camp')
+t('region.abilitywar.goblin_camp.sub', '위험 · 고블린 무리', 'Danger · Goblin warband')
+
 def apply(fname, idx):
     p = os.path.join(LANG, fname)
     d = json.load(open(p, encoding='utf-8'))

@@ -1,0 +1,8 @@
+{
+  "type": "abilitywar:rpg",
+  "kind": "goblin_camp",
+  "biomes": "#abilitywar:has_structure/goblin_camp",
+  "step": "top_layer_modification",
+  "terrain_adaptation": "beard_thin",
+  "spawn_overrides": {}
+}

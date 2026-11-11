@@ -1,0 +1,8 @@
+{
+  "type": "abilitywar:rpg",
+  "kind": "fallen_fortress",
+  "biomes": "#abilitywar:has_structure/fallen_fortress",
+  "step": "top_layer_modification",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {}
+}

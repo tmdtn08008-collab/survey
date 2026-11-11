@@ -1,0 +1,34 @@
+{
+  "structures": [
+    {
+      "structure": "abilitywar:fallen_fortress",
+      "weight": 3
+    },
+    {
+      "structure": "abilitywar:ember_altar",
+      "weight": 3
+    },
+    {
+      "structure": "abilitywar:frost_temple",
+      "weight": 3
+    },
+    {
+      "structure": "abilitywar:wyvern_roost",
+      "weight": 3
+    },
+    {
+      "structure": "abilitywar:goblin_camp",
+      "weight": 5
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 22,
+    "separation": 8,
+    "salt": 20482,
+    "exclusion_zone": {
+      "other_set": "abilitywar:towns",
+      "chunk_count": 6
+    }
+  }
+}

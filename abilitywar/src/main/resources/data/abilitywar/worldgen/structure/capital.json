@@ -1,0 +1,13 @@
+{
+  "type": "abilitywar:rpg",
+  "kind": "capital",
+  "biomes": "#abilitywar:has_structure/capital",
+  "step": "top_layer_modification",
+  "terrain_adaptation": "beard_box",
+  "spawn_overrides": {
+    "monster": {
+      "bounding_box": "full",
+      "spawns": []
+    }
+  }
+}
