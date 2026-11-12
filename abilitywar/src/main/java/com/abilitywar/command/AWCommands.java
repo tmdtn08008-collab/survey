@@ -340,7 +340,7 @@ public final class AWCommands {
                             ctx.getSource().sendFeedback(() -> st.getName(), false);
                             return 1;
                         })))
-                // 아르반티아 시험용: /aw stage <0 기본 | 1 초월+ | 2 정제> (손에 든 ? 장비)
+                // ? 장비 끝까지 시험용: /aw stage <0 기본 | 1 초월+ | 2 정제> (손에 든 ? 장비)
                 .then(literal("stage").requires(s -> s.hasPermissionLevel(2))
                         .then(argument("stage", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, com.abilitywar.gear.GearEnhance.REFINE)).executes(ctx -> {
                             ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();

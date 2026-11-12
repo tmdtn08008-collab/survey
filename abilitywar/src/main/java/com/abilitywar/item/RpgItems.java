@@ -36,7 +36,7 @@ public final class RpgItems {
     /** 후반: 심연의 탑 보상 (각성 재료) · 엔더 드래곤 전리품 (★3 부터 각성 재료). */
     public static final Item ABYSS_CRYSTAL = reg("abyss_crystal", new Material(new Item.Settings().rarity(Rarity.EPIC), "item.abilitywar.abyss_crystal.desc", true));
     public static final Item DRAGON_HEART = reg("dragon_heart", new Material(new Item.Settings().maxCount(16).rarity(Rarity.EPIC).fireproof(), "item.abilitywar.dragon_heart.desc", true));
-    /** 2.9: 야생 생명체 전리품 (아르반티아 초월 · 정제 · 승급 재료). */
+    /** 2.9: 야생 생명체 전리품 (? 장비 초월 · 정제 · 인피니티 승급 재료). */
     public static final Item DIRE_FANG = reg("dire_fang", new Material(new Item.Settings(), "item.abilitywar.dire_fang.desc", false));
     public static final Item BANDIT_SEAL = reg("bandit_seal", new Material(new Item.Settings(), "item.abilitywar.bandit_seal.desc", false));
     public static final Item PIRATE_DOUBLOON = reg("pirate_doubloon", new Material(new Item.Settings().rarity(Rarity.UNCOMMON), "item.abilitywar.pirate_doubloon.desc", false));

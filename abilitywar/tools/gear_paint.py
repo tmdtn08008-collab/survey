@@ -419,7 +419,7 @@ def finish_weapon(cv, mat, gem, tier, rng, blade_mask, extra):
 
 
 def prism(f, nfr):
-    """아르반티아 인피니티: 프레임마다 색이 바뀌는 무지개빛."""
+    """인피니티 등급: 프레임마다 색이 바뀌는 무지개빛."""
     import colorsys
     r, g, b = colorsys.hsv_to_rgb((f / nfr) % 1.0, 0.55, 1.0)
     return np.array((r * 255, g * 255, b * 255), np.float32)

@@ -3,7 +3,7 @@ package com.abilitywar.gear;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-/** 장비 등급: 일반 → 좋음 → 희귀 → 영웅 → 전설 → 신화 → 시크릿 → ? → 아르반티아 인피니티 (? 를 끝까지 키워 승급해서만 얻음). */
+/** 장비 등급: 일반 → 좋음 → 희귀 → 영웅 → 전설 → 신화 → 시크릿 → ? → 인피니티 (? 를 끝까지 키워 승급해서 얻음, 아바리티아 모드가 있으면 그 대신 아바리티아 인피니티 장비). */
 public enum GearGrade {
     COMMON("common", 0xC8C8C8),
     GOOD("good", 0x6BE36B),

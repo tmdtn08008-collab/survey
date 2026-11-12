@@ -143,7 +143,7 @@ public class EnhanceScreen extends Screen {
         boolean mats = true;
         if (asc != null) {
             for (GearEnhance.Mat m : GearEnhance.ascendMats(asc)) mats &= Shops.count(inv, m.item()) >= m.count();
-            promote.setMessage(Text.translatable("smith.abilitywar.btn." + asc.key()));
+            promote.setMessage(Text.translatable("smith.abilitywar.btn." + asc.langKey()));
             promote.active = lv >= GearEnhance.BEYOND_MAX && (creative || (mats && RpgClient.gold >= GearEnhance.ascendGold(asc)));
             promote.visible = true;
         } else {
@@ -247,7 +247,7 @@ public class EnhanceScreen extends Screen {
             ctx.getMatrices().pop();
             ctx.drawTextWithShadow(textRenderer, st.getName(), rx0 + 44, ly0 + 7, 0xFFFFFF);
             ctx.drawTextWithShadow(textRenderer, Text.literal("◆ ").append(g.displayName()).styled(s -> s.withColor(g.color)), rx0 + 44, ly0 + 19, 0xFFFFFF);
-            // 별 15 (? · 아르반티아: +99 막대 + 단계)
+            // 별 15 (? · 인피니티 등급: +99 막대 + 단계)
             int sx = rx0 + 44 + textRenderer.getWidth(Text.literal("◆ ").append(g.displayName())) + 8;
             if (GearEnhance.beyond(g)) {
                 int stg = GearEnhance.stage(st), bc = GearEnhance.colorOf(st);
@@ -378,11 +378,11 @@ public class EnhanceScreen extends Screen {
         return hover;
     }
 
-    /** ? 장비: 초월+ · 정제 · 아르반티아 인피니티 승급 (재료가 많아서 두 줄). */
+    /** ? 장비: 초월+ · 정제 · 인피니티 (아바리티아) 승급 (재료가 많아서 두 줄). */
     ItemStack ascendPanel(DrawContext ctx, ItemStack st, GearEnhance.Ascend asc, int rx0, int rx1, int pz0, PlayerInventory inv, ItemStack hover) {
         int lv = GearEnhance.level(st);
         int col = asc == GearEnhance.Ascend.TRANSCEND ? GearEnhance.TRANSCEND_COLOR : asc == GearEnhance.Ascend.REFINE ? GearEnhance.REFINE_COLOR : GearEnhance.INFINITY_COLOR;
-        Text title = Text.translatable("smith.abilitywar.ascend." + asc.key()).styled(s -> s.withColor(col).withBold(true));
+        Text title = Text.translatable("smith.abilitywar.ascend." + asc.langKey()).styled(s -> s.withColor(col).withBold(true));
         ctx.drawTextWithShadow(textRenderer, title, rx0 + 8, pz0 + 5, 0xFFFFFF);
         boolean lvOk = lv >= GearEnhance.BEYOND_MAX;
         ctx.drawTextWithShadow(textRenderer, Text.literal(lvOk ? "✔ " : "✖ ").formatted(lvOk ? Formatting.GREEN : Formatting.RED)
@@ -411,7 +411,7 @@ public class EnhanceScreen extends Screen {
         ctx.getMatrices().push();
         ctx.getMatrices().translate(rx0 + 8, my0 + 19, 0);
         ctx.getMatrices().scale(0.7f, 0.7f, 1);
-        ctx.drawTextWithShadow(textRenderer, Text.translatable("smith.abilitywar.ascend_note." + asc.key()).formatted(Formatting.GRAY), 0, 0, 0xFFFFFF);
+        ctx.drawTextWithShadow(textRenderer, Text.translatable("smith.abilitywar.ascend_note." + asc.langKey()).formatted(Formatting.GRAY), 0, 0, 0xFFFFFF);
         ctx.getMatrices().pop();
         return hover;
     }
@@ -518,7 +518,7 @@ public class EnhanceScreen extends Screen {
                 col = GearEnhance.REFINE_COLOR;
             }
             case 9 -> {
-                msg = Text.translatable("smith.abilitywar.result.infinity");
+                msg = Text.translatable(com.abilitywar.compat.AvaritiaCompat.available() ? "smith.abilitywar.result.infinity_avaritia" : "smith.abilitywar.result.infinity");
                 col = GearEnhance.INFINITY_COLOR;
             }
             default -> {

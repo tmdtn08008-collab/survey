@@ -32,9 +32,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>각성 (★1 ~ ★5): +15 장비를 심연의 결정 · 보스의 영혼 · 용의 심장 (★3 부터) 으로 더 강하게. ★ 하나 = 강화 2 단계 만큼의 능력치.
  * 실패해도 내려가지 않음 (재료만 사라짐). 승급해도 각성은 남음. NBT "AWAwaken".
  *
- * <p>아르반티아 (2.9): ? 장비는 +99 까지 강화 (+15 부터는 실패해도 그대로) → +99 에서 초월+ (+1+ 부터 다시, "+N+") → +99+ 에서 정제 (+1 부터 다시)
- * → 정제 +99 에서 승급하면 같은 종류의 아르반티아 인피니티 장비. 단계는 NBT "AWStage" (1 초월+, 2 정제).
- * 능력치 단계: 기본 +15 까지 1 씩, 그 뒤 0.4 씩 (+99 = 48) · 초월+ 48 + 0.5 씩 (+99+ = 97) · 정제 97 + 0.6 씩 (+99 = 156) · 아르반티아 156 + 0.6 씩.
+ * <p>? 장비 끝까지 (2.9): ? 장비는 +99 까지 강화 (+15 부터는 실패해도 그대로) → +99 에서 초월+ (+1+ 부터 다시, "+N+") → +99+ 에서 정제 (+1 부터 다시)
+ * → 정제 +99 에서 승급하면 아바리티아 (Re:Avaritia) 인피니티 장비 (모드가 없으면 같은 종류의 인피니티 등급). 단계는 NBT "AWStage" (1 초월+, 2 정제).
+ * 능력치 단계: 기본 +15 까지 1 씩, 그 뒤 0.4 씩 (+99 = 48) · 초월+ 48 + 0.5 씩 (+99+ = 97) · 정제 97 + 0.6 씩 (+99 = 156) · 인피니티 등급 156 + 0.6 씩.
  */
 public final class GearEnhance {
     public static final String KEY = "AWEnhance";
@@ -69,7 +69,7 @@ public final class GearEnhance {
         } else stack.getOrCreateNbt().putInt(AWAKEN_KEY, a);
     }
 
-    /** 각성할 수 있는지: 최대 강화 (+15, ? · 아르반티아는 +99) 이고 ★ 가 남았을 때. */
+    /** 각성할 수 있는지: 최대 강화 (+15, ? · 인피니티 등급은 +99) 이고 ★ 가 남았을 때. */
     public static boolean canAwaken(ItemStack stack) {
         return level(stack) >= maxLevel(stack) && awaken(stack) < AWAKEN_MAX;
     }
@@ -93,7 +93,7 @@ public final class GearEnhance {
         return l;
     }
 
-    /** 능력치 계산에 쓰는 단계 = 강화 (초월+ · 정제 · 아르반티아는 위 표) + 각성 × 2. */
+    /** 능력치 계산에 쓰는 단계 = 강화 (초월+ · 정제 · 인피니티 등급은 위 표) + 각성 × 2. */
     public static int statLevel(ItemStack stack) {
         int lv = level(stack), base;
         if (gradeOf(stack) == GearGrade.ARVANTIA) base = INFINITY_BASE + lv * 3 / 5;
@@ -105,11 +105,11 @@ public final class GearEnhance {
         return base + awaken(stack) * AWAKEN_STEP;
     }
 
-    // ================================================================ 아르반티아 (? +99 → 초월+ → 정제 → 아르반티아 인피니티)
+    // ================================================================ ? +99 → 초월+ → 정제 → 인피니티 (아바리티아)
     public static final int BEYOND_MAX = 99;
     public static final String STAGE_KEY = "AWStage";
     public static final int TRANSCEND = 1, REFINE = 2;
-    /** 아르반티아 인피니티 +0 의 능력치 단계 (= 정제 +99). */
+    /** 인피니티 등급 +0 의 능력치 단계 (= 정제 +99). */
     public static final int INFINITY_BASE = 156;
     public static final int TRANSCEND_COLOR = 0x5AE8FF, REFINE_COLOR = 0xD07CFF, INFINITY_COLOR = 0xFF80E8;
 
@@ -118,7 +118,7 @@ public final class GearEnhance {
         return st.getItem() instanceof GearItem g ? g.grade() : null;
     }
 
-    /** +15 을 넘어 +99 까지 강화되는 등급 (? · 아르반티아). */
+    /** +15 을 넘어 +99 까지 강화되는 등급 (? · 인피니티 등급). */
     public static boolean beyond(@org.jetbrains.annotations.Nullable GearGrade g) {
         return g == GearGrade.UNKNOWN || g == GearGrade.ARVANTIA;
     }
@@ -144,7 +144,7 @@ public final class GearEnhance {
         } else st.getOrCreateNbt().putInt(STAGE_KEY, Math.min(REFINE, s));
     }
 
-    /** +15 을 넘은 강화 구간 (실패해도 그대로, 값 표가 다름): 0 아님 = 그 구간의 단계 (1 기본 +15~ · 2 초월+ · 3 정제 · 4 아르반티아). */
+    /** +15 을 넘은 강화 구간 (실패해도 그대로, 값 표가 다름): 0 아님 = 그 구간의 단계 (1 기본 +15~ · 2 초월+ · 3 정제 · 4 인피니티 등급). */
     static int beyondTier(ItemStack st) {
         GearGrade g = gradeOf(st);
         if (g == GearGrade.ARVANTIA) return 4;
@@ -184,12 +184,17 @@ public final class GearEnhance {
         return k == 0 ? goldCost(g == null ? GearGrade.COMMON : g, lv) : 50 + lv * 6 + k * 150;
     }
 
-    /** ? 장비의 다음 큰 단계: 초월+ (기본 +99) · 정제 (초월+ +99) · 아르반티아 인피니티 승급 (정제 +99). */
+    /** ? 장비의 다음 큰 단계: 초월+ (기본 +99) · 정제 (초월+ +99) · 인피니티 (아바리티아) 승급 (정제 +99). */
     public enum Ascend {
         TRANSCEND, REFINE, INFINITY;
 
         public String key() {
             return name().toLowerCase();
+        }
+
+        /** 글자 키: 아바리티아 모드가 있으면 승급은 "infinity_avaritia". */
+        public String langKey() {
+            return this == INFINITY && com.abilitywar.compat.AvaritiaCompat.available() ? "infinity_avaritia" : key();
         }
     }
 
@@ -206,7 +211,7 @@ public final class GearEnhance {
     /**
      * 초월+ · 정제 · 승급 재료 (약간 양심 없게: 셋 다 하면 돈 80만 G + 재료 ≈ 100만 G 어치).
      * 초월+ ← 골렘 핵 · 군주의 증표 · 보스의 영혼 · 심연의 결정 / 정제 ← 원혼의 정수 · 광신도의 인장 · 요정 가루 · 인어의 눈물 · 용의 심장
-     * 아르반티아 인피니티 ← 용왕의 역린 · 비룡 비늘 · 해적 금화 · 도적단의 인장 · 흉포한 송곳니 · 용의 심장
+     * 인피니티 (아바리티아) 승급 ← 용왕의 역린 · 비룡 비늘 · 해적 금화 · 도적단의 인장 · 흉포한 송곳니 · 용의 심장
      */
     public static List<Mat> ascendMats(Ascend a) {
         return switch (a) {
@@ -229,18 +234,22 @@ public final class GearEnhance {
         };
     }
 
-    /** 같은 종류의 아르반티아 인피니티 무기 (종류마다 하나). */
+    /** 승급 결과 무기: 아바리티아 (Re:Avaritia) 가 있으면 그 인피니티 무기, 없으면 같은 종류의 인피니티 등급 무기 (종류마다 하나). */
     @org.jetbrains.annotations.Nullable
     public static Item infinityWeapon(GearDefs.Weapon def, net.minecraft.util.math.random.Random r) {
+        Item ava = com.abilitywar.compat.AvaritiaCompat.available() ? com.abilitywar.compat.AvaritiaCompat.weapon(def.type()) : null;
+        if (ava != null) return ava;
         List<Item> all = GearItems.WEAPONS.get(GearGrade.ARVANTIA);
         if (all == null || all.isEmpty()) return null;
         for (Item i : all) if (i instanceof GearWeaponItem w && w.def.type().equals(def.type())) return i;
         return all.get(r.nextInt(all.size()));
     }
 
-    /** 아르반티아 인피니티 갑옷 세트 하나의 같은 부위. */
+    /** 승급 결과 갑옷: 아바리티아가 있으면 인피니티 갑옷의 같은 부위, 없으면 인피니티 등급 세트 하나의 같은 부위. */
     @org.jetbrains.annotations.Nullable
     public static Item infinityArmor(GearArmorItem a, net.minecraft.util.math.random.Random r) {
+        Item ava = com.abilitywar.compat.AvaritiaCompat.available() ? com.abilitywar.compat.AvaritiaCompat.armor(a.piece.slot()) : null;
+        if (ava != null) return ava;
         List<Item> pool = new ArrayList<>();
         for (GearDefs.ArmorSet s : GearItems.SETS.getOrDefault(GearGrade.ARVANTIA, List.of())) {
             GearDefs.Piece p = s.pieces().get(a.piece.slot());
@@ -249,7 +258,7 @@ public final class GearEnhance {
         return pool.isEmpty() ? null : pool.get(r.nextInt(pool.size()));
     }
 
-    /** 강화 수치 색 (단계에 따라: 초월+ 하늘 · 정제 보라 · 아르반티아 분홍). */
+    /** 강화 수치 색 (단계에 따라: 초월+ 하늘 · 정제 보라 · 인피니티 분홍). */
     public static int colorOf(ItemStack st) {
         int lv = level(st);
         if (gradeOf(st) == GearGrade.ARVANTIA) return INFINITY_COLOR;

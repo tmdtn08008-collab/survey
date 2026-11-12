@@ -10,8 +10,8 @@ GRADES = [
     ('mythic', '신화', 'Mythic', 50, (255, 72, 72)),
     ('secret', '시크릿', 'Secret', 10, (46, 242, 208)),
     ('unknown', '?', '?', 10, (255, 255, 255)),
-    # ? 를 +99 → 초월+ +99 → 정제 +99 까지 키운 뒤 승급해서만 얻음 (2.9)
-    ('arvantia', '아르반티아 인피니티', 'Arvantia Infinity', 12, (255, 128, 232)),
+    # ? 를 +99 → 초월+ +99 → 정제 +99 까지 키운 뒤 승급해서 얻음 (2.9). 아바리티아 (Re:Avaritia) 모드가 있으면 그 인피니티 장비를 대신 줌
+    ('arvantia', '인피니티', 'Infinity', 12, (255, 128, 232)),
 ]
 GRADE_KEYS = [g[0] for g in GRADES]
 
@@ -321,34 +321,34 @@ STYLE_SET_EFFECT = {
 }
 
 
-# ---------------------------------------------------------------- 아르반티아 인피니티 (2.9): 무기 종류마다 하나 · 갑옷 모양마다 하나
+# ---------------------------------------------------------------- 인피니티 등급 (2.9, 아바리티아 모드가 없을 때의 승급 결과): 무기 종류마다 하나 · 갑옷 모양마다 하나
 # (한국어, 영어, 종류, 재료, 손잡이, 보석, 설명 한국어, 설명 영어)
 ARVANTIA_WEAPONS = [
-    ('아르반티아 · 영원의 검', 'Arvantia: Blade of Eternity', 'sword', 'arvantia', 'gold', 'infinity', '끝나지 않는 이야기의 첫 줄을 벼려 만든 검.', 'A blade forged from the first line of a story that never ends.'),
-    ('아르반티아 · 무한의 대검', 'Arvantia: Greatsword of the Infinite', 'greatsword', 'infinity', 'gold', 'prism', '아무리 휘둘러도 끝이 닿지 않는 대검.', 'A greatsword whose edge never reaches its end.'),
-    ('아르반티아 · 찰나의 단검', 'Arvantia: Dagger of the Instant', 'dagger', 'arvantia', 'violet', 'prism', '찌른 순간이 영원히 남는다.', 'The instant it strikes remains forever.'),
-    ('아르반티아 · 종말의 도끼', 'Arvantia: Axe of the End', 'axe', 'infinity', 'dark', 'infinity', '세계의 끝에서 주워 온 도끼.', 'An axe picked up at the end of the world.'),
-    ('아르반티아 · 창세의 망치', 'Arvantia: Hammer of Genesis', 'hammer', 'arvantia', 'gold', 'sun', '세상을 처음 두드려 모양을 만든 망치.', 'The hammer that first beat the world into shape.'),
-    ('아르반티아 · 천공의 창', 'Arvantia: Spear of the Firmament', 'spear', 'infinity', 'white', 'prism', '하늘의 덮개를 꿰뚫는 창.', 'A spear that pierces the vault of the sky.'),
-    ('아르반티아 · 윤회의 낫', 'Arvantia: Scythe of Rebirth', 'scythe', 'arvantia', 'violet', 'infinity', '베인 것은 다시 태어난다. 더 약하게.', 'What it reaps is reborn. Weaker.'),
-    ('아르반티아 · 여명의 태도', 'Arvantia: Katana of Dawn', 'katana', 'infinity', 'white', 'sun', '밤을 베어 아침을 여는 칼.', 'A blade that cuts the night to open the morning.'),
-    ('아르반티아 · 별무리 레이피어', 'Arvantia: Rapier of the Starfield', 'rapier', 'arvantia', 'blue', 'diamond', '별 사이를 꿰매는 가는 칼끝.', 'A fine point that stitches between the stars.'),
-    ('아르반티아 · 심판의 철퇴', 'Arvantia: Mace of Judgment', 'mace', 'infinity', 'gold', 'infinity', '마지막 심판의 날 울릴 철퇴.', 'The mace that will toll on the day of final judgment.'),
-    ('아르반티아 · 근원의 지팡이', 'Arvantia: Staff of the Origin', 'staff', 'arvantia', 'white', 'prism', '모든 마법이 시작된 곳을 가리키는 지팡이.', 'A staff that points to where all magic began.'),
-    ('아르반티아 · 꿈결의 완드', 'Arvantia: Wand of Dreams', 'wand', 'infinity', 'violet', 'infinity', '꿈을 현실로, 현실을 꿈으로.', 'Dreams into reality, reality into dreams.'),
+    ('인피니티 · 영원의 검', 'Infinity: Blade of Eternity', 'sword', 'arvantia', 'gold', 'infinity', '끝나지 않는 이야기의 첫 줄을 벼려 만든 검.', 'A blade forged from the first line of a story that never ends.'),
+    ('인피니티 · 무한의 대검', 'Infinity: Greatsword of the Infinite', 'greatsword', 'infinity', 'gold', 'prism', '아무리 휘둘러도 끝이 닿지 않는 대검.', 'A greatsword whose edge never reaches its end.'),
+    ('인피니티 · 찰나의 단검', 'Infinity: Dagger of the Instant', 'dagger', 'arvantia', 'violet', 'prism', '찌른 순간이 영원히 남는다.', 'The instant it strikes remains forever.'),
+    ('인피니티 · 종말의 도끼', 'Infinity: Axe of the End', 'axe', 'infinity', 'dark', 'infinity', '세계의 끝에서 주워 온 도끼.', 'An axe picked up at the end of the world.'),
+    ('인피니티 · 창세의 망치', 'Infinity: Hammer of Genesis', 'hammer', 'arvantia', 'gold', 'sun', '세상을 처음 두드려 모양을 만든 망치.', 'The hammer that first beat the world into shape.'),
+    ('인피니티 · 천공의 창', 'Infinity: Spear of the Firmament', 'spear', 'infinity', 'white', 'prism', '하늘의 덮개를 꿰뚫는 창.', 'A spear that pierces the vault of the sky.'),
+    ('인피니티 · 윤회의 낫', 'Infinity: Scythe of Rebirth', 'scythe', 'arvantia', 'violet', 'infinity', '베인 것은 다시 태어난다. 더 약하게.', 'What it reaps is reborn. Weaker.'),
+    ('인피니티 · 여명의 태도', 'Infinity: Katana of Dawn', 'katana', 'infinity', 'white', 'sun', '밤을 베어 아침을 여는 칼.', 'A blade that cuts the night to open the morning.'),
+    ('인피니티 · 별무리 레이피어', 'Infinity: Rapier of the Starfield', 'rapier', 'arvantia', 'blue', 'diamond', '별 사이를 꿰매는 가는 칼끝.', 'A fine point that stitches between the stars.'),
+    ('인피니티 · 심판의 철퇴', 'Infinity: Mace of Judgment', 'mace', 'infinity', 'gold', 'infinity', '마지막 심판의 날 울릴 철퇴.', 'The mace that will toll on the day of final judgment.'),
+    ('인피니티 · 근원의 지팡이', 'Infinity: Staff of the Origin', 'staff', 'arvantia', 'white', 'prism', '모든 마법이 시작된 곳을 가리키는 지팡이.', 'A staff that points to where all magic began.'),
+    ('인피니티 · 꿈결의 완드', 'Infinity: Wand of Dreams', 'wand', 'infinity', 'violet', 'infinity', '꿈을 현실로, 현실을 꿈으로.', 'Dreams into reality, reality into dreams.'),
 ]
 # (한국어, 영어, 모양, 재료, 보석, 설명 한국어, 설명 영어)
 ARVANTIA_ARMORS = [
-    ('아르반티아 · 영원의 기사', 'Arvantia: Eternal Knight', 'knight', 'arvantia', 'infinity', '쓰러지지 않는 기사의 맹세가 깃든 갑주.', 'Armor sworn with the oath of a knight who never falls.'),
-    ('아르반티아 · 무한의 용', 'Arvantia: Infinite Dragon', 'dragon', 'infinity', 'prism', '용왕의 역린으로 지은 비늘 갑옷.', "Scale armor built from the Dragon King's reversed scales."),
-    ('아르반티아 · 천상의 날개', 'Arvantia: Celestial Wings', 'angel', 'arvantia', 'sun', '입으면 등 뒤에서 빛이 펼쳐진다.', "Light unfolds behind the wearer's back."),
-    ('아르반티아 · 종말의 군주', 'Arvantia: Lord of the End', 'demon', 'infinity', 'infinity', '마지막 날의 왕이 입는 갑주.', 'Armor of the king of the last day.'),
-    ('아르반티아 · 찰나의 그림자', 'Arvantia: Shadow of the Instant', 'assassin', 'arvantia', 'prism', '눈을 깜빡이는 사이에 사라진다.', 'Gone in the blink of an eye.'),
-    ('아르반티아 · 근원의 법의', 'Arvantia: Vestment of the Origin', 'robe', 'infinity', 'prism', '마법의 근원에서 짠 법의.', 'Vestments woven at the source of magic.'),
-    ('아르반티아 · 창세의 판금', 'Arvantia: Plate of Genesis', 'plate', 'arvantia', 'sun', '세상이 생길 때의 첫 쇠로 두드린 판금.', 'Plate beaten from the first iron of creation.'),
-    ('아르반티아 · 별무리 수정', 'Arvantia: Starfield Crystal', 'crystal', 'infinity', 'diamond', '별무리를 통째로 굳혀 깎았다.', 'Carved from an entire starfield, frozen solid.'),
-    ('아르반티아 · 심해의 비늘', 'Arvantia: Abyssal Scale', 'scale', 'arvantia', 'frost', '인어의 눈물로 씻어 낸 비늘.', "Scales washed in mermaids' tears."),
-    ('아르반티아 · 바람의 가죽', 'Arvantia: Windborne', 'leather', 'infinity', 'prism', '입으면 발이 땅에 닿지 않는다.', "The wearer's feet never quite touch the ground."),
-    ('아르반티아 · 윤회의 사슬', 'Arvantia: Chains of Rebirth', 'chain', 'arvantia', 'infinity', '끊어져도 다시 이어지는 사슬.', 'Chains that join again even when broken.'),
-    ('아르반티아 · 불멸의 뼈', 'Arvantia: Undying Bone', 'bone', 'infinity', 'void', '죽지 않는 자의 뼈를 깎아 만들었다.', 'Carved from the bones of one who cannot die.'),
+    ('인피니티 · 영원의 기사', 'Infinity: Eternal Knight', 'knight', 'arvantia', 'infinity', '쓰러지지 않는 기사의 맹세가 깃든 갑주.', 'Armor sworn with the oath of a knight who never falls.'),
+    ('인피니티 · 무한의 용', 'Infinity: Infinite Dragon', 'dragon', 'infinity', 'prism', '용왕의 역린으로 지은 비늘 갑옷.', "Scale armor built from the Dragon King's reversed scales."),
+    ('인피니티 · 천상의 날개', 'Infinity: Celestial Wings', 'angel', 'arvantia', 'sun', '입으면 등 뒤에서 빛이 펼쳐진다.', "Light unfolds behind the wearer's back."),
+    ('인피니티 · 종말의 군주', 'Infinity: Lord of the End', 'demon', 'infinity', 'infinity', '마지막 날의 왕이 입는 갑주.', 'Armor of the king of the last day.'),
+    ('인피니티 · 찰나의 그림자', 'Infinity: Shadow of the Instant', 'assassin', 'arvantia', 'prism', '눈을 깜빡이는 사이에 사라진다.', 'Gone in the blink of an eye.'),
+    ('인피니티 · 근원의 법의', 'Infinity: Vestment of the Origin', 'robe', 'infinity', 'prism', '마법의 근원에서 짠 법의.', 'Vestments woven at the source of magic.'),
+    ('인피니티 · 창세의 판금', 'Infinity: Plate of Genesis', 'plate', 'arvantia', 'sun', '세상이 생길 때의 첫 쇠로 두드린 판금.', 'Plate beaten from the first iron of creation.'),
+    ('인피니티 · 별무리 수정', 'Infinity: Starfield Crystal', 'crystal', 'infinity', 'diamond', '별무리를 통째로 굳혀 깎았다.', 'Carved from an entire starfield, frozen solid.'),
+    ('인피니티 · 심해의 비늘', 'Infinity: Abyssal Scale', 'scale', 'arvantia', 'frost', '인어의 눈물로 씻어 낸 비늘.', "Scales washed in mermaids' tears."),
+    ('인피니티 · 바람의 가죽', 'Infinity: Windborne', 'leather', 'infinity', 'prism', '입으면 발이 땅에 닿지 않는다.', "The wearer's feet never quite touch the ground."),
+    ('인피니티 · 윤회의 사슬', 'Infinity: Chains of Rebirth', 'chain', 'arvantia', 'infinity', '끊어져도 다시 이어지는 사슬.', 'Chains that join again even when broken.'),
+    ('인피니티 · 불멸의 뼈', 'Infinity: Undying Bone', 'bone', 'infinity', 'void', '죽지 않는 자의 뼈를 깎아 만들었다.', 'Carved from the bones of one who cannot die.'),
 ]

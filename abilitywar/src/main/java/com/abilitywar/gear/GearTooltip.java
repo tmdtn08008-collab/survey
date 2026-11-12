@@ -88,7 +88,7 @@ public final class GearTooltip {
         }
     }
 
-    /** ? · 아르반티아: "강화 +37+ / 99 (초월+)" + 20칸 막대 + 다음 단계 안내. */
+    /** ? · 인피니티 등급: "강화 +37+ / 99 (초월+)" + 20칸 막대 + 다음 단계 안내. */
     static void beyondLine(ItemStack stack, GearGrade g, int lv, List<Text> out) {
         int stage = GearEnhance.stage(stack), col = GearEnhance.colorOf(stack);
         if (lv <= 0 && stage == 0 && GearEnhance.awaken(stack) == 0) {
@@ -117,7 +117,7 @@ public final class GearTooltip {
             out.add(c(Text.translatable("gear.abilitywar.ui.awaken", aw, GearEnhance.AWAKEN_MAX), GearEnhance.AWAKEN_COLOR).append(Text.literal(" ")).append(as));
         }
         GearEnhance.Ascend next = GearEnhance.nextAscend(stack);
-        if (next != null) out.add(c(Text.translatable("gear.abilitywar.ui.next_" + next.key()), 0x9A8DB8));
+        if (next != null) out.add(c(Text.translatable("gear.abilitywar.ui.next_" + next.langKey()), 0x9A8DB8));
     }
 
     public static void weapon(GearWeaponItem item, ItemStack stack, List<Text> out) {

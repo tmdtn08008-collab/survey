@@ -230,8 +230,8 @@ public final class Shops {
     }
 
     /**
-     * ? 장비의 큰 단계: 초월+ (+99 → +1+) · 정제 (+99+ → 정제 +1) · 아르반티아 인피니티 승급 (정제 +99 → 같은 종류 아르반티아 +0).
-     * 결과 코드 7 초월 · 8 정제 · 9 아르반티아.
+     * ? 장비의 큰 단계: 초월+ (+99 → +1+) · 정제 (+99+ → 정제 +1) · 인피니티 승급 (정제 +99 → 아바리티아 인피니티 장비, 모드가 없으면 같은 종류의 인피니티 등급 +0).
+     * 결과 코드 7 초월 · 8 정제 · 9 인피니티.
      */
     @Nullable
     public static String ascend(ServerPlayerEntity p, int slot) {
@@ -271,7 +271,7 @@ public final class Shops {
             default -> {
                 out = new ItemStack(next);
                 int aw = GearEnhance.awaken(st);
-                if (aw > 0) GearEnhance.setAwaken(out, aw);
+                if (aw > 0 && next instanceof com.abilitywar.gear.GearItem) GearEnhance.setAwaken(out, aw);
                 inv.setStack(slot, out);
                 code = 9;
             }
@@ -282,7 +282,7 @@ public final class Shops {
         w.spawnParticles(ParticleTypes.END_ROD, p.getX(), p.getY() + 1.2, p.getZ(), 120, 0.5, 1.0, 0.5, 0.2);
         w.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, p.getX(), p.getY() + 1.2, p.getZ(), 80, 0.6, 0.8, 0.6, 0.6);
         w.spawnParticles(ParticleTypes.REVERSE_PORTAL, p.getX(), p.getY() + 1.2, p.getZ(), 100, 0.6, 1.0, 0.6, 0.3);
-        announce(p, Text.translatable("smith.abilitywar.broadcast_" + a.key(), p.getDisplayName(), out.getName()));
+        announce(p, Text.translatable("smith.abilitywar.broadcast_" + a.langKey(), p.getDisplayName(), out.getName()));
         result(p, code, GearEnhance.level(out), slot);
         return null;
     }

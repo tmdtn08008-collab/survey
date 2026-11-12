@@ -22,7 +22,7 @@ Remove-Item -Force -ErrorAction SilentlyContinue (Join-Path $dest 'edf-remastere
 Get-ChildItem -Path $dest -Filter 'abilitywar-*.jar' -ErrorAction SilentlyContinue | Remove-Item -Force
 
 $files = @(
-    @('abilitywar-2.9.0.jar', 'https://raw.githubusercontent.com/tmdtn08008-collab/survey/claude/blissful-carson-s8snwp/abilitywar/dist/abilitywar-2.9.0.jar', 'both'),
+    @('abilitywar-2.9.1.jar', 'https://raw.githubusercontent.com/tmdtn08008-collab/survey/claude/blissful-carson-s8snwp/abilitywar/dist/abilitywar-2.9.1.jar', 'both'),
     @('fabric-api-0.92.12+1.20.1.jar', 'https://cdn.modrinth.com/data/P7dR8mSH/versions/rvI2dfzR/fabric-api-0.92.12%2B1.20.1.jar', 'both'),
     @('BOMD-1.7.5-1.20.1.jar', 'https://cdn.modrinth.com/data/du3UfiLL/versions/yoCCX4Cc/BOMD-1.7.5-1.20.1.jar', 'both'),
     @('soulslike-weaponry-1.4.10-1.20.1-fabric.jar', 'https://cdn.modrinth.com/data/oX6SohLj/versions/LY1MhWN0/soulslike-weaponry-1.4.10-1.20.1-fabric.jar', 'both'),
@@ -42,6 +42,7 @@ $files = @(
     @('IllagerInvasion-v8.0.7-1.20.1-Fabric.jar', 'https://cdn.modrinth.com/data/jSV9w0J5/versions/tdl5EQxi/IllagerInvasion-v8.0.7-1.20.1-Fabric.jar', 'both'),
     @('ghosts-fabric-1.20.1-1.3.4.jar', 'https://cdn.modrinth.com/data/gJKLGvbS/versions/G3k8pPhx/ghosts-fabric-1.20.1-1.3.4.jar', 'both'),
     @('skeleton_ghost_ship-1.0.0-fabric-1.20.1.jar', 'https://cdn.modrinth.com/data/UILFr9Hb/versions/W7kOIEHK/skeleton_ghost_ship-1.0.0%20fabric%201.20.1.jar', 'both'),
+    @('Re-Avaritia-fabric-1.20.1-1.4.2-fabric.jar', 'https://cdn.modrinth.com/data/QeB3NRC5/versions/9YZiPPHJ/Re-Avaritia-fabric-1.20.1-1.4.2-fabric.jar', 'both'),
     @('Terralith_1.20.x_v2.5.4.jar', 'https://cdn.modrinth.com/data/8oi3bsk5/versions/WeYhEb5d/Terralith_1.20.x_v2.5.4.jar', 'both'),
     @('tectonic-3.0.17-fabric-1.20.1.jar', 'https://cdn.modrinth.com/data/lWDHr9jE/versions/mz3wlQKd/tectonic-3.0.17-fabric-1.20.1.jar', 'both'),
     @('lithostitched-fabric-1.20.1-1.4.11.jar', 'https://cdn.modrinth.com/data/XaDC71GB/versions/9bbVphAR/lithostitched-fabric-1.20.1-1.4.11.jar', 'both'),
