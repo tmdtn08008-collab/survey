@@ -18,7 +18,9 @@
     "PlayerEntityRendererMixin",
     "TooltipBackgroundRendererMixin",
     "BossBarHudAccessor",
-    "LivingEntityRendererMixin"
+    "LivingEntityRendererMixin",
+    "EnderDragonRendererMixin",
+    "HandledScreenAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

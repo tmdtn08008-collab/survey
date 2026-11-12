@@ -54,7 +54,7 @@ public class GearArmorItem extends ArmorItem implements GearItem {
     /** 강화된 갑옷: 방어력 · 체력이 더 붙음. */
     @Override
     public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(ItemStack stack, EquipmentSlot slot) {
-        int lv = GearEnhance.level(stack);
+        int lv = GearEnhance.statLevel(stack);
         if (slot != this.type.getEquipmentSlot() || lv <= 0) return getAttributeModifiers(slot);
         return GearEnhance.armorModifiers(this, modifiers, lv);
     }

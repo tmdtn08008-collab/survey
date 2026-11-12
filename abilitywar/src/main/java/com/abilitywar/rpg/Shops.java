@@ -240,6 +240,42 @@ public final class Shops {
         return null;
     }
 
+    /** 각성 (+15 장비): ★ 하나 더. 실패하면 재료만 사라짐. 결과 코드 4 = 각성 성공, 5 = 각성 실패. */
+    @Nullable
+    public static String awaken(ServerPlayerEntity p, int slot) {
+        if (!validSlot(slot)) return "smith.abilitywar.err.no_item";
+        PlayerInventory inv = p.getInventory();
+        ItemStack st = inv.getStack(slot);
+        if (grade(st) == null) return "smith.abilitywar.err.no_item";
+        if (GearEnhance.level(st) < GearEnhance.MAX) return "smith.abilitywar.err.awaken_level";
+        int a = GearEnhance.awaken(st);
+        if (a >= GearEnhance.AWAKEN_MAX) return "smith.abilitywar.err.awaken_max";
+        List<GearEnhance.Mat> mats = GearEnhance.awakenMats(a);
+        int cost = GearEnhance.awakenGold(a);
+        if (!p.getAbilities().creativeMode) {
+            for (GearEnhance.Mat m : mats) if (count(inv, m.item()) < m.count()) return "smith.abilitywar.err.materials";
+            if (RpgManager.gold(p) < cost) return "smith.abilitywar.err.gold";
+            for (GearEnhance.Mat m : mats) take(inv, m.item(), m.count());
+            RpgManager.takeGold(p, cost);
+        }
+        ServerWorld w = p.getServerWorld();
+        boolean ok = w.getRandom().nextInt(100) < GearEnhance.awakenChance(a);
+        if (ok) {
+            GearEnhance.setAwaken(st, a + 1);
+            w.playSound(null, p.getBlockPos(), SoundEvents.BLOCK_END_PORTAL_SPAWN, SoundCategory.PLAYERS, 0.5f, 1.4f);
+            w.playSound(null, p.getBlockPos(), SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.PLAYERS, 0.9f, 1.2f);
+            w.spawnParticles(ParticleTypes.REVERSE_PORTAL, p.getX(), p.getY() + 1.2, p.getZ(), 80, 0.5, 0.8, 0.5, 0.3);
+            w.spawnParticles(ParticleTypes.END_ROD, p.getX(), p.getY() + 1.2, p.getZ(), 40, 0.4, 0.8, 0.4, 0.12);
+            announce(p, Text.translatable("smith.abilitywar.broadcast_awaken", p.getDisplayName(), st.getName()));
+        } else {
+            w.playSound(null, p.getBlockPos(), SoundEvents.BLOCK_RESPAWN_ANCHOR_DEPLETE.value(), SoundCategory.PLAYERS, 0.8f, 0.9f);
+            w.spawnParticles(ParticleTypes.SMOKE, p.getX(), p.getY() + 1.2, p.getZ(), 20, 0.3, 0.3, 0.3, 0.02);
+        }
+        inv.markDirty();
+        result(p, ok ? 4 : 5, GearEnhance.awaken(st), slot);
+        return null;
+    }
+
     static void announce(ServerPlayerEntity p, Text t) {
         if (p.getServer() == null) return;
         for (ServerPlayerEntity o : p.getServer().getPlayerManager().getPlayerList())
@@ -263,6 +299,8 @@ public final class Shops {
                     : dead instanceof com.abilitywar.mob.EmberColossusEntity ? RpgItems.EMBER_CORE
                     : dead instanceof com.abilitywar.mob.AncientWyvernEntity ? RpgItems.WYVERN_SCALE : null;
             if (trophy != null) dead.dropStack(new ItemStack(trophy, r.nextInt(100) < 30 ? 2 : 1));
+            // 심연의 탑에서 쓰러뜨린 보스: 심연의 결정
+            if (dead.getCommandTags().contains(AbyssTower.MOB_TAG)) dead.dropStack(new ItemStack(RpgItems.ABYSS_CRYSTAL, 1 + r.nextInt(2)));
             return;
         }
         if (!(dead instanceof net.minecraft.entity.mob.Monster)) return;
@@ -279,6 +317,15 @@ public final class Shops {
     }
 
     /** 다른 모드 보스 (몸이 없음): 바로 인벤토리로. */
+    /** 엔더 드래곤을 쓰러뜨림: 가까이서 싸운 모두에게 용의 심장 + 심연의 결정 (바로 인벤토리로 — 드래곤은 공중에서 죽음). */
+    public static void dragonReward(ServerPlayerEntity p) {
+        var r = p.getRandom();
+        give(p, new ItemStack(RpgItems.DRAGON_HEART));
+        give(p, new ItemStack(RpgItems.ABYSS_CRYSTAL, 3 + r.nextInt(3)));
+        give(p, new ItemStack(RpgItems.BOSS_SOUL, 3));
+        give(p, new ItemStack(RpgItems.ENHANCE_STONE, 8 + r.nextInt(5)));
+    }
+
     public static void bossRewardDirect(ServerPlayerEntity p, int xp) {
         var r = p.getRandom();
         give(p, new ItemStack(RpgItems.ENHANCE_STONE, 3 + r.nextInt(4)));

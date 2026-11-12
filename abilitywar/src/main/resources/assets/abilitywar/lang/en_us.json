@@ -19,7 +19,7 @@
  "abilitywar.skill.void.skill4": "Void Counter",
  "abilitywar.skill.void.skill4.desc": "Counter stance. If hit by an attack or skill (not ultimates), negate it, punch the attacker in the face and slam them down. On failure only the guard motion plays.",
  "abilitywar.skill.void.ultimate": "Event Horizon",
- "abilitywar.skill.void.ultimate.desc": "Usable when the gauge is full. Summons a black hole that pulls everything in. Captured enemies lose 75% of max health. Players within 10 blocks see the cinematic.",
+ "abilitywar.skill.void.ultimate.desc": "Usable when the gauge is full. Summons a black hole that pulls everything in. Captured enemies lose 75% of max health (bosses: 10%). Players within 10 blocks see the cinematic.",
  "abilitywar.skill.void.passive": "Shadow Step",
  "abilitywar.skill.void.passive.desc": "Sink into your shadow (invulnerable) and emerge from any shadow you choose: a dark spot or another creature's shadow. Press T again to emerge at the aimed shadow.",
  "abilitywar.skill.void.block": "Void Veil",

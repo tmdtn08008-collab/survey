@@ -35,12 +35,13 @@ public abstract class LivingEntityMixin extends Entity {
     /** 흑마법사 하수인은 죽어도 아이템/경험치를 떨어뜨리지 않는다. */
     @Inject(method = "drop", at = @At("HEAD"), cancellable = true)
     private void aw$minionDrop(DamageSource source, org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
-        if (com.abilitywar.ability.warlock.Necromancy.isMinion(this)) ci.cancel();
+        // 심연의 탑에서 쓰러진 플레이어도 아이템을 떨어뜨리지 않음 (AbyssTower 가 되살아날 때 돌려줌)
+        if (com.abilitywar.ability.warlock.Necromancy.isMinion(this) || com.abilitywar.rpg.AbyssTower.keepsInventory((LivingEntity) (Object) this)) ci.cancel();
     }
 
     @Inject(method = "dropXp", at = @At("HEAD"), cancellable = true)
     private void aw$minionXp(org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
-        if (com.abilitywar.ability.warlock.Necromancy.isMinion(this)) ci.cancel();
+        if (com.abilitywar.ability.warlock.Necromancy.isMinion(this) || com.abilitywar.rpg.AbyssTower.keepsInventory((LivingEntity) (Object) this)) ci.cancel();
     }
 
     /** 3차 전직: 내가 거는 (또는 나에게 걸리는) 좋은 효과의 지속 시간 +30%. */

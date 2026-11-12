@@ -19,7 +19,7 @@
  "abilitywar.skill.void.skill4": "공허 반격",
  "abilitywar.skill.void.skill4.desc": "반격 자세. 이때 평타나 스킬(궁극기 제외)에 맞으면 피해를 무효로 하고 얼굴을 강타한 뒤 아래로 찍어버린다. 실패하면 막는 동작만 나온다.",
  "abilitywar.skill.void.ultimate": "사건의 지평선",
- "abilitywar.skill.void.ultimate.desc": "게이지가 가득 차면 사용. 블랙홀을 소환해 주변을 빨아들인다. 붙잡힌 적은 최대 체력의 75%를 잃는다. 10블록 안의 플레이어는 연출을 보게 된다.",
+ "abilitywar.skill.void.ultimate.desc": "게이지가 가득 차면 사용. 블랙홀을 소환해 주변을 빨아들인다. 붙잡힌 적은 최대 체력의 75%를 잃는다 (보스는 10%). 10블록 안의 플레이어는 연출을 보게 된다.",
  "abilitywar.skill.void.passive": "그림자 이동",
  "abilitywar.skill.void.passive.desc": "그림자 속으로 들어가(무적) 원하는 그림자—어두운 곳이나 다른 생명체의 그림자—에서 나온다. 다시 T를 누르면 조준한 그림자로 나간다.",
  "abilitywar.skill.void.block": "공허의 장막",

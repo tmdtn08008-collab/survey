@@ -134,6 +134,35 @@ public final class Combat {
         return hit.getType() == HitResult.Type.MISS ? null : hit.getPos();
     }
 
+    private static final ThreadLocal<Boolean> FIXED = new ThreadLocal<>();
+
+    /** 고정 피해: 장비·스탯·버프 배율을 안 받는다 (보스에게 주는 공허 궁극기 등). */
+    public static boolean damageFixed(LivingEntity target, DamageSource source, float amount, byte kind) {
+        FIXED.set(Boolean.TRUE);
+        try {
+            return damage(target, source, amount, kind);
+        } finally {
+            FIXED.remove();
+        }
+    }
+
+    /** 엔더 드래곤: 몸통 대신 머리에 고정 피해 (몸통은 피해가 1/4 로 줄어서). */
+    public static boolean damageFixedDragon(net.minecraft.entity.boss.dragon.EnderDragonEntity d, DamageSource source, float amount, byte kind) {
+        FIXED.set(Boolean.TRUE);
+        NEXT_KIND.set(kind);
+        d.timeUntilRegen = 0;
+        try {
+            return d.damagePart(d.head, source, amount);
+        } finally {
+            FIXED.remove();
+            NEXT_KIND.remove();
+        }
+    }
+
+    public static boolean isFixedDamage() {
+        return FIXED.get() != null;
+    }
+
     public static boolean damage(LivingEntity target, DamageSource source, float amount, byte kind) {
         target.timeUntilRegen = 0;
         NEXT_KIND.set(kind);

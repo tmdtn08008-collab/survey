@@ -28,12 +28,73 @@ import java.util.concurrent.ConcurrentHashMap;
  *   <li>승급: +10 이상 (시크릿 → ? 는 +15) 이면 광물 + 몬스터 · 보스 전리품으로 다음 등급의 같은 종류 장비로 바뀜. 강화 수치는 절반만 남음.</li>
  * </ul>
  * 강화 수치는 아이템 NBT "AWEnhance".
+ *
+ * <p>각성 (★1 ~ ★5): +15 장비를 심연의 결정 · 보스의 영혼 · 용의 심장 (★3 부터) 으로 더 강하게. ★ 하나 = 강화 2 단계 만큼의 능력치.
+ * 실패해도 내려가지 않음 (재료만 사라짐). 승급해도 각성은 남음. NBT "AWAwaken".
  */
 public final class GearEnhance {
     public static final String KEY = "AWEnhance";
     public static final int MAX = 15;
     public static final int PROMOTE_MIN = 10;
     static final int[] CHANCE = {100, 100, 100, 100, 100, 90, 80, 70, 60, 50, 40, 35, 30, 25, 20};
+
+    // ================================================================ 각성
+    public static final String AWAKEN_KEY = "AWAwaken";
+    public static final int AWAKEN_MAX = 5;
+    /** ★ 하나가 능력치로는 강화 몇 단계인지. */
+    public static final int AWAKEN_STEP = 2;
+    static final int[] AWAKEN_CHANCE = {80, 65, 50, 40, 30};
+    static final int[] AWAKEN_CRYSTALS = {4, 6, 9, 12, 16};
+    static final int[] AWAKEN_SOULS = {2, 3, 4, 5, 6};
+    static final int[] AWAKEN_HEARTS = {0, 0, 1, 1, 2};
+    static final int[] AWAKEN_GOLD = {20000, 40000, 70000, 110000, 160000};
+
+    public static int awaken(ItemStack stack) {
+        NbtCompound n = stack.getNbt();
+        return n == null ? 0 : Math.max(0, Math.min(AWAKEN_MAX, n.getInt(AWAKEN_KEY)));
+    }
+
+    public static void setAwaken(ItemStack stack, int a) {
+        a = Math.max(0, Math.min(AWAKEN_MAX, a));
+        if (a == 0) {
+            NbtCompound n = stack.getNbt();
+            if (n != null) {
+                n.remove(AWAKEN_KEY);
+                if (n.isEmpty()) stack.setNbt(null);
+            }
+        } else stack.getOrCreateNbt().putInt(AWAKEN_KEY, a);
+    }
+
+    /** 각성할 수 있는지: +15 이고 ★ 가 남았을 때. */
+    public static boolean canAwaken(ItemStack stack) {
+        return level(stack) >= MAX && awaken(stack) < AWAKEN_MAX;
+    }
+
+    /** ★a → ★a+1 성공 확률 (%). */
+    public static int awakenChance(int a) {
+        return a >= AWAKEN_MAX ? 0 : AWAKEN_CHANCE[a];
+    }
+
+    public static int awakenGold(int a) {
+        return AWAKEN_GOLD[Math.min(a, AWAKEN_MAX - 1)];
+    }
+
+    /** ★a → ★a+1 재료: 심연의 결정 · 보스의 영혼 · (★3 부터) 용의 심장. */
+    public static List<Mat> awakenMats(int a) {
+        int i = Math.min(a, AWAKEN_MAX - 1);
+        List<Mat> l = new ArrayList<>();
+        l.add(new Mat(com.abilitywar.item.RpgItems.ABYSS_CRYSTAL, AWAKEN_CRYSTALS[i]));
+        l.add(new Mat(com.abilitywar.item.RpgItems.BOSS_SOUL, AWAKEN_SOULS[i]));
+        if (AWAKEN_HEARTS[i] > 0) l.add(new Mat(com.abilitywar.item.RpgItems.DRAGON_HEART, AWAKEN_HEARTS[i]));
+        return l;
+    }
+
+    /** 능력치 계산에 쓰는 단계 = 강화 + 각성 × 2. */
+    public static int statLevel(ItemStack stack) {
+        return level(stack) + awaken(stack) * AWAKEN_STEP;
+    }
+
+    public static final int AWAKEN_COLOR = 0xC07CFF;
 
     public static int level(ItemStack stack) {
         NbtCompound n = stack.getNbt();
@@ -167,12 +228,16 @@ public final class GearEnhance {
 
     // ================================================================ 이름
 
-    /** "+7 이름": 강화 수치 색 (낮음 회색 → 높음 금색 → +15 무지개빛 붉은 금). */
+    /** "+7 이름": 강화 수치 색 (낮음 회색 → 높음 금색 → +15 무지개빛 붉은 금). 각성하면 "+15 ★3 이름". */
     public static Text name(ItemStack stack, Text base) {
-        int lv = level(stack);
-        if (lv <= 0) return base;
-        int col = color(lv);
-        MutableText t = Text.literal("+" + lv + " ").styled(s -> s.withColor(TextColor.fromRgb(col)).withBold(lv >= 10));
+        int lv = level(stack), aw = awaken(stack);
+        if (lv <= 0 && aw <= 0) return base;
+        MutableText t = Text.empty();
+        if (lv > 0) {
+            int col = color(lv);
+            t.append(Text.literal("+" + lv + " ").styled(s -> s.withColor(TextColor.fromRgb(col)).withBold(lv >= 10)));
+        }
+        if (aw > 0) t.append(Text.literal("★" + aw + " ").styled(s -> s.withColor(TextColor.fromRgb(AWAKEN_COLOR)).withBold(true)));
         return t.append(base);
     }
 

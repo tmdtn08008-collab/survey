@@ -18,6 +18,7 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 import java.util.Collection;
 import java.util.List;
@@ -65,6 +66,14 @@ public final class AWCommands {
         return n;
     }
 
+    /** /aw tower start [층]: 관리자는 아무 층부터, 아니면 체크포인트만. */
+    static int towerStart(ServerCommandSource src, int floor) throws CommandSyntaxException {
+        ServerPlayerEntity p = src.getPlayerOrThrow();
+        String err = com.abilitywar.rpg.AbyssTower.start(p, floor, src.hasPermissionLevel(2));
+        if (err != null) src.sendError(Text.translatable(err, com.abilitywar.rpg.AbyssTower.MIN_LEVEL));
+        return err == null ? 1 : 0;
+    }
+
     /** /aw request accept|decline party|trade [보낸 사람] */
     static int request(com.mojang.brigadier.context.CommandContext<ServerCommandSource> ctx, String from) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
         boolean accept = StringArgumentType.getString(ctx, "answer").equals("accept");
@@ -93,7 +102,7 @@ public final class AWCommands {
     static final java.util.Map<String, net.minecraft.entity.EntityType<?>> NPCS = java.util.Map.of(
             "apothecary", com.abilitywar.registry.AWEntities.APOTHECARY, "blacksmith", com.abilitywar.registry.AWEntities.BLACKSMITH,
             "guild_clerk", com.abilitywar.registry.AWEntities.GUILD_CLERK, "job_master", com.abilitywar.registry.AWEntities.JOB_MASTER,
-            "king", com.abilitywar.registry.AWEntities.KING);
+            "king", com.abilitywar.registry.AWEntities.KING, "tower_keeper", com.abilitywar.registry.AWEntities.TOWER_KEEPER);
 
     private static final com.mojang.brigadier.suggestion.SuggestionProvider<ServerCommandSource> BOSSES = (ctx, b) ->
             net.minecraft.command.CommandSource.suggestMatching(java.util.stream.Stream.of("abilitywar:fallen_king", "abilitywar:ember_colossus", "abilitywar:frost_witch", "abilitywar:ancient_wyvern",
@@ -102,7 +111,11 @@ public final class AWCommands {
                     "soulsweapons:moonknight", "soulsweapons:day_stalker", "soulsweapons:night_prowler", "graveyard:lich",
                     "archon:tar", "archon:ayla", "archon:leven", "archon:inigo", "archon:null",
                     "adventurez:blackstone_golem", "adventurez:the_eye", "adventurez:void_shadow",
-                    "dungeonnowloading:chaos_spawner", "dungeonnowloading:fairkeeper_boros", "dungeonnowloading:fairkeeper_ouros")
+                    "dungeonnowloading:chaos_spawner", "dungeonnowloading:fairkeeper_boros", "dungeonnowloading:fairkeeper_ouros",
+                    "aquamirae:captain_cornelia", "myths_of_the_sea:leviathan", "myths_of_the_sea:kraken", "mutantmonsters:mutant_zombie",
+                    "mutantmonsters:mutant_skeleton", "mutantmonsters:mutant_creeper", "mutantmonsters:mutant_enderman", "saintsdragons:raevyx",
+                    "saintsdragons:ignivorus", "saintsdragons:cindervane", "saintsdragons:nulljaw", "saintsdragons:atroxiia", "mobs_of_mythology:drake",
+                    "mobs_of_mythology:automaton", "minecraft:ender_dragon", "minecraft:wither")
                     .filter(id -> net.minecraft.registry.Registries.ENTITY_TYPE.containsId(new net.minecraft.util.Identifier(id))).toList(), b);
 
     private static final com.mojang.brigadier.suggestion.SuggestionProvider<ServerCommandSource> PLACES = (ctx, b) ->
@@ -313,6 +326,36 @@ public final class AWCommands {
                             ctx.getSource().sendFeedback(() -> st.getName(), false);
                             return 1;
                         })))
+                .then(literal("awaken").requires(s -> s.hasPermissionLevel(2))
+                        .then(argument("stars", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, com.abilitywar.gear.GearEnhance.AWAKEN_MAX)).executes(ctx -> {
+                            ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
+                            var st = p.getMainHandStack();
+                            if (!(st.getItem() instanceof com.abilitywar.gear.GearItem)) {
+                                ctx.getSource().sendError(Text.translatable("smith.abilitywar.err.no_item"));
+                                return 0;
+                            }
+                            int a = com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "stars");
+                            if (a > 0) com.abilitywar.gear.GearEnhance.set(st, com.abilitywar.gear.GearEnhance.MAX);
+                            com.abilitywar.gear.GearEnhance.setAwaken(st, a);
+                            ctx.getSource().sendFeedback(() -> st.getName(), false);
+                            return 1;
+                        })))
+                .then(literal("tower")
+                        .then(literal("start").executes(ctx -> towerStart(ctx.getSource(), 1))
+                                .then(argument("floor", com.mojang.brigadier.arguments.IntegerArgumentType.integer(1)).executes(ctx ->
+                                        towerStart(ctx.getSource(), com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "floor")))))
+                        .then(literal("leave").executes(ctx -> com.abilitywar.rpg.AbyssTower.leave(ctx.getSource().getPlayerOrThrow()) ? 1 : 0))
+                        .then(literal("top").executes(ctx -> {
+                            var l = com.abilitywar.rpg.AbyssTower.top(ctx.getSource().getServer());
+                            ctx.getSource().sendFeedback(() -> Text.translatable("tower.abilitywar.top").formatted(Formatting.LIGHT_PURPLE, Formatting.BOLD), false);
+                            for (Text t : l) ctx.getSource().sendFeedback(() -> t, false);
+                            return l.size();
+                        }))
+                        .then(literal("best").requires(s -> s.hasPermissionLevel(2))
+                                .then(argument("floor", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0))
+                                        .executes(ctx -> rpgEach(List.of(ctx.getSource().getPlayerOrThrow()), p -> com.abilitywar.rpg.AbyssTower.setBest(p, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "floor"))))
+                                        .then(argument("targets", EntityArgumentType.players()).executes(ctx -> rpgEach(EntityArgumentType.getPlayers(ctx, "targets"),
+                                                p -> com.abilitywar.rpg.AbyssTower.setBest(p, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "floor"))))))))
                 .then(literal("goto").requires(s -> s.hasPermissionLevel(2))
                         .then(argument("place", StringArgumentType.word()).suggests(PLACES)
                                 .executes(ctx -> gotoPlace(ctx.getSource(), StringArgumentType.getString(ctx, "place")))))

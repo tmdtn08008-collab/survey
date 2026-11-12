@@ -41,6 +41,8 @@ public class AbilityWarClient implements ClientModInitializer {
         EntityRendererRegistry.register(AWEntities.GUILD_CLERK, com.abilitywar.client.render.JobMasterRenderer::clerk);
         EntityRendererRegistry.register(AWEntities.APOTHECARY, com.abilitywar.client.render.JobMasterRenderer::apothecary);
         EntityRendererRegistry.register(AWEntities.BLACKSMITH, com.abilitywar.client.render.JobMasterRenderer::blacksmith);
+        EntityRendererRegistry.register(AWEntities.TOWER_KEEPER, com.abilitywar.client.render.JobMasterRenderer::towerKeeper);
+        com.abilitywar.client.screen.InventoryPanel.init();
         com.abilitywar.client.render.mob.MobRenderers.init();
         com.abilitywar.client.dev.TestDriver.init();
         ClientNet.init();
@@ -88,6 +90,8 @@ public class AbilityWarClient implements ClientModInitializer {
                 PlayerAnimator.tick();
             }
             InputHandler.tick();
+            com.abilitywar.client.input.KeyConflicts.tick(client);
+            com.abilitywar.client.fx.DragonLook.tick(client);
             com.abilitywar.client.dev.TestDriver.tick(client);
             VfxManager.tick();
             PostEffects.tick();

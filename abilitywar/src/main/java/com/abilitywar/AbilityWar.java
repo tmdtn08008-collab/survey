@@ -36,6 +36,8 @@ public class AbilityWar implements ModInitializer {
         com.abilitywar.gear.GearItems.init();
         com.abilitywar.item.RpgItems.init();
         com.abilitywar.social.Social.init();
+        com.abilitywar.rpg.AbyssTower.init();
+        com.abilitywar.mob.FinalDragon.init();
         Abilities.init();
         com.abilitywar.ability.warlock.GrimoireScreenHandler.init();
         AWNet.initServer();

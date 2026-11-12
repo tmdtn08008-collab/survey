@@ -33,7 +33,10 @@ public final class RpgItems {
     public static final Item EMBER_CORE = reg("ember_core", new Material(new Item.Settings().rarity(Rarity.RARE).fireproof(), "item.abilitywar.ember_core.desc", true));
     public static final Item WYVERN_SCALE = reg("wyvern_scale", new Material(new Item.Settings().rarity(Rarity.EPIC), "item.abilitywar.wyvern_scale.desc", true));
     public static final Item BOSS_SOUL = reg("boss_soul", new Material(new Item.Settings().rarity(Rarity.EPIC), "item.abilitywar.boss_soul.desc", true));
-    public static final Item[] LOOT = {GOBLIN_EAR, ORC_TUSK, WISP_ESSENCE, KNIGHT_CREST, CROWN_SHARD, FROST_HEART, EMBER_CORE, WYVERN_SCALE, BOSS_SOUL};
+    /** 후반: 심연의 탑 보상 (각성 재료) · 엔더 드래곤 전리품 (★3 부터 각성 재료). */
+    public static final Item ABYSS_CRYSTAL = reg("abyss_crystal", new Material(new Item.Settings().rarity(Rarity.EPIC), "item.abilitywar.abyss_crystal.desc", true));
+    public static final Item DRAGON_HEART = reg("dragon_heart", new Material(new Item.Settings().maxCount(16).rarity(Rarity.EPIC).fireproof(), "item.abilitywar.dragon_heart.desc", true));
+    public static final Item[] LOOT = {GOBLIN_EAR, ORC_TUSK, WISP_ESSENCE, KNIGHT_CREST, CROWN_SHARD, FROST_HEART, EMBER_CORE, WYVERN_SCALE, BOSS_SOUL, ABYSS_CRYSTAL, DRAGON_HEART};
 
     static Item reg(String id, Item item) {
         return Registry.register(Registries.ITEM, AbilityWar.id(id), item);
@@ -74,6 +77,7 @@ public final class RpgItems {
                     e.add(com.abilitywar.registry.AWEntities.BLACKSMITH_EGG);
                     e.add(com.abilitywar.registry.AWEntities.GUILD_CLERK_EGG);
                     e.add(com.abilitywar.registry.AWEntities.JOB_MASTER_EGG);
+                    e.add(com.abilitywar.registry.AWEntities.TOWER_KEEPER_EGG);
                 })
                 .build());
     }

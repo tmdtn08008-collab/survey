@@ -281,6 +281,10 @@ public final class AbilityManager {
     /** 버프/디버프 배율 (용맹·불협화음·수호) + 막기(F) 피해 감소. */
     public static float modifyDamage(LivingEntity victim, DamageSource source, float amount) {
         if (victim.getWorld().isClient) return amount;
+        if (Combat.isFixedDamage()) {
+            com.abilitywar.gear.GearEffects.lastCrit = false;
+            return amount;
+        }
         if (!source.isOf(net.minecraft.entity.damage.DamageTypes.GENERIC_KILL) && !source.isOf(net.minecraft.entity.damage.DamageTypes.OUT_OF_WORLD)) {
             float mult = 1f;
             if (source.getAttacker() instanceof LivingEntity la && la != victim) {
@@ -290,6 +294,8 @@ public final class AbilityManager {
                 // 되살린 몹은 피해 절반
                 if (com.abilitywar.ability.warlock.Necromancy.isRaised(la)) mult *= 0.5f;
             }
+            // 마지막 보스 엔더 드래곤: 받는 피해 줄임 · 주는 피해 늘림
+            mult = com.abilitywar.mob.FinalDragon.modify(victim, source.getAttacker(), mult);
             // 3차 전직: 주는 피해 +30%, 받는 피해 -10%
             if (source.getAttacker() instanceof net.minecraft.entity.player.PlayerEntity gp && gp != victim && com.abilitywar.rpg.RpgManager.isGrand(gp))
                 mult *= com.abilitywar.rpg.RpgManager.GRAND_DAMAGE;

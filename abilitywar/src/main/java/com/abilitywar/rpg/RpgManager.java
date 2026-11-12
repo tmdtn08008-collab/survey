@@ -110,6 +110,7 @@ public final class RpgManager {
 
     /** 몬스터를 잡고 받는 돈: 최대 체력의 40% (보스는 1.5 배, 최소 150). */
     public static long goldFor(LivingEntity e) {
+        if (e instanceof EnderDragonEntity) return com.abilitywar.mob.FinalDragon.GOLD;
         if (isBoss(e)) return Math.max(150, Math.round(e.getMaxHealth() * 1.5));
         if (!(e instanceof Monster) || com.abilitywar.ability.warlock.Necromancy.isMinion(e)) return 0;
         return Math.max(1, Math.round(e.getMaxHealth() * 0.4));
@@ -125,6 +126,7 @@ public final class RpgManager {
 
     public static int mobXp(LivingEntity e) {
         if (e instanceof PlayerEntity) return 0;
+        if (e instanceof EnderDragonEntity) return com.abilitywar.mob.FinalDragon.XP;
         if (isBoss(e)) return Math.max(200, Math.round(e.getMaxHealth() * 2));
         if (com.abilitywar.ability.warlock.Necromancy.isMinion(e)) return 0;
         if (!(e instanceof Monster)) return 1;
@@ -181,13 +183,16 @@ public final class RpgManager {
     /** 몹이 죽음: 막타 친 플레이어 (또는 하수인의 주인) 와 근처 같은 팀에게 경험치, 퀘스트 처치 수. */
     public static void onDeath(LivingEntity dead, net.minecraft.entity.damage.DamageSource source) {
         if (dead.getWorld().isClient) return;
+        if (com.abilitywar.mob.FinalDragon.isDecoy(dead)) return;
         if (isBoss(dead) && !com.abilitywar.compat.UltrisCompat.isUltrisBoss(dead) && dead.getWorld() instanceof ServerWorld sw) {
             com.abilitywar.mob.BossAltar.onAnyBossDeath(dead);
-            Shops.drops(dead, true);
-            // 보스: 가까이서 싸운 모두가 경험치 + 퀘스트 (마지막 한 방이 누구든)
+            boolean dragon = dead instanceof EnderDragonEntity;
+            if (!dragon) Shops.drops(dead, true);
+            // 보스: 가까이서 싸운 모두가 경험치 + 퀘스트 (마지막 한 방이 누구든). 엔더 드래곤은 더 넓게 (공중에서 죽음)
             int xp = mobXp(dead);
             long g = goldFor(dead);
-            for (ServerPlayerEntity o : sw.getEntitiesByClass(ServerPlayerEntity.class, dead.getBoundingBox().expand(48), o -> !o.isSpectator() && o.isAlive())) {
+            for (ServerPlayerEntity o : sw.getEntitiesByClass(ServerPlayerEntity.class, dead.getBoundingBox().expand(dragon ? 160 : 48), o -> !o.isSpectator() && o.isAlive())) {
+                if (dragon) Shops.dragonReward(o);
                 addXp(o, xp);
                 addGold(o, g);
                 questAmount(o, JobQuests.Type.BOSS, 1);
@@ -763,6 +768,7 @@ public final class RpgManager {
         buf.writeVarInt(gn);
         for (int i = 0; i < gn; i++) buf.writeVarInt(guildHave(p, gq, i));
         buf.writeVarLong(r.gold);
+        buf.writeVarInt(r.towerBest);
         if (ServerPlayNetworking.canSend(p, S2C_RPG)) ServerPlayNetworking.send(p, S2C_RPG, buf);
     }
 
@@ -823,11 +829,11 @@ public final class RpgManager {
                         }
                         openNpc(player, npc);
                     }
-                    case 10, 11, 12 -> {
-                        // 상점 · 대장장이 (가까이에서만): 10 사기 ("물건:개수"), 11 강화 ("칸:보호"), 12 승급 ("칸")
+                    case 10, 11, 12, 13, 14 -> {
+                        // 상점 · 대장장이 · 탑지기 (가까이에서만): 10 사기 ("물건:개수"), 11 강화 ("칸:보호"), 12 승급 ("칸"), 13 각성 ("칸"), 14 탑 들어가기 ("시작 층")
                         Entity e = player.getWorld().getEntityById(npc);
-                        if (!(e instanceof ShopNpcEntity shop) || e.squaredDistanceTo(player) > 10 * 10
-                                || (action != 10 && !ShopNpcEntity.BLACKSMITH.equals(shop.kind()))) {
+                        String need = action == 10 ? null : action == 14 ? ShopNpcEntity.TOWER_KEEPER : ShopNpcEntity.BLACKSMITH;
+                        if (!(e instanceof ShopNpcEntity shop) || e.squaredDistanceTo(player) > 10 * 10 || (need != null && !need.equals(shop.kind()))) {
                             player.sendMessage(Text.translatable("shop.abilitywar.err.far").formatted(Formatting.RED), true);
                             return;
                         }
@@ -835,9 +841,11 @@ public final class RpgManager {
                         String err = switch (action) {
                             case 10 -> Shops.buy(player, shop.kind(), a[0], a.length > 1 ? parseInt(a[1]) : 1);
                             case 11 -> Shops.enhance(player, parseInt(a[0]), a.length > 1 && a[1].equals("1"));
-                            default -> Shops.promote(player, parseInt(a[0]));
+                            case 12 -> Shops.promote(player, parseInt(a[0]));
+                            case 13 -> Shops.awaken(player, parseInt(a[0]));
+                            default -> AbyssTower.start(player, parseInt(a[0]));
                         };
-                        if (err != null) player.sendMessage(Text.translatable(err).formatted(Formatting.RED), true);
+                        if (err != null) player.sendMessage(Text.translatable(err, AbyssTower.MIN_LEVEL).formatted(Formatting.RED), true);
                     }
                     default -> {
                     }

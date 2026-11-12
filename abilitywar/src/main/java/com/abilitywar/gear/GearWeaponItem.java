@@ -55,7 +55,7 @@ public class GearWeaponItem extends Item implements GearItem {
     /** 강화된 무기: 강화 수치에 맞는 능력치 (Fabric 의 아이템마다 능력치). */
     @Override
     public Multimap<EntityAttribute, EntityAttributeModifier> getAttributeModifiers(ItemStack stack, EquipmentSlot slot) {
-        int lv = GearEnhance.level(stack);
+        int lv = GearEnhance.statLevel(stack);
         if (slot != EquipmentSlot.MAINHAND || lv <= 0) return getAttributeModifiers(slot);
         return GearEnhance.weaponModifiers(this, lv);
     }

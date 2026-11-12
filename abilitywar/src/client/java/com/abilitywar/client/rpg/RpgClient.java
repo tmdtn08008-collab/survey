@@ -43,6 +43,8 @@ public final class RpgClient {
 
     /** 가진 돈 (G) + HUD 에 떠오르는 변화량. */
     public static long gold;
+    /** 심연의 탑 최고 층. */
+    public static int towerBest;
     public static int goldFlash;
     public static final class GoldPop {
         public final long delta;
@@ -101,6 +103,7 @@ public final class RpgClient {
             }
             gold = g;
         }
+        if (buf.isReadable()) towerBest = buf.readVarInt();
         if (synced && x > xp && lv == level) xpFlash = 14;
         if (synced && pts > points) pointsFlash = 40;
         if (lastLevel >= 0 && lv != level) xpShown = 0;

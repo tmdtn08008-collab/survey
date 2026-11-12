@@ -73,6 +73,15 @@ public final class GearTooltip {
             if (i % 5 == 0 && i < GearEnhance.MAX) stars.append(Text.literal(" "));
         }
         out.add(c(Text.translatable("gear.abilitywar.ui.enhance", lv, GearEnhance.MAX), GearEnhance.color(lv)).append(Text.literal(" ")).append(stars));
+        int aw = GearEnhance.awaken(stack);
+        if (aw > 0 || lv >= GearEnhance.MAX) {
+            MutableText as = Text.literal("");
+            for (int i = 1; i <= GearEnhance.AWAKEN_MAX; i++) {
+                int col = i <= aw ? GearEnhance.AWAKEN_COLOR : 0x3A3448;
+                as.append(Text.literal(i <= aw ? "✦" : "✧").styled(s -> s.withColor(TextColor.fromRgb(col))));
+            }
+            out.add(c(Text.translatable("gear.abilitywar.ui.awaken", aw, GearEnhance.AWAKEN_MAX), GearEnhance.AWAKEN_COLOR).append(Text.literal(" ")).append(as));
+        }
     }
 
     public static void weapon(GearWeaponItem item, ItemStack stack, List<Text> out) {
@@ -84,7 +93,7 @@ public final class GearTooltip {
         lore(item.getTranslationKey() + ".lore", out);
         out.add(Text.empty());
         out.add(c(Text.translatable("gear.abilitywar.ui.held"), 0xA0A0AC));
-        stats(GearEnhance.weaponStats(d, GearEnhance.level(stack)), unk, out, STAT);
+        stats(GearEnhance.weaponStats(d, GearEnhance.statLevel(stack)), unk, out, STAT);
         if (!d.effects().isEmpty()) {
             out.add(c(Text.translatable("gear.abilitywar.ui.on_hit"), GOLD));
             for (GearDefs.Effect e : d.effects()) out.add(effect(e, false));
@@ -102,7 +111,7 @@ public final class GearTooltip {
         out.add(Text.empty());
         out.add(c(Text.translatable("gear.abilitywar.ui.worn"), 0xA0A0AC));
         stats(item.piece.stats(), unk, out, STAT);
-        int lv = GearEnhance.level(stack);
+        int lv = GearEnhance.statLevel(stack);
         if (lv > 0) out.add(lit(" ", ON).append(c(Text.translatable("gear.abilitywar.ui.enhance_armor",
                 GearStat.trim(GearEnhance.armorBonus(item.getProtection(), lv)), GearStat.trim(GearEnhance.healthBonus(lv))), ON)));
         if (set.setStats().isEmpty() && set.setEffects().isEmpty()) return;

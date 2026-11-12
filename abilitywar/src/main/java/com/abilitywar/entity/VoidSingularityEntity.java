@@ -31,13 +31,15 @@ import java.util.UUID;
 /**
  * 공허 궁극기 "사건의 지평선" 블랙홀.
  * - 반경 안의 생명체를 끌어당긴다 (시전자 제외)
- * - 중심(사건의 지평선)에 붙잡히면 빠져나갈 수 없고, 최대 체력의 75% 만큼 피해를 입는다
+ * - 중심(사건의 지평선)에 붙잡히면 빠져나갈 수 없고, 최대 체력의 75% 만큼 피해를 입는다 (보스는 10%)
  * - 시간이 끝나면 붕괴하며 남은 피해를 한꺼번에 준다
  */
 public class VoidSingularityEntity extends Entity {
     public static final float PULL_RADIUS = 14f;
     public static final float CAPTURE_RADIUS = 2.4f;
     public static final float DAMAGE_RATIO = 0.75f;
+    /** 보스는 최대 체력의 10% 만. */
+    public static final float BOSS_DAMAGE_RATIO = 0.10f;
 
     private static final TrackedData<Integer> DURATION = DataTracker.registerData(VoidSingularityEntity.class, TrackedDataHandlerRegistry.INTEGER);
     private static final TrackedData<Integer> OWNER_ID = DataTracker.registerData(VoidSingularityEntity.class, TrackedDataHandlerRegistry.INTEGER);
@@ -51,11 +53,21 @@ public class VoidSingularityEntity extends Entity {
         final float owed;
         float dealt;
         final float phase;
+        /** 보스: 최대 체력의 10% 고정 피해 (장비·스탯 배율 없음). */
+        final boolean boss;
 
-        Captured(LivingEntity entity, float owed, float phase) {
+        Captured(LivingEntity entity, float owed, float phase, boolean boss) {
             this.entity = entity;
             this.owed = owed;
             this.phase = phase;
+            this.boss = boss;
+        }
+
+        void hit(ServerWorld w, @Nullable Entity owner, float amount) {
+            var src = AWDamage.source(w, AWDamage.ULTIMATE, owner);
+            if (boss && entity instanceof net.minecraft.entity.boss.dragon.EnderDragonEntity d) Combat.damageFixedDragon(d, src, amount, AWNet.DMG_ULT);
+            else if (boss) Combat.damageFixed(entity, src, amount, AWNet.DMG_ULT);
+            else Combat.damage(entity, src, amount, AWNet.DMG_ULT);
         }
     }
 
@@ -122,7 +134,7 @@ public class VoidSingularityEntity extends Entity {
             if (this.age % 8 == 0 && c.dealt < c.owed - 0.01f) {
                 float chunk = Math.min(c.owed * 0.07f, c.owed - c.dealt);
                 c.dealt += chunk;
-                Combat.damage(e, AWDamage.source(w, AWDamage.ULTIMATE, owner), chunk, AWNet.DMG_ULT);
+                c.hit(w, owner, chunk);
             }
         }
 
@@ -156,8 +168,9 @@ public class VoidSingularityEntity extends Entity {
     }
 
     private void capture(ServerWorld w, LivingEntity e, @Nullable Entity owner) {
-        float owed = e.getMaxHealth() * DAMAGE_RATIO;
-        captured.put(e.getUuid(), new Captured(e, owed, random.nextFloat() * 6.28f));
+        boolean boss = com.abilitywar.rpg.RpgManager.isBoss(e);
+        float owed = e.getMaxHealth() * (boss ? BOSS_DAMAGE_RATIO : DAMAGE_RATIO);
+        captured.put(e.getUuid(), new Captured(e, owed, random.nextFloat() * 6.28f, boss));
         Combat.hold(e, true);
         Combat.stun(e, 20, owner);
         if (e instanceof ServerPlayerEntity) AWNet.anim(e, "common.captured");
@@ -180,7 +193,7 @@ public class VoidSingularityEntity extends Entity {
             Combat.hold(e, false);
             Combat.unstun(e);
             float rest = c.owed - c.dealt;
-            if (rest > 0.01f) Combat.damage(e, AWDamage.source(w, AWDamage.ULTIMATE, owner), rest, AWNet.DMG_ULT);
+            if (rest > 0.01f) c.hit(w, owner, rest);
             Vec3d out = Combat.horizontal(e.getPos().subtract(center)).multiply(0.9).add(0, 0.6, 0);
             Combat.setVelocity(e, out);
             Combat.concuss(e, 60, 30, owner);
