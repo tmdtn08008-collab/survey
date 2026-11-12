@@ -340,9 +340,9 @@ public final class AWCommands {
                             ctx.getSource().sendFeedback(() -> st.getName(), false);
                             return 1;
                         })))
-                // ? 장비 끝까지 시험용: /aw stage <0 기본 | 1 초월+ | 2 정제> (손에 든 ? 장비)
+                // ? 장비 끝까지 시험용: /aw stage <0 기본 | 1 초월+ | 2 정제 | 3 초정제> (손에 든 ? 장비)
                 .then(literal("stage").requires(s -> s.hasPermissionLevel(2))
-                        .then(argument("stage", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, com.abilitywar.gear.GearEnhance.REFINE)).executes(ctx -> {
+                        .then(argument("stage", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, com.abilitywar.gear.GearEnhance.SUPER_REFINE)).executes(ctx -> {
                             ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
                             var st = p.getMainHandStack();
                             if (com.abilitywar.gear.GearEnhance.gradeOf(st) != com.abilitywar.gear.GearGrade.UNKNOWN) {

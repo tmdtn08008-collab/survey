@@ -100,6 +100,7 @@ public final class GearEnhance {
         else base = switch (stage(stack)) {
             case TRANSCEND -> 48 + lv / 2;
             case REFINE -> 97 + lv * 3 / 5;
+            case SUPER_REFINE -> 156 + lv * 3 / 5;
             default -> lv <= MAX ? lv : MAX + (lv - MAX) * 2 / 5;
         };
         return base + awaken(stack) * AWAKEN_STEP;
@@ -108,10 +109,12 @@ public final class GearEnhance {
     // ================================================================ ? +99 → 초월+ → 정제 → 인피니티 (아바리티아)
     public static final int BEYOND_MAX = 99;
     public static final String STAGE_KEY = "AWStage";
-    public static final int TRANSCEND = 1, REFINE = 2;
-    /** 인피니티 등급 +0 의 능력치 단계 (= 정제 +99). */
-    public static final int INFINITY_BASE = 156;
-    public static final int TRANSCEND_COLOR = 0x5AE8FF, REFINE_COLOR = 0xD07CFF, INFINITY_COLOR = 0xFF80E8;
+    public static final int TRANSCEND = 1, REFINE = 2, SUPER_REFINE = 3;
+    /** 인피니티 등급 +0 의 능력치 단계 (= 초정제 +99). */
+    public static final int INFINITY_BASE = 215;
+    public static final int TRANSCEND_COLOR = 0x5AE8FF, REFINE_COLOR = 0xD07CFF, SUPER_COLOR = 0xFFC83C, INFINITY_COLOR = 0xFF80E8;
+    /** +15 넘은 구간 (? +15~ · 초월+ · 정제 · 초정제 · 인피니티 등급) 한 번 강화: 성공 10% · 실패 50% (보호 주문서 없으면 장비가 깨짐) · 하락 40%. */
+    public static final int BEYOND_SUCCESS = 10, BEYOND_FAIL = 50, BEYOND_DROP = 40;
 
     @org.jetbrains.annotations.Nullable
     public static GearGrade gradeOf(ItemStack st) {
@@ -127,11 +130,11 @@ public final class GearEnhance {
         return beyond(gradeOf(st)) ? BEYOND_MAX : MAX;
     }
 
-    /** 0 기본 · 1 초월+ · 2 정제 (? 장비만). */
+    /** 0 기본 · 1 초월+ · 2 정제 · 3 초정제 (? 장비만). */
     public static int stage(ItemStack st) {
         NbtCompound n = st.getNbt();
         if (n == null || gradeOf(st) != GearGrade.UNKNOWN) return 0;
-        return Math.max(0, Math.min(REFINE, n.getInt(STAGE_KEY)));
+        return Math.max(0, Math.min(SUPER_REFINE, n.getInt(STAGE_KEY)));
     }
 
     public static void setStage(ItemStack st, int s) {
@@ -141,35 +144,39 @@ public final class GearEnhance {
                 n.remove(STAGE_KEY);
                 if (n.isEmpty()) st.setNbt(null);
             }
-        } else st.getOrCreateNbt().putInt(STAGE_KEY, Math.min(REFINE, s));
+        } else st.getOrCreateNbt().putInt(STAGE_KEY, Math.min(SUPER_REFINE, s));
     }
 
-    /** +15 을 넘은 강화 구간 (실패해도 그대로, 값 표가 다름): 0 아님 = 그 구간의 단계 (1 기본 +15~ · 2 초월+ · 3 정제 · 4 인피니티 등급). */
+    /** +15 을 넘은 강화 구간: 0 아님 = 그 구간의 단계 (1 기본 +15~ · 2 초월+ · 3 정제 · 4 초정제 · 5 인피니티 등급). */
     static int beyondTier(ItemStack st) {
         GearGrade g = gradeOf(st);
-        if (g == GearGrade.ARVANTIA) return 4;
+        if (g == GearGrade.ARVANTIA) return 5;
         if (g != GearGrade.UNKNOWN) return 0;
         int s = stage(st);
         if (s > 0) return s + 1;
         return level(st) >= MAX ? 1 : 0;
     }
 
+    /** +15 넘은 구간인지 (성공 10% · 실패 50% (깨짐) · 하락 40%). */
+    public static boolean beyondZone(ItemStack st) {
+        return beyondTier(st) > 0 && level(st) < maxLevel(st);
+    }
+
     /** 다음 강화 성공 확률 (%). */
     public static int chance(ItemStack st) {
         int lv = level(st);
         if (lv >= maxLevel(st)) return 0;
-        return switch (beyondTier(st)) {
-            case 1 -> Math.max(10, 45 - (lv - MAX) * 2 / 5);
-            case 2 -> Math.max(10, 50 - lv * 2 / 5);
-            case 3 -> Math.max(6, 45 - lv * 2 / 5);
-            case 4 -> Math.max(5, 40 - lv * 2 / 5);
-            default -> chance(lv);
-        };
+        return beyondTier(st) > 0 ? BEYOND_SUCCESS : chance(lv);
     }
 
-    /** 실패하면 내려가는지: +10 ~ +14 만 (+15 넘은 구간은 그대로). */
+    /** 실패하면 나빠지는지 (보호 주문서를 쓸 수 있는지): +10 ~ +14 (내려감) · +15 넘은 구간 (깨짐 · 내려감). */
     public static boolean failDrops(ItemStack st) {
-        return beyondTier(st) == 0 && failDrops(level(st));
+        return beyondTier(st) > 0 || failDrops(level(st));
+    }
+
+    /** 내려갈 때의 바닥: 초월+ · 정제 · 초정제는 +1, 그 밖은 +0. */
+    public static int dropFloor(ItemStack st) {
+        return stage(st) > 0 ? 1 : 0;
     }
 
     public static int stoneCost(ItemStack st) {
@@ -184,9 +191,9 @@ public final class GearEnhance {
         return k == 0 ? goldCost(g == null ? GearGrade.COMMON : g, lv) : 50 + lv * 6 + k * 150;
     }
 
-    /** ? 장비의 다음 큰 단계: 초월+ (기본 +99) · 정제 (초월+ +99) · 인피니티 (아바리티아) 승급 (정제 +99). */
+    /** ? 장비의 다음 큰 단계: 초월+ (기본 +99) · 정제 (초월+ +99) · 초정제 (정제 +99) · 인피니티 (아바리티아) 승급 (초정제 +99). */
     public enum Ascend {
-        TRANSCEND, REFINE, INFINITY;
+        TRANSCEND, REFINE, SUPER_REFINE, INFINITY;
 
         public String key() {
             return name().toLowerCase();
@@ -203,14 +210,16 @@ public final class GearEnhance {
         if (gradeOf(st) != GearGrade.UNKNOWN) return null;
         return switch (stage(st)) {
             case TRANSCEND -> Ascend.REFINE;
-            case REFINE -> Ascend.INFINITY;
+            case REFINE -> Ascend.SUPER_REFINE;
+            case SUPER_REFINE -> Ascend.INFINITY;
             default -> Ascend.TRANSCEND;
         };
     }
 
     /**
-     * 초월+ · 정제 · 승급 재료 (약간 양심 없게: 셋 다 하면 돈 80만 G + 재료 ≈ 100만 G 어치).
+     * 초월+ · 정제 · 초정제 · 승급 재료 (넷 다 하면 돈 115만 G + 재료).
      * 초월+ ← 골렘 핵 · 군주의 증표 · 보스의 영혼 · 심연의 결정 / 정제 ← 원혼의 정수 · 광신도의 인장 · 요정 가루 · 인어의 눈물 · 용의 심장
+     * 초정제 ← 용왕의 역린 · 골렘 핵 · 군주의 증표 · 원혼의 정수 · 보스의 영혼
      * 인피니티 (아바리티아) 승급 ← 용왕의 역린 · 비룡 비늘 · 해적 금화 · 도적단의 인장 · 흉포한 송곳니 · 용의 심장
      */
     public static List<Mat> ascendMats(Ascend a) {
@@ -220,6 +229,9 @@ public final class GearEnhance {
             case REFINE -> List.of(new Mat(com.abilitywar.item.RpgItems.WRAITH_ESSENCE, 10), new Mat(com.abilitywar.item.RpgItems.CULT_SIGIL, 10),
                     new Mat(com.abilitywar.item.RpgItems.FAIRY_DUST, 10), new Mat(com.abilitywar.item.RpgItems.MERMAID_TEAR, 5),
                     new Mat(com.abilitywar.item.RpgItems.DRAGON_HEART, 2));
+            case SUPER_REFINE -> List.of(new Mat(com.abilitywar.item.RpgItems.DRAGON_KING_SCALE, 2), new Mat(com.abilitywar.item.RpgItems.GOLEM_CORE, 10),
+                    new Mat(com.abilitywar.item.RpgItems.LORD_EMBLEM, 10), new Mat(com.abilitywar.item.RpgItems.WRAITH_ESSENCE, 15),
+                    new Mat(com.abilitywar.item.RpgItems.BOSS_SOUL, 20));
             case INFINITY -> List.of(new Mat(com.abilitywar.item.RpgItems.DRAGON_KING_SCALE, 3), new Mat(com.abilitywar.item.RpgItems.DRAKE_SCALE, 10),
                     new Mat(com.abilitywar.item.RpgItems.PIRATE_DOUBLOON, 15), new Mat(com.abilitywar.item.RpgItems.BANDIT_SEAL, 15),
                     new Mat(com.abilitywar.item.RpgItems.DIRE_FANG, 15), new Mat(com.abilitywar.item.RpgItems.DRAGON_HEART, 2));
@@ -230,6 +242,7 @@ public final class GearEnhance {
         return switch (a) {
             case TRANSCEND -> 150_000;
             case REFINE -> 250_000;
+            case SUPER_REFINE -> 350_000;
             case INFINITY -> 400_000;
         };
     }
@@ -265,16 +278,18 @@ public final class GearEnhance {
         return switch (stage(st)) {
             case TRANSCEND -> TRANSCEND_COLOR;
             case REFINE -> REFINE_COLOR;
+            case SUPER_REFINE -> SUPER_COLOR;
             default -> lv > MAX ? GearGrade.lerp(0xFF5A3C, 0xFFE27A, Math.min(1, (lv - MAX) / 84.0)) : color(lv);
         };
     }
 
-    /** 강화 수치 글자: "+7" · "+37+" (초월+) · "정제 +12". */
+    /** 강화 수치 글자: "+7" · "+37+" (초월+) · "정제 +12" · "초정제 +12". */
     public static MutableText levelText(ItemStack st, int lv) {
         int col = colorOf(st);
         int s = stage(st);
         MutableText t = Text.empty();
         if (s == REFINE) t.append(Text.translatable("gear.abilitywar.ui.refined_mark").styled(x -> x.withColor(TextColor.fromRgb(REFINE_COLOR)).withBold(true))).append(" ");
+        if (s == SUPER_REFINE) t.append(Text.translatable("gear.abilitywar.ui.super_mark").styled(x -> x.withColor(TextColor.fromRgb(SUPER_COLOR)).withBold(true))).append(" ");
         t.append(Text.literal("+" + lv + (s == TRANSCEND ? "+" : "")).styled(x -> x.withColor(TextColor.fromRgb(col)).withBold(lv >= 10 || s > 0)));
         return t;
     }

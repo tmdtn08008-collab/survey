@@ -478,7 +478,7 @@ t('smith.abilitywar.chance', '성공 확률 %s%%', 'Success %s%%')
 t('smith.abilitywar.fail_drop', '실패하면 +%s 로 내려감', 'On failure: drops to +%s')
 t('smith.abilitywar.fail_keep', '실패해도 그대로', 'On failure: stays')
 t('smith.abilitywar.fail_none', '항상 성공', 'Always succeeds')
-t('smith.abilitywar.use_scroll', '보호 주문서 쓰기 (가짐: %s)', 'Use a Protection Scroll (have %s)')
+t('smith.abilitywar.use_scroll', '보호 주문서 (%s)', 'Scroll (%s)')
 t('smith.abilitywar.promote_to', '승급 →', 'Promote →')
 t('smith.abilitywar.promote_req', '+%s 이상 강화 (지금 +%s)', 'Enhanced to +%s or more (now +%s)')
 t('smith.abilitywar.promote_note', '다음 등급의 같은 종류로 바뀜 · 강화 +%s 유지', 'Becomes next grade, same kind · keeps +%s')
@@ -674,11 +674,25 @@ for k, ko, en, dko, den in [
     t(f'item.abilitywar.{k}.desc', dko, den)
 
 
-# ================================================================ 2.9 ? +99 → 초월+ → 정제 → 인피니티 (아바리티아 모드가 있으면 그 인피니티 장비)
+# ================================================================ 2.9 ? +99 → 초월+ → 정제 → 초정제 → 인피니티 (아바리티아 모드가 있으면 그 인피니티 장비)
 for k, ko, en in [
-        ('smith.abilitywar.btn.repeat', '연속 강화 ×20', 'Enhance ×20'),
+        ('smith.abilitywar.btn.repeat', '연속 ×20', '×20 tries'),
         ('smith.abilitywar.btn.transcend', '초월+', 'Transcend+'),
         ('smith.abilitywar.btn.refine', '정제', 'Refine'),
+        # 2.9.2: +15 넘은 구간 성공 10 · 실패 50 (깨짐) · 하락 40, 초정제
+        ('smith.abilitywar.fail_break', '실패 %s%% → 깨짐! · 하락 %s%%', 'Fail %s%% → BREAKS! · Drop %s%%'),
+        ('smith.abilitywar.fail_protected', '보호 주문서: 깨짐 · 하락을 막음', 'Scroll: blocks breaking and drops'),
+        ('smith.abilitywar.result.broken', '장비가 깨졌다…', 'The gear SHATTERED…'),
+        ('smith.abilitywar.broken', '강화 실패! %s 이(가) 산산조각 났습니다…', 'Enhancement failed! %s shattered…'),
+        ('smith.abilitywar.broadcast_broken', '%s 님의 %s 이(가) 강화에 실패해 깨졌습니다…', "%s's %s shattered while enhancing…"),
+        ('smith.abilitywar.btn.super_refine', '초정제', 'Super Refine'),
+        ('smith.abilitywar.ascend.super_refine', '초정제 → 초정제 +1 부터 다시', 'Super Refine → restart at Super +1'),
+        ('smith.abilitywar.ascend_note.super_refine', '능력치는 그대로 이어지고 초정제 +1 부터 다시 +99 까지 강화합니다. 초정제 +99 에서 아바리티아 승급.', 'Stats carry over; enhance again from Super +1 to +99. At Super +99: ascend to Avaritia.'),
+        ('smith.abilitywar.result.super_refine', '초정제 완료!', 'SUPER REFINED!'),
+        ('smith.abilitywar.broadcast_super_refine', '%s 님이 %s 을(를) 초정제했습니다!', '%s super-refined %s!'),
+        ('gear.abilitywar.ui.super_mark', '초정제', 'Super'),
+        ('gear.abilitywar.ui.stage.3', '[초정제]', '[Super Refined]'),
+        ('gear.abilitywar.ui.next_super_refine', '정제 +99 에서 대장장이에게 초정제를 받을 수 있다.', 'At Refined +99 a blacksmith can Super Refine it.'),
         ('smith.abilitywar.btn.infinity', '인피니티 승급', 'Ascend: Infinity'),
         ('smith.abilitywar.btn.infinity_avaritia', '아바리티아 승급', 'Ascend: Avaritia'),
         ('smith.abilitywar.ascend.transcend', '초월+ → +1+ 부터 다시', 'Transcend+ → restart at +1+'),
@@ -687,8 +701,8 @@ for k, ko, en in [
         ('smith.abilitywar.ascend.infinity_avaritia', '승급 → 아바리티아 인피니티', 'Ascend → Avaritia Infinity'),
         ('smith.abilitywar.ascend_req', '+%s 필요 (지금 +%s)', 'Needs +%s (now +%s)'),
         ('smith.abilitywar.ascend_note.transcend', '능력치는 그대로 이어지고 +1+ 부터 다시 +99+ 까지 강화합니다. 각성 ★ 은 남습니다.', 'Stats carry over; enhance again from +1+ to +99+. Awakening ★ stays.'),
-        ('smith.abilitywar.ascend_note.refine', '능력치는 그대로 이어지고 정제 +1 부터 다시 +99 까지 강화합니다.', 'Stats carry over; enhance again from Refined +1 to +99.'),
-        ('smith.abilitywar.ascend_note.infinity', '같은 종류의 인피니티 등급 장비 (+0, 정제 +99 보다 강함) 로 바뀝니다. 각성 ★ 은 남습니다.', 'Becomes Infinity grade gear of the same kind (+0, stronger than Refined +99). Awakening ★ stays.'),
+        ('smith.abilitywar.ascend_note.refine', '능력치는 그대로 이어지고 정제 +1 부터 다시 +99 까지 강화합니다. 정제 +99 에서 초정제.', 'Stats carry over; enhance again from Refined +1 to +99. At Refined +99: Super Refine.'),
+        ('smith.abilitywar.ascend_note.infinity', '같은 종류의 인피니티 등급 장비 (+0, 초정제 +99 보다 강함) 로 바뀝니다. 각성 ★ 은 남습니다.', 'Becomes Infinity grade gear of the same kind (+0, stronger than Super +99). Awakening ★ stays.'),
         ('smith.abilitywar.ascend_note.infinity_avaritia', '아바리티아의 진짜 인피니티 장비로 바뀝니다: 날붙이 → 우주의 검 · 도끼 → 자연의 파멸 · 망치 → 세계 파괴자 · 창 → 삼지창 · 지팡이 → 천상의 장궁 · 갑옷 → 인피니티 갑옷.', "Becomes real Avaritia Infinity gear: blades → Sword of the Cosmos, axe → Nature's Ruin, hammer → World Breaker, spear → trident, staff → Longbow of the Heavens, armor → Infinity armor."),
         ('smith.abilitywar.result.repeat', '연속 강화 끝 · +%s', 'Done · +%s'),
         ('smith.abilitywar.result.transcend', '초월+!', 'TRANSCENDED+!'),
@@ -708,9 +722,9 @@ for k, ko, en in [
         ('gear.abilitywar.ui.stage.2', '[정제]', '[Refined]'),
         ('gear.abilitywar.ui.next_transcend', '+99 에서 대장장이에게 초월+ 를 받을 수 있다.', 'At +99 a blacksmith can Transcend+ it.'),
         ('gear.abilitywar.ui.next_refine', '+99+ 에서 대장장이에게 정제를 받을 수 있다.', 'At +99+ a blacksmith can Refine it.'),
-        ('gear.abilitywar.ui.next_infinity', '정제 +99 에서 인피니티 장비로 승급할 수 있다.', 'At Refined +99 it can ascend to Infinity gear.'),
-        ('gear.abilitywar.ui.next_infinity_avaritia', '정제 +99 에서 아바리티아 인피니티 장비로 승급할 수 있다.', 'At Refined +99 it can ascend to Avaritia Infinity gear.'),
-        ('gear.abilitywar.ui.beyond_hint', '? 장비는 +99 까지 강화할 수 있다 (+15 부터는 실패해도 그대로).', '? gear can be enhanced to +99 (from +15, failures keep the level).')]:
+        ('gear.abilitywar.ui.next_infinity', '초정제 +99 에서 인피니티 장비로 승급할 수 있다.', 'At Super +99 it can ascend to Infinity gear.'),
+        ('gear.abilitywar.ui.next_infinity_avaritia', '초정제 +99 에서 아바리티아 인피니티 장비로 승급할 수 있다.', 'At Super +99 it can ascend to Avaritia Infinity gear.'),
+        ('gear.abilitywar.ui.beyond_hint', '? 장비는 +99 까지 강화할 수 있다. +15 부터: 성공 10% · 실패 50% (보호 주문서 없으면 깨짐) · 하락 40%.', '? gear can be enhanced to +99. From +15: success 10%, fail 50% (breaks without a Protection Scroll), drop 40%.')]:
     t(k, ko, en)
 
 

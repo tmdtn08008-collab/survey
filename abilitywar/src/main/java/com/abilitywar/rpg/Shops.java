@@ -175,10 +175,12 @@ public final class Shops {
         if (g == null) return "smith.abilitywar.err.no_item";
         if (GearEnhance.level(st) >= GearEnhance.maxLevel(st)) return "smith.abilitywar.err.max";
         times = Math.max(1, Math.min(20, times));
-        if (times > 1 && GearEnhance.failDrops(st)) times = 1;
+        // 연속 강화: +10~+14 (실패하면 내려감) 에서는 안 됨, +15 넘은 구간은 보호 주문서를 쓸 때만 (한 번에 깨지지 않게)
+        if (times > 1 && GearEnhance.failDrops(st) && !(GearEnhance.beyondZone(st) && protect)) times = 1;
         ServerWorld w = p.getServerWorld();
         boolean free = p.getAbilities().creativeMode;
         int code = 1, ups = 0, tries = 0, start = GearEnhance.level(st);
+        boolean broken = false;
         for (int i = 0; i < times; i++) {
             int lv = GearEnhance.level(st);
             if (lv >= GearEnhance.maxLevel(st)) break;
@@ -196,8 +198,20 @@ public final class Shops {
                 if (useScroll) take(inv, RpgItems.PROTECTION_SCROLL, 1);
             }
             tries++;
-            boolean ok = w.getRandom().nextInt(100) < GearEnhance.chance(st);
-            if (ok) {
+            boolean beyond = GearEnhance.beyondZone(st);
+            int roll = w.getRandom().nextInt(100);
+            boolean ok = roll < GearEnhance.chance(st);
+            if (!ok && beyond) {
+                // +15 넘은 구간: 실패 50% → 보호 주문서가 없으면 장비가 깨짐 · 하락 40% → 1 내려감 (보호 주문서가 있으면 둘 다 막음)
+                if (useScroll) code = 1;
+                else if (roll < GearEnhance.BEYOND_SUCCESS + GearEnhance.BEYOND_FAIL) {
+                    broken = true;
+                    break;
+                } else {
+                    GearEnhance.set(st, Math.max(GearEnhance.dropFloor(st), lv - 1));
+                    code = 2;
+                }
+            } else if (ok) {
                 GearEnhance.set(st, lv + 1);
                 ups++;
                 code = 0;
@@ -207,6 +221,22 @@ public final class Shops {
                 GearEnhance.set(st, lv - 1);
                 code = 2;
             } else code = 1;
+        }
+        if (broken) {
+            ItemStack gone = st.copy();
+            Text name = st.getName().copy();
+            inv.setStack(slot, ItemStack.EMPTY);
+            inv.markDirty();
+            w.playSound(null, p.getBlockPos(), SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 1.2f, 0.6f);
+            w.playSound(null, p.getBlockPos(), SoundEvents.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1f, 0.5f);
+            w.playSound(null, p.getBlockPos(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 0.5f, 1.4f);
+            w.spawnParticles(new net.minecraft.particle.ItemStackParticleEffect(ParticleTypes.ITEM, gone), p.getX(), p.getY() + 1.2, p.getZ(), 40, 0.4, 0.4, 0.4, 0.15);
+            w.spawnParticles(ParticleTypes.LARGE_SMOKE, p.getX(), p.getY() + 1.2, p.getZ(), 25, 0.4, 0.4, 0.4, 0.03);
+            p.sendMessage(Text.translatable("smith.abilitywar.broken", name).formatted(Formatting.RED, Formatting.BOLD), false);
+            if (times > 1) p.sendMessage(Text.translatable("smith.abilitywar.repeat_done", tries, ups, start, 0).formatted(Formatting.GOLD), false);
+            announce(p, Text.translatable("smith.abilitywar.broadcast_broken", p.getDisplayName(), name));
+            result(p, 10, 0, slot);
+            return null;
         }
         if (ups > 0) {
             w.playSound(null, p.getBlockPos(), SoundEvents.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 0.8f, 1.2f + Math.min(15, GearEnhance.level(st)) * 0.03f);
@@ -230,8 +260,8 @@ public final class Shops {
     }
 
     /**
-     * ? 장비의 큰 단계: 초월+ (+99 → +1+) · 정제 (+99+ → 정제 +1) · 인피니티 승급 (정제 +99 → 아바리티아 인피니티 장비, 모드가 없으면 같은 종류의 인피니티 등급 +0).
-     * 결과 코드 7 초월 · 8 정제 · 9 인피니티.
+     * ? 장비의 큰 단계: 초월+ (+99 → +1+) · 정제 (+99+ → 정제 +1) · 초정제 (정제 +99 → 초정제 +1) · 인피니티 승급 (초정제 +99 → 아바리티아 인피니티 장비, 모드가 없으면 같은 종류의 인피니티 등급 +0).
+     * 결과 코드 7 초월 · 8 정제 · 11 초정제 · 9 인피니티 (10 = 강화 실패로 장비가 깨짐).
      */
     @Nullable
     public static String ascend(ServerPlayerEntity p, int slot) {
@@ -267,6 +297,11 @@ public final class Shops {
                 GearEnhance.setStage(st, GearEnhance.REFINE);
                 GearEnhance.set(st, 1);
                 code = 8;
+            }
+            case SUPER_REFINE -> {
+                GearEnhance.setStage(st, GearEnhance.SUPER_REFINE);
+                GearEnhance.set(st, 1);
+                code = 11;
             }
             default -> {
                 out = new ItemStack(next);
