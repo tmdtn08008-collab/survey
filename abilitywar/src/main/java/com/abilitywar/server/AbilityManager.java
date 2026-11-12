@@ -101,6 +101,11 @@ public final class AbilityManager {
             deny(player);
             return;
         }
+        // 궁극기: 먼저 2초 각성 연출 (시간 정지 · 컷인), 그다음 진짜 궁극기
+        if (slot == SkillSlot.ULTIMATE && UltPrelude.applies(player, a)) {
+            UltPrelude.start(player, d, a, extra);
+            return;
+        }
         if (a.useSkill(player, d, slot, extra)) {
             d.dirty = true;
         }

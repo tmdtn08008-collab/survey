@@ -3730,4 +3730,15 @@ C['common.dash_right'] = dash_clip(
     {'R': ([3.5, -12.5, 8], [30, 14, 40]), 'L': ([-9.5, -13, 6], [34, 12, -70])},
     [0, -1.2, -5])
 
+# 궁극기 각성 (모든 궁극기 앞의 2초 연출): 몸을 웅크려 힘을 모음 → 떨림 → 팔을 활짝 펼치며 하늘을 봄
+C['common.ult_awaken'] = clip(40, blend_in=2, blend_out=4, bones=seq([
+    (0, {'body': [0, 0, 0], 'head': [0, 0, 0], 'right_arm': [0, 0, 0], 'left_arm': [0, 0, 0], 'right_leg': [0, 0, 0], 'left_leg': [0, 0, 0], 'root': {'pos': [0, 0, 0], 'rot': [0, 0, 0]}}),
+    (6, {'body': [20, 0, 0], 'head': [12, 0, 0], 'right_arm': [-42, 24, 34], 'left_arm': [-42, -24, -34], 'right_leg': [-14, 0, 7], 'left_leg': [-8, 0, -7], 'root': {'pos': [0, -1.6, 0], 'rot': [6, 0, 0]}}, 'outCubic'),
+    (16, {'body': [23, 0, 0], 'head': [14, 0, 0], 'right_arm': [-48, 28, 38], 'left_arm': [-48, -28, -38], 'right_leg': [-16, 0, 7], 'left_leg': [-10, 0, -7], 'root': {'pos': [0, -1.8, 0], 'rot': [7, 0, 0]}}, 'inOutSine'),
+    (22, {'body': [21, 1, 0], 'head': [12, -2, 0], 'right_arm': [-46, 26, 40], 'left_arm': [-50, -26, -36], 'right_leg': [-16, 0, 7], 'left_leg': [-10, 0, -7], 'root': {'pos': [0, -1.7, 0], 'rot': [7, 0, 0]}}, 'inOutSine'),
+    (28, {'body': [24, -1, 0], 'head': [15, 2, 0], 'right_arm': [-52, 30, 36], 'left_arm': [-46, -30, -40], 'right_leg': [-18, 0, 8], 'left_leg': [-12, 0, -8], 'root': {'pos': [0, -2.0, 0], 'rot': [8, 0, 0]}}, 'inOutSine'),
+    (32, {'body': [-16, 0, 0], 'head': [-30, 0, 0], 'right_arm': [-24, 0, 112], 'left_arm': [-24, 0, -112], 'right_leg': [0, 0, 14], 'left_leg': [0, 0, -14], 'root': {'pos': [0, 0.6, 0], 'rot': [-6, 0, 0]}}, 'outExpo'),
+    (40, {'body': [-10, 0, 0], 'head': [-20, 0, 0], 'right_arm': [-30, 0, 100], 'left_arm': [-30, 0, -100], 'right_leg': [0, 0, 12], 'left_leg': [0, 0, -12], 'root': {'pos': [0, 0.3, 0], 'rot': [-4, 0, 0]}}, 'inOutSine'),
+]))
+
 write('common', C)

@@ -791,6 +791,131 @@ public final class Effects {
         }
     }
 
+    // ================================================================ ULT AWAKEN (모든 궁극기 앞 2초 각성)
+    /**
+     * 발밑에 두 겹 마법진이 펼쳐지고, 둘레에서 빛줄기가 솟고, 빛 입자 · 번개가 몸으로 빨려 들며 몸의 빛이 커짐 →
+     * 끝에 한 점으로 압축됐다가 빛기둥 + 충격파 고리 + 불꽃으로 터짐. 색은 능력 색 (n "col").
+     */
+    public static final class UltAwaken extends Fx {
+        final int caster, dur, col, light;
+        final Vec3d groundPos;
+
+        UltAwaken(ClientWorld w, NbtCompound n) {
+            super(n.getInt("d") + 14);
+            caster = n.getInt("c");
+            dur = n.getInt("d");
+            col = n.getInt("col");
+            light = lighten(col, 0.55f);
+            Vec3d p = pos(n);
+            Vec3d g = ground(w, p.add(0, 0.5, 0), 4);
+            groundPos = (g != null ? g : p).add(0, 0.05, 0);
+        }
+
+        static int lighten(int c, float k) {
+            int r = (c >> 16) & 255, g = (c >> 8) & 255, b = c & 255;
+            return ((int) (r + (255 - r) * k) << 16) | ((int) (g + (255 - g) * k) << 8) | (int) (b + (255 - b) * k);
+        }
+
+        Vec3d core(ClientWorld w, float td) {
+            Entity e = w.getEntityById(caster);
+            return e != null ? chest(e, td) : groundPos.add(0, 1.2, 0);
+        }
+
+        @Override
+        public boolean tick(ClientWorld w) {
+            Vec3d o = core(w, 1f);
+            if (age < dur - 4) {
+                // 둘레에서 솟는 빛 + 몸으로 빨려드는 빛 입자
+                for (int i = 0; i < 5; i++) {
+                    double a = R.nextDouble() * Math.PI * 2, rr = rf(3.0f, 5.5f);
+                    Vec3d sp = groundPos.add(Math.cos(a) * rr, rf(0.1f, 2.5f), Math.sin(a) * rr);
+                    Particles.P p = spawn(Kind.STREAK, sp, o.subtract(sp).multiply(0.02), rf(14, 22), rf(0.06f, 0.12f));
+                    p.color(i % 2 == 0 ? col : light, 1f);
+                    p.attract = o;
+                    p.attractStrength = 0.02f + 0.05f * age / dur;
+                    p.drag = 0.92f;
+                }
+                for (int i = 0; i < 2; i++) {
+                    double a = R.nextDouble() * Math.PI * 2, rr = rf(1.5f, 4.5f);
+                    spawn(Kind.GLOW, groundPos.add(Math.cos(a) * rr, 0.1, Math.sin(a) * rr), new Vec3d(0, rf(0.12f, 0.3f), 0), rf(12, 20), rf(0.08f, 0.16f)).color(light, 0.9f);
+                }
+            }
+            if (age == dur - 1) {
+                // 터짐: 사방으로 불꽃 + 연기 고리
+                sparks(o, 70, 1.4f, light, 0.16f);
+                sparks(o, 40, 0.8f, col, 0.2f);
+                for (int i = 0; i < 24; i++) {
+                    double a = i / 24.0 * Math.PI * 2;
+                    spawn(Kind.SMOKE_ADD, groundPos.add(0, 0.3, 0), new Vec3d(Math.cos(a) * 0.55, 0.02, Math.sin(a) * 0.55), 24, 0.9f).color(col, 0.5f);
+                }
+            }
+            return super.tick(w);
+        }
+
+        @Override
+        public void render(Ctx c) {
+            float a = age + c.tickDelta;
+            Vec3d gp = groundPos.subtract(c.cam);
+            Vec3d o = core(c.world, c.tickDelta).subtract(c.cam);
+            float fade = a > dur ? Math.max(0, 1 - (a - dur) / 10f) : 1;
+            float grow = outBack(Math.min(1, a / 10f));
+            float pulse = a > 28 && a < dur ? 1 + 0.12f * (float) Math.sin(a * 1.6f) : 1;
+            float R0 = 4.6f * grow * pulse;
+            // 바닥: 어둠 + 두 겹 마법진
+            VertexConsumer dk = c.imm.getBuffer(AWRenderLayers.translucent(Tex.GLOW));
+            Draw.flat(dk, c.m, gp.x, gp.y - 0.01, gp.z, R0 * 1.4f, 0, 0.02f, 0.0f, 0.04f, 0.65f * fade);
+            VertexConsumer mc1 = c.imm.getBuffer(AWRenderLayers.additive(Tex.MAGIC_CIRCLE));
+            Draw.flat(mc1, c.m, gp.x, gp.y, gp.z, R0, a * 0.02f, r(col), g(col), b(col), 0.95f * fade);
+            VertexConsumer mc2 = c.imm.getBuffer(AWRenderLayers.additive(Tex.MAGIC_CIRCLE2));
+            Draw.flat(mc2, c.m, gp.x, gp.y + 0.02, gp.z, R0 * 0.6f, -a * 0.04f, r(light), g(light), b(light), 0.9f * fade);
+            // 둘레의 빛줄기
+            VertexConsumer st = c.imm.getBuffer(AWRenderLayers.additive(Tex.STREAK));
+            if (a > 6) {
+                float pa = Math.min(1, (a - 6) / 6f) * fade;
+                for (int i = 0; i < 10; i++) {
+                    double ang = i / 10.0 * Math.PI * 2 + a * 0.02;
+                    Vec3d base = gp.add(Math.cos(ang) * R0 * 0.95, 0, Math.sin(ang) * R0 * 0.95);
+                    float hgt = 2.5f + 1.5f * (float) Math.sin(a * 0.35 + i * 1.7) + (a > 30 ? (a - 30) * 0.4f : 0);
+                    Draw.streak(st, c.m, base.add(0, hgt, 0), new Vec3d(0, 1, 0), hgt, 0.16f, r(col), g(col), b(col), pa * 0.85f);
+                }
+            }
+            // 몸의 빛: 커지다가 (30~38) 한 점으로 압축
+            float core;
+            if (a < 30) core = 0.4f + 1.6f * Math.min(1, a / 30f);
+            else if (a < dur - 2) core = 2.0f * (1 - (a - 30) / (dur - 32f)) + 0.25f;
+            else core = 0.25f + (a - (dur - 2)) * 1.4f;
+            VertexConsumer gl = c.imm.getBuffer(AWRenderLayers.additive(Tex.GLOW));
+            float nf = nearFade(o, core * 2.5f);
+            Draw.billboard(gl, c.m, c.camRot, o.x, o.y, o.z, core * 2.5f, 0, r(col), g(col), b(col), 0.75f * fade * nf);
+            Draw.billboard(gl, c.m, c.camRot, o.x, o.y, o.z, core * 1.1f, 0, r(light), g(light), b(light), 0.9f * fade * nf);
+            // 번개: 마법진 둘레 → 몸
+            if (a > 12 && a < dur - 2) {
+                VertexConsumer lt = c.imm.getBuffer(AWRenderLayers.ADDITIVE_COLOR);
+                long seed = (long) (a / 2);
+                java.util.Random rr = new java.util.Random(seed * 131);
+                for (int i = 0; i < 4; i++) {
+                    double ang = rr.nextDouble() * Math.PI * 2;
+                    Vec3d from = gp.add(Math.cos(ang) * R0 * 0.9, 0.05, Math.sin(ang) * R0 * 0.9);
+                    Draw.lightning(lt, c.m, from, o, seed * 7 + i, 0.03f, 12, 0.8f, r(light), g(light), b(light), 0.85f * fade);
+                }
+            }
+            // 끝: 하늘로 솟는 빛기둥 + 바닥으로 퍼지는 충격파 고리
+            if (a > dur - 4) {
+                float k = Math.min(1, (a - (dur - 4)) / 4f);
+                float hf = fade * (a < dur ? k : 1);
+                Draw.streak(st, c.m, gp.add(0, 18, 0), new Vec3d(0, 1, 0), 18, 0.9f + 0.6f * k, r(light), g(light), b(light), 0.9f * hf);
+                Draw.streak(st, c.m, gp.add(0, 18, 0), new Vec3d(0, 1, 0), 18, 2.2f, r(col), g(col), b(col), 0.5f * hf);
+            }
+            if (a > dur - 1) {
+                float k = (a - (dur - 1)) / 12f;
+                float rad = 1 + 14 * (1 - (1 - k) * (1 - k));
+                VertexConsumer ring = c.imm.getBuffer(AWRenderLayers.additive(Tex.RING));
+                Draw.flat(ring, c.m, gp.x, gp.y + 0.1, gp.z, rad, 0, r(light), g(light), b(light), Math.max(0, 1 - k) * 0.95f);
+                Draw.flat(ring, c.m, gp.x, gp.y + 0.12, gp.z, rad * 0.7f, 0, r(col), g(col), b(col), Math.max(0, 1 - k) * 0.8f);
+            }
+        }
+    }
+
     // ================================================================ DASH (공통 대시)
     public static final class DashTrail extends Fx {
         final int entity, color;

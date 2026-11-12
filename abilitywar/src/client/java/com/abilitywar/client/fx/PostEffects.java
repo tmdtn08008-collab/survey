@@ -17,7 +17,7 @@ public final class PostEffects {
     private static PostEffectProcessor processor;
     private static int w = -1, h = -1;
     private static boolean failed;
-    private static float concussion, voidAmt;
+    private static float concussion, voidAmt, radial;
     private static boolean hadConcussion;
     // 색조 (기본: 공허 보라)
     static final float[] VOID_DARK = {0.01f, 0f, 0.035f}, VOID_LIGHT = {0.42f, 0.22f, 0.78f};
@@ -50,6 +50,8 @@ public final class PostEffects {
                 holy = CameraController.cinematicType().startsWith("cantor") || CameraController.cinematicType().startsWith("angel");
                 necro = CameraController.cinematicType().startsWith("warlock");
                 targetV = Math.max(targetV, fire ? 0.32f : blade ? 0.3f : blood ? 0.42f : holy ? 0.22f : necro ? 0.5f : 0.45f);
+                // 궁극기 각성: 시간이 멈춘 듯 거의 흑백 (능력 색조)
+                if (CameraController.isPrelude()) targetV = 0.97f;
             }
             float[] td = fire ? FIRE_DARK : blade ? BLADE_DARK : blood ? BLOOD_DARK : holy ? CANTOR_DARK : necro ? WARLOCK_DARK : VOID_DARK, tl = fire ? FIRE_LIGHT : blade ? BLADE_LIGHT : blood ? BLOOD_LIGHT : holy ? CANTOR_LIGHT : necro ? WARLOCK_LIGHT : VOID_LIGHT;
             for (int i = 0; i < 3; i++) {
@@ -57,6 +59,13 @@ public final class PostEffects {
                 light[i] += (tl[i] - light[i]) * 0.2f;
             }
         }
+        float targetR = 0;
+        if (CameraController.isPrelude()) {
+            float ct = CameraController.cinematicTime(0);
+            targetR = ct < 4 ? 0.6f : ct >= 28 ? Math.min(1f, (ct - 28) / 6f) : 0.08f;
+        }
+        radial += (targetR - radial) * 0.35f;
+        if (radial < 0.002f) radial = 0;
         concussion += (targetC - concussion) * (targetC > concussion ? 0.5f : 0.12f);
         voidAmt += (targetV - voidAmt) * 0.15f;
         if (concussion < 0.002f) concussion = 0;
@@ -68,7 +77,7 @@ public final class PostEffects {
     }
 
     public static void render(float tickDelta) {
-        if ((concussion <= 0 && voidAmt <= 0) || failed) return;
+        if ((concussion <= 0 && voidAmt <= 0 && radial <= 0) || failed) return;
         MinecraftClient mc = MinecraftClient.getInstance();
         try {
             if (processor == null) {
@@ -89,6 +98,7 @@ public final class PostEffects {
                 prog.getUniformByNameOrDummy("Time").set(time / 20f);
                 prog.getUniformByNameOrDummy("TintDark").set(dark[0], dark[1], dark[2]);
                 prog.getUniformByNameOrDummy("TintLight").set(light[0], light[1], light[2]);
+                prog.getUniformByNameOrDummy("Radial").set(radial);
             }
             RenderSystem.disableBlend();
             RenderSystem.disableDepthTest();

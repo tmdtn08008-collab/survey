@@ -67,7 +67,7 @@ public class VoidAbility extends Ability {
     public static final int CD_PASSIVE = 240;
 
     public static final int ULT_CINEMATIC = 70;
-    public static final int ULT_DURATION = 150;
+    public static final int ULT_DURATION = 230;
 
     private static final UUID SHADOW_SPEED_ID = UUID.fromString("b1d7c3a2-7c1e-4b8f-9a55-2a0f7d4e9c31");
 

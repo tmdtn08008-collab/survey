@@ -40,7 +40,11 @@ public final class BlackHoleFx {
             shrink = 1 - k * k;
         }
         float breathe = 1 + 0.04f * (float) Math.sin(a * 0.25);
-        return Math.max(0, grow * shrink * breathe);
+        // 확장 (45%~85%) → 임계 (85%~: 떨림)
+        float f = a / Math.max(1, dur);
+        float big = VoidSingularityEntity.expansion(f) + 0.15f * Math.max(0, Math.min(1, (f - 0.45f) / 0.4f));
+        float jitter = f > 0.85f ? 1 + 0.06f * (float) Math.sin(a * 2.9f) * Math.min(1, (f - 0.85f) / 0.05f) : 1;
+        return Math.max(0, grow * shrink * breathe * big * jitter);
     }
 
     public static void tick(ClientWorld w) {
@@ -164,11 +168,32 @@ public final class BlackHoleFx {
             float pt = (a % 24) / 24f;
             VertexConsumer swv = c.imm.getBuffer(AWRenderLayers.additive(Tex.SHOCKWAVE));
             Draw.billboard(swv, c.m, c.camRot, p.x, p.y, p.z, core * (1.3f + pt * 5f), 0, r(PURPLE), g(PURPLE), b(PURPLE), (1 - pt) * 0.35f);
-            // 번개
+            float f = a / Math.max(1, e.getDuration());
+            // 확장 단계: 위아래로 뻗는 공허의 기둥 + 두 번째 원반
+            if (f > 0.45f) {
+                float k = Math.min(1, (f - 0.45f) / 0.1f);
+                VertexConsumer stk = c.imm.getBuffer(AWRenderLayers.additive(Tex.STREAK));
+                for (int sgn : new int[]{1, -1}) {
+                    Draw.streak(stk, c.m, p.add(0, sgn * core * 6, 0), new Vec3d(0, 1, 0), core * 6, core * 0.5f, r(PURPLE), g(PURPLE), b(PURPLE), 0.7f * k);
+                    Draw.streak(stk, c.m, p.add(0, sgn * core * 6, 0), new Vec3d(0, 1, 0), core * 6, core * 0.18f, r(PALE), g(PALE), b(PALE), 0.8f * k);
+                }
+                Vec3d ax2 = ay, ay2 = ax.multiply(-1).add(0, 0.35, 0).normalize();
+                Draw.annulus(sw, c.m, p, ax2, ay2, core * 1.6f, core * 3.6f, 48, a * 0.014f, 3, 0.95f, 0.55f, 1f, 0.7f * k, 0f);
+            }
+            // 임계: 하얗게 달아오르는 중심 + 빠른 맥동
+            if (f > 0.85f) {
+                float k = Math.min(1, (f - 0.85f) / 0.08f);
+                float flick = 0.6f + 0.4f * (float) Math.sin(a * 3.1f);
+                Draw.billboard(gl, c.m, c.camRot, p.x, p.y, p.z, core * 1.6f, 0, 1f, 0.9f, 1f, 0.55f * k * flick);
+                float pt2 = (a % 8) / 8f;
+                Draw.billboard(swv, c.m, c.camRot, p.x, p.y, p.z, core * (1.2f + pt2 * 3f), 0, r(PALE), g(PALE), b(PALE), (1 - pt2) * 0.5f * k);
+            }
+            // 번개 (확장 · 임계 단계에서 더 많이)
             VertexConsumer lt = c.imm.getBuffer(AWRenderLayers.ADDITIVE_COLOR);
             long seed = (long) (a / 2) + e.getId() * 1000L;
             Random rr = new Random(seed);
-            for (int i = 0; i < 4; i++) {
+            int bolts = f > 0.85f ? 10 : f > 0.45f ? 7 : 4;
+            for (int i = 0; i < bolts; i++) {
                 double ang = rr.nextDouble() * Math.PI * 2;
                 Vec3d d0 = ax.multiply(Math.cos(ang)).add(ay.multiply(Math.sin(ang)));
                 Vec3d from = p.add(d0.multiply(core * 1.1));

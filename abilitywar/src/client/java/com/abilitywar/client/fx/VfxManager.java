@@ -49,6 +49,7 @@ public final class VfxManager {
                 case "shield_fade" -> shieldFade(n.getInt("c"));
                 case "shadow_pool" -> add(new Effects.ShadowPool(w, p, n.getInt("k")));
                 case "ult_cast" -> add(new Effects.UltCast(w, n));
+                case "ult_awaken" -> add(new Effects.UltAwaken(w, n));
                 case "capture" -> {
                     Entity e = w.getEntityById(n.getInt("e"));
                     Vec3d at = e != null ? e.getPos().add(0, e.getHeight() * 0.5, 0) : p;

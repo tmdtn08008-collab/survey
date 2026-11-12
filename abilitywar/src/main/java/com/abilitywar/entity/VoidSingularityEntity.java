@@ -33,6 +33,7 @@ import java.util.UUID;
  * - 반경 안의 생명체를 끌어당긴다 (시전자 제외)
  * - 중심(사건의 지평선)에 붙잡히면 빠져나갈 수 없고, 최대 체력의 75% 만큼 피해를 입는다 (보스는 10%)
  * - 시간이 끝나면 붕괴하며 남은 피해를 한꺼번에 준다
+ * - 2.8.1: 더 길게 (11.5초) + 3 단계: 생성 → 확장 (45% 부터 반경 · 크기 +30~45%) → 임계 (85% 부터 떨림 · 흔들림) → 붕괴
  */
 public class VoidSingularityEntity extends Entity {
     public static final float PULL_RADIUS = 14f;
@@ -99,6 +100,12 @@ public class VoidSingularityEntity extends Entity {
     }
 
     @Nullable
+    /** 0..1 진행도 → 확장 단계 크기 배율 (1 → 1.3). */
+    public static float expansion(float f) {
+        float k = Math.max(0, Math.min(1, (f - 0.45f) / 0.4f));
+        return 1 + 0.3f * k * k * (3 - 2 * k);
+    }
+
     private Entity owner() {
         if (ownerUuid == null || !(getWorld() instanceof ServerWorld sw)) return null;
         return sw.getEntity(ownerUuid);
@@ -119,7 +126,19 @@ public class VoidSingularityEntity extends Entity {
         Entity owner = owner();
         Vec3d center = getPos();
         float grow = MathHelper.clamp(this.age / 20f, 0f, 1f);
-        float radius = PULL_RADIUS * (0.4f + 0.6f * grow);
+        float f = this.age / (float) duration;
+        float radius = PULL_RADIUS * (0.4f + 0.6f * grow) * expansion(f);
+        // 단계 전환 연출 (소리 · 흔들림)
+        int expandAt = (int) (duration * 0.45f), criticalAt = (int) (duration * 0.85f);
+        if (this.age == expandAt) {
+            w.playSound(null, getX(), getY(), getZ(), AWSounds.VOID_BLACKHOLE, SoundCategory.PLAYERS, 5f, 0.55f);
+            w.playSound(null, getX(), getY(), getZ(), net.minecraft.sound.SoundEvents.ENTITY_WARDEN_SONIC_BOOM, SoundCategory.PLAYERS, 3f, 0.6f);
+            AWNet.shakeAround(w, center, 0.7f, 18, 40);
+        }
+        if (this.age == criticalAt) {
+            w.playSound(null, getX(), getY(), getZ(), net.minecraft.sound.SoundEvents.ENTITY_WARDEN_SONIC_CHARGE, SoundCategory.PLAYERS, 4f, 0.7f);
+            AWNet.shakeAround(w, center, 1.0f, duration - criticalAt, 40);
+        }
 
         // 붙잡힌 대상 유지 + 지속 피해
         captured.values().removeIf(c -> !c.entity.isAlive() || c.entity.isRemoved() || c.entity.getWorld() != w);

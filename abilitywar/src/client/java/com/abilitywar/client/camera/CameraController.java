@@ -66,6 +66,10 @@ public final class CameraController {
                 roll += p.rot[2][2];
             }
         }
+        if (isCinematic()) {
+            Shot sh = currentShot(tickDelta);
+            if (sh != null) roll += sh.roll;
+        }
         float c = PostEffects.concussion();
         if (c > 0) {
             roll += c * 3.5f * (float) Math.sin(t * 0.09);
@@ -155,8 +159,13 @@ public final class CameraController {
 
     public static final class Shot {
         public Vec3d pos;
-        public float yaw, pitch;
+        public float yaw, pitch, roll;
         public double fov;
+    }
+
+    /** 궁극기 각성 연출 ("void_pre" 같은 "_pre" 시네마틱) 인가. */
+    public static boolean isPrelude() {
+        return isCinematic() && cin.type.endsWith("_pre");
     }
 
     private static final Shot SHOT = new Shot();
@@ -189,6 +198,7 @@ public final class CameraController {
             SHOT.yaw = (float) (MathHelper.atan2(d.z, d.x) * 57.2957795) - 90f;
             SHOT.pitch = (float) -(MathHelper.atan2(d.y, h) * 57.2957795);
             SHOT.fov = 50;
+            SHOT.roll = 0;
             return SHOT;
         }
         if (!isCinematic()) return null;
@@ -205,7 +215,40 @@ public final class CameraController {
         Vec3d T = cin.target;
         Vec3d cam, look;
         double fov;
-        if (cin.type.equals("blade_ult")) {
+        float roll = 0;
+        if (cin.type.endsWith("_pre")) {
+            // 궁극기 각성: 얼굴 클로즈업 → 낮은 각도로 돌며 올려다봄 → 확 빠지며 위로 → 넓게 멈춤
+            Vec3d eye = C.add(0, caster.getStandingEyeHeight() - 0.05, 0);
+            if (t < 14) {
+                float k = smooth(t / 14f);
+                cam = eye.add(F.multiply(1.35 - 0.25 * k)).add(R.multiply(0.32)).add(0, -0.08, 0);
+                look = eye.add(0, -0.05, 0);
+                fov = 40 - 6 * k;
+                roll = 7 - 5 * k;
+            } else if (t < 28) {
+                float k = smooth((t - 14) / 14f);
+                double th = Math.toRadians(40 - 85 * k);
+                double rad = 2.6 + 0.4 * k;
+                cam = C.add(F.multiply(Math.cos(th) * rad)).add(R.multiply(Math.sin(th) * rad)).add(0, 0.25, 0);
+                look = C.add(0, 1.35 + 0.2 * k, 0);
+                fov = 64 + 4 * k;
+                roll = (float) (-9 * Math.sin(k * Math.PI));
+            } else if (t < 36) {
+                float k = (t - 28) / 8f;
+                k = 1 - (1 - k) * (1 - k) * (1 - k);
+                double th = Math.toRadians(-45);
+                double rad = 3.0 + 7 * k;
+                cam = C.add(F.multiply(Math.cos(th) * rad)).add(R.multiply(Math.sin(th) * rad)).add(0, 0.3 + 6 * k, 0);
+                look = C.add(0, 1.2, 0);
+                fov = 68 + 14 * k;
+            } else {
+                float k = smooth((t - 36) / 4f);
+                double th = Math.toRadians(-45);
+                cam = C.add(F.multiply(Math.cos(th) * 10)).add(R.multiply(Math.sin(th) * 10)).add(0, 6.3 + 0.3 * k, 0);
+                look = C.add(0, 1.2, 0);
+                fov = 82 + 2 * k;
+            }
+        } else if (cin.type.equals("blade_ult")) {
             Vec3d S = cin.start;
             if (t < 20) {
                 // 검을 하늘로 드는 모습: 낮은 앵글에서 올려다보며 돌아감
@@ -484,6 +527,7 @@ public final class CameraController {
             SHOT.pitch += s * 3 * noise(t * 2.2f, 9);
         }
         SHOT.fov = fov;
+        SHOT.roll = roll;
         return SHOT;
     }
 

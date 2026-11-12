@@ -17,6 +17,7 @@
 - 🆕 **2.8 후반 컨텐츠**: **🗼 심연의 탑** (레벨 40 부터, 파티로 끝없이 올라가는 층 · 5층마다 보스 · 층마다 보상 · 최고 기록) + **✦ 장비 각성** (+15 장비를 ★1~★5 로, 탑의 심연의 결정 · 엔더 드래곤의 용의 심장) + **🐉 종언의 용** (엔더 드래곤에 뿔 · 가시 · 발톱 · 숨결 연기, 더 단단해지고 분노의 포효, 큰 보상).
 - 🆕 **2.8 모드팩**: 엔더 드래곤 개편 **True Ending**, 드래곤 · 생명체 **Saint's Dragons · Mobs of Mythology · Myths of The Sea · Aquamirae · Mutant Monsters**, 셰이더 **Sodium + Iris + Complementary Reimagined** (처음부터 켜짐), 인벤토리 꾸미기 **Inventory Particles · Smooth Gui · Mouse Tweaks** + 인벤토리 옆 **캐릭터 카드**.
 - ⚖ **공허 궁극기**: 보스에게는 **최대 체력의 10% 고정** (장비 · 스탯 · 무기 효과 배율 없음).
+- 🆕 **2.8.1 궁극기 각성 연출**: 모든 2차 · 3차 직업 궁극기 앞에 **2초 각성** — 시간이 멈춘 듯 흑백 화면 · 얼굴 클로즈업 → 낮게 돌며 올려다보는 카메라 · 집중선 · **"ULTIMATE + 궁극기 이름" 컷인 띠** · 발밑 마법진 · 몸으로 빨려드는 빛과 번개 → 빛기둥 + 충격파로 터지며 원래 궁극기. **공허의 블랙홀은 11.5초로 길어지고** 확장 (위아래 공허 기둥 · 두 번째 원반) → 임계 (떨림 · 하얗게 달아오름) → 붕괴.
 - 🆕 **보스 모드** 를 같이 쓰게 해 두었습니다: **Bosses of Mass Destruction** (보스 4) + **Marium's Soulslike Weaponry** (보스 8 + 전설 무기) + **The Graveyard** (묘지 · 언데드 + 리치) + **Archon** (원소 보스 5) + **AdventureZ · VoidZ** (블랙스톤 골렘 · 디 아이 · 공허의 그림자 + 중간 보스) + **Dungeon Now Loading** (던전 + 보스 3) + **Withering Heights** (위더 강화) + **True Ending** (엔더 드래곤 개편) + 2.8 의 드래곤 · 생명체 모드. 야생 보스 · 던전 제단 · 심연의 탑 · "보스 처치" 에 바로 함께 쓰입니다.
   **Ultris: Boss Expansion** (보스 8) 도 호환됩니다 (라이선스 때문에 [공식 페이지](https://modrinth.com/datapack/ultris) 에서 직접 받아 넣기).
 - **레벨 (최대 100) · 경험치 · 스탯 포인트 (힘·민첩·지능·체력·지혜)**, **전직 교관 NPC**, 퀘스트 창, 직업 트리 화면
@@ -29,6 +30,16 @@
 - 서버와 클라이언트 **둘 다** 설치해야 합니다 (멀티 서버면 서버 `mods` 폴더 + 각 플레이어 `mods` 폴더)
 
 ## 스크린샷
+
+### 🆕 2.8.1 — 궁극기 각성 연출 (모든 궁극기) · 더 길어진 블랙홀
+
+| 1. 얼굴 클로즈업 (시간이 멈추며 흑백으로) | 2. "ULTIMATE · EVENT HORIZON" 컷인 띠 + 집중선 |
+|---|---|
+| ![](screenshots/185_ult_awaken_face.jpg) | ![](screenshots/186_ult_awaken_cutin.jpg) |
+| 3. 확 빠지는 카메라: 발밑 마법진 · 멈춘 적들 · 방사형 흐림 → 번쩍이며 궁극기 | 용기사: 같은 연출이 능력 색 (주황) 으로 · 古龍降臨 |
+| ![](screenshots/187_ult_awaken_burst.jpg) | ![](screenshots/188_ult_awaken_dragon.jpg) |
+| 블랙홀 확장 단계: 위아래로 뻗는 공허 기둥 · 번개 많아짐 | 임계 단계: 커지고 떨리며 하얗게 달아오름 → 붕괴 |
+| ![](screenshots/189_void_hole_expand.jpg) | ![](screenshots/190_void_hole_critical.jpg) |
 
 ### 🆕 2.8 — 심연의 탑 · 각성 · 종언의 용 · 캐릭터 카드
 
@@ -305,7 +316,7 @@
 ## 설치
 
 1. Fabric Loader(1.20.1)를 설치합니다.
-💡 **모드팩 파일 (가장 쉬움)**: [`dist/abilitywar-rpg-2.8.0.mrpack`](dist/abilitywar-rpg-2.8.0.mrpack) 를 **Modrinth 앱** (또는 Prism Launcher · ATLauncher 등) 에서 *파일에서 가져오기* 로 열면 마인크래프트 1.20.1 + Fabric Loader 0.19.5 + 능력대전쟁 + 보스 · 드래곤 · 생명체 모드 (Ultris · True Ending 포함) + 셰이더 (Sodium · Iris · Complementary Reimagined, **켜진 상태로 시작**) + 인벤토리 꾸미기 모드 + Fabric API 가 한 번에 설치됩니다. 모드 파일은 Modrinth 공식 주소에서 받아집니다.
+💡 **모드팩 파일 (가장 쉬움)**: [`dist/abilitywar-rpg-2.8.1.mrpack`](dist/abilitywar-rpg-2.8.1.mrpack) 를 **Modrinth 앱** (또는 Prism Launcher · ATLauncher 등) 에서 *파일에서 가져오기* 로 열면 마인크래프트 1.20.1 + Fabric Loader 0.19.5 + 능력대전쟁 + 보스 · 드래곤 · 생명체 모드 (Ultris · True Ending 포함) + 셰이더 (Sodium · Iris · Complementary Reimagined, **켜진 상태로 시작**) + 인벤토리 꾸미기 모드 + Fabric API 가 한 번에 설치됩니다. 모드 파일은 Modrinth 공식 주소에서 받아집니다.
    - 2.7.0 팩에서 바꾸면: 예전 **Ender Dragon Fight Remastered** 는 True Ending 과 같이 쓰면 안 돼서 뺐습니다 (직접 넣었다면 `edf-remastered-4.3.jar` 를 지우세요).
    - 셰이더가 무거우면 게임 안에서 **O** (셰이더 팩 화면) → OFF. Iris 의 R (다시 불러오기) · K (켜기/끄기) 키는 능력 키와 겹쳐서 처음 실행할 때 꺼 둡니다 (Saint's Dragons 의 겹치는 키도 V · C · Z … 로 옮김, `config/abilitywar_keys.txt`).
 
@@ -314,7 +325,7 @@
 irm https://raw.githubusercontent.com/tmdtn08008-collab/survey/claude/blissful-carson-s8snwp/abilitywar/dist/download_mods.ps1 | iex
 ```
 
-2. `mods` 폴더에 **Fabric API** 와 **`dist/abilitywar-2.8.0.jar`** 를 넣습니다.
+2. `mods` 폴더에 **Fabric API** 와 **`dist/abilitywar-2.8.1.jar`** 를 넣습니다.
    보스 모드도 쓰려면 위의 모드팩이나 다운로드 스크립트를 쓰세요 (`dist/boss_mods/` 에는 2.7 까지의 보스 모드 jar 16개가 그대로 있고, 설명은 `dist/boss_mods/README.md`).
 3. 게임 실행 → 월드 접속 → 처음 들어오면 **1차 직업 선택 화면**이 뜹니다 (전사·마법사·탱커·힐러).
    관리자는 `/aw set <직업>` 으로 아무 직업이나 바로 지정할 수 있습니다: `warrior` `mage` `tank` `healer` / `void` `dragon` `blade` `blood` `cantor` `warlock` `angel` `guardian`
@@ -350,7 +361,7 @@ irm https://raw.githubusercontent.com/tmdtn08008-collab/survey/claude/blissful-c
 | 2 | **공허 파동** | 주먹에 공허를 모았다가 폭발 — 앞쪽 적에게 큰 피해 + **멀리 날려버림** + 뇌진탕. 벽에 부딪히면 추가 피해 | 8 (+2) | 12초 |
 | 3 | **공허 난무** | 적(20칸)에게 순간이동 → **4연타** → 바닥에 내리꽂기. 적이 땅에서 **3칸 이상 떠 있으면 바로 내리꽂고 같은 피해(10)** | 1.25×4 + 5 | 16초 |
 | 4 | **공허 반격** | 0.8초 반격 자세. 이때 평타·스킬에 맞으면 **피해 무효** → 공허로 막고 **얼굴 강타** → **아래로 찍기**. 궁극기는 반격 불가. 실패하면 막는 모션만 | 4 + 4 | 8초 (실패 10초) |
-| R | **사건의 지평선** | 게이지가 차면 사용. 블랙홀 소환 — 주변(14칸)을 빨아들이고, 중심에 붙잡히면 빠져나갈 수 없으며 **최대 체력의 75%** 를 잃음 (**보스는 최대 체력의 10% 고정** — 장비·스탯 배율 없음). **10블록 안의 플레이어는 궁극기 연출(시네마틱)** 을 보게 됨 | 최대 체력 75% (보스 10%) | 게이지 |
+| R | **사건의 지평선** | 게이지가 차면 사용. (2초 각성 연출 뒤) 블랙홀 소환 — 11.5초 동안 주변(14칸, 확장 단계에서 18칸)을 빨아들이고, 중심에 붙잡히면 빠져나갈 수 없으며 **최대 체력의 75%** 를 잃음 (**보스는 최대 체력의 10% 고정** — 장비·스탯 배율 없음). **10블록 안의 플레이어는 궁극기 연출(시네마틱)** 을 보게 됨 | 최대 체력 75% (보스 10%) | 게이지 |
 | T | **그림자 이동** | 그림자 속으로 가라앉아(무적, 이동 속도 증가) 원하는 그림자에서 나옴: **다른 생명체의 그림자**(그 뒤에서 등장) 또는 **어두운 곳/하늘이 가려진 곳**. 최대 4초 | – | 12초 |
 | F | **막기** | 앞에서 오는 평타 80%, 스킬 50% 감소 (잡기·궁극기는 못 막음). 막는 동안 느려짐 | – | – |
 | Q | **대시** (공통) | 누르고 있는 이동키 방향(WASD, 없으면 앞)으로 약 6칸 돌진. 공중에서도 가능. 막기 중이면 막기를 풀고 대시. 공허는 보랏빛 잔상과 그림자가 남음 | – | 3초 |
@@ -635,7 +646,7 @@ RPG 의 버퍼 역할. 찬가로 **자신과 같은 팀**(`/team`)을 강화하�
 
 ### 🆕 같이 쓰는 보스 · 드래곤 · 생명체 모드
 
-**가장 쉬운 방법: 모드팩 `dist/abilitywar-rpg-2.8.0.mrpack`** (위의 설치 참고). 직접 넣으려면 `dist/boss_mods/` 의 jar 16개 + 다운로드 스크립트로 2.8 에 새로 들어간 모드를 받으세요 (**Fabric Loader 0.19.5 이상** 필요). 무엇이 어느 모드용인지는 `dist/boss_mods/README.md`.
+**가장 쉬운 방법: 모드팩 `dist/abilitywar-rpg-2.8.1.mrpack`** (위의 설치 참고). 직접 넣으려면 `dist/boss_mods/` 의 jar 16개 + 다운로드 스크립트로 2.8 에 새로 들어간 모드를 받으세요 (**Fabric Loader 0.19.5 이상** 필요). 무엇이 어느 모드용인지는 `dist/boss_mods/README.md`.
 
 **Bosses of Mass Destruction** (LGPL, 보스마다 전용 경기장 구조물)
 
@@ -1017,7 +1028,7 @@ RPG 를 위한 무기와 방어구입니다. 등급은 8개이고, 등급마다 
 | `/aw gold <add\|set\|take> <양> [플레이어]` | 돈 (G) 주기 · 정하기 · 빼기 (OP) |
 | `/aw goto <장소>` | 가장 가까운 마을·던전으로 이동: `town`, `fallen_fortress`, `ember_altar`, `frost_temple`, `wyvern_roost`, `goblin_camp` (`capital` = 수도) (OP) |
 
-게임 규칙: `abilitywarNoCooldown`(쿨타임 없음, 테스트용), `abilitywarSelfSelect`(**기본 꺼짐** — 켜면 B 직업 트리에서 누구나 아무 직업이나 바로 고름), `abilitywarCinematicRadius`(궁극기 연출 반경, 기본 10), `abilitywarUltChargePercent`(게이지 충전 배율 %), `abilitywarFirstJoinSelect`(처음 접속 시 직업 선택 화면),
+게임 규칙: `abilitywarUltPrelude`(궁극기 앞 2초 각성 연출, 기본 켜짐 — 끄면 바로 궁극기), `abilitywarNoCooldown`(쿨타임 없음, 테스트용), `abilitywarSelfSelect`(**기본 꺼짐** — 켜면 B 직업 트리에서 누구나 아무 직업이나 바로 고름), `abilitywarCinematicRadius`(궁극기 연출 반경, 기본 10), `abilitywarUltChargePercent`(게이지 충전 배율 %), `abilitywarFirstJoinSelect`(처음 접속 시 직업 선택 화면),
 `abilitywarJobLevel`(2차 전직 레벨, 기본 30), `abilitywarGrandLevel`(3차 전직 레벨, 기본 60), `abilitywarXpRate`(경험치 배율 %, 기본 100), `abilitywarGearLevel`(장비 착용 레벨 제한, 기본 켜짐),
 `abilitywarWildBosses`(야생 보스, 기본 켜짐), `abilitywarWildBossChance`(야생 보스 확률 %, 기본 15).
 `/team` 으로 같은 팀이 된 플레이어는 스킬에 맞지 않습니다.
@@ -1042,7 +1053,7 @@ RPG 를 위한 무기와 방어구입니다. 등급은 8개이고, 등급마다 
 ## 개발자용
 
 ```
-./gradlew build          # build/libs/abilitywar-2.8.0.jar
+./gradlew build          # build/libs/abilitywar-2.8.1.jar
 python3 tools/modpack.py --check   # dist/abilitywar-rpg-<버전>.mrpack + dist/download_mods.ps1 (모드 목록은 이 파일 안)
 ./gradlew runClient      # 개발 클라이언트
 python3 tools/gen_textures.py     # 이펙트/아이콘 텍스처 다시 생성

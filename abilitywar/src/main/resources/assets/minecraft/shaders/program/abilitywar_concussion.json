@@ -12,6 +12,7 @@
     {"name": "VoidAmount", "type": "float", "count": 1, "values": [0.0]},
     {"name": "Time", "type": "float", "count": 1, "values": [0.0]},
     {"name": "TintDark", "type": "float", "count": 3, "values": [0.01, 0.0, 0.035]},
-    {"name": "TintLight", "type": "float", "count": 3, "values": [0.42, 0.22, 0.78]}
+    {"name": "TintLight", "type": "float", "count": 3, "values": [0.42, 0.22, 0.78]},
+    {"name": "Radial", "type": "float", "count": 1, "values": [0.0]}
   ]
 }

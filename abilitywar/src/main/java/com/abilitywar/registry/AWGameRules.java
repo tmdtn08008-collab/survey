@@ -14,6 +14,9 @@ public final class AWGameRules {
     /** 궁극기 연출(시네마틱)이 재생되는 반경 (블록). */
     public static final GameRules.Key<GameRules.IntRule> CINEMATIC_RADIUS =
             GameRuleRegistry.register("abilitywarCinematicRadius", GameRules.Category.PLAYER, GameRuleFactory.createIntRule(10, 0, 64));
+    /** 궁극기 앞의 각성 연출 (2초: 시간 정지 · 얼굴 클로즈업 · 컷인). 끄면 바로 궁극기. */
+    public static final GameRules.Key<GameRules.BooleanRule> ULT_PRELUDE =
+            GameRuleRegistry.register("abilitywarUltPrelude", GameRules.Category.PLAYER, GameRuleFactory.createBooleanRule(true));
     /** 궁극기 게이지 충전 배율 (%). */
     public static final GameRules.Key<GameRules.IntRule> ULT_CHARGE_PERCENT =
             GameRuleRegistry.register("abilitywarUltChargePercent", GameRules.Category.PLAYER, GameRuleFactory.createIntRule(100, 0, 10000));

@@ -6,6 +6,7 @@ uniform float VoidAmount;
 uniform float Time;
 uniform vec3 TintDark;
 uniform vec3 TintLight;
+uniform float Radial;
 
 in vec2 texCoord;
 in vec2 oneTexel;
@@ -19,6 +20,13 @@ void main() {
     // 울렁임
     uv += vec2(sin(uv.y * 11.0 + Time * 2.3), cos(uv.x * 9.0 + Time * 1.9)) * 0.0035 * s;
     vec3 base = texture(DiffuseSampler, uv).rgb;
+    // 궁극기 각성: 가운데로 빨려드는 방사형 흐림
+    float rz = clamp(Radial, 0.0, 1.0);
+    if (rz > 0.001) {
+        vec3 acc = vec3(0.0);
+        for (int i = 0; i < 12; i++) acc += texture(DiffuseSampler, uv - c * (float(i) / 12.0) * 0.16 * rz).rgb;
+        base = mix(base, acc / 12.0, rz);
+    }
     // 흐림
     vec3 blur = vec3(0.0);
     float rad = 4.0 * s;
