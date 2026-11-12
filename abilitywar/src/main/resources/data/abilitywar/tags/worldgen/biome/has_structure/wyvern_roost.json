@@ -10,6 +10,22 @@
     "minecraft:meadow",
     "minecraft:grove",
     "minecraft:snowy_slopes",
-    "minecraft:cherry_grove"
+    "minecraft:cherry_grove",
+    {
+      "id": "#c:mountain",
+      "required": false
+    },
+    {
+      "id": "#c:mountain_peak",
+      "required": false
+    },
+    {
+      "id": "#c:mountain_slope",
+      "required": false
+    },
+    {
+      "id": "#c:extreme_hills",
+      "required": false
+    }
   ]
 }

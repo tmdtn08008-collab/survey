@@ -383,10 +383,12 @@ public final class BossFx {
             }
             if (wy.hurtTime > 0) p.shake = wy.hurtTime / 10f;
             float yaw = MathHelper.lerpAngleDegrees(td, wy.prevBodyYaw, wy.bodyYaw);
-            float scale = 0.32f;
-            Vec3d pos = e.getLerpedPos(td).subtract(0, 4.4 * scale - 1.0, 0);
+            boolean king = e instanceof com.abilitywar.mob.DragonKingEntity, drake = e instanceof com.abilitywar.mob.DrakeEntity;
+            float scale = king ? 0.5f : drake ? 0.15f : 0.32f;
+            Vec3d pos = e.getLerpedPos(td).subtract(0, 4.4 * scale - (king ? 1.6 : drake ? 0.5 : 1.0), 0);
             float alpha = e.isAlive() ? 1f : 1f - wy.deathTime / 20f;
-            ElderDragon.render(c, pos, yaw, scale, p, alpha, wy.enraged() ? 1.3f : 0.9f);
+            ElderDragon.render(c, pos, yaw, scale, p, alpha, wy.enraged() ? 1.3f : king ? 1.1f : 0.9f,
+                    king ? ElderDragon.AZURE : drake ? ElderDragon.JADE : ElderDragon.RED);
             lastMouth.put(e.getId(), ElderDragon.lastMouth);
             c.imm.draw();
         }

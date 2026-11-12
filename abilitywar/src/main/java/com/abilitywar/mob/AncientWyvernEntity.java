@@ -27,6 +27,12 @@ import java.util.Set;
 public class AncientWyvernEntity extends BossEntity {
     public static final int SWOOP = 1, BREATH = 2, BARRAGE = 3, GUST = 4;
     public static final int FIRE = 0xFF8A30;
+
+    /** 숨결 · 불덩이 색. */
+    protected int fireColor() {
+        return FIRE;
+    }
+
     double orbit;
     Vec3d swoopFrom = Vec3d.ZERO, swoopTo = Vec3d.ZERO;
     final Set<Integer> hitOnce = new HashSet<>();
@@ -35,7 +41,11 @@ public class AncientWyvernEntity extends BossEntity {
     int count;
 
     public AncientWyvernEntity(EntityType<? extends HostileEntity> type, World world) {
-        super(type, world, BossBar.Color.PURPLE);
+        this(type, world, BossBar.Color.PURPLE);
+    }
+
+    protected AncientWyvernEntity(EntityType<? extends HostileEntity> type, World world, BossBar.Color color) {
+        super(type, world, color);
         setNoGravity(true);
         orbit = random.nextDouble() * Math.PI * 2;
     }
@@ -87,7 +97,7 @@ public class AncientWyvernEntity extends BossEntity {
             Vec3d at = new Vec3d(b[0], b[1], b[2]);
             NbtCompound s = new NbtCompound();
             s.putFloat("r", 2.6f);
-            s.putInt("col", FIRE);
+            s.putInt("col", fireColor());
             AWNet.fx((ServerWorld) getWorld(), at, "boss_slam", s);
             for (LivingEntity v : victims(at.add(0, 0.6, 0), 2.6)) {
                 hurt(v, 8, false);
@@ -101,8 +111,16 @@ public class AncientWyvernEntity extends BossEntity {
     @Override
     protected void idleMove(LivingEntity target, double dist) {
         orbit += enraged() ? 0.035 : 0.025;
-        Vec3d to = target.getPos().add(Math.cos(orbit) * 14, 10 + Math.sin(age * 0.03) * 2, Math.sin(orbit) * 14);
+        Vec3d to = target.getPos().add(Math.cos(orbit) * orbitRadius(), orbitHeight() + Math.sin(age * 0.03) * 2, Math.sin(orbit) * orbitRadius());
         flyTo(to, enraged() ? 0.9 : 0.7);
+    }
+
+    protected double orbitRadius() {
+        return 14;
+    }
+
+    protected double orbitHeight() {
+        return 10;
     }
 
     @Override
@@ -132,7 +150,7 @@ public class AncientWyvernEntity extends BossEntity {
                     dir = dir.normalize();
                     swoopFrom = tp.subtract(dir.multiply(16)).add(0, 9, 0);
                     swoopTo = tp.add(dir.multiply(14)).add(0, 1.5, 0);
-                    for (int k = -2; k <= 3; k++) warn(tp.add(dir.multiply(k * 2.5)).add(0, -1.2, 0), 2.2f, 24, FIRE);
+                    for (int k = -2; k <= 3; k++) warn(tp.add(dir.multiply(k * 2.5)).add(0, -1.2, 0), 2.2f, 24, fireColor());
                     playSound(SoundEvents.ENTITY_ENDER_DRAGON_GROWL, 3f, 1.2f);
                 }
                 if (t < 12) flyTo(swoopFrom, 1.2);
@@ -175,7 +193,7 @@ public class AncientWyvernEntity extends BossEntity {
                     NbtCompound n = new NbtCompound();
                     n.putInt("c", getId());
                     n.putInt("d", 36);
-                    n.putInt("col", FIRE);
+                    n.putInt("col", fireColor());
                     n.putFloat("len", 13);
                     AWNet.fx(w, getPos(), "boss_breath", n);
                 }
@@ -196,10 +214,10 @@ public class AncientWyvernEntity extends BossEntity {
                 if (target != null) idleMove(target, 20);
                 if (target != null && t % 4 == 0 && t <= 24) {
                     Vec3d at = target.getPos().add(random.nextGaussian() * 2.5, 0, random.nextGaussian() * 2.5);
-                    warn(at, 2.6f, 16, FIRE);
+                    warn(at, 2.6f, 16, fireColor());
                     NbtCompound m = new NbtCompound();
                     m.putInt("t", 16);
-                    m.putInt("col", FIRE);
+                    m.putInt("col", fireColor());
                     m.putInt("c", getId());
                     AWNet.fx(w, at, "boss_meteor", m);
                     pendingBombs.add(new double[]{at.x, at.y, at.z, age + 16});

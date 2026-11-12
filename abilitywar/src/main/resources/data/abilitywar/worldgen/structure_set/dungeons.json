@@ -19,6 +19,10 @@
     {
       "structure": "abilitywar:goblin_camp",
       "weight": 5
+    },
+    {
+      "structure": "abilitywar:dragon_nest",
+      "weight": 2
     }
   ],
   "placement": {

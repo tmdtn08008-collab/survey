@@ -29,6 +29,7 @@ public final class DungeonPlans {
             case FROST_TEMPLE -> frost(b, x, y, z, r);
             case WYVERN_ROOST -> roost(b, x, y, z, r);
             case GOBLIN_CAMP -> camp(b, x, y, z, r);
+            case DRAGON_NEST -> nest(b, x, y, z, r);
             default -> {
             }
         }
@@ -346,6 +347,99 @@ public final class DungeonPlans {
     }
 
     // ================================================================ 고룡 둥지 (산 위 바위 기둥)
+    /**
+     * 용의 둥지 (용왕): 산꼭대기 바위 받침 위 움푹한 둥지. 금 더미 · 거대한 용의 알 셋 · 둥지를 감싼 거대한 갈비뼈,
+     * 가운데 용왕 제단, 위를 맴도는 비룡들, 상자 (보스방 보상) 셋.
+     */
+    static void nest(Blueprint b, int cx, int by, int cz, Random r) {
+        int depth = 30;
+        BlockState[] rock = {s(Blocks.STONE), s(Blocks.ANDESITE), s(Blocks.DEEPSLATE), s(Blocks.BLACKSTONE), s(Blocks.BASALT), s(Blocks.TUFF)};
+        int[] rw = {30, 15, 20, 15, 12, 8};
+        // 바위 받침: 아래로 넓어짐
+        b.fn(cx - 24, by - depth, cz - 24, cx + 24, by, cz + 24, (x, y, z) -> {
+            double rr = 15.5 + (by - y) * 0.26 + (Math.floorMod(Build.hash(x >> 1, y >> 2, z >> 1), 5) - 2) * 0.5;
+            double d = Math.sqrt(sq(x - cx) + sq(z - cz));
+            return d > rr ? null : mix(x, y, z, rock, rw);
+        });
+        // 위를 비움
+        b.fn(cx - 18, by + 1, cz - 18, cx + 18, by + 22, cz + 18, (x, y, z) -> sq(x - cx) + sq(z - cz) <= 18 * 18 ? s(Blocks.AIR) : null);
+        // 움푹한 둥지 바닥 (금 더미 섞임)
+        BlockState[] hoard = {s(Blocks.COARSE_DIRT), s(Blocks.GRAVEL), s(Blocks.GOLD_BLOCK), s(Blocks.RAW_GOLD_BLOCK), s(Blocks.GILDED_BLACKSTONE), s(Blocks.BONE_BLOCK), s(Blocks.HAY_BLOCK)};
+        int[] hw = {25, 15, 8, 10, 15, 12, 15};
+        b.fn(cx - 11, by - 3, cz - 11, cx + 11, by, cz + 11, (x, y, z) -> {
+            double d = Math.sqrt(sq(x - cx) + sq(z - cz));
+            if (d > 11) return null;
+            int floor = by - (d < 8 ? 2 : d < 10 ? 1 : 0);
+            if (y > floor) return s(Blocks.AIR);
+            return y == floor ? mix(x, y, z, hoard, hw) : mix(x, y, z, rock, rw);
+        });
+        // 둥지 테 (통나무 · 뼈 · 건초 · 마른 덤불)
+        b.fn(cx - 15, by, cz - 15, cx + 15, by + 4, cz + 15, (x, y, z) -> {
+            double d = Math.sqrt(sq(x - cx) + sq(z - cz));
+            int ly = y - by;
+            double outer = 14.6 - ly * 0.7, inner = 11.2 - ly * 0.15;
+            if (d >= outer || d < inner) return null;
+            int h = h100(x, y, z);
+            if (h < 32) return Build.log(Blocks.DARK_OAK_LOG, ((x + y) & 1) == 0 ? Direction.Axis.X : Direction.Axis.Z);
+            if (h < 52) return s(Blocks.BONE_BLOCK);
+            if (h < 70) return s(Blocks.HAY_BLOCK);
+            if (h < 82) return Build.log(Blocks.SPRUCE_LOG, Direction.Axis.Y);
+            if (h < 90) return s(Blocks.GILDED_BLACKSTONE);
+            return ly >= 1 ? s(Blocks.DEAD_BUSH) : s(Blocks.COARSE_DIRT);
+        });
+        // 둥지를 감싼 거대한 갈비뼈 6 개 (안쪽으로 휨)
+        for (int k = 0; k < 6; k++) {
+            double a = k * Math.PI / 3 + 0.25;
+            for (double t = 0; t <= 0.86; t += 0.02) {
+                double rad = 15.5 - 7.5 * t * t;
+                int y = by + (int) Math.round(15 * Math.sin(t * Math.PI / 2));
+                int x = cx + (int) Math.round(Math.cos(a) * rad), z = cz + (int) Math.round(Math.sin(a) * rad);
+                b.set(x, y, z, s(Blocks.BONE_BLOCK));
+                if (t < 0.45) b.set(x, y + 1, z, s(Blocks.BONE_BLOCK));
+            }
+        }
+        // 거대한 용의 알 셋 (푸른 껍데기 · 금빛 점)
+        BlockState[] shell = {s(Blocks.BLUE_CONCRETE), s(Blocks.LIGHT_BLUE_CONCRETE), s(Blocks.CYAN_TERRACOTTA), s(Blocks.GOLD_BLOCK)};
+        int[] sw = {50, 22, 16, 12};
+        for (int k = 0; k < 3; k++) {
+            double a = k * Math.PI * 2 / 3 + 0.9;
+            int ex = cx + (int) Math.round(Math.cos(a) * 5.5), ez = cz + (int) Math.round(Math.sin(a) * 5.5), ey = by - 1;
+            b.fn(ex - 2, ey, ez - 2, ex + 2, ey + 4, ez + 2, (x, y, z) -> {
+                double dx = (x - ex) / 1.7, dy = (y - ey - 1.8) / 2.4, dz = (z - ez) / 1.7;
+                return dx * dx + dy * dy + dz * dz <= 1.0 ? mix(x, y, z, shell, sw) : null;
+            });
+        }
+        // 가운데: 금빛 단 위 용왕 제단
+        b.fill(cx - 2, by - 2, cz - 2, cx + 2, by - 2, cz + 2, s(Blocks.GILDED_BLACKSTONE));
+        b.fill(cx - 1, by - 1, cz - 1, cx + 1, by - 1, cz + 1, s(Blocks.GOLD_BLOCK));
+        altar(b, cx, by, cz, "dragon_king");
+        for (int k = 0; k < 4; k++) {
+            int px = cx + (k < 2 ? -3 : 3), pz = cz + (k % 2 == 0 ? -3 : 3);
+            b.fill(px, by - 1, pz, px, by + 2, pz, s(Blocks.POLISHED_BLACKSTONE_WALL));
+            b.set(px, by + 3, pz, s(Blocks.SOUL_LANTERN));
+        }
+        chest(b, cx + 8, by - 1, cz, Direction.WEST, 2);
+        chest(b, cx - 8, by - 1, cz, Direction.EAST, 2);
+        chest(b, cx, by - 1, cz + 8, Direction.NORTH, 1);
+        // 둥지 위를 맴도는 비룡
+        for (int k = 0; k < 3; k++) {
+            double a = k * Math.PI * 2 / 3;
+            mob(b, cx + (int) Math.round(Math.cos(a) * 9), by + 8 + k, cz + (int) Math.round(Math.sin(a) * 9), AWMobs.DRAKE);
+        }
+        // 나선 비탈길 (받침 바깥, 아래에서 위로)
+        for (int i = 0; i <= depth; i++) {
+            int y = by - depth + i;
+            double rr = 15.5 + (by - y) * 0.26;
+            double a0 = i * 0.36;
+            for (double a = a0; a < a0 + 0.4; a += 0.04)
+                for (double dr = 0.4; dr <= 2.6; dr += 0.6) {
+                    int x = cx + (int) Math.round(Math.cos(a) * (rr + dr)), z = cz + (int) Math.round(Math.sin(a) * (rr + dr));
+                    b.set(x, y, z, h100(x, y, z) < 70 ? s(Blocks.POLISHED_BLACKSTONE_BRICKS) : s(Blocks.CRACKED_POLISHED_BLACKSTONE_BRICKS));
+                    b.fill(x, y + 1, z, x, y + 3, z, s(Blocks.AIR));
+                }
+        }
+    }
+
     static void roost(Blueprint b, int cx, int by, int cz, Random r) {
         int depth = 26;
         BlockState[] rock = {s(Blocks.STONE), s(Blocks.ANDESITE), s(Blocks.TUFF), s(Blocks.COBBLESTONE), s(Blocks.DEEPSLATE), s(Blocks.CALCITE)};
@@ -459,6 +553,7 @@ public final class DungeonPlans {
         spawner(b, cx, by + 1, cz - 5, AWMobs.GOBLIN);
         for (int k = 0; k < 4; k++) mob(b, cx - 3 + k * 2, by + 1, cz + (k % 2 == 0 ? 5 : -6), AWMobs.GOBLIN);
         mob(b, cx, by + 1, cz + 7, AWMobs.ORC);
+        if (r.nextInt(3) == 0) mob(b, cx + 2, by + 1, cz - 2, AWMobs.GOBLIN_LORD);
     }
 
     private DungeonPlans() {

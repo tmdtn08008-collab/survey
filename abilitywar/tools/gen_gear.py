@@ -28,6 +28,8 @@ SHEETS = os.path.join(ROOT, 'tools', 'art', 'gear_sheets')
 FONT = '/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc'
 
 TIER = {g[0]: i for i, g in enumerate(D.GRADES)}
+# --only <등급>: 그 등급 그림만 새로 그림
+ONLY = sys.argv[sys.argv.index('--only') + 1] if '--only' in sys.argv else None
 
 
 def josa(word, a, b):
@@ -43,27 +45,27 @@ def r1(x):
 
 
 # ================================================================ 능력치
-ATK = [4.0, 5.5, 7.0, 9.0, 11.5, 14.0, 17.0, 20.0]
-ABIL = [0.03, 0.06, 0.10, 0.15, 0.21, 0.28, 0.36, 0.45]
+ATK = [4.0, 5.5, 7.0, 9.0, 11.5, 14.0, 17.0, 20.0, 30.0]
+ABIL = [0.03, 0.06, 0.10, 0.15, 0.21, 0.28, 0.36, 0.45, 0.65]
 BONUS = {
-    'max_health': [1, 2, 2, 3, 4, 5, 6, 8],
-    'move_speed': [0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.09, 0.1],
-    'cooldown': [0.02, 0.03, 0.04, 0.05, 0.07, 0.09, 0.11, 0.13],
-    'lifesteal': [0.01, 0.015, 0.02, 0.03, 0.04, 0.05, 0.06, 0.08],
-    'ult_charge': [0.05, 0.08, 0.1, 0.14, 0.18, 0.22, 0.28, 0.35],
-    'armor': [1, 1, 2, 2, 3, 3, 4, 5],
-    'crit_chance': [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08],
-    'crit_damage': [0.05, 0.08, 0.12, 0.16, 0.2, 0.25, 0.32, 0.4],
-    'knockback_resistance': [0.03, 0.05, 0.07, 0.1, 0.13, 0.16, 0.2, 0.25],
-    'luck': [1, 1, 1, 1, 2, 2, 3, 3],
-    'ability_damage': [0.02, 0.03, 0.04, 0.05, 0.07, 0.09, 0.11, 0.14],
-    'damage_reduction': [0.01, 0.015, 0.02, 0.025, 0.03, 0.04, 0.05, 0.06],
+    'max_health': [1, 2, 2, 3, 4, 5, 6, 8, 10],
+    'move_speed': [0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.09, 0.1, 0.115],
+    'cooldown': [0.02, 0.03, 0.04, 0.05, 0.07, 0.09, 0.11, 0.13, 0.15],
+    'lifesteal': [0.01, 0.015, 0.02, 0.03, 0.04, 0.05, 0.06, 0.08, 0.1],
+    'ult_charge': [0.05, 0.08, 0.1, 0.14, 0.18, 0.22, 0.28, 0.35, 0.42],
+    'armor': [1, 1, 2, 2, 3, 3, 4, 5, 6],
+    'crit_chance': [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.092],
+    'crit_damage': [0.05, 0.08, 0.12, 0.16, 0.2, 0.25, 0.32, 0.4, 0.48],
+    'knockback_resistance': [0.03, 0.05, 0.07, 0.1, 0.13, 0.16, 0.2, 0.25, 0.3],
+    'luck': [1, 1, 1, 1, 2, 2, 3, 3, 3],
+    'ability_damage': [0.02, 0.03, 0.04, 0.05, 0.07, 0.09, 0.11, 0.14, 0.17],
+    'damage_reduction': [0.01, 0.015, 0.02, 0.025, 0.03, 0.04, 0.05, 0.06, 0.07],
 }
 INT_STATS = {'max_health', 'armor', 'luck'}
 W_BONUS_KEYS = ['max_health', 'move_speed', 'cooldown', 'lifesteal', 'ult_charge', 'armor', 'crit_chance', 'crit_damage', 'knockback_resistance', 'luck']
 A_BONUS_KEYS = ['max_health', 'ability_damage', 'cooldown', 'move_speed', 'crit_chance', 'lifesteal', 'damage_reduction', 'ult_charge', 'knockback_resistance']
-N_BONUS_W = [None, 1, 2, 2, 3, 3, 4, 4]
-N_BONUS_A = [0, None, 1, 1, 2, 2, 3, 3]
+N_BONUS_W = [None, 1, 2, 2, 3, 3, 4, 4, 5]
+N_BONUS_A = [0, None, 1, 1, 2, 2, 3, 3, 4]
 
 
 def bonus_value(key, t, rng):
@@ -87,12 +89,12 @@ def weapon_effect(t, mat_key, rng, forced=None):
 
 
 def make_effect(key, t, rng):
-    chance = [0, 0, 0, 0.15, 0.2, 0.25, 0.3, 0.32][t]
-    secs = [0, 0, 0, 3, 4, 5, 6, 6][t]
-    power = {'lightning': [0, 0, 0, 3, 4, 6, 8, 9], 'vampire': [0, 0, 0, 5, 8, 11, 15, 18], 'holy': [0, 0, 0, 1, 2, 2, 3, 4],
-             'execute': [0, 0, 0, 30, 45, 60, 80, 90], 'chain': [0, 0, 0, 40, 50, 60, 75, 80], 'explode': [0, 0, 0, 2, 3, 4, 6, 7]}.get(key, [0] * 8)[t]
+    chance = [0, 0, 0, 0.15, 0.2, 0.25, 0.3, 0.32, 0.368][t]
+    secs = [0, 0, 0, 3, 4, 5, 6, 6, 7][t]
+    power = {'lightning': [0, 0, 0, 3, 4, 6, 8, 9, 10], 'vampire': [0, 0, 0, 5, 8, 11, 15, 18, 21], 'holy': [0, 0, 0, 1, 2, 2, 3, 4, 5],
+             'execute': [0, 0, 0, 30, 45, 60, 80, 90, 104], 'chain': [0, 0, 0, 40, 50, 60, 75, 80, 92], 'explode': [0, 0, 0, 2, 3, 4, 6, 7, 8]}.get(key, [0] * 9)[t]
     if key == 'haste':
-        secs = [0, 0, 0, 1, 1, 1.5, 2, 2][t]
+        secs = [0, 0, 0, 1, 1, 1.5, 2, 2, 2.3][t]
     return {'id': key, 'chance': r1(chance * rng.uniform(0.9, 1.1)), 'seconds': secs, 'power': power}
 
 
@@ -140,6 +142,9 @@ def build_weapons():
         elif gkey == 'secret':
             for (ko, en, kind, mat, hand, gem, lko, len_) in D.SECRET_WEAPONS:
                 items.append(dict(kind=kind, mat=mat, hand=hand, gem=gem, ko=ko, en=en, lore_ko=lko, lore_en=len_))
+        elif gkey == 'arvantia':
+            for (ko, en, kind, mat, hand, gem, lko, len_) in D.ARVANTIA_WEAPONS:
+                items.append(dict(kind=kind, mat=mat, hand=hand, gem=gem, ko=ko, en=en, lore_ko=lko, lore_en=len_))
         else:
             for i, (kind, mat) in enumerate(D.UNKNOWN_WEAPONS):
                 items.append(dict(kind=kind, mat=mat, hand='dark', gem='void', ko=f'??? #{i + 1:02d}', en=f'??? #{i + 1:02d}'))
@@ -166,6 +171,11 @@ def build_weapons():
                     effects[1] = make_effect('lightning' if effects[0]['id'] != 'lightning' else 'chain', t, irng)
             elif gkey == 'unknown':
                 effects = [{'id': 'chaos', 'chance': 0.35, 'seconds': 5, 'power': 8}]
+            elif gkey == 'arvantia':
+                keys = [D.MAT_EFFECT.get(it['mat'], 'chain'), 'lightning', 'vampire', 'execute', 'holy', 'void', 'chain', 'explode']
+                keys = list(dict.fromkeys(keys))
+                irng.shuffle(keys)
+                effects = [make_effect(k, t, irng) for k in keys[:3]]
             else:
                 effects = weapon_effect(t, it['mat'], irng)
             wid = f'w_{gkey}_{n + 1:03d}'
@@ -175,7 +185,7 @@ def build_weapons():
 
 
 # ================================================================ 갑옷 목록
-PROT = [7, 11, 15, 18, 20, 22, 24, 26]
+PROT = [7, 11, 15, 18, 20, 22, 24, 26, 32]
 SPLIT = {'helmet': 0.16, 'chestplate': 0.38, 'leggings': 0.3, 'boots': 0.16}
 STYLE_PROT = {'robe': 0.75, 'leather': 0.85, 'assassin': 0.85, 'bone': 0.95, 'chain': 1.0, 'scale': 1.0, 'crystal': 0.95,
               'plate': 1.1, 'knight': 1.12, 'dragon': 1.08, 'angel': 1.0, 'demon': 1.05}
@@ -222,6 +232,9 @@ def build_armors():
         elif gkey == 'secret':
             for (ko, en, style, mat, gem, lko, len_) in D.SECRET_ARMORS:
                 sets.append(dict(style=style, mat=mat, trim='gold', gem=gem, ko=ko, en=en, mode='secret', lore_ko=lko, lore_en=len_))
+        elif gkey == 'arvantia':
+            for (ko, en, style, mat, gem, lko, len_) in D.ARVANTIA_ARMORS:
+                sets.append(dict(style=style, mat=mat, trim='gold', gem=gem, ko=ko, en=en, mode='secret', lore_ko=lko, lore_en=len_))
         else:
             for i, mat in enumerate(D.UNKNOWN_ARMORS):
                 sets.append(dict(style=D.UNKNOWN_STYLES[i], mat=mat, trim='void', gem='void', ko=f'??? #{i + 1:02d}', en=f'??? #{i + 1:02d}', mode='unknown'))
@@ -238,11 +251,11 @@ def build_armors():
             for pi, (pkey, _, _) in enumerate(D.PIECES):
                 prot = max(1, int(round(total * SPLIT[pkey])))
                 stats = {'armor': prot}
-                tough = [0, 0, 0.5, 1, 1.5, 2, 2.5, 3][t]
+                tough = [0, 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5][t]
                 if tough:
                     stats['toughness'] = tough
                 if t >= 4:
-                    stats['knockback_resistance'] = r1([0, 0, 0, 0, 0.025, 0.05, 0.075, 0.1][t])
+                    stats['knockback_resistance'] = r1([0, 0, 0, 0, 0.025, 0.05, 0.075, 0.1, 0.125][t])
                 nb = N_BONUS_A[t] if N_BONUS_A[t] is not None else irng.choice([0, 1])
                 for k, v in pick_bonus(A_BONUS_KEYS, nb, t, irng).items():
                     stats[k] = r1(stats.get(k, 0) + v)
@@ -261,18 +274,22 @@ def build_armors():
             # 세트 효과
             set_stats, set_fx = {}, []
             if t >= 2:
-                set_stats['max_health'] = [0, 0, 2, 4, 6, 8, 10, 12][t]
+                set_stats['max_health'] = [0, 0, 2, 4, 6, 8, 10, 12, 14][t]
                 if style in ('robe', 'crystal', 'angel'):
-                    set_stats['ability_damage'] = r1([0, 0, 0.04, 0.06, 0.08, 0.1, 0.13, 0.16][t])
+                    set_stats['ability_damage'] = r1([0, 0, 0.04, 0.06, 0.08, 0.1, 0.13, 0.16, 0.19][t])
                 elif style in ('assassin', 'leather'):
-                    set_stats['crit_chance'] = r1([0, 0, 0.03, 0.04, 0.05, 0.07, 0.09, 0.1][t])
+                    set_stats['crit_chance'] = r1([0, 0, 0.03, 0.04, 0.05, 0.07, 0.09, 0.1, 0.115][t])
                 else:
-                    set_stats['damage_reduction'] = r1([0, 0, 0.02, 0.03, 0.04, 0.05, 0.06, 0.08][t])
+                    set_stats['damage_reduction'] = r1([0, 0, 0.02, 0.03, 0.04, 0.05, 0.06, 0.08, 0.1][t])
             if t >= 4:
                 set_fx.append(D.STYLE_SET_EFFECT.get(style, 'regen'))
             if gkey == 'secret':
                 extra = irng.choice([k for k in D.SET_EFFECTS if k not in set_fx])
                 set_fx.append(extra)
+            if gkey == 'arvantia':
+                pool = [k for k in D.SET_EFFECTS if k not in set_fx]
+                irng.shuffle(pool)
+                set_fx += pool[:2]
             if gkey == 'unknown':
                 set_fx = ['chaos']
             if st['mode'] == 'prefix':
@@ -376,10 +393,14 @@ def armor_palettes():
 def write_textures(weapons, armors):
     os.makedirs(TEX_ITEM, exist_ok=True)
     os.makedirs(TEX_ARMOR, exist_ok=True)
-    for f in os.listdir(TEX_ITEM):
-        os.remove(os.path.join(TEX_ITEM, f))
-    for f in os.listdir(TEX_ARMOR):
-        os.remove(os.path.join(TEX_ARMOR, f))
+    if ONLY:
+        weapons = [w for w in weapons if w['grade'] == ONLY]
+        armors = [a for a in armors if a['grade'] == ONLY]
+    else:
+        for f in os.listdir(TEX_ITEM):
+            os.remove(os.path.join(TEX_ITEM, f))
+        for f in os.listdir(TEX_ARMOR):
+            os.remove(os.path.join(TEX_ARMOR, f))
     icons = {}
     n_over = 0
     for w in weapons:
@@ -606,9 +627,12 @@ def main():
         return
     icons = write_textures(weapons, armors)
     os.makedirs(SHEETS, exist_ok=True)
-    for f in os.listdir(SHEETS):
-        os.remove(os.path.join(SHEETS, f))
+    if not ONLY:
+        for f in os.listdir(SHEETS):
+            os.remove(os.path.join(SHEETS, f))
     for i, g in enumerate(D.GRADES):
+        if ONLY and g[0] != ONLY:
+            continue
         sheet_weapons(weapons, icons, g[0]).save(os.path.join(SHEETS, f'weapons_{i + 1}_{g[0]}.png'))
         sheet_armors(armors, icons, g[0]).save(os.path.join(SHEETS, f'armor_{i + 1}_{g[0]}.png'))
     print('textures', len(os.listdir(TEX_ITEM)), len(os.listdir(TEX_ARMOR)))

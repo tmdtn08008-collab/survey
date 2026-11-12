@@ -65,6 +65,10 @@ public final class GearTooltip {
     /** 강화 줄: "강화 +7 / 15 ★★★★★★★☆☆…" + 다음 승급 안내. */
     static void enhanceLine(ItemStack stack, GearGrade g, List<Text> out) {
         int lv = GearEnhance.level(stack);
+        if (GearEnhance.beyond(g)) {
+            beyondLine(stack, g, lv, out);
+            return;
+        }
         if (lv <= 0) return;
         MutableText stars = Text.literal("");
         for (int i = 1; i <= GearEnhance.MAX; i++) {
@@ -82,6 +86,38 @@ public final class GearTooltip {
             }
             out.add(c(Text.translatable("gear.abilitywar.ui.awaken", aw, GearEnhance.AWAKEN_MAX), GearEnhance.AWAKEN_COLOR).append(Text.literal(" ")).append(as));
         }
+    }
+
+    /** ? · 아르반티아: "강화 +37+ / 99 (초월+)" + 20칸 막대 + 다음 단계 안내. */
+    static void beyondLine(ItemStack stack, GearGrade g, int lv, List<Text> out) {
+        int stage = GearEnhance.stage(stack), col = GearEnhance.colorOf(stack);
+        if (lv <= 0 && stage == 0 && GearEnhance.awaken(stack) == 0) {
+            if (g == GearGrade.UNKNOWN) out.add(c(Text.translatable("gear.abilitywar.ui.beyond_hint"), 0x8A8A9A));
+            return;
+        }
+        MutableText bar = Text.literal("");
+        int seg = 20, fill = Math.round(lv / (float) GearEnhance.BEYOND_MAX * seg);
+        for (int i = 0; i < seg; i++) {
+            int cc = i < fill ? col : 0x3A3A44;
+            bar.append(Text.literal("▮").styled(s -> s.withColor(TextColor.fromRgb(cc))));
+        }
+        MutableText line = c(Text.translatable("gear.abilitywar.ui.enhance_beyond"), col).append(" ").append(GearEnhance.levelText(stack, lv))
+                .append(c(Text.literal(" / " + GearEnhance.BEYOND_MAX), 0x8A8A9A));
+        if (g == GearGrade.UNKNOWN && stage > 0)
+            line.append(" ").append(c(Text.translatable("gear.abilitywar.ui.stage." + stage), col));
+        out.add(line);
+        out.add(Text.literal(" ").append(bar));
+        int aw = GearEnhance.awaken(stack);
+        if (aw > 0) {
+            MutableText as = Text.literal("");
+            for (int i = 1; i <= GearEnhance.AWAKEN_MAX; i++) {
+                int cc = i <= aw ? GearEnhance.AWAKEN_COLOR : 0x3A3448;
+                as.append(Text.literal(i <= aw ? "✦" : "✧").styled(s -> s.withColor(TextColor.fromRgb(cc))));
+            }
+            out.add(c(Text.translatable("gear.abilitywar.ui.awaken", aw, GearEnhance.AWAKEN_MAX), GearEnhance.AWAKEN_COLOR).append(Text.literal(" ")).append(as));
+        }
+        GearEnhance.Ascend next = GearEnhance.nextAscend(stack);
+        if (next != null) out.add(c(Text.translatable("gear.abilitywar.ui.next_" + next.key()), 0x9A8DB8));
     }
 
     public static void weapon(GearWeaponItem item, ItemStack stack, List<Text> out) {

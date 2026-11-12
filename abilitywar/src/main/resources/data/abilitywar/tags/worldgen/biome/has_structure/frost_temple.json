@@ -5,6 +5,14 @@
     "minecraft:ice_spikes",
     "minecraft:snowy_taiga",
     "minecraft:grove",
-    "minecraft:snowy_slopes"
+    "minecraft:snowy_slopes",
+    {
+      "id": "#c:snowy_plains",
+      "required": false
+    },
+    {
+      "id": "#c:icy",
+      "required": false
+    }
   ]
 }

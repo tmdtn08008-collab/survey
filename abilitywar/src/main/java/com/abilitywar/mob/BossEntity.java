@@ -140,6 +140,24 @@ public abstract class BossEntity extends HostileEntity {
         return SoundEvents.ENTITY_WITHER_SPAWN;
     }
 
+    /**
+     * 정예 몹 (EliteEntity · 비룡): 보스처럼 공격 패턴을 쓰지만 보스는 아님.
+     * 자연 스폰 · 멀어지면 사라짐 · 체력바는 가까이 (28칸) 싸울 때만 · 등장 연출은 처음 노릴 때 · 장비 보상은 적게.
+     */
+    protected boolean elite() {
+        return false;
+    }
+
+    /** 정예: 등장 연출 (이름 카드) 을 할지. */
+    protected boolean announces() {
+        return true;
+    }
+
+    /** 정예: 체력바를 보여 줄지. */
+    protected boolean showsBossBar() {
+        return true;
+    }
+
     // ================================================================ 틱
     @Override
     protected void mobTick() {
@@ -152,9 +170,13 @@ public abstract class BossEntity extends HostileEntity {
             bar.setName(barName());
         }
         if (!(getWorld() instanceof ServerWorld sw)) return;
-        if (!introDone && age > 2) {
+        if (!introDone && (elite() ? getTarget() instanceof PlayerEntity tp && squaredDistanceTo(tp) < 24 * 24 : age > 2)) {
             introDone = true;
-            intro(sw);
+            if (announces()) intro(sw);
+        }
+        if (elite() && showsBossBar() && age % 10 == 0) {
+            for (ServerPlayerEntity p : sw.getPlayers(p -> p.squaredDistanceTo(this) < 28 * 28 && !p.isSpectator())) bar.addPlayer(p);
+            for (ServerPlayerEntity p : new java.util.ArrayList<>(bar.getPlayers())) if (p.isRemoved() || p.getWorld() != sw || p.squaredDistanceTo(this) > 36 * 36) bar.removePlayer(p);
         }
         if (!enraged() && getHealth() <= getMaxHealth() * 0.5f) {
             dataTracker.set(ENRAGED, true);
@@ -210,7 +232,7 @@ public abstract class BossEntity extends HostileEntity {
         } else idleMove(target, dist);
     }
 
-    void intro(ServerWorld sw) {
+    protected void intro(ServerWorld sw) {
         playSound(introSound(), 4f, 1f);
         NbtCompound n = new NbtCompound();
         n.putInt("e", getId());
@@ -272,7 +294,7 @@ public abstract class BossEntity extends HostileEntity {
     @Override
     public void onStartedTrackingBy(ServerPlayerEntity player) {
         super.onStartedTrackingBy(player);
-        bar.addPlayer(player);
+        if (!elite()) bar.addPlayer(player);
     }
 
     @Override
@@ -315,12 +337,17 @@ public abstract class BossEntity extends HostileEntity {
 
     @Override
     public boolean cannotDespawn() {
-        return true;
+        return !elite() || home != null;
     }
 
     @Override
     public boolean canImmediatelyDespawn(double distanceSquared) {
-        return false;
+        return elite() && home == null;
+    }
+
+    @Override
+    public boolean isPersistent() {
+        return elite() ? home != null || hasCustomName() : super.isPersistent();
     }
 
     @Override
@@ -340,25 +367,33 @@ public abstract class BossEntity extends HostileEntity {
     @Override
     protected void dropLoot(DamageSource source, boolean causedByPlayer) {
         super.dropLoot(source, causedByPlayer);
+        gearLoot();
+    }
+
+    /** 장비 하나 떨어뜨림 (빛남). */
+    protected void dropGear(GearGrade g) {
+        net.minecraft.item.Item item = null;
+        if (random.nextBoolean()) {
+            var list = GearItems.WEAPONS.get(g);
+            if (list != null && !list.isEmpty()) item = list.get(random.nextInt(list.size()));
+        } else {
+            var sets = GearItems.SETS.get(g);
+            if (sets != null && !sets.isEmpty()) {
+                var pieces = new java.util.ArrayList<>(sets.get(random.nextInt(sets.size())).pieces().values());
+                item = GearItems.BY_ID.get(pieces.get(random.nextInt(pieces.size())).id());
+            }
+        }
+        if (item == null) return;
+        ItemEntity ie = dropStack(new ItemStack(item));
+        if (ie != null) ie.setGlowing(true);
+    }
+
+    /** 보스 장비 보상 (정예 몹은 덮어씀). */
+    protected void gearLoot() {
         int n = 2 + (enraged() ? 1 : 0);
         for (int i = 0; i < n; i++) {
             float r = random.nextFloat();
-            GearGrade g = r < 0.05f ? GearGrade.SECRET : r < 0.2f ? GearGrade.MYTHIC : r < 0.5f ? GearGrade.LEGENDARY : GearGrade.HERO;
-            net.minecraft.item.Item item = null;
-            if (random.nextBoolean()) {
-                var list = GearItems.WEAPONS.get(g);
-                if (list != null && !list.isEmpty()) item = list.get(random.nextInt(list.size()));
-            } else {
-                var sets = GearItems.SETS.get(g);
-                if (sets != null && !sets.isEmpty()) {
-                    var pieces = new java.util.ArrayList<>(sets.get(random.nextInt(sets.size())).pieces().values());
-                    item = GearItems.BY_ID.get(pieces.get(random.nextInt(pieces.size())).id());
-                }
-            }
-            if (item == null) continue;
-            ItemStack st = new ItemStack(item);
-            ItemEntity ie = dropStack(st);
-            if (ie != null) ie.setGlowing(true);
+            dropGear(r < 0.05f ? GearGrade.SECRET : r < 0.2f ? GearGrade.MYTHIC : r < 0.5f ? GearGrade.LEGENDARY : GearGrade.HERO);
         }
     }
 

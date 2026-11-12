@@ -113,7 +113,8 @@ public final class RpgManager {
         if (e instanceof EnderDragonEntity) return com.abilitywar.mob.FinalDragon.GOLD;
         if (isBoss(e)) return Math.max(150, Math.round(e.getMaxHealth() * 1.5));
         if (!(e instanceof Monster) || com.abilitywar.ability.warlock.Necromancy.isMinion(e)) return 0;
-        return Math.max(1, Math.round(e.getMaxHealth() * 0.4));
+        long bonus = e instanceof com.abilitywar.mob.TrophyMob t ? t.goldBonus() : 0;
+        return Math.max(1, Math.round(e.getMaxHealth() * 0.4)) + bonus;
     }
 
     /** 보스 하나를 쓰러뜨린 것으로 셈 (다른 모드 보스 호환용): 경험치 + 전직 · 왕 · 길드 퀘스트의 "보스 처치". */
@@ -131,6 +132,7 @@ public final class RpgManager {
         if (com.abilitywar.ability.warlock.Necromancy.isMinion(e)) return 0;
         if (!(e instanceof Monster)) return 1;
         float xp = e.getMaxHealth() * 0.5f;
+        if (e instanceof com.abilitywar.mob.BossEntity) xp *= 2; // 정예 몹 (보스 아님)
         if (e instanceof WitherEntity || e instanceof EnderDragonEntity || e instanceof WardenEntity || e instanceof ElderGuardianEntity) xp *= 4;
         return Math.max(1, Math.round(xp));
     }
@@ -840,7 +842,7 @@ public final class RpgManager {
                         String[] a = arg.split(":");
                         String err = switch (action) {
                             case 10 -> Shops.buy(player, shop.kind(), a[0], a.length > 1 ? parseInt(a[1]) : 1);
-                            case 11 -> Shops.enhance(player, parseInt(a[0]), a.length > 1 && a[1].equals("1"));
+                            case 11 -> Shops.enhance(player, parseInt(a[0]), a.length > 1 && a[1].equals("1"), a.length > 2 ? parseInt(a[2]) : 1);
                             case 12 -> Shops.promote(player, parseInt(a[0]));
                             case 13 -> Shops.awaken(player, parseInt(a[0]));
                             default -> AbyssTower.start(player, parseInt(a[0]));

@@ -39,7 +39,7 @@ public class EnhanceScreen extends Screen {
     final int npc;
     int px, py, pw = 440, ph = 268;
     int selected = -1, scroll;
-    ButtonWidget enhance, promote, shop, close;
+    ButtonWidget enhance, repeat, promote, shop, close;
     /** +15 장비: 강화 단추가 각성 단추로 바뀜. */
     boolean awakenMode;
     CheckboxWidget protect;
@@ -105,6 +105,9 @@ public class EnhanceScreen extends Screen {
             if (awakenMode) RpgClient.send(13, String.valueOf(selected), npc);
             else RpgClient.send(11, selected + ":" + (protect.isChecked() ? 1 : 0), npc);
         }).dimensions(px + pw - 110, py + 150, 100, 18).build());
+        repeat = addDrawableChild(ButtonWidget.builder(Text.translatable("smith.abilitywar.btn.repeat"), b -> {
+            if (!sel().isEmpty() && !awakenMode) RpgClient.send(11, selected + ":0:20", npc);
+        }).dimensions(px + pw - 214, py + 150, 100, 18).build());
         protect = addDrawableChild(new CheckboxWidget(rx + 2, py + 148, 20, 20, Text.empty(), false));
         promote = addDrawableChild(ButtonWidget.builder(Text.translatable("smith.abilitywar.btn.promote"), b -> {
             if (!sel().isEmpty()) RpgClient.send(12, String.valueOf(selected), npc);
@@ -123,20 +126,32 @@ public class EnhanceScreen extends Screen {
         int lv = has ? GearEnhance.level(s) : 0;
         GearGrade g = has ? ((GearItem) s.getItem()).grade() : GearGrade.COMMON;
         boolean creative = MinecraftClient.getInstance().player != null && MinecraftClient.getInstance().player.getAbilities().creativeMode;
-        awakenMode = has && lv >= GearEnhance.MAX;
+        int max = has ? GearEnhance.maxLevel(s) : GearEnhance.MAX;
+        awakenMode = has && lv >= max;
         enhance.setMessage(Text.translatable(awakenMode ? "smith.abilitywar.btn.awaken" : "smith.abilitywar.btn.enhance"));
         if (awakenMode) {
             int a = GearEnhance.awaken(s);
             boolean am = true;
             for (GearEnhance.Mat m : GearEnhance.awakenMats(a)) am &= Shops.count(inv, m.item()) >= m.count();
             enhance.active = a < GearEnhance.AWAKEN_MAX && (creative || (am && RpgClient.gold >= GearEnhance.awakenGold(a)));
-        } else enhance.active = has && lv < GearEnhance.MAX && (creative || (Shops.count(inv, RpgItems.ENHANCE_STONE) >= GearEnhance.stoneCost(g, lv)
-                && RpgClient.gold >= GearEnhance.goldCost(g, lv)));
-        protect.visible = has && GearEnhance.failDrops(lv) && lv < GearEnhance.MAX;
+        } else enhance.active = has && lv < max && (creative || (Shops.count(inv, RpgItems.ENHANCE_STONE) >= GearEnhance.stoneCost(s)
+                && RpgClient.gold >= GearEnhance.goldCost(s)));
+        protect.visible = has && GearEnhance.failDrops(s) && lv < max;
+        repeat.visible = has && !awakenMode && !GearEnhance.failDrops(s) && lv < max && GearEnhance.chance(s) < 100;
+        repeat.active = enhance.active;
+        GearEnhance.Ascend asc = has ? GearEnhance.nextAscend(s) : null;
         boolean mats = true;
-        if (has && GearEnhance.canPromote(g)) for (GearEnhance.Mat m : GearEnhance.promoteMats(g)) mats &= Shops.count(inv, m.item()) >= m.count();
-        promote.active = has && GearEnhance.canPromote(g) && lv >= GearEnhance.promoteMin(g) && (creative || (mats && RpgClient.gold >= GearEnhance.promoteGold(g)));
-        promote.visible = has && GearEnhance.canPromote(g);
+        if (asc != null) {
+            for (GearEnhance.Mat m : GearEnhance.ascendMats(asc)) mats &= Shops.count(inv, m.item()) >= m.count();
+            promote.setMessage(Text.translatable("smith.abilitywar.btn." + asc.key()));
+            promote.active = lv >= GearEnhance.BEYOND_MAX && (creative || (mats && RpgClient.gold >= GearEnhance.ascendGold(asc)));
+            promote.visible = true;
+        } else {
+            if (has && GearEnhance.canPromote(g)) for (GearEnhance.Mat m : GearEnhance.promoteMats(g)) mats &= Shops.count(inv, m.item()) >= m.count();
+            promote.setMessage(Text.translatable("smith.abilitywar.btn.promote"));
+            promote.active = has && GearEnhance.canPromote(g) && lv >= GearEnhance.promoteMin(g) && (creative || (mats && RpgClient.gold >= GearEnhance.promoteGold(g)));
+            promote.visible = has && GearEnhance.canPromote(g);
+        }
         MinecraftClient mc = MinecraftClient.getInstance();
         Entity e = mc.world == null ? null : mc.world.getEntityById(npc);
         if (e == null || mc.player == null || e.squaredDistanceTo(mc.player) > 12 * 12) close();
@@ -232,9 +247,20 @@ public class EnhanceScreen extends Screen {
             ctx.getMatrices().pop();
             ctx.drawTextWithShadow(textRenderer, st.getName(), rx0 + 44, ly0 + 7, 0xFFFFFF);
             ctx.drawTextWithShadow(textRenderer, Text.literal("◆ ").append(g.displayName()).styled(s -> s.withColor(g.color)), rx0 + 44, ly0 + 19, 0xFFFFFF);
-            // 별 15
+            // 별 15 (? · 아르반티아: +99 막대 + 단계)
             int sx = rx0 + 44 + textRenderer.getWidth(Text.literal("◆ ").append(g.displayName())) + 8;
-            for (int i = 1; i <= GearEnhance.MAX; i++) {
+            if (GearEnhance.beyond(g)) {
+                int stg = GearEnhance.stage(st), bc = GearEnhance.colorOf(st);
+                if (stg > 0) {
+                    Text sn = Text.translatable("gear.abilitywar.ui.stage." + stg);
+                    ctx.drawTextWithShadow(textRenderer, sn, sx, ly0 + 19, bc);
+                    sx += textRenderer.getWidth(sn) + 6;
+                }
+                int bw = Math.max(40, rx1 - 8 - sx - 30);
+                HudDraw.rect(ctx, sx, ly0 + 20, sx + bw, ly0 + 26, 0xFF1A1A22);
+                HudDraw.rect(ctx, sx, ly0 + 20, sx + (int) (bw * lv / (float) GearEnhance.BEYOND_MAX), ly0 + 26, 0xFF000000 | bc);
+                sx += bw + 6;
+            } else for (int i = 1; i <= GearEnhance.MAX; i++) {
                 int col = i <= lv ? GearEnhance.color(i) : 0x3A3A44;
                 ctx.drawTextWithShadow(textRenderer, i <= lv ? "★" : "☆", sx, ly0 + 19, col);
                 sx += 8 + (i % 5 == 0 ? 3 : 0);
@@ -245,11 +271,10 @@ public class EnhanceScreen extends Screen {
                 sx += 8;
             }
             int ty = ly0 + 40;
-            if (lv >= GearEnhance.MAX) {
+            if (lv >= GearEnhance.maxLevel(st)) {
                 hover = awakenPanel(ctx, st, rx0, rx1, ly0, ty, inv, hover);
             } else {
-                Text arrow = Text.literal("+" + lv).styled(s -> s.withColor(GearEnhance.color(lv))).append(Text.literal("  →  ").formatted(Formatting.GRAY))
-                        .append(Text.literal("+" + (lv + 1)).styled(s -> s.withColor(GearEnhance.color(lv + 1)).withBold(true)));
+                Text arrow = GearEnhance.levelText(st, lv).append(Text.literal("  →  ").formatted(Formatting.GRAY)).append(GearEnhance.levelText(st, lv + 1));
                 ctx.drawTextWithShadow(textRenderer, Text.translatable("smith.abilitywar.next").append(" ").append(arrow), rx0 + 8, ty, 0xE8DCC0);
                 ty += 12;
                 // 능력치 미리보기
@@ -257,16 +282,16 @@ public class EnhanceScreen extends Screen {
                     ctx.drawTextWithShadow(textRenderer, t, rx0 + 12, ty, 0xFFFFFF);
                     ty += 10;
                 }
-                int ch = GearEnhance.chance(lv);
+                int ch = GearEnhance.chance(st);
                 int cc = ch >= 80 ? 0x7CE87C : ch >= 50 ? 0xFFE070 : 0xFF8A5A;
                 ctx.drawTextWithShadow(textRenderer, Text.translatable("smith.abilitywar.chance", ch), rx1 - 8 - textRenderer.getWidth(Text.translatable("smith.abilitywar.chance", ch)), ly0 + 40, cc);
-                Text fail = GearEnhance.failDrops(lv) ? Text.translatable("smith.abilitywar.fail_drop", lv - 1).formatted(Formatting.RED)
+                Text fail = GearEnhance.failDrops(st) ? Text.translatable("smith.abilitywar.fail_drop", lv - 1).formatted(Formatting.RED)
                         : Text.translatable(ch >= 100 ? "smith.abilitywar.fail_none" : "smith.abilitywar.fail_keep").formatted(Formatting.GRAY);
                 ctx.drawTextWithShadow(textRenderer, fail, rx1 - 8 - textRenderer.getWidth(fail), ly0 + 52, 0xFFFFFF);
                 // 재료
                 int cy = py + 124;
-                cost(ctx, rx0 + 8, cy, new ItemStack(RpgItems.ENHANCE_STONE), Shops.count(inv, RpgItems.ENHANCE_STONE), GearEnhance.stoneCost(g, lv), true);
-                goldCost(ctx, rx0 + 150, cy, GearEnhance.goldCost(g, lv));
+                cost(ctx, rx0 + 8, cy, new ItemStack(RpgItems.ENHANCE_STONE), Shops.count(inv, RpgItems.ENHANCE_STONE), GearEnhance.stoneCost(st), true);
+                goldCost(ctx, rx0 + 150, cy, GearEnhance.goldCost(st));
                 if (protect.visible) {
                     int have = Shops.count(inv, RpgItems.PROTECTION_SCROLL);
                     ctx.drawItem(new ItemStack(RpgItems.PROTECTION_SCROLL), rx0 + 26, py + 149);
@@ -281,7 +306,10 @@ public class EnhanceScreen extends Screen {
         if (!st.isEmpty()) {
             GearGrade g = ((GearItem) st.getItem()).grade();
             int lv = GearEnhance.level(st);
-            if (!GearEnhance.canPromote(g)) {
+            GearEnhance.Ascend asc = GearEnhance.nextAscend(st);
+            if (asc != null) {
+                hover = ascendPanel(ctx, st, asc, rx0, rx1, pz0, inv, hover);
+            } else if (!GearEnhance.canPromote(g)) {
                 ctx.drawTextWithShadow(textRenderer, Text.translatable("smith.abilitywar.promote_top").formatted(Formatting.GRAY), rx0 + 8, pz0 + 8, 0xFFFFFF);
             } else {
                 GearGrade ng = GearEnhance.next(g);
@@ -350,6 +378,44 @@ public class EnhanceScreen extends Screen {
         return hover;
     }
 
+    /** ? 장비: 초월+ · 정제 · 아르반티아 인피니티 승급 (재료가 많아서 두 줄). */
+    ItemStack ascendPanel(DrawContext ctx, ItemStack st, GearEnhance.Ascend asc, int rx0, int rx1, int pz0, PlayerInventory inv, ItemStack hover) {
+        int lv = GearEnhance.level(st);
+        int col = asc == GearEnhance.Ascend.TRANSCEND ? GearEnhance.TRANSCEND_COLOR : asc == GearEnhance.Ascend.REFINE ? GearEnhance.REFINE_COLOR : GearEnhance.INFINITY_COLOR;
+        Text title = Text.translatable("smith.abilitywar.ascend." + asc.key()).styled(s -> s.withColor(col).withBold(true));
+        ctx.drawTextWithShadow(textRenderer, title, rx0 + 8, pz0 + 5, 0xFFFFFF);
+        boolean lvOk = lv >= GearEnhance.BEYOND_MAX;
+        ctx.drawTextWithShadow(textRenderer, Text.literal(lvOk ? "✔ " : "✖ ").formatted(lvOk ? Formatting.GREEN : Formatting.RED)
+                .append(Text.translatable("smith.abilitywar.ascend_req", GearEnhance.BEYOND_MAX, lv).formatted(Formatting.GRAY)), rx0 + 16 + textRenderer.getWidth(title), pz0 + 5, 0xFFFFFF);
+        int mx0 = rx0 + 8, my0 = pz0 + 16, right = rx1 - 6;
+        for (GearEnhance.Mat m : GearEnhance.ascendMats(asc)) {
+            ItemStack icon = new ItemStack(m.item());
+            int have = Shops.count(inv, m.item());
+            String t = have + "/" + m.count();
+            int w = 18 + textRenderer.getWidth(t) + 8;
+            if (mx0 + w > right) {
+                mx0 = rx0 + 8;
+                my0 += 17;
+            }
+            ctx.drawItem(icon, mx0, my0);
+            ctx.drawTextWithShadow(textRenderer, t, mx0 + 18, my0 + 5, have >= m.count() ? 0x7CE87C : 0xFF6A6A);
+            if (RpgUi.in(mouseX, mouseY, mx0, my0, mx0 + 16, my0 + 16)) hover = icon;
+            mx0 += w;
+        }
+        String gs = GoldHud.fmt(GearEnhance.ascendGold(asc)) + " G";
+        if (mx0 + 16 + textRenderer.getWidth(gs) > right) {
+            mx0 = rx0 + 8;
+            my0 += 17;
+        }
+        goldCost(ctx, mx0 + 2, my0 + 4, GearEnhance.ascendGold(asc));
+        ctx.getMatrices().push();
+        ctx.getMatrices().translate(rx0 + 8, my0 + 19, 0);
+        ctx.getMatrices().scale(0.7f, 0.7f, 1);
+        ctx.drawTextWithShadow(textRenderer, Text.translatable("smith.abilitywar.ascend_note." + asc.key()).formatted(Formatting.GRAY), 0, 0, 0xFFFFFF);
+        ctx.getMatrices().pop();
+        return hover;
+    }
+
     /** 동전 + "120 G" (가진 돈이 모자라면 빨강). */
     void goldCost(DrawContext ctx, int x, int y, long cost) {
         GoldHud.coin(ctx, x, y - 1, 11);
@@ -372,7 +438,9 @@ public class EnhanceScreen extends Screen {
     /** 다음 강화의 능력치 변화 줄. */
     List<Text> preview(ItemStack st, int lv) {
         int sl = GearEnhance.statLevel(st);
-        return preview(st, sl, sl + 1);
+        ItemStack next = st.copy();
+        GearEnhance.set(next, lv + 1);
+        return preview(st, sl, Math.max(sl + 1, GearEnhance.statLevel(next)));
     }
 
     /** 능력치 단계 lv → to 의 변화 줄. */
@@ -436,6 +504,22 @@ public class EnhanceScreen extends Screen {
             case 5 -> {
                 msg = Text.translatable("smith.abilitywar.result.awaken_fail");
                 col = 0x9A88B8;
+            }
+            case 6 -> {
+                msg = Text.translatable("smith.abilitywar.result.repeat", resultLevel);
+                col = 0xFFE070;
+            }
+            case 7 -> {
+                msg = Text.translatable("smith.abilitywar.result.transcend");
+                col = GearEnhance.TRANSCEND_COLOR;
+            }
+            case 8 -> {
+                msg = Text.translatable("smith.abilitywar.result.refine");
+                col = GearEnhance.REFINE_COLOR;
+            }
+            case 9 -> {
+                msg = Text.translatable("smith.abilitywar.result.infinity");
+                col = GearEnhance.INFINITY_COLOR;
             }
             default -> {
                 msg = Text.translatable("smith.abilitywar.result.fail");

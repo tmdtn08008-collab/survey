@@ -36,7 +36,20 @@ public final class RpgItems {
     /** 후반: 심연의 탑 보상 (각성 재료) · 엔더 드래곤 전리품 (★3 부터 각성 재료). */
     public static final Item ABYSS_CRYSTAL = reg("abyss_crystal", new Material(new Item.Settings().rarity(Rarity.EPIC), "item.abilitywar.abyss_crystal.desc", true));
     public static final Item DRAGON_HEART = reg("dragon_heart", new Material(new Item.Settings().maxCount(16).rarity(Rarity.EPIC).fireproof(), "item.abilitywar.dragon_heart.desc", true));
-    public static final Item[] LOOT = {GOBLIN_EAR, ORC_TUSK, WISP_ESSENCE, KNIGHT_CREST, CROWN_SHARD, FROST_HEART, EMBER_CORE, WYVERN_SCALE, BOSS_SOUL, ABYSS_CRYSTAL, DRAGON_HEART};
+    /** 2.9: 야생 생명체 전리품 (아르반티아 초월 · 정제 · 승급 재료). */
+    public static final Item DIRE_FANG = reg("dire_fang", new Material(new Item.Settings(), "item.abilitywar.dire_fang.desc", false));
+    public static final Item BANDIT_SEAL = reg("bandit_seal", new Material(new Item.Settings(), "item.abilitywar.bandit_seal.desc", false));
+    public static final Item PIRATE_DOUBLOON = reg("pirate_doubloon", new Material(new Item.Settings().rarity(Rarity.UNCOMMON), "item.abilitywar.pirate_doubloon.desc", false));
+    public static final Item CULT_SIGIL = reg("cult_sigil", new Material(new Item.Settings().rarity(Rarity.UNCOMMON), "item.abilitywar.cult_sigil.desc", false));
+    public static final Item WRAITH_ESSENCE = reg("wraith_essence", new Material(new Item.Settings().rarity(Rarity.UNCOMMON), "item.abilitywar.wraith_essence.desc", false));
+    public static final Item FAIRY_DUST = reg("fairy_dust", new Material(new Item.Settings().rarity(Rarity.UNCOMMON), "item.abilitywar.fairy_dust.desc", false));
+    public static final Item MERMAID_TEAR = reg("mermaid_tear", new Material(new Item.Settings().rarity(Rarity.RARE), "item.abilitywar.mermaid_tear.desc", true));
+    public static final Item DRAKE_SCALE = reg("drake_scale", new Material(new Item.Settings().rarity(Rarity.UNCOMMON).fireproof(), "item.abilitywar.drake_scale.desc", false));
+    public static final Item GOLEM_CORE = reg("golem_core", new Material(new Item.Settings().rarity(Rarity.RARE), "item.abilitywar.golem_core.desc", true));
+    public static final Item LORD_EMBLEM = reg("lord_emblem", new Material(new Item.Settings().rarity(Rarity.RARE), "item.abilitywar.lord_emblem.desc", true));
+    public static final Item DRAGON_KING_SCALE = reg("dragon_king_scale", new Material(new Item.Settings().maxCount(16).rarity(Rarity.EPIC).fireproof(), "item.abilitywar.dragon_king_scale.desc", true));
+    public static final Item[] LOOT = {GOBLIN_EAR, ORC_TUSK, WISP_ESSENCE, KNIGHT_CREST, CROWN_SHARD, FROST_HEART, EMBER_CORE, WYVERN_SCALE, BOSS_SOUL, ABYSS_CRYSTAL, DRAGON_HEART,
+            DIRE_FANG, BANDIT_SEAL, PIRATE_DOUBLOON, CULT_SIGIL, WRAITH_ESSENCE, FAIRY_DUST, MERMAID_TEAR, DRAKE_SCALE, GOLEM_CORE, LORD_EMBLEM, DRAGON_KING_SCALE};
 
     static Item reg(String id, Item item) {
         return Registry.register(Registries.ITEM, AbilityWar.id(id), item);

@@ -105,7 +105,7 @@ public final class AWCommands {
             "king", com.abilitywar.registry.AWEntities.KING, "tower_keeper", com.abilitywar.registry.AWEntities.TOWER_KEEPER);
 
     private static final com.mojang.brigadier.suggestion.SuggestionProvider<ServerCommandSource> BOSSES = (ctx, b) ->
-            net.minecraft.command.CommandSource.suggestMatching(java.util.stream.Stream.of("abilitywar:fallen_king", "abilitywar:ember_colossus", "abilitywar:frost_witch", "abilitywar:ancient_wyvern",
+            net.minecraft.command.CommandSource.suggestMatching(java.util.stream.Stream.of("abilitywar:fallen_king", "abilitywar:ember_colossus", "abilitywar:frost_witch", "abilitywar:ancient_wyvern", "abilitywar:dragon_king",
                     "bosses_of_mass_destruction:lich", "bosses_of_mass_destruction:obsidilith", "bosses_of_mass_destruction:gauntlet", "bosses_of_mass_destruction:void_blossom",
                     "soulsweapons:accursed_lord_boss", "soulsweapons:draugr_boss", "soulsweapons:night_shade", "soulsweapons:returning_knight", "soulsweapons:chaos_monarch",
                     "soulsweapons:moonknight", "soulsweapons:day_stalker", "soulsweapons:night_prowler", "graveyard:lich",
@@ -315,7 +315,7 @@ public final class AWCommands {
                                         .executes(ctx -> goldOp(ctx, List.of(ctx.getSource().getPlayerOrThrow())))
                                         .then(argument("targets", EntityArgumentType.players()).executes(ctx -> goldOp(ctx, EntityArgumentType.getPlayers(ctx, "targets")))))))
                 .then(literal("enhance").requires(s -> s.hasPermissionLevel(2))
-                        .then(argument("level", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, com.abilitywar.gear.GearEnhance.MAX)).executes(ctx -> {
+                        .then(argument("level", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, com.abilitywar.gear.GearEnhance.BEYOND_MAX)).executes(ctx -> {
                             ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
                             var st = p.getMainHandStack();
                             if (!(st.getItem() instanceof com.abilitywar.gear.GearItem)) {
@@ -335,8 +335,21 @@ public final class AWCommands {
                                 return 0;
                             }
                             int a = com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "stars");
-                            if (a > 0) com.abilitywar.gear.GearEnhance.set(st, com.abilitywar.gear.GearEnhance.MAX);
+                            if (a > 0) com.abilitywar.gear.GearEnhance.set(st, Math.max(com.abilitywar.gear.GearEnhance.level(st), com.abilitywar.gear.GearEnhance.MAX));
                             com.abilitywar.gear.GearEnhance.setAwaken(st, a);
+                            ctx.getSource().sendFeedback(() -> st.getName(), false);
+                            return 1;
+                        })))
+                // 아르반티아 시험용: /aw stage <0 기본 | 1 초월+ | 2 정제> (손에 든 ? 장비)
+                .then(literal("stage").requires(s -> s.hasPermissionLevel(2))
+                        .then(argument("stage", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, com.abilitywar.gear.GearEnhance.REFINE)).executes(ctx -> {
+                            ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
+                            var st = p.getMainHandStack();
+                            if (com.abilitywar.gear.GearEnhance.gradeOf(st) != com.abilitywar.gear.GearGrade.UNKNOWN) {
+                                ctx.getSource().sendError(Text.translatable("smith.abilitywar.err.stage_unknown"));
+                                return 0;
+                            }
+                            com.abilitywar.gear.GearEnhance.setStage(st, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "stage"));
                             ctx.getSource().sendFeedback(() -> st.getName(), false);
                             return 1;
                         })))

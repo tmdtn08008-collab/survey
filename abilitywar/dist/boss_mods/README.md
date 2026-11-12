@@ -3,7 +3,7 @@
 Fabric 1.20.1 용 보스 모드 7개 (+ 애드온) 입니다.
 
 > 2.8.0 부터: 엔더 드래곤 모드는 **True Ending** 으로 바뀌었고 (Ender Dragon Fight Remastered 는 뺌 — 같이 쓰면 안 됨), 드래곤 · 생명체 보스 모드 (Saint's Dragons · Mobs of Mythology · Myths of The Sea · Aquamirae · Mutant Monsters), 셰이더 (Sodium + Iris + Complementary Reimagined · MakeUp Ultra Fast), 인벤토리 꾸미기 모드가 더 들어갔습니다.
-> 새로 들어간 모드는 이 폴더에 jar 로 넣지 않고 **Modrinth 공식 주소에서 받게** 했습니다: `../abilitywar-rpg-2.8.2.mrpack` (Modrinth 앱) 또는 `../download_mods.ps1` (Windows) 을 쓰세요.
+> 새로 들어간 모드는 이 폴더에 jar 로 넣지 않고 **Modrinth 공식 주소에서 받게** 했습니다: `../abilitywar-rpg-2.9.0.mrpack` (Modrinth 앱) 또는 `../download_mods.ps1` (Windows) 을 쓰세요.
 > 예전에 넣은 `edf-remastered-4.3.jar` 는 mods 폴더에서 **지우세요**.
 - **Bosses of Mass Destruction**: Fabric 보스 모드 중 가장 많이 쓰이는 모드 (Modrinth 다운로드 800만 이상). L_Ender's Cataclysm 처럼 보스마다 전용 경기장 구조물이 있습니다. (Cataclysm 은 Forge 전용이라 대신 골랐습니다.)
 - **Marium's Soulslike Weaponry**: 소울라이크 보스 8 + 보스가 떨어뜨리는 전설 무기 40개 이상 (Modrinth 다운로드 400만 이상).

@@ -11,6 +11,22 @@
     "minecraft:meadow",
     "minecraft:dark_forest",
     "minecraft:jungle",
-    "minecraft:sparse_jungle"
+    "minecraft:sparse_jungle",
+    {
+      "id": "#c:plains",
+      "required": false
+    },
+    {
+      "id": "#c:forest",
+      "required": false
+    },
+    {
+      "id": "#c:savanna",
+      "required": false
+    },
+    {
+      "id": "#c:jungle",
+      "required": false
+    }
   ]
 }

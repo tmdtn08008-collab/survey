@@ -42,6 +42,14 @@ MODS = [
     ("Myths of The Sea", "CERBON", "WaCchT6K", "PErFvJ7K", "both", "creature"),
     ("Aquamirae", "Obscuria", "k23mNPhZ", "NOuOAVhC", "both", "creature"),
     ("Mutant Monsters", "Fuzs (원작 Chaosyr)", "derP0ten", "W1xZlM32", "both", "creature"),
+    # --- 야생 생명체 (광신도 일리저 · 숲의 유령 · 해골 유령선)
+    ("Illager Invasion", "Fuzs · Safro (원작 Illager Expansion)", "jSV9w0J5", "tdl5EQxi", "both", "wild"),
+    ("Ghost", "Joo5h · Xylonity", "gJKLGvbS", "G3k8pPhx", "both", "wild"),
+    ("Skeleton Ghost Ship", "SuperWarioModTeam", "UILFr9Hb", "W7kOIEHK", "both", "wild"),
+    # --- 지형 (Tectonic 이 Terralith 를 알아보고 같이 씀)
+    ("Terralith", "Stardust Labs (Apollo · catter1 · Starmute)", "8oi3bsk5", "WeYhEb5d", "both", "terrain"),
+    ("Tectonic", "Apollo · DawnKiro", "lWDHr9jE", "mz3wlQKd", "both", "terrain"),
+    ("Lithostitched", "Apollo", "XaDC71GB", "9bbVphAR", "both", "lib"),
     # --- 라이브러리
     ("Cloth Config API", "shedaniel", "9s6osm5g", "2xQdCMyG", "both", "lib"),
     ("Cardinal Components API", "Ladysnake", "K01OU20C", "Ielhod3p", "both", "lib"),
@@ -110,7 +118,7 @@ shaderPack={pack}
 
 
 def credits(mods, ver):
-    groups = [("boss", "보스 모드"), ("dragon", "엔더 드래곤"), ("creature", "드래곤 · 생명체"),
+    groups = [("boss", "보스 모드"), ("dragon", "엔더 드래곤"), ("creature", "드래곤 · 생명체"), ("wild", "야생 생명체"), ("terrain", "지형"),
               ("graphics", "그래픽 (셰이더)"), ("shader", "셰이더 팩"), ("inventory", "인벤토리 꾸미기"), ("lib", "라이브러리")]
     lines = ["능력대전쟁 RPG 모드팩 — 들어 있는 모드와 만든 사람", f"- 능력대전쟁 (Ability War) {ver}"]
     for g, title in groups:
@@ -128,7 +136,7 @@ def build_mrpack(mods, ver, jar):
     index = {
         "formatVersion": 1, "game": "minecraft", "versionId": ver,
         "name": "능력대전쟁 RPG (보스 모드 팩)",
-        "summary": "능력대전쟁 + 보스 · 드래곤 · 생명체 모드 + 셰이더 + 인벤토리 꾸미기",
+        "summary": "능력대전쟁 + 보스 · 드래곤 · 생명체 · 야생 생명체 모드 + 지형 + 셰이더 + 인벤토리 꾸미기",
         "files": [{
             "path": m["path"], "hashes": {"sha1": m["sha1"], "sha512": m["sha512"]},
             "env": {"client": "required", "server": "required" if m["env"] == "both" else "unsupported"},

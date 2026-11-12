@@ -24,12 +24,18 @@ import java.util.List;
  * <p>로컬 좌표: +Z = 앞(바라보는 방향), +Y = 위, +X = 왼쪽. 원점 = 땅 위의 중심.
  */
 public final class ElderDragon {
-    static final Identifier SCALES = Tex.fx("elder_scales");
-    static final Identifier GLOW = Tex.fx("elder_glow");
-    static final Identifier BELLY = Tex.fx("elder_belly");
-    static final Identifier HORN = Tex.fx("elder_horn");
-    static final Identifier MEMBRANE = Tex.fx("elder_membrane");
-    static final Identifier MEMBRANE_GLOW = Tex.fx("elder_membrane_glow");
+    /** 고룡 그림 한 벌 (붉은 고룡 · 푸른 용왕 · 녹옥 비룡). */
+    public record Skin(Identifier scales, Identifier glow, Identifier belly, Identifier horn, Identifier membrane, Identifier membraneGlow, float tr, float tg, float tb) {
+        static Skin of(String suffix, float tr, float tg, float tb) {
+            return new Skin(Tex.fx("elder_scales" + suffix), Tex.fx("elder_glow" + suffix), Tex.fx("elder_belly" + suffix), Tex.fx("elder_horn" + suffix),
+                    Tex.fx("elder_membrane" + suffix), Tex.fx("elder_membrane_glow" + suffix), tr, tg, tb);
+        }
+    }
+
+    public static final Skin RED = Skin.of("", 0.74f, 0.62f, 0.62f);
+    public static final Skin AZURE = Skin.of("_azure", 0.9f, 0.92f, 1f);
+    public static final Skin JADE = Skin.of("_jade", 0.85f, 0.9f, 0.85f);
+    static Skin skin = RED;
 
     /** 자세 (모두 로컬 좌표). */
     public static final class Pose {
@@ -427,6 +433,15 @@ public final class ElderDragon {
      * @param alpha 전체 투명도
      * @param glow  비늘 틈 용암빛 세기
      */
+    public static void render(Fx.Ctx c, Vec3d pos, float yaw, float scale, Pose p, float alpha, float glow, Skin sk) {
+        skin = sk;
+        try {
+            render(c, pos, yaw, scale, p, alpha, glow);
+        } finally {
+            skin = RED;
+        }
+    }
+
     public static void render(Fx.Ctx c, Vec3d pos, float yaw, float scale, Pose p, float alpha, float glow) {
         Vec3d mouthLocal = build(p);
         // 로컬 → 월드
@@ -445,19 +460,19 @@ public final class ElderDragon {
         Matrix3f n = c.matrices.peek().getNormalMatrix();
         int light = 0xF000F0;
         // 몸 (재질별로 한 번씩)
-        emitParts(c.imm.getBuffer(RenderLayer.getEntityTranslucent(SCALES)), m, n, Mat.SCALES, alpha, light);
-        emitParts(c.imm.getBuffer(RenderLayer.getEntityTranslucent(BELLY)), m, n, Mat.BELLY, alpha, light);
-        emitParts(c.imm.getBuffer(RenderLayer.getEntityTranslucent(HORN)), m, n, Mat.HORN, alpha, light);
-        emitParts(c.imm.getBuffer(RenderLayer.getEntityTranslucent(HORN)), m, n, Mat.WHITE, alpha, light);
-        VertexConsumer mv = c.imm.getBuffer(RenderLayer.getEntityTranslucent(MEMBRANE));
+        emitParts(c.imm.getBuffer(RenderLayer.getEntityTranslucent(skin.scales())), m, n, Mat.SCALES, alpha, light);
+        emitParts(c.imm.getBuffer(RenderLayer.getEntityTranslucent(skin.belly())), m, n, Mat.BELLY, alpha, light);
+        emitParts(c.imm.getBuffer(RenderLayer.getEntityTranslucent(skin.horn())), m, n, Mat.HORN, alpha, light);
+        emitParts(c.imm.getBuffer(RenderLayer.getEntityTranslucent(skin.horn())), m, n, Mat.WHITE, alpha, light);
+        VertexConsumer mv = c.imm.getBuffer(RenderLayer.getEntityTranslucent(skin.membrane()));
         for (Poly poly : MEMBRANES) emitPoly(mv, m, n, poly, 1, 1, 1, alpha * 0.92f, light);
         c.imm.draw();
         // 빛 (가산)
         float g = glow * alpha;
         if (g > 0.01f) {
-            VertexConsumer gv = c.imm.getBuffer(AWRenderLayers.additive(GLOW));
+            VertexConsumer gv = c.imm.getBuffer(AWRenderLayers.additive(skin.glow()));
             for (Part pt : PARTS) if (pt.mat() == Mat.SCALES) emitBoxSimple(gv, m, pt, g, g, g, 1);
-            VertexConsumer mg = c.imm.getBuffer(AWRenderLayers.additive(MEMBRANE_GLOW));
+            VertexConsumer mg = c.imm.getBuffer(AWRenderLayers.additive(skin.membraneGlow()));
             for (Poly poly : MEMBRANES) emitPolySimple(mg, m, poly, g, g, g, 1);
             VertexConsumer ev = c.imm.getBuffer(AWRenderLayers.additive(Tex.GLOW));
             for (Part pt : EMISSIVE) emitBoxSimple(ev, m, pt, pt.r() * alpha, pt.g() * alpha, pt.b() * alpha, 1);
@@ -507,7 +522,7 @@ public final class ElderDragon {
 
     static void emitParts(VertexConsumer vc, Matrix4f m, Matrix3f n, Mat mat, float alpha, int light) {
         // 재질 색조: 오래된 용이라 비늘은 어둡게
-        float tr = mat == Mat.SCALES ? 0.74f : 1f, tg = mat == Mat.SCALES ? 0.62f : 1f, tb = mat == Mat.SCALES ? 0.62f : 1f;
+        float tr = mat == Mat.SCALES ? skin.tr() : 1f, tg = mat == Mat.SCALES ? skin.tg() : 1f, tb = mat == Mat.SCALES ? skin.tb() : 1f;
         for (Part p : PARTS) if (p.mat() == mat) emitBox(vc, m, n, p, alpha, light, tr, tg, tb);
     }
 

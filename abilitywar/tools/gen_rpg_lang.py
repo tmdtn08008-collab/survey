@@ -643,6 +643,71 @@ for k, ko, en in [
     t(k, ko, en)
 
 
+# ================================================================ 2.9 야생 생명체
+for k, ko, en in [('goblin_lord', '고블린 로드', 'Goblin Lord'), ('orc_lord', '오크 로드', 'Orc Warlord'), ('bandit', '산적', 'Bandit'),
+                  ('thief', '도적', 'Thief'), ('pirate', '해적', 'Pirate'), ('cultist', '광신도', 'Cultist'), ('wraith', '유령', 'Wraith'),
+                  ('fairy', '요정', 'Fairy'), ('mermaid', '인어', 'Mermaid'), ('dire_wolf', '흉포한 늑대', 'Dire Wolf'),
+                  ('ancient_golem', '고대 골렘', 'Ancient Golem'), ('enhanced_golem', '강화 골렘', 'Enhanced Golem'),
+                  ('drake', '비룡', 'Drake'), ('dragon_king', '용왕', 'The Dragon King')]:
+    t(f'entity.abilitywar.{k}', ko, en)
+    t(f'item.abilitywar.{k}_spawn_egg', f'{ko} 생성 알', f'{en} Spawn Egg')
+t('elite.abilitywar.goblin_lord.sub', '— 고블린 무리의 우두머리 —', '— Chieftain of the Goblin Horde —')
+t('elite.abilitywar.orc_lord.sub', '— 피로 물든 부족장 —', '— The Bloodied Warchief —')
+t('elite.abilitywar.enhanced_golem.sub', '— 룬이 새겨진 파수꾼 —', '— The Rune-Carved Sentinel —')
+t('boss.abilitywar.dragon_king.sub', '— 모든 용의 왕 —', '— King of All Dragons —')
+t('mob.abilitywar.thief.stole', '도적이 %s G 를 훔쳐 달아납니다! 쫓아가서 쓰러뜨리면 돌려받습니다.', 'A thief stole %s G and ran! Catch and defeat it to get it back.')
+t('region.abilitywar.dragon_nest', '용의 둥지', "Dragon's Nest")
+t('region.abilitywar.dragon_nest.sub', '매우 위험 · 보스: 용왕 · 비룡 무리', 'Extreme danger · Boss: The Dragon King · Drakes')
+for k, ko, en, dko, den in [
+        ('dire_fang', '흉포한 송곳니', 'Dire Fang', '흉포한 늑대의 송곳니. 아르반티아 승급 재료.', 'Fang of a dire wolf. Arvantia promotion material.'),
+        ('bandit_seal', '도적단의 인장', "Brigand's Seal", '산적 · 도적이 지닌 인장. 아르반티아 승급 재료.', 'A seal carried by bandits and thieves. Arvantia promotion material.'),
+        ('pirate_doubloon', '해적 금화', 'Pirate Doubloon', '해적의 낡은 금화. 아르반티아 승급 재료.', "A pirate's old gold coin. Arvantia promotion material."),
+        ('cult_sigil', '광신도의 인장', 'Cult Sigil', '광신도가 품은 검은 인장. 아르반티아 정제 재료.', 'A black sigil carried by cultists. Arvantia refining material.'),
+        ('wraith_essence', '원혼의 정수', 'Wraith Essence', '유령이 흩어지며 남긴 차가운 빛. 아르반티아 정제 재료.', 'Cold light left by a vanishing wraith. Arvantia refining material.'),
+        ('fairy_dust', '요정 가루', 'Fairy Dust', '반짝이는 요정의 가루. 아르반티아 정제 재료.', 'Glittering fairy dust. Arvantia refining material.'),
+        ('mermaid_tear', '인어의 눈물', "Mermaid's Tear", '진주처럼 굳은 인어의 눈물. 아르반티아 정제 재료.', "A mermaid's tear hardened like a pearl. Arvantia refining material."),
+        ('drake_scale', '비룡 비늘', 'Drake Scale', '산을 맴도는 비룡의 비늘. 아르반티아 승급 재료.', 'Scale of a mountain drake. Arvantia promotion material.'),
+        ('golem_core', '골렘 핵', 'Golem Core', '골렘을 움직이던 룬의 핵. 초월+ 재료.', 'The rune core that drove a golem. Transcendence material.'),
+        ('lord_emblem', '군주의 증표', "Warlord's Emblem", '고블린 로드 · 오크 로드의 증표. 초월+ 재료.', 'Emblem of a goblin lord or orc warlord. Transcendence material.'),
+        ('dragon_king_scale', '용왕의 역린', "Dragon King's Scale", '용왕의 목 아래 거꾸로 난 비늘. 아르반티아 인피니티 승급 재료.', "The reversed scale beneath the Dragon King's throat. Arvantia Infinity promotion material.")]:
+    t(f'item.abilitywar.{k}', ko, en)
+    t(f'item.abilitywar.{k}.desc', dko, den)
+
+
+# ================================================================ 2.9 아르반티아 (? +99 → 초월+ → 정제 → 아르반티아 인피니티)
+for k, ko, en in [
+        ('smith.abilitywar.btn.repeat', '연속 강화 ×20', 'Enhance ×20'),
+        ('smith.abilitywar.btn.transcend', '초월+', 'Transcend+'),
+        ('smith.abilitywar.btn.refine', '정제', 'Refine'),
+        ('smith.abilitywar.btn.infinity', '아르반티아 승급', 'Ascend: Arvantia'),
+        ('smith.abilitywar.ascend.transcend', '초월+ → +1+ 부터 다시', 'Transcend+ → restart at +1+'),
+        ('smith.abilitywar.ascend.refine', '정제 → 정제 +1 부터 다시', 'Refine → restart at Refined +1'),
+        ('smith.abilitywar.ascend.infinity', '승급 → 아르반티아 인피니티', 'Ascend → Arvantia Infinity'),
+        ('smith.abilitywar.ascend_req', '+%s 필요 (지금 +%s)', 'Needs +%s (now +%s)'),
+        ('smith.abilitywar.ascend_note.transcend', '능력치는 그대로 이어지고 +1+ 부터 다시 +99+ 까지 강화합니다. 각성 ★ 은 남습니다.', 'Stats carry over; enhance again from +1+ to +99+. Awakening ★ stays.'),
+        ('smith.abilitywar.ascend_note.refine', '능력치는 그대로 이어지고 정제 +1 부터 다시 +99 까지 강화합니다.', 'Stats carry over; enhance again from Refined +1 to +99.'),
+        ('smith.abilitywar.ascend_note.infinity', '같은 종류의 아르반티아 인피니티 장비 (+0, 정제 +99 보다 강함) 로 바뀝니다. 각성 ★ 은 남습니다.', 'Becomes Arvantia Infinity gear of the same kind (+0, stronger than Refined +99). Awakening ★ stays.'),
+        ('smith.abilitywar.result.repeat', '연속 강화 끝 · +%s', 'Done · +%s'),
+        ('smith.abilitywar.result.transcend', '초월+!', 'TRANSCENDED+!'),
+        ('smith.abilitywar.result.refine', '정제 완료!', 'REFINED!'),
+        ('smith.abilitywar.result.infinity', '아르반티아 인피니티!', 'ARVANTIA INFINITY!'),
+        ('smith.abilitywar.repeat_done', '연속 강화: %s 번 시도, %s 번 성공 (+%s → +%s)', 'Repeat enhance: %s tries, %s successes (+%s → +%s)'),
+        ('smith.abilitywar.broadcast_transcend', '%s 님이 %s 을(를) 초월+ 했습니다!', '%s transcended %s!'),
+        ('smith.abilitywar.broadcast_refine', '%s 님이 %s 을(를) 정제했습니다!', '%s refined %s!'),
+        ('smith.abilitywar.broadcast_infinity', '✦ %s 님이 아르반티아 인피니티 %s 을(를) 손에 넣었습니다! ✦', '✦ %s obtained the Arvantia Infinity %s! ✦'),
+        ('smith.abilitywar.err.ascend_level', '+99 까지 강화해야 합니다.', 'Enhance to +99 first.'),
+        ('smith.abilitywar.err.stage_unknown', '? 등급 장비를 손에 들어야 합니다.', 'Hold a ? grade item.'),
+        ('gear.abilitywar.ui.refined_mark', '정제', 'Refined'),
+        ('gear.abilitywar.ui.enhance_beyond', '강화', 'Enhance'),
+        ('gear.abilitywar.ui.stage.1', '[초월+]', '[Transcended+]'),
+        ('gear.abilitywar.ui.stage.2', '[정제]', '[Refined]'),
+        ('gear.abilitywar.ui.next_transcend', '+99 에서 대장장이에게 초월+ 를 받을 수 있다.', 'At +99 a blacksmith can Transcend+ it.'),
+        ('gear.abilitywar.ui.next_refine', '+99+ 에서 대장장이에게 정제를 받을 수 있다.', 'At +99+ a blacksmith can Refine it.'),
+        ('gear.abilitywar.ui.next_infinity', '정제 +99 에서 아르반티아 인피니티로 승급할 수 있다.', 'At Refined +99 it can ascend to Arvantia Infinity.'),
+        ('gear.abilitywar.ui.beyond_hint', '? 장비는 +99 까지 강화할 수 있다 (+15 부터는 실패해도 그대로).', '? gear can be enhanced to +99 (from +15, failures keep the level).')]:
+    t(k, ko, en)
+
+
 def apply(fname, idx):
     p = os.path.join(LANG, fname)
     d = json.load(open(p, encoding='utf-8'))

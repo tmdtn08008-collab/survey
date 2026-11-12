@@ -159,47 +159,131 @@ public final class Shops {
     /** @return 오류 번역 키 (되면 null). */
     @Nullable
     public static String enhance(ServerPlayerEntity p, int slot, boolean protect) {
+        return enhance(p, slot, protect, 1);
+    }
+
+    /**
+     * 강화 (times 번까지 이어서 시도: 연속 강화는 +15 넘은 구간 또는 +10 아래에서만, 재료 · 돈이 떨어지거나 최대가 되면 멈춤).
+     * 결과 코드 0 성공 · 1 실패 (그대로) · 2 실패 (내려감) · 6 연속 강화 끝.
+     */
+    @Nullable
+    public static String enhance(ServerPlayerEntity p, int slot, boolean protect, int times) {
         if (!validSlot(slot)) return "smith.abilitywar.err.no_item";
         PlayerInventory inv = p.getInventory();
         ItemStack st = inv.getStack(slot);
         GearGrade g = grade(st);
         if (g == null) return "smith.abilitywar.err.no_item";
-        int lv = GearEnhance.level(st);
-        if (lv >= GearEnhance.MAX) return "smith.abilitywar.err.max";
-        int stones = GearEnhance.stoneCost(g, lv), cost = GearEnhance.goldCost(g, lv);
-        boolean useScroll = protect && GearEnhance.failDrops(lv);
-        boolean free = p.getAbilities().creativeMode;
-        if (!free) {
-            if (count(inv, RpgItems.ENHANCE_STONE) < stones) return "smith.abilitywar.err.stones";
-            if (RpgManager.gold(p) < cost) return "smith.abilitywar.err.gold";
-            if (useScroll && count(inv, RpgItems.PROTECTION_SCROLL) < 1) return "smith.abilitywar.err.scroll";
-            take(inv, RpgItems.ENHANCE_STONE, stones);
-            RpgManager.takeGold(p, cost);
-            if (useScroll) take(inv, RpgItems.PROTECTION_SCROLL, 1);
-        }
+        if (GearEnhance.level(st) >= GearEnhance.maxLevel(st)) return "smith.abilitywar.err.max";
+        times = Math.max(1, Math.min(20, times));
+        if (times > 1 && GearEnhance.failDrops(st)) times = 1;
         ServerWorld w = p.getServerWorld();
-        boolean ok = w.getRandom().nextInt(100) < GearEnhance.chance(lv);
-        int code;
-        if (ok) {
-            GearEnhance.set(st, lv + 1);
-            code = 0;
-            w.playSound(null, p.getBlockPos(), SoundEvents.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 0.8f, 1.2f + lv * 0.03f);
+        boolean free = p.getAbilities().creativeMode;
+        int code = 1, ups = 0, tries = 0, start = GearEnhance.level(st);
+        for (int i = 0; i < times; i++) {
+            int lv = GearEnhance.level(st);
+            if (lv >= GearEnhance.maxLevel(st)) break;
+            int stones = GearEnhance.stoneCost(st), cost = GearEnhance.goldCost(st);
+            boolean useScroll = protect && GearEnhance.failDrops(st);
+            if (!free) {
+                String err = count(inv, RpgItems.ENHANCE_STONE) < stones ? "smith.abilitywar.err.stones" : RpgManager.gold(p) < cost ? "smith.abilitywar.err.gold"
+                        : useScroll && count(inv, RpgItems.PROTECTION_SCROLL) < 1 ? "smith.abilitywar.err.scroll" : null;
+                if (err != null) {
+                    if (tries == 0) return err;
+                    break;
+                }
+                take(inv, RpgItems.ENHANCE_STONE, stones);
+                RpgManager.takeGold(p, cost);
+                if (useScroll) take(inv, RpgItems.PROTECTION_SCROLL, 1);
+            }
+            tries++;
+            boolean ok = w.getRandom().nextInt(100) < GearEnhance.chance(st);
+            if (ok) {
+                GearEnhance.set(st, lv + 1);
+                ups++;
+                code = 0;
+                if (lv + 1 >= 12 && (lv + 1 <= GearEnhance.MAX || (lv + 1) % 10 == 0 || lv + 1 == GearEnhance.BEYOND_MAX))
+                    announce(p, Text.translatable("smith.abilitywar.broadcast", p.getDisplayName(), st.getName()));
+            } else if (GearEnhance.failDrops(st) && !useScroll) {
+                GearEnhance.set(st, lv - 1);
+                code = 2;
+            } else code = 1;
+        }
+        if (ups > 0) {
+            w.playSound(null, p.getBlockPos(), SoundEvents.BLOCK_ANVIL_USE, SoundCategory.PLAYERS, 0.8f, 1.2f + Math.min(15, GearEnhance.level(st)) * 0.03f);
             w.playSound(null, p.getBlockPos(), SoundEvents.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.6f, 1.4f);
             w.spawnParticles(ParticleTypes.ENCHANT, p.getX(), p.getY() + 1.2, p.getZ(), 40, 0.5, 0.6, 0.5, 0.8);
-            w.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, p.getX(), p.getY() + 1.2, p.getZ(), lv >= 9 ? 30 : 8, 0.4, 0.5, 0.4, 0.3);
-            if (lv + 1 >= 12) announce(p, Text.translatable("smith.abilitywar.broadcast", p.getDisplayName(), st.getName()));
-        } else if (GearEnhance.failDrops(lv) && !useScroll) {
-            GearEnhance.set(st, lv - 1);
-            code = 2;
+            w.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, p.getX(), p.getY() + 1.2, p.getZ(), GearEnhance.level(st) >= 10 ? 30 : 8, 0.4, 0.5, 0.4, 0.3);
+        } else if (code == 2) {
             w.playSound(null, p.getBlockPos(), SoundEvents.BLOCK_ANVIL_DESTROY, SoundCategory.PLAYERS, 0.7f, 0.9f);
             w.spawnParticles(ParticleTypes.LARGE_SMOKE, p.getX(), p.getY() + 1.2, p.getZ(), 20, 0.4, 0.4, 0.4, 0.02);
         } else {
-            code = 1;
             w.playSound(null, p.getBlockPos(), SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.PLAYERS, 0.6f, 0.8f);
             w.spawnParticles(ParticleTypes.SMOKE, p.getX(), p.getY() + 1.2, p.getZ(), 14, 0.3, 0.3, 0.3, 0.02);
         }
+        if (times > 1) {
+            p.sendMessage(Text.translatable("smith.abilitywar.repeat_done", tries, ups, start, GearEnhance.level(st)).formatted(Formatting.GOLD), false);
+            code = 6;
+        }
         inv.markDirty();
         result(p, code, GearEnhance.level(st), slot);
+        return null;
+    }
+
+    /**
+     * ? 장비의 큰 단계: 초월+ (+99 → +1+) · 정제 (+99+ → 정제 +1) · 아르반티아 인피니티 승급 (정제 +99 → 같은 종류 아르반티아 +0).
+     * 결과 코드 7 초월 · 8 정제 · 9 아르반티아.
+     */
+    @Nullable
+    public static String ascend(ServerPlayerEntity p, int slot) {
+        PlayerInventory inv = p.getInventory();
+        ItemStack st = inv.getStack(slot);
+        GearEnhance.Ascend a = GearEnhance.nextAscend(st);
+        if (a == null) return "smith.abilitywar.err.top_grade";
+        if (GearEnhance.level(st) < GearEnhance.BEYOND_MAX) return "smith.abilitywar.err.ascend_level";
+        List<GearEnhance.Mat> mats = GearEnhance.ascendMats(a);
+        long cost = GearEnhance.ascendGold(a);
+        ServerWorld w = p.getServerWorld();
+        Item next = null;
+        if (a == GearEnhance.Ascend.INFINITY) {
+            next = st.getItem() instanceof GearWeaponItem wi ? GearEnhance.infinityWeapon(wi.def, w.getRandom())
+                    : st.getItem() instanceof GearArmorItem ai ? GearEnhance.infinityArmor(ai, w.getRandom()) : null;
+            if (next == null) return "smith.abilitywar.err.top_grade";
+        }
+        if (!p.getAbilities().creativeMode) {
+            for (GearEnhance.Mat m : mats) if (count(inv, m.item()) < m.count()) return "smith.abilitywar.err.materials";
+            if (RpgManager.gold(p) < cost) return "smith.abilitywar.err.gold";
+            for (GearEnhance.Mat m : mats) take(inv, m.item(), m.count());
+            RpgManager.takeGold(p, cost);
+        }
+        int code;
+        ItemStack out = st;
+        switch (a) {
+            case TRANSCEND -> {
+                GearEnhance.setStage(st, GearEnhance.TRANSCEND);
+                GearEnhance.set(st, 1);
+                code = 7;
+            }
+            case REFINE -> {
+                GearEnhance.setStage(st, GearEnhance.REFINE);
+                GearEnhance.set(st, 1);
+                code = 8;
+            }
+            default -> {
+                out = new ItemStack(next);
+                int aw = GearEnhance.awaken(st);
+                if (aw > 0) GearEnhance.setAwaken(out, aw);
+                inv.setStack(slot, out);
+                code = 9;
+            }
+        }
+        inv.markDirty();
+        w.playSound(null, p.getBlockPos(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 1f, code == 9 ? 0.8f : 1.1f);
+        w.playSound(null, p.getBlockPos(), SoundEvents.BLOCK_END_PORTAL_SPAWN, SoundCategory.PLAYERS, 0.6f, code == 9 ? 1.0f : 1.6f);
+        w.spawnParticles(ParticleTypes.END_ROD, p.getX(), p.getY() + 1.2, p.getZ(), 120, 0.5, 1.0, 0.5, 0.2);
+        w.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, p.getX(), p.getY() + 1.2, p.getZ(), 80, 0.6, 0.8, 0.6, 0.6);
+        w.spawnParticles(ParticleTypes.REVERSE_PORTAL, p.getX(), p.getY() + 1.2, p.getZ(), 100, 0.6, 1.0, 0.6, 0.3);
+        announce(p, Text.translatable("smith.abilitywar.broadcast_" + a.key(), p.getDisplayName(), out.getName()));
+        result(p, code, GearEnhance.level(out), slot);
         return null;
     }
 
@@ -210,6 +294,7 @@ public final class Shops {
         ItemStack st = inv.getStack(slot);
         GearGrade g = grade(st);
         if (g == null) return "smith.abilitywar.err.no_item";
+        if (g == GearGrade.UNKNOWN) return ascend(p, slot);
         if (!GearEnhance.canPromote(g)) return "smith.abilitywar.err.top_grade";
         int lv = GearEnhance.level(st);
         if (lv < GearEnhance.promoteMin(g)) return "smith.abilitywar.err.promote_level";
@@ -247,7 +332,7 @@ public final class Shops {
         PlayerInventory inv = p.getInventory();
         ItemStack st = inv.getStack(slot);
         if (grade(st) == null) return "smith.abilitywar.err.no_item";
-        if (GearEnhance.level(st) < GearEnhance.MAX) return "smith.abilitywar.err.awaken_level";
+        if (GearEnhance.level(st) < GearEnhance.maxLevel(st)) return "smith.abilitywar.err.awaken_level";
         int a = GearEnhance.awaken(st);
         if (a >= GearEnhance.AWAKEN_MAX) return "smith.abilitywar.err.awaken_max";
         List<GearEnhance.Mat> mats = GearEnhance.awakenMats(a);
@@ -294,7 +379,8 @@ public final class Shops {
         if (boss) {
             dead.dropStack(new ItemStack(RpgItems.ENHANCE_STONE, 3 + r.nextInt(4)));
             dead.dropStack(new ItemStack(RpgItems.BOSS_SOUL, endgame(dead) ? 3 : 1));
-            Item trophy = dead instanceof com.abilitywar.mob.FallenKingEntity ? RpgItems.CROWN_SHARD
+            Item trophy = dead instanceof com.abilitywar.mob.DragonKingEntity ? RpgItems.DRAGON_KING_SCALE
+                    : dead instanceof com.abilitywar.mob.FallenKingEntity ? RpgItems.CROWN_SHARD
                     : dead instanceof com.abilitywar.mob.FrostWitchEntity ? RpgItems.FROST_HEART
                     : dead instanceof com.abilitywar.mob.EmberColossusEntity ? RpgItems.EMBER_CORE
                     : dead instanceof com.abilitywar.mob.AncientWyvernEntity ? RpgItems.WYVERN_SCALE : null;
@@ -309,6 +395,10 @@ public final class Shops {
         if (dead instanceof com.abilitywar.mob.OrcEntity && r.nextInt(100) < 40) dead.dropStack(new ItemStack(RpgItems.ORC_TUSK));
         if (dead instanceof com.abilitywar.mob.WispEntity && r.nextInt(100) < 40) dead.dropStack(new ItemStack(RpgItems.WISP_ESSENCE));
         if (dead instanceof com.abilitywar.mob.SkeletonKnightEntity && r.nextInt(100) < 35) dead.dropStack(new ItemStack(RpgItems.KNIGHT_CREST));
+        // 2.9 야생 생명체 · 정예 몹 전리품
+        if (dead instanceof com.abilitywar.mob.TrophyMob t && t.trophy() != null && r.nextInt(100) < t.trophyChance())
+            dead.dropStack(new ItemStack(t.trophy(), t.trophyCount(r)));
+        if (dead instanceof com.abilitywar.mob.EliteEntity) dead.dropStack(new ItemStack(RpgItems.ENHANCE_STONE, 1 + r.nextInt(3)));
     }
 
     static boolean endgame(net.minecraft.entity.LivingEntity e) {

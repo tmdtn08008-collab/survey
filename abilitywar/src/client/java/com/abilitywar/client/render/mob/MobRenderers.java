@@ -34,6 +34,7 @@ public final class MobRenderers {
         EntityRendererRegistry.register(AWMobs.EMBER_COLOSSUS, ColossusRenderer::new);
         EntityRendererRegistry.register(AWMobs.FROST_WITCH, FrostWitchRenderer::new);
         EntityRendererRegistry.register(AWMobs.ANCIENT_WYVERN, Invisible::new);
+        WildRenderers.init();
     }
 
     static Identifier tex(String name) {
@@ -100,7 +101,7 @@ public final class MobRenderers {
     }
 
     /** 고대 비룡: 몸은 BossFx 가 고룡 모델로 그림. */
-    static final class Invisible<T extends Entity> extends EntityRenderer<T> {
+    public static final class Invisible<T extends Entity> extends EntityRenderer<T> {
         Invisible(EntityRendererFactory.Context ctx) {
             super(ctx);
         }

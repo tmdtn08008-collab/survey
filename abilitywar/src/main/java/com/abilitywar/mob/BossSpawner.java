@@ -95,10 +95,10 @@ public final class BossSpawner {
         AbilityWar.LOG.info("[wild bosses] {} entries", ENTRIES.size());
     }
 
-    static final int CONFIG_VERSION = 6;
+    static final int CONFIG_VERSION = 7;
 
     /**
-     * 기본 목록: 이 모드 보스 4 + Bosses of Mass Destruction (설치돼 있으면 나옴)
+     * 기본 목록: 이 모드 보스 5 (용왕은 산에서 드물게) + Bosses of Mass Destruction (설치돼 있으면 나옴)
      * + L_Ender's Cataclysm 의 보스들 (Forge 전용이라 무게 0 = 꺼짐).
      */
     static String defaults() {
@@ -110,7 +110,8 @@ public final class BossSpawner {
         JsonArray a = new JsonArray();
         String[][] def = {
                 {"abilitywar:fallen_king", "10", "any"}, {"abilitywar:ember_colossus", "10", "hot"}, {"abilitywar:frost_witch", "10", "cold"},
-                {"abilitywar:ancient_wyvern", "8", "mountain"}, {"abilitywar:ancient_wyvern", "3", "any"},
+                {"abilitywar:ancient_wyvern", "8", "mountain"}, {"abilitywar:ancient_wyvern", "3", "any"}, {"abilitywar:dragon_king", "3", "mountain"},
+                {"illagerinvasion:invoker", "3", "forest"},
                 {"bosses_of_mass_destruction:lich", "8", "cold"}, {"bosses_of_mass_destruction:lich", "3", "any"},
                 {"bosses_of_mass_destruction:gauntlet", "6", "hot"}, {"bosses_of_mass_destruction:obsidilith", "5", "mountain"},
                 {"bosses_of_mass_destruction:void_blossom", "6", "forest"}, {"bosses_of_mass_destruction:void_blossom", "4", "swamp"},

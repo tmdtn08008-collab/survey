@@ -31,6 +31,10 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>각성 (★1 ~ ★5): +15 장비를 심연의 결정 · 보스의 영혼 · 용의 심장 (★3 부터) 으로 더 강하게. ★ 하나 = 강화 2 단계 만큼의 능력치.
  * 실패해도 내려가지 않음 (재료만 사라짐). 승급해도 각성은 남음. NBT "AWAwaken".
+ *
+ * <p>아르반티아 (2.9): ? 장비는 +99 까지 강화 (+15 부터는 실패해도 그대로) → +99 에서 초월+ (+1+ 부터 다시, "+N+") → +99+ 에서 정제 (+1 부터 다시)
+ * → 정제 +99 에서 승급하면 같은 종류의 아르반티아 인피니티 장비. 단계는 NBT "AWStage" (1 초월+, 2 정제).
+ * 능력치 단계: 기본 +15 까지 1 씩, 그 뒤 0.4 씩 (+99 = 48) · 초월+ 48 + 0.5 씩 (+99+ = 97) · 정제 97 + 0.6 씩 (+99 = 156) · 아르반티아 156 + 0.6 씩.
  */
 public final class GearEnhance {
     public static final String KEY = "AWEnhance";
@@ -65,9 +69,9 @@ public final class GearEnhance {
         } else stack.getOrCreateNbt().putInt(AWAKEN_KEY, a);
     }
 
-    /** 각성할 수 있는지: +15 이고 ★ 가 남았을 때. */
+    /** 각성할 수 있는지: 최대 강화 (+15, ? · 아르반티아는 +99) 이고 ★ 가 남았을 때. */
     public static boolean canAwaken(ItemStack stack) {
-        return level(stack) >= MAX && awaken(stack) < AWAKEN_MAX;
+        return level(stack) >= maxLevel(stack) && awaken(stack) < AWAKEN_MAX;
     }
 
     /** ★a → ★a+1 성공 확률 (%). */
@@ -89,20 +93,192 @@ public final class GearEnhance {
         return l;
     }
 
-    /** 능력치 계산에 쓰는 단계 = 강화 + 각성 × 2. */
+    /** 능력치 계산에 쓰는 단계 = 강화 (초월+ · 정제 · 아르반티아는 위 표) + 각성 × 2. */
     public static int statLevel(ItemStack stack) {
-        return level(stack) + awaken(stack) * AWAKEN_STEP;
+        int lv = level(stack), base;
+        if (gradeOf(stack) == GearGrade.ARVANTIA) base = INFINITY_BASE + lv * 3 / 5;
+        else base = switch (stage(stack)) {
+            case TRANSCEND -> 48 + lv / 2;
+            case REFINE -> 97 + lv * 3 / 5;
+            default -> lv <= MAX ? lv : MAX + (lv - MAX) * 2 / 5;
+        };
+        return base + awaken(stack) * AWAKEN_STEP;
+    }
+
+    // ================================================================ 아르반티아 (? +99 → 초월+ → 정제 → 아르반티아 인피니티)
+    public static final int BEYOND_MAX = 99;
+    public static final String STAGE_KEY = "AWStage";
+    public static final int TRANSCEND = 1, REFINE = 2;
+    /** 아르반티아 인피니티 +0 의 능력치 단계 (= 정제 +99). */
+    public static final int INFINITY_BASE = 156;
+    public static final int TRANSCEND_COLOR = 0x5AE8FF, REFINE_COLOR = 0xD07CFF, INFINITY_COLOR = 0xFF80E8;
+
+    @org.jetbrains.annotations.Nullable
+    public static GearGrade gradeOf(ItemStack st) {
+        return st.getItem() instanceof GearItem g ? g.grade() : null;
+    }
+
+    /** +15 을 넘어 +99 까지 강화되는 등급 (? · 아르반티아). */
+    public static boolean beyond(@org.jetbrains.annotations.Nullable GearGrade g) {
+        return g == GearGrade.UNKNOWN || g == GearGrade.ARVANTIA;
+    }
+
+    public static int maxLevel(ItemStack st) {
+        return beyond(gradeOf(st)) ? BEYOND_MAX : MAX;
+    }
+
+    /** 0 기본 · 1 초월+ · 2 정제 (? 장비만). */
+    public static int stage(ItemStack st) {
+        NbtCompound n = st.getNbt();
+        if (n == null || gradeOf(st) != GearGrade.UNKNOWN) return 0;
+        return Math.max(0, Math.min(REFINE, n.getInt(STAGE_KEY)));
+    }
+
+    public static void setStage(ItemStack st, int s) {
+        if (s <= 0) {
+            NbtCompound n = st.getNbt();
+            if (n != null) {
+                n.remove(STAGE_KEY);
+                if (n.isEmpty()) st.setNbt(null);
+            }
+        } else st.getOrCreateNbt().putInt(STAGE_KEY, Math.min(REFINE, s));
+    }
+
+    /** +15 을 넘은 강화 구간 (실패해도 그대로, 값 표가 다름): 0 아님 = 그 구간의 단계 (1 기본 +15~ · 2 초월+ · 3 정제 · 4 아르반티아). */
+    static int beyondTier(ItemStack st) {
+        GearGrade g = gradeOf(st);
+        if (g == GearGrade.ARVANTIA) return 4;
+        if (g != GearGrade.UNKNOWN) return 0;
+        int s = stage(st);
+        if (s > 0) return s + 1;
+        return level(st) >= MAX ? 1 : 0;
+    }
+
+    /** 다음 강화 성공 확률 (%). */
+    public static int chance(ItemStack st) {
+        int lv = level(st);
+        if (lv >= maxLevel(st)) return 0;
+        return switch (beyondTier(st)) {
+            case 1 -> Math.max(10, 45 - (lv - MAX) * 2 / 5);
+            case 2 -> Math.max(10, 50 - lv * 2 / 5);
+            case 3 -> Math.max(6, 45 - lv * 2 / 5);
+            case 4 -> Math.max(5, 40 - lv * 2 / 5);
+            default -> chance(lv);
+        };
+    }
+
+    /** 실패하면 내려가는지: +10 ~ +14 만 (+15 넘은 구간은 그대로). */
+    public static boolean failDrops(ItemStack st) {
+        return beyondTier(st) == 0 && failDrops(level(st));
+    }
+
+    public static int stoneCost(ItemStack st) {
+        int k = beyondTier(st), lv = level(st);
+        GearGrade g = gradeOf(st);
+        return k == 0 ? stoneCost(g == null ? GearGrade.COMMON : g, lv) : k + lv / 40;
+    }
+
+    public static int goldCost(ItemStack st) {
+        int k = beyondTier(st), lv = level(st);
+        GearGrade g = gradeOf(st);
+        return k == 0 ? goldCost(g == null ? GearGrade.COMMON : g, lv) : 50 + lv * 6 + k * 150;
+    }
+
+    /** ? 장비의 다음 큰 단계: 초월+ (기본 +99) · 정제 (초월+ +99) · 아르반티아 인피니티 승급 (정제 +99). */
+    public enum Ascend {
+        TRANSCEND, REFINE, INFINITY;
+
+        public String key() {
+            return name().toLowerCase();
+        }
+    }
+
+    @org.jetbrains.annotations.Nullable
+    public static Ascend nextAscend(ItemStack st) {
+        if (gradeOf(st) != GearGrade.UNKNOWN) return null;
+        return switch (stage(st)) {
+            case TRANSCEND -> Ascend.REFINE;
+            case REFINE -> Ascend.INFINITY;
+            default -> Ascend.TRANSCEND;
+        };
+    }
+
+    /**
+     * 초월+ · 정제 · 승급 재료 (약간 양심 없게: 셋 다 하면 돈 80만 G + 재료 ≈ 100만 G 어치).
+     * 초월+ ← 골렘 핵 · 군주의 증표 · 보스의 영혼 · 심연의 결정 / 정제 ← 원혼의 정수 · 광신도의 인장 · 요정 가루 · 인어의 눈물 · 용의 심장
+     * 아르반티아 인피니티 ← 용왕의 역린 · 비룡 비늘 · 해적 금화 · 도적단의 인장 · 흉포한 송곳니 · 용의 심장
+     */
+    public static List<Mat> ascendMats(Ascend a) {
+        return switch (a) {
+            case TRANSCEND -> List.of(new Mat(com.abilitywar.item.RpgItems.GOLEM_CORE, 5), new Mat(com.abilitywar.item.RpgItems.LORD_EMBLEM, 5),
+                    new Mat(com.abilitywar.item.RpgItems.BOSS_SOUL, 10), new Mat(com.abilitywar.item.RpgItems.ABYSS_CRYSTAL, 10));
+            case REFINE -> List.of(new Mat(com.abilitywar.item.RpgItems.WRAITH_ESSENCE, 10), new Mat(com.abilitywar.item.RpgItems.CULT_SIGIL, 10),
+                    new Mat(com.abilitywar.item.RpgItems.FAIRY_DUST, 10), new Mat(com.abilitywar.item.RpgItems.MERMAID_TEAR, 5),
+                    new Mat(com.abilitywar.item.RpgItems.DRAGON_HEART, 2));
+            case INFINITY -> List.of(new Mat(com.abilitywar.item.RpgItems.DRAGON_KING_SCALE, 3), new Mat(com.abilitywar.item.RpgItems.DRAKE_SCALE, 10),
+                    new Mat(com.abilitywar.item.RpgItems.PIRATE_DOUBLOON, 15), new Mat(com.abilitywar.item.RpgItems.BANDIT_SEAL, 15),
+                    new Mat(com.abilitywar.item.RpgItems.DIRE_FANG, 15), new Mat(com.abilitywar.item.RpgItems.DRAGON_HEART, 2));
+        };
+    }
+
+    public static long ascendGold(Ascend a) {
+        return switch (a) {
+            case TRANSCEND -> 150_000;
+            case REFINE -> 250_000;
+            case INFINITY -> 400_000;
+        };
+    }
+
+    /** 같은 종류의 아르반티아 인피니티 무기 (종류마다 하나). */
+    @org.jetbrains.annotations.Nullable
+    public static Item infinityWeapon(GearDefs.Weapon def, net.minecraft.util.math.random.Random r) {
+        List<Item> all = GearItems.WEAPONS.get(GearGrade.ARVANTIA);
+        if (all == null || all.isEmpty()) return null;
+        for (Item i : all) if (i instanceof GearWeaponItem w && w.def.type().equals(def.type())) return i;
+        return all.get(r.nextInt(all.size()));
+    }
+
+    /** 아르반티아 인피니티 갑옷 세트 하나의 같은 부위. */
+    @org.jetbrains.annotations.Nullable
+    public static Item infinityArmor(GearArmorItem a, net.minecraft.util.math.random.Random r) {
+        List<Item> pool = new ArrayList<>();
+        for (GearDefs.ArmorSet s : GearItems.SETS.getOrDefault(GearGrade.ARVANTIA, List.of())) {
+            GearDefs.Piece p = s.pieces().get(a.piece.slot());
+            if (p != null && GearItems.BY_ID.get(p.id()) != null) pool.add(GearItems.BY_ID.get(p.id()));
+        }
+        return pool.isEmpty() ? null : pool.get(r.nextInt(pool.size()));
+    }
+
+    /** 강화 수치 색 (단계에 따라: 초월+ 하늘 · 정제 보라 · 아르반티아 분홍). */
+    public static int colorOf(ItemStack st) {
+        int lv = level(st);
+        if (gradeOf(st) == GearGrade.ARVANTIA) return INFINITY_COLOR;
+        return switch (stage(st)) {
+            case TRANSCEND -> TRANSCEND_COLOR;
+            case REFINE -> REFINE_COLOR;
+            default -> lv > MAX ? GearGrade.lerp(0xFF5A3C, 0xFFE27A, Math.min(1, (lv - MAX) / 84.0)) : color(lv);
+        };
+    }
+
+    /** 강화 수치 글자: "+7" · "+37+" (초월+) · "정제 +12". */
+    public static MutableText levelText(ItemStack st, int lv) {
+        int col = colorOf(st);
+        int s = stage(st);
+        MutableText t = Text.empty();
+        if (s == REFINE) t.append(Text.translatable("gear.abilitywar.ui.refined_mark").styled(x -> x.withColor(TextColor.fromRgb(REFINE_COLOR)).withBold(true))).append(" ");
+        t.append(Text.literal("+" + lv + (s == TRANSCEND ? "+" : "")).styled(x -> x.withColor(TextColor.fromRgb(col)).withBold(lv >= 10 || s > 0)));
+        return t;
     }
 
     public static final int AWAKEN_COLOR = 0xC07CFF;
 
     public static int level(ItemStack stack) {
         NbtCompound n = stack.getNbt();
-        return n == null ? 0 : Math.max(0, Math.min(MAX, n.getInt(KEY)));
+        return n == null ? 0 : Math.max(0, Math.min(maxLevel(stack), n.getInt(KEY)));
     }
 
     public static void set(ItemStack stack, int level) {
-        level = Math.max(0, Math.min(MAX, level));
+        level = Math.max(0, Math.min(maxLevel(stack), level));
         if (level == 0) {
             NbtCompound n = stack.getNbt();
             if (n != null) {
@@ -162,14 +338,14 @@ public final class GearEnhance {
                     new Mat(com.abilitywar.item.RpgItems.FROST_HEART, 1), new Mat(com.abilitywar.item.RpgItems.EMBER_CORE, 1));
             case SECRET -> List.of(new Mat(net.minecraft.item.Items.NETHERITE_INGOT, 1), new Mat(net.minecraft.item.Items.SHULKER_SHELL, 4),
                     new Mat(com.abilitywar.item.RpgItems.WYVERN_SCALE, 2), new Mat(com.abilitywar.item.RpgItems.BOSS_SOUL, 3));
-            case UNKNOWN -> List.of(new Mat(net.minecraft.item.Items.NETHER_STAR, 2), new Mat(net.minecraft.item.Items.ECHO_SHARD, 4),
+            case UNKNOWN, ARVANTIA -> List.of(new Mat(net.minecraft.item.Items.NETHER_STAR, 2), new Mat(net.minecraft.item.Items.ECHO_SHARD, 4),
                     new Mat(net.minecraft.item.Items.DRAGON_BREATH, 4), new Mat(com.abilitywar.item.RpgItems.BOSS_SOUL, 10));
         };
     }
 
     /** 승급 값 (G). */
     public static int promoteGold(GearGrade g) {
-        return new int[]{200, 500, 1200, 3000, 6000, 12000, 25000, 25000}[g.tier()];
+        return new int[]{200, 500, 1200, 3000, 6000, 12000, 25000, 25000, 25000}[g.tier()];
     }
 
     public static GearGrade next(GearGrade g) {
@@ -231,12 +407,9 @@ public final class GearEnhance {
     /** "+7 이름": 강화 수치 색 (낮음 회색 → 높음 금색 → +15 무지개빛 붉은 금). 각성하면 "+15 ★3 이름". */
     public static Text name(ItemStack stack, Text base) {
         int lv = level(stack), aw = awaken(stack);
-        if (lv <= 0 && aw <= 0) return base;
+        if (lv <= 0 && aw <= 0 && stage(stack) == 0) return base;
         MutableText t = Text.empty();
-        if (lv > 0) {
-            int col = color(lv);
-            t.append(Text.literal("+" + lv + " ").styled(s -> s.withColor(TextColor.fromRgb(col)).withBold(lv >= 10)));
-        }
+        if (lv > 0 || stage(stack) > 0) t.append(levelText(stack, lv)).append(" ");
         if (aw > 0) t.append(Text.literal("★" + aw + " ").styled(s -> s.withColor(TextColor.fromRgb(AWAKEN_COLOR)).withBold(true)));
         return t.append(base);
     }

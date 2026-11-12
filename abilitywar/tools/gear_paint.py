@@ -402,7 +402,7 @@ def finish_weapon(cv, mat, gem, tier, rng, blade_mask, extra):
             pulse = 1.0 if nfr == 1 else 0.75 + 0.25 * math.sin(f / nfr * math.tau)
             ga = g * (0.55 if tier == 4 else 0.7) * pulse
             sel = ga > 0.02
-            r2[sel] = accent
+            r2[sel] = prism(f, nfr) if tier >= 8 else accent
             a2[sel] = ga[sel]
         if nfr > 1 and tier != 7:
             # 빛줄기가 칼날을 따라 지나감
@@ -416,6 +416,13 @@ def finish_weapon(cv, mat, gem, tier, rng, blade_mask, extra):
         out[..., 3] = np.clip(a2, 0, 1) * 255
         frames.append(out.astype(np.uint8))
     return frames
+
+
+def prism(f, nfr):
+    """아르반티아 인피니티: 프레임마다 색이 바뀌는 무지개빛."""
+    import colorsys
+    r, g, b = colorsys.hsv_to_rgb((f / nfr) % 1.0, 0.55, 1.0)
+    return np.array((r * 255, g * 255, b * 255), np.float32)
 
 
 def glitch(rgb, a, f, rng):
@@ -548,7 +555,7 @@ def paint_armor_icon(piece, style, mat, trim, gem, tier, rng):
             pulse = 1.0 if nfr == 1 else 0.75 + 0.25 * math.sin(f / nfr * math.tau)
             ga = g * (0.5 if tier == 4 else 0.65) * pulse
             sel = ga > 0.02
-            r2[sel] = accent
+            r2[sel] = prism(f, nfr) if tier >= 8 else accent
             a2[sel] = ga[sel]
         if nfr > 1 and tier != 7:
             pos = -6 + f / nfr * 50

@@ -11,6 +11,14 @@
     "minecraft:taiga",
     "minecraft:snowy_plains",
     "minecraft:savanna",
-    "minecraft:cherry_grove"
+    "minecraft:cherry_grove",
+    {
+      "id": "#c:plains",
+      "required": false
+    },
+    {
+      "id": "#c:flower_forests",
+      "required": false
+    }
   ]
 }

@@ -375,13 +375,16 @@ public final class AbyssTower {
 
     /** 일반 몹: 층이 오르면 더 센 무리가 섞임. [층 이상부터, 몹 id …] */
     static final String[][] TIERS = {
-            {"1", "minecraft:zombie", "minecraft:skeleton", "minecraft:spider", "minecraft:husk", "abilitywar:goblin", "abilitywar:wisp"},
+            {"1", "minecraft:zombie", "minecraft:skeleton", "minecraft:spider", "minecraft:husk", "abilitywar:goblin", "abilitywar:wisp",
+                    "abilitywar:bandit", "abilitywar:thief", "abilitywar:fairy", "abilitywar:dire_wolf"},
             {"6", "abilitywar:orc", "abilitywar:skeleton_knight", "minecraft:witch", "minecraft:stray", "minecraft:pillager", "minecraft:cave_spider",
-                    "mobs_of_mythology:kobold_warrior", "mobs_of_mythology:sporeling"},
+                    "mobs_of_mythology:kobold_warrior", "mobs_of_mythology:sporeling",
+                    "abilitywar:pirate", "abilitywar:cultist", "abilitywar:wraith", "abilitywar:drake", "illagerinvasion:provoker", "illagerinvasion:basher"},
             {"11", "minecraft:wither_skeleton", "minecraft:blaze", "minecraft:vindicator", "minecraft:piglin_brute", "minecraft:enderman",
-                    "mobs_of_mythology:chupacabra", "graveyard:revenant", "graveyard:wraith"},
+                    "mobs_of_mythology:chupacabra", "graveyard:revenant", "graveyard:wraith",
+                    "abilitywar:ancient_golem", "abilitywar:goblin_lord", "illagerinvasion:sorcerer", "illagerinvasion:marauder", "illagerinvasion:inquisitor"},
             {"21", "minecraft:evoker", "minecraft:ravager", "mutantmonsters:mutant_zombie", "mutantmonsters:mutant_skeleton", "mobs_of_mythology:automaton",
-                    "mutantmonsters:mutant_creeper"}};
+                    "mutantmonsters:mutant_creeper", "abilitywar:orc_lord", "abilitywar:enhanced_golem", "illagerinvasion:necromancer"}};
 
     /** 보스 층 보스: 이 모드 보스 + 같이 넣은 다른 모드 보스 (설치된 것만). [층 이상부터, id] */
     static final String[][] BOSSES = {
@@ -390,7 +393,7 @@ public final class AbyssTower {
             {"15", "soulsweapons:draugr_boss"}, {"15", "soulsweapons:accursed_lord_boss"}, {"20", "soulsweapons:returning_knight"},
             {"20", "bosses_of_mass_destruction:gauntlet"}, {"20", "archon:tar"}, {"20", "aquamirae:captain_cornelia"}, {"25", "archon:inigo"},
             {"25", "archon:ayla"}, {"25", "adventurez:blackstone_golem"}, {"30", "soulsweapons:moonknight"}, {"30", "soulsweapons:chaos_monarch"},
-            {"30", "bosses_of_mass_destruction:void_blossom"}, {"40", "bosses_of_mass_destruction:obsidilith"}, {"40", "archon:leven"},
+            {"30", "bosses_of_mass_destruction:void_blossom"}, {"20", "illagerinvasion:invoker"}, {"35", "abilitywar:dragon_king"}, {"40", "bosses_of_mass_destruction:obsidilith"}, {"40", "archon:leven"},
             {"50", "minecraft:wither"}};
 
     static int mobCount(int floor, int players) {

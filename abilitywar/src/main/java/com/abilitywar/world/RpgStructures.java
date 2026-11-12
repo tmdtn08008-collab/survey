@@ -41,7 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class RpgStructures {
     // ================================================================ 종류
     public enum Kind {
-        CAPITAL(118, 70), CAPITAL_LANDS(320, 40), TOWN(40, 34), FALLEN_FORTRESS(30, 30), EMBER_ALTAR(26, 30), FROST_TEMPLE(26, 34), WYVERN_ROOST(22, 30), GOBLIN_CAMP(14, 12);
+        CAPITAL(118, 70), CAPITAL_LANDS(320, 40), TOWN(40, 34), FALLEN_FORTRESS(30, 30), EMBER_ALTAR(26, 30), FROST_TEMPLE(26, 34), WYVERN_ROOST(22, 30), GOBLIN_CAMP(14, 12), DRAGON_NEST(30, 40);
 
         /** 반지름 (가로·세로), 높이 (바닥 위). */
         public final int radius, height;
@@ -218,9 +218,9 @@ public final class RpgStructures {
             // 물 위·너무 울퉁불퉁한 곳은 건너뜀 (수도는 어디든 지음)
             if (!capital) {
                 if (hs[4] <= sea) return Optional.empty();
-                if (kind != Kind.WYVERN_ROOST && hs[8] - hs[0] > 28) return Optional.empty();
+                if (kind != Kind.WYVERN_ROOST && kind != Kind.DRAGON_NEST && hs[8] - hs[0] > 28) return Optional.empty();
             }
-            if (kind == Kind.WYVERN_ROOST) y = hs[6];
+            if (kind == Kind.WYVERN_ROOST || kind == Kind.DRAGON_NEST) y = hs[6];
             final int baseY = y;
             BlockBox box = new BlockBox(cx - r - 2, baseY + 1, cz - r - 2, cx + r + 2, baseY + kind.height, cz + r + 2);
             return Optional.of(new StructurePosition(new BlockPos(cx, baseY, cz), collector -> {

@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:jagged_peaks",
+    "minecraft:stony_peaks",
+    "minecraft:frozen_peaks",
+    "minecraft:windswept_hills",
+    "minecraft:windswept_gravelly_hills",
+    {"id": "#c:mountain_peak", "required": false},
+    {"id": "#c:extreme_hills", "required": false}
+  ]
+}

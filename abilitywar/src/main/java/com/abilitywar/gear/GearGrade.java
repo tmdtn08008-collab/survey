@@ -3,7 +3,7 @@ package com.abilitywar.gear;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-/** 장비 등급: 일반 → 좋음 → 희귀 → 영웅 → 전설 → 신화 → 시크릿 → ?. */
+/** 장비 등급: 일반 → 좋음 → 희귀 → 영웅 → 전설 → 신화 → 시크릿 → ? → 아르반티아 인피니티 (? 를 끝까지 키워 승급해서만 얻음). */
 public enum GearGrade {
     COMMON("common", 0xC8C8C8),
     GOOD("good", 0x6BE36B),
@@ -12,7 +12,8 @@ public enum GearGrade {
     LEGENDARY("legendary", 0xFFB020),
     MYTHIC("mythic", 0xFF4848),
     SECRET("secret", 0x2EF2D0),
-    UNKNOWN("unknown", 0xFFFFFF);
+    UNKNOWN("unknown", 0xFFFFFF),
+    ARVANTIA("arvantia", 0xFF80E8);
 
     public final String key;
     public final int color;
@@ -28,7 +29,7 @@ public enum GearGrade {
 
     /** 착용 레벨 (게임 규칙 abilitywarGearLevel 이 켜져 있을 때). */
     public int requiredLevel() {
-        return new int[]{1, 10, 20, 35, 50, 65, 80, 90}[ordinal()];
+        return new int[]{1, 10, 20, 35, 50, 65, 80, 90, 100}[ordinal()];
     }
 
     public Text displayName() {
@@ -50,11 +51,32 @@ public enum GearGrade {
             long f = (time / 90 + index * 7L) % 11;
             return f < 2 ? 0xFF4CF0 : f < 4 ? 0x60FFF4 : f < 5 ? 0x707070 : 0xF4F4F4;
         }
+        if (this == ARVANTIA) {
+            // 무지개빛이 글자를 따라 흐름 (분홍 · 하늘 · 금빛이 더 자주)
+            float h = (float) (((time / 1600.0) - index * 0.06) % 1.0);
+            if (h < 0) h += 1;
+            return hsv(h, 0.45f, 1f);
+        }
         if (this == MYTHIC) {
             double k = 0.5 + 0.5 * Math.sin(time / 420.0 - index * 0.4);
             return lerp(0xFF4848, 0xFF9A5A, k);
         }
         return color;
+    }
+
+    public static int hsv(float h, float s, float v) {
+        int i = (int) (h * 6) % 6;
+        float f = h * 6 - (int) (h * 6), p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
+        float r, g, b;
+        switch (i) {
+            case 0 -> { r = v; g = t; b = p; }
+            case 1 -> { r = q; g = v; b = p; }
+            case 2 -> { r = p; g = v; b = t; }
+            case 3 -> { r = p; g = q; b = v; }
+            case 4 -> { r = t; g = p; b = v; }
+            default -> { r = v; g = p; b = q; }
+        }
+        return ((int) (r * 255) << 16) | ((int) (g * 255) << 8) | (int) (b * 255);
     }
 
     public static int lerp(int a, int b, double k) {
@@ -74,6 +96,7 @@ public enum GearGrade {
             case MYTHIC -> Formatting.RED;
             case SECRET -> Formatting.AQUA;
             case UNKNOWN -> Formatting.WHITE;
+            case ARVANTIA -> Formatting.LIGHT_PURPLE;
         };
     }
 }

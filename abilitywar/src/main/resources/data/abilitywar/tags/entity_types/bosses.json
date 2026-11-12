@@ -5,6 +5,7 @@
     "abilitywar:ember_colossus",
     "abilitywar:frost_witch",
     "abilitywar:ancient_wyvern",
+    "abilitywar:dragon_king",
     {
       "id": "bosses_of_mass_destruction:void_blossom",
       "required": false
@@ -163,6 +164,10 @@
     },
     {
       "id": "mutantmonsters:mutant_enderman",
+      "required": false
+    },
+    {
+      "id": "illagerinvasion:invoker",
       "required": false
     }
   ]
