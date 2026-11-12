@@ -728,6 +728,68 @@ for k, ko, en in [
     t(k, ko, en)
 
 
+# ================================================================ 2.10 인스턴스 던전
+t('entity.abilitywar.dungeon_guide', '던전 안내인', 'Dungeon Guide')
+t('item.abilitywar.dungeon_guide_spawn_egg', '던전 안내인 생성 알', 'Dungeon Guide Spawn Egg')
+for k, ko, en in [
+        ('dungeon.abilitywar.title', '던전 안내인 — 인스턴스 던전', 'Dungeon Guide — Instance Dungeons'),
+        ('dungeon.abilitywar.say', '"어서 오게, 모험가. 들어갈 때마다 길이 바뀌는 던전들이지. 문이 닫히면 다 쓰러뜨려야 열리고, 함정 방에선 바닥을 조심하게. 끝에 있는 주인을 쓰러뜨리면 큰 보상이 있다네."',
+         '"Welcome, adventurer. These dungeons change every time you enter. Doors lock until every foe is down, watch the floor in trap rooms, and great rewards await whoever slays the master at the end."'),
+        ('dungeon.abilitywar.name.goblin_warren', '고블린 굴', 'Goblin Warren'),
+        ('dungeon.abilitywar.name.pirate_grotto', '해적 동굴', 'Pirate Grotto'),
+        ('dungeon.abilitywar.name.cult_crypt', '광신도 묘실', 'Cult Crypt'),
+        ('dungeon.abilitywar.name.golem_ruins', '골렘 유적', 'Golem Ruins'),
+        ('dungeon.abilitywar.name.dragon_abyss', '용의 심연', "Dragon's Abyss"),
+        ('dungeon.abilitywar.boss.goblin_warren.mid', '고블린 로드 · 굴의 우두머리', 'Goblin Lord, Warren Chief'),
+        ('dungeon.abilitywar.boss.goblin_warren.boss', '오크 로드 · 굴의 주인 크로가', 'Krogga, Orc Warlord of the Warren'),
+        ('dungeon.abilitywar.boss.pirate_grotto.mid', '갑판장 비셋', 'Bosun Bissett'),
+        ('dungeon.abilitywar.boss.pirate_grotto.boss', '유령 선장', 'The Ghost Captain'),
+        ('dungeon.abilitywar.boss.cult_crypt.mid', '죽음의 사제', 'Priest of Death'),
+        ('dungeon.abilitywar.boss.cult_crypt.boss', '타락한 기사왕 · 묘실의 왕', 'The Fallen King of the Crypt'),
+        ('dungeon.abilitywar.boss.golem_ruins.mid', '강화 골렘 · 유적의 파수꾼', 'Enhanced Golem, Ruin Warden'),
+        ('dungeon.abilitywar.boss.golem_ruins.boss', '화염 거인 · 유적의 심장', 'Ember Colossus, Heart of the Ruins'),
+        ('dungeon.abilitywar.boss.dragon_abyss.mid', '고대 비룡 · 심연의 문지기', 'Ancient Wyvern, Abyss Gatekeeper'),
+        ('dungeon.abilitywar.boss.dragon_abyss.boss', '용왕 · 심연의 주인', 'The Dragon King, Lord of the Abyss'),
+        ('dungeon.abilitywar.diff.normal', '보통', 'Normal'),
+        ('dungeon.abilitywar.diff.hard', '어려움', 'Hard'),
+        ('dungeon.abilitywar.diff.hell', '지옥', 'Hell'),
+        ('dungeon.abilitywar.row_sub', '레벨 %s 부터 · 보스: %s', 'Level %s+ · Boss: %s'),
+        ('dungeon.abilitywar.btn_tip', '레벨 %s 이상 · 입장료 %s G · 보상 ×%s', 'Level %s+ · Entry %s G · Rewards ×%s'),
+        ('dungeon.abilitywar.party', '파티 %s 명이 같이 들어갑니다 (32칸 안)', 'Party of %s enters together (within 32 blocks)'),
+        ('dungeon.abilitywar.solo', '혼자 들어갑니다 (파티면 같이)', 'Entering solo (parties enter together)'),
+        ('dungeon.abilitywar.list_line', '레벨 %s · 입장료 %s G (어려움 ×2 · 지옥 ×4)', 'Level %s · Entry %s G (Hard ×2 · Hell ×4)'),
+        ('dungeon.abilitywar.enter', '%s [%s] 에 들어왔습니다. 전투 방 %s 곳을 지나 끝의 주인을 쓰러뜨리세요. (나가기: /aw dungeon leave)',
+         'You entered %s [%s]. Clear %s battle rooms and slay the master at the end. (Leave: /aw dungeon leave)'),
+        ('dungeon.abilitywar.enter_sub', '길은 매번 바뀝니다', 'The paths change every time'),
+        ('dungeon.abilitywar.left', '%s 님이 던전을 나갔습니다.', '%s left the dungeon.'),
+        ('dungeon.abilitywar.fell', '%s 님이 쓰러졌습니다 (아이템은 그대로).', '%s has fallen (items kept).'),
+        ('dungeon.abilitywar.timeout', '시간이 다 되어 던전이 무너집니다…', 'Time is up — the dungeon collapses…'),
+        ('dungeon.abilitywar.treasure', '보물 방이다!', 'A treasure room!'),
+        ('dungeon.abilitywar.trap', '⚠ 함정 방 — 붉은 원을 피하세요!', '⚠ Trap room — avoid the red circles!'),
+        ('dungeon.abilitywar.wave', '다음 무리! (%s / %s)', 'Next wave! (%s / %s)'),
+        ('dungeon.abilitywar.mid_room', '— 중간 보스 —', '— Mid Boss —'),
+        ('dungeon.abilitywar.boss_room', '— 던전의 주인 —', '— Dungeon Master —'),
+        ('dungeon.abilitywar.room_clear', '방 정리! +%s G', 'Room cleared! +%s G'),
+        ('dungeon.abilitywar.mid_down', '중간 보스 처치! +%s G', 'Mid boss down! +%s G'),
+        ('dungeon.abilitywar.clear', '던전 클리어!', 'DUNGEON CLEAR!'),
+        ('dungeon.abilitywar.clear_sub', '+%s G · 경험치 %s · 보상이 가방에 들어왔습니다', '+%s G · %s XP · rewards are in your bag'),
+        ('dungeon.abilitywar.clear_chat', '✦ %s [%s] 클리어 (걸린 시간 %s) — %s G, 장비 · 재료 · 강화석 · 보스의 영혼. 보스 방 가운데 상자도 열어 보세요!',
+         '✦ %s [%s] cleared in %s — %s G, gear, materials, enhance stones, boss souls. Open the chest in the boss room too!'),
+        ('dungeon.abilitywar.broadcast_hell', '%s 님의 파티가 지옥 난이도 %s 을(를) 클리어했습니다!', "%s's party cleared %s on Hell difficulty!"),
+        ('dungeon.abilitywar.bar.explore', '%s [%s] · 전투 방 %s / %s · 남은 시간 %s', '%s [%s] · Rooms %s / %s · %s left'),
+        ('dungeon.abilitywar.bar.fight', '%s · 남은 적 %s / %s · %s', '%s · Enemies %s / %s · %s'),
+        ('dungeon.abilitywar.bar.boss', '%s  ❤ %s / %s · %s', '%s  ❤ %s / %s · %s'),
+        ('dungeon.abilitywar.bar.done', '클리어! %s 초 뒤 돌아갑니다 (/aw dungeon leave)', 'Cleared! Returning in %s s (/aw dungeon leave)'),
+        ('dungeon.abilitywar.err.closed', '던전이 열리지 않았습니다.', 'Dungeons are not available.'),
+        ('dungeon.abilitywar.err.already', '이미 던전이나 탑 안에 있습니다.', 'You are already in a dungeon or the tower.'),
+        ('dungeon.abilitywar.err.level', '레벨 %s 부터 들어갈 수 있습니다.', 'Requires level %s.'),
+        ('dungeon.abilitywar.err.fee', '입장료 %2$s G 가 모자랍니다.', 'Not enough gold for the %2$s G entry fee.'),
+        ('dungeon.abilitywar.err.full', '지금은 던전이 가득 찼습니다. 잠시 뒤에 다시 오세요.', 'All dungeons are full right now. Try again later.'),
+        ('dungeon.abilitywar.err.level_member', '레벨 %s 이 안 되어 같이 들어가지 못했습니다.', 'You could not join: level %s required.'),
+        ('dungeon.abilitywar.err.fee_member', '입장료 %s G 가 모자라 같이 들어가지 못했습니다.', 'You could not join: %s G entry fee required.')]:
+    t(k, ko, en)
+
+
 def apply(fname, idx):
     p = os.path.join(LANG, fname)
     d = json.load(open(p, encoding='utf-8'))

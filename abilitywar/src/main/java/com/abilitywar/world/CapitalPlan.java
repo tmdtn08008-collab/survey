@@ -464,6 +464,10 @@ public final class CapitalPlan {
         b.set(mx + 7, by + 5, gz, s(Blocks.END_ROD));
         b.set(mx + 8, by + 5, gz, s(Blocks.END_ROD));
         b.spawns.add(new Blueprint.Spawn(new BlockPos(mx + 7, by + 1, gz - 1), w -> named(AWEntities.TOWER_KEEPER.create(w), 180)));
+        // 던전 안내인 (2.10): 회관 안 서쪽 책장 앞 (물약 상인 맞은편) + 영혼 등불
+        b.spawns.add(new Blueprint.Spawn(new BlockPos(x0 + 3, by + 1, hz0 + 9), w -> named(AWEntities.DUNGEON_GUIDE.create(w), 270)));
+        b.set(x0 + 2, by + 4, hz0 + 8, s(Blocks.SOUL_LANTERN));
+        b.set(x0 + 2, by + 4, hz0 + 10, s(Blocks.SOUL_LANTERN));
         // 정면 큰 깃발 (파랑 · 금 · 칼 문양 대신 노랑 줄)
         for (int fx : new int[]{mx - 5, mx + 5}) {
             b.fill(fx, by + 4, hz0 - 1, fx, by + 10, hz0 - 1, s(Blocks.BLUE_WOOL));

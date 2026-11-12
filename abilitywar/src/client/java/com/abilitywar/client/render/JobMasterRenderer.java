@@ -22,6 +22,7 @@ public class JobMasterRenderer extends MobEntityRenderer<JobMasterEntity, Player
     static final Identifier APOTHECARY_SKIN = AbilityWar.id("textures/entity/apothecary.png");
     static final Identifier BLACKSMITH_SKIN = AbilityWar.id("textures/entity/blacksmith.png");
     static final Identifier TOWER_KEEPER_SKIN = AbilityWar.id("textures/entity/tower_keeper.png");
+    static final Identifier DUNGEON_GUIDE_SKIN = AbilityWar.id("textures/entity/dungeon_guide.png");
 
     public static JobMasterRenderer apothecary(EntityRendererFactory.Context ctx) {
         return new JobMasterRenderer(ctx, APOTHECARY_SKIN, false);
@@ -33,6 +34,10 @@ public class JobMasterRenderer extends MobEntityRenderer<JobMasterEntity, Player
 
     public static JobMasterRenderer towerKeeper(net.minecraft.client.render.entity.EntityRendererFactory.Context ctx) {
         return new JobMasterRenderer(ctx, TOWER_KEEPER_SKIN, false);
+    }
+
+    public static JobMasterRenderer dungeonGuide(net.minecraft.client.render.entity.EntityRendererFactory.Context ctx) {
+        return new JobMasterRenderer(ctx, DUNGEON_GUIDE_SKIN, false);
     }
     final Identifier skin;
 

@@ -31,6 +31,7 @@ public final class ClientNet {
                 else if (e instanceof com.abilitywar.rpg.ShopNpcEntity shop) {
                     if (com.abilitywar.rpg.ShopNpcEntity.BLACKSMITH.equals(shop.kind())) com.abilitywar.client.screen.EnhanceScreen.open(npc);
                     else if (com.abilitywar.rpg.ShopNpcEntity.TOWER_KEEPER.equals(shop.kind())) com.abilitywar.client.screen.TowerScreen.open(npc);
+                    else if (com.abilitywar.rpg.ShopNpcEntity.DUNGEON_GUIDE.equals(shop.kind())) com.abilitywar.client.screen.DungeonScreen.open(npc);
                     else com.abilitywar.client.screen.ShopScreen.open(npc, shop.kind());
                 } else com.abilitywar.client.screen.JobMasterScreen.open(npc);
             });

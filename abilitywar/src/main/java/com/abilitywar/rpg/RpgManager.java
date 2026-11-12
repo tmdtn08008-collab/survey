@@ -831,10 +831,10 @@ public final class RpgManager {
                         }
                         openNpc(player, npc);
                     }
-                    case 10, 11, 12, 13, 14 -> {
+                    case 10, 11, 12, 13, 14, 15 -> {
                         // 상점 · 대장장이 · 탑지기 (가까이에서만): 10 사기 ("물건:개수"), 11 강화 ("칸:보호"), 12 승급 ("칸"), 13 각성 ("칸"), 14 탑 들어가기 ("시작 층")
                         Entity e = player.getWorld().getEntityById(npc);
-                        String need = action == 10 ? null : action == 14 ? ShopNpcEntity.TOWER_KEEPER : ShopNpcEntity.BLACKSMITH;
+                        String need = action == 10 ? null : action == 14 ? ShopNpcEntity.TOWER_KEEPER : action == 15 ? ShopNpcEntity.DUNGEON_GUIDE : ShopNpcEntity.BLACKSMITH;
                         if (!(e instanceof ShopNpcEntity shop) || e.squaredDistanceTo(player) > 10 * 10 || (need != null && !need.equals(shop.kind()))) {
                             player.sendMessage(Text.translatable("shop.abilitywar.err.far").formatted(Formatting.RED), true);
                             return;
@@ -845,9 +845,19 @@ public final class RpgManager {
                             case 11 -> Shops.enhance(player, parseInt(a[0]), a.length > 1 && a[1].equals("1"), a.length > 2 ? parseInt(a[2]) : 1);
                             case 12 -> Shops.promote(player, parseInt(a[0]));
                             case 13 -> Shops.awaken(player, parseInt(a[0]));
+                            case 15 -> {
+                                // 15 던전 들어가기 ("테마:난이도")
+                                InstanceDungeon.Theme th = InstanceDungeon.Theme.byKey(a[0]);
+                                InstanceDungeon.Diff df = InstanceDungeon.Diff.byKey(a.length > 1 ? a[1] : "normal");
+                                yield th == null ? null : InstanceDungeon.start(player, th, df);
+                            }
                             default -> AbyssTower.start(player, parseInt(a[0]));
                         };
-                        if (err != null) player.sendMessage(Text.translatable(err, AbyssTower.MIN_LEVEL).formatted(Formatting.RED), true);
+                        if (err != null && action == 15) {
+                            InstanceDungeon.Theme th = InstanceDungeon.Theme.byKey(a[0]);
+                            InstanceDungeon.Diff df = InstanceDungeon.Diff.byKey(a.length > 1 ? a[1] : "normal");
+                            player.sendMessage(Text.translatable(err, th == null ? 0 : InstanceDungeon.minLevel(th, df), th == null ? "0" : Shops.fmt(InstanceDungeon.fee(th, df))).formatted(Formatting.RED), true);
+                        } else if (err != null) player.sendMessage(Text.translatable(err, AbyssTower.MIN_LEVEL).formatted(Formatting.RED), true);
                     }
                     default -> {
                     }

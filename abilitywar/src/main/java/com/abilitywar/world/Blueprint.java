@@ -373,7 +373,7 @@ public final class Blueprint {
 
     /** 상자 보상. tier 0 마을 (재료·음식) · 1 던전 (장비 희귀~영웅) · 2 보스방 (전설~신화). */
     public static final class Loot {
-        static void fill(ChestBlockEntity be, int tier, Random r) {
+        public static void fill(ChestBlockEntity be, int tier, Random r) {
             List<ItemStack> items = new ArrayList<>();
             net.minecraft.item.Item[] basic = {net.minecraft.item.Items.BREAD, net.minecraft.item.Items.COOKED_BEEF, net.minecraft.item.Items.APPLE,
                     net.minecraft.item.Items.IRON_INGOT, net.minecraft.item.Items.GOLD_INGOT, net.minecraft.item.Items.TORCH, net.minecraft.item.Items.ARROW,

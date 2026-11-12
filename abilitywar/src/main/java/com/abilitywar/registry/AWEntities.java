@@ -86,6 +86,17 @@ public final class AWEntities {
     public static final net.minecraft.item.Item TOWER_KEEPER_EGG = Registry.register(Registries.ITEM, AbilityWar.id("tower_keeper_spawn_egg"),
             new net.minecraft.item.SpawnEggItem(TOWER_KEEPER, 0x1A1030, 0xB070FF, new net.minecraft.item.Item.Settings()));
 
+    /** 던전 안내인 NPC: 인스턴스 던전 (수도 모험가 길드 옆, 탑 문 반대편). */
+    public static final EntityType<com.abilitywar.rpg.ShopNpcEntity> DUNGEON_GUIDE = Registry.register(Registries.ENTITY_TYPE,
+            AbilityWar.id("dungeon_guide"),
+            FabricEntityTypeBuilder.<com.abilitywar.rpg.ShopNpcEntity>create(SpawnGroup.MISC, com.abilitywar.rpg.ShopNpcEntity::dungeonGuide)
+                    .dimensions(EntityDimensions.fixed(0.6f, 1.95f))
+                    .trackRangeBlocks(64)
+                    .fireImmune()
+                    .build());
+    public static final net.minecraft.item.Item DUNGEON_GUIDE_EGG = Registry.register(Registries.ITEM, AbilityWar.id("dungeon_guide_spawn_egg"),
+            new net.minecraft.item.SpawnEggItem(DUNGEON_GUIDE, 0x3A2A1A, 0xE0A040, new net.minecraft.item.Item.Settings()));
+
     public static void init() {
         net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(KING, com.abilitywar.rpg.JobMasterEntity.createAttributes());
         net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(net.minecraft.item.ItemGroups.SPAWN_EGGS).register(e -> e.add(KING_EGG));
@@ -93,12 +104,13 @@ public final class AWEntities {
         net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(net.minecraft.item.ItemGroups.SPAWN_EGGS).register(e -> e.add(JOB_MASTER_EGG));
         net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(GUILD_CLERK, com.abilitywar.rpg.JobMasterEntity.createAttributes());
         net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(net.minecraft.item.ItemGroups.SPAWN_EGGS).register(e -> e.add(GUILD_CLERK_EGG));
-        for (var t : java.util.List.of(APOTHECARY, BLACKSMITH, TOWER_KEEPER))
+        for (var t : java.util.List.of(APOTHECARY, BLACKSMITH, TOWER_KEEPER, DUNGEON_GUIDE))
             net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry.register(t, com.abilitywar.rpg.JobMasterEntity.createAttributes());
         net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents.modifyEntriesEvent(net.minecraft.item.ItemGroups.SPAWN_EGGS).register(e -> {
             e.add(APOTHECARY_EGG);
             e.add(BLACKSMITH_EGG);
             e.add(TOWER_KEEPER_EGG);
+            e.add(DUNGEON_GUIDE_EGG);
         });
     }
 

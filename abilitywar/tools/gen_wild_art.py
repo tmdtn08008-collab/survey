@@ -514,9 +514,54 @@ def icons():
     i.save('dragon_king_scale')
 
 
+def dungeon_guide():
+    """던전 안내인 (플레이어 모델 64x64): 흉터 있는 늙은 모험가, 가죽 외투 · 붉은 목도리 · 지도 통 · 등불 벨트."""
+    s = Skin(seed=60)
+    SK, HAIR, COAT, COATD, SCARF, BELT, BOOT = (176, 130, 100), (150, 150, 150), (92, 64, 40), (64, 44, 28), (150, 32, 30), (52, 36, 22), (40, 30, 22)
+    s.box(0, 0, 8, 8, 8, SK)
+    s.rect(8, 8, 8, 2, HAIR, 6)
+    for u in (0, 16, 24):
+        s.rect(u, 8, 8, 3, HAIR, 8)
+    s.rect(8, 0, 8, 8, HAIR, 8)
+    for x in (9, 13):
+        s.rect(x, 11, 2, 1, (40, 30, 24), 0)
+    s.dot(12, 10, (120, 70, 60)); s.dot(12, 11, (120, 70, 60)); s.dot(12, 12, (120, 70, 60))  # 흉터
+    s.rect(9, 13, 6, 3, (110, 104, 100), 6)  # 수염
+    s.rect(11, 13, 2, 1, (90, 50, 40), 0)
+    hat(s, (60, 44, 30))
+    s.rect(40, 0, 8, 8, (70, 52, 34), 6)
+    s.rect(40, 8, 8, 2, (60, 44, 30), 6)
+    s.rect(40, 10, 8, 6, (0, 0, 0), 0)
+    clear(s, 40, 10, 8, 6)
+    for u in (32, 48, 56):
+        clear(s, u, 10, 8, 6)
+    # 외투 · 목도리 · 벨트
+    s.box(16, 16, 8, 12, 4, COAT, front=COATD)
+    s.rect(20, 20, 8, 2, SCARF, 8)
+    s.rect(16, 20, 4, 2, SCARF, 8)
+    s.rect(28, 20, 4, 2, SCARF, 8)
+    s.rect(32, 20, 8, 2, SCARF, 8)
+    s.rect(21, 22, 1, 6, SCARF, 6)
+    s.rect(20, 27, 8, 1, BELT, 3)
+    s.dot(24, 27, (230, 190, 70))
+    s.rect(32, 21, 8, 8, (130, 100, 60), 8)  # 등의 지도 통
+    for x in range(33, 39, 2):
+        s.dot(x, 24, (90, 70, 40))
+    # 팔 (오른 (40,16) · 왼 (32,48)) · 다리 (오른 (0,16) · 왼 (16,48))
+    for (u, v) in ((40, 16), (32, 48)):
+        s.box(u, v, 4, 12, 4, COAT)
+        s.rect(u + 4, v + 14, 4, 2, SK, 4)
+        s.rect(u, v + 12, 16, 1, COATD, 3)
+    for (u, v) in ((0, 16), (16, 48)):
+        s.box(u, v, 4, 12, 4, (70, 58, 44))
+        for k in range(4):
+            s.rect(u + k * 4, v + 13, 4, 3, BOOT, 4)
+    s.save('dungeon_guide')
+
+
 def eggs():
     for m in ['goblin_lord', 'orc_lord', 'bandit', 'thief', 'pirate', 'cultist', 'wraith', 'fairy', 'mermaid', 'dire_wolf', 'ancient_golem',
-              'enhanced_golem', 'drake', 'dragon_king']:
+              'enhanced_golem', 'drake', 'dragon_king', 'dungeon_guide']:
         json.dump({'parent': 'minecraft:item/template_spawn_egg'}, open(os.path.join(MODELS, m + '_spawn_egg.json'), 'w'))
 
 
@@ -524,5 +569,5 @@ if __name__ == '__main__':
     goblin_lord(); orc_lord(); bandit(); thief(); pirate(); cultist(); wraith(); fairy(); mermaid(); dire_wolf()
     golem('ancient_golem', (112, 118, 104), (84, 90, 78), (150, 160, 140), (80, 255, 210), 51, moss=(70, 120, 50))
     golem('enhanced_golem', (34, 26, 44), (20, 14, 28), (255, 200, 90), (255, 170, 50), 53)
-    dragons(); icons(); eggs()
+    dragons(); icons(); dungeon_guide(); eggs()
     print('done')

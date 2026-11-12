@@ -164,7 +164,7 @@ public final class AbyssTower {
         if (server == null) return "tower.abilitywar.err.closed";
         ServerWorld abyss = server.getWorld(WORLD);
         if (abyss == null) return "tower.abilitywar.err.closed";
-        if (inTower(leader) || isAbyss(leader.getWorld())) return "tower.abilitywar.err.already";
+        if (inTower(leader) || isAbyss(leader.getWorld()) || InstanceDungeon.inDungeon(leader) || InstanceDungeon.isDungeon(leader.getWorld())) return "tower.abilitywar.err.already";
         if (RpgManager.rpg(leader).level < MIN_LEVEL && !leader.isCreative()) return "tower.abilitywar.err.level";
         int best = RpgManager.rpg(leader).towerBest;
         if (startFloor < 1 || (!any && !checkpoints(best).contains(startFloor))) startFloor = 1;

@@ -102,7 +102,8 @@ public final class AWCommands {
     static final java.util.Map<String, net.minecraft.entity.EntityType<?>> NPCS = java.util.Map.of(
             "apothecary", com.abilitywar.registry.AWEntities.APOTHECARY, "blacksmith", com.abilitywar.registry.AWEntities.BLACKSMITH,
             "guild_clerk", com.abilitywar.registry.AWEntities.GUILD_CLERK, "job_master", com.abilitywar.registry.AWEntities.JOB_MASTER,
-            "king", com.abilitywar.registry.AWEntities.KING, "tower_keeper", com.abilitywar.registry.AWEntities.TOWER_KEEPER);
+            "king", com.abilitywar.registry.AWEntities.KING, "tower_keeper", com.abilitywar.registry.AWEntities.TOWER_KEEPER,
+            "dungeon_guide", com.abilitywar.registry.AWEntities.DUNGEON_GUIDE);
 
     private static final com.mojang.brigadier.suggestion.SuggestionProvider<ServerCommandSource> BOSSES = (ctx, b) ->
             net.minecraft.command.CommandSource.suggestMatching(java.util.stream.Stream.of("abilitywar:fallen_king", "abilitywar:ember_colossus", "abilitywar:frost_witch", "abilitywar:ancient_wyvern", "abilitywar:dragon_king",
@@ -120,6 +121,22 @@ public final class AWCommands {
 
     private static final com.mojang.brigadier.suggestion.SuggestionProvider<ServerCommandSource> PLACES = (ctx, b) ->
             net.minecraft.command.CommandSource.suggestMatching(java.util.Arrays.stream(com.abilitywar.world.RpgStructures.Kind.values()).map(k -> k.name().toLowerCase()).toList(), b);
+
+    private static int dungeonStart(ServerCommandSource src, String theme, String diff) throws CommandSyntaxException {
+        ServerPlayerEntity p = src.getPlayerOrThrow();
+        var t = com.abilitywar.rpg.InstanceDungeon.Theme.byKey(theme);
+        if (t == null) {
+            src.sendError(Text.literal(theme + "?"));
+            return 0;
+        }
+        var d = com.abilitywar.rpg.InstanceDungeon.Diff.byKey(diff);
+        String err = com.abilitywar.rpg.InstanceDungeon.start(p, t, d);
+        if (err != null) {
+            src.sendError(Text.translatable(err, com.abilitywar.rpg.InstanceDungeon.minLevel(t, d), com.abilitywar.rpg.Shops.fmt(com.abilitywar.rpg.InstanceDungeon.fee(t, d))));
+            return 0;
+        }
+        return 1;
+    }
 
     /** /aw goto <장소>: 가장 가까운 RPG 구조물 앞으로 순간이동 (수도는 광장). */
     private static int gotoPlace(ServerCommandSource src, String kind) throws CommandSyntaxException {
@@ -351,6 +368,26 @@ public final class AWCommands {
                             }
                             com.abilitywar.gear.GearEnhance.setStage(st, com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(ctx, "stage"));
                             ctx.getSource().sendFeedback(() -> st.getName(), false);
+                            return 1;
+                        })))
+                .then(literal("dungeon")
+                        .then(literal("start").then(argument("theme", StringArgumentType.word())
+                                .suggests((c, sb) -> CommandSource.suggestMatching(java.util.Arrays.stream(com.abilitywar.rpg.InstanceDungeon.Theme.values()).map(t -> t.key), sb))
+                                .executes(ctx -> dungeonStart(ctx.getSource(), StringArgumentType.getString(ctx, "theme"), "normal"))
+                                .then(argument("difficulty", StringArgumentType.word())
+                                        .suggests((c, sb) -> CommandSource.suggestMatching(List.of("normal", "hard", "hell"), sb))
+                                        .executes(ctx -> dungeonStart(ctx.getSource(), StringArgumentType.getString(ctx, "theme"), StringArgumentType.getString(ctx, "difficulty"))))))
+                        .then(literal("leave").executes(ctx -> com.abilitywar.rpg.InstanceDungeon.leave(ctx.getSource().getPlayerOrThrow()) ? 1 : 0))
+                        .then(literal("next").requires(s -> s.hasPermissionLevel(2))
+                                .executes(ctx -> com.abilitywar.rpg.InstanceDungeon.debugNext(ctx.getSource().getPlayerOrThrow(), null) ? 1 : 0)
+                                .then(argument("kind", StringArgumentType.word()).suggests((c, sb) -> CommandSource.suggestMatching(List.of("trap", "treasure", "mid", "boss", "start"), sb))
+                                        .executes(ctx -> com.abilitywar.rpg.InstanceDungeon.debugNext(ctx.getSource().getPlayerOrThrow(), StringArgumentType.getString(ctx, "kind")) ? 1 : 0)))
+                        .then(literal("list").executes(ctx -> {
+                            for (var t : com.abilitywar.rpg.InstanceDungeon.Theme.values()) {
+                                ctx.getSource().sendFeedback(() -> Text.literal("• ").append(Text.translatable("dungeon.abilitywar.name." + t.key).styled(st -> st.withColor(t.color)))
+                                        .append(Text.literal("  " + t.key + "  ").formatted(Formatting.DARK_GRAY))
+                                        .append(Text.translatable("dungeon.abilitywar.list_line", t.level, com.abilitywar.rpg.Shops.fmt(t.fee)).formatted(Formatting.GRAY)), false);
+                            }
                             return 1;
                         })))
                 .then(literal("tower")

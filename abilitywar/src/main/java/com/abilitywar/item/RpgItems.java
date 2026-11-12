@@ -91,6 +91,7 @@ public final class RpgItems {
                     e.add(com.abilitywar.registry.AWEntities.GUILD_CLERK_EGG);
                     e.add(com.abilitywar.registry.AWEntities.JOB_MASTER_EGG);
                     e.add(com.abilitywar.registry.AWEntities.TOWER_KEEPER_EGG);
+                    e.add(com.abilitywar.registry.AWEntities.DUNGEON_GUIDE_EGG);
                 })
                 .build());
     }
