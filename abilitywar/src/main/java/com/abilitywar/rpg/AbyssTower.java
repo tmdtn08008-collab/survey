@@ -524,7 +524,8 @@ public final class AbyssTower {
             }
             p.networkHandler.sendPacket(new TitleFadeS2CPacket(4, 30, 10));
             p.networkHandler.sendPacket(new TitleS2CPacket(Text.translatable("tower.abilitywar.cleared", f).formatted(Formatting.GOLD, Formatting.BOLD)));
-            p.networkHandler.sendPacket(new SubtitleS2CPacket(Text.translatable("tower.abilitywar.cleared.sub", Shops.fmt(g), crystals)));
+            p.networkHandler.sendPacket(new SubtitleS2CPacket(crystals > 0 ? Text.translatable("tower.abilitywar.cleared.sub", Shops.fmt(g), crystals)
+                    : Text.translatable("tower.abilitywar.cleared.sub_g", Shops.fmt(g))));
             p.heal(p.getMaxHealth() * 0.3f);
         }
         w.playSound(null, r.center, SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundCategory.PLAYERS, 1.0f, 1.0f);

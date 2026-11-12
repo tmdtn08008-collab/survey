@@ -25,29 +25,21 @@ public final class DragonLook {
         ModelPartData head = root.getChild("head");
         for (int side : new int[]{1, -1}) {
             String s = side > 0 ? "l" : "r";
-            // 뒤로 휘며 솟는 큰 뿔 (세 마디)
-            ModelPartData h1 = head.addChild("aw_horn_" + s, ModelPartBuilder.create().uv(48, 0).cuboid(-1.5f, -1.5f, 0, 3, 3, 12),
-                    ModelTransform.of(5.5f * side, -7, 1, 0.62f, 0.32f * side, 0));
-            ModelPartData h2 = h1.addChild("aw_horn2", ModelPartBuilder.create().uv(48, 0).cuboid(-1f, -1f, 0, 2, 2, 10),
-                    ModelTransform.of(0, 0, 11, -0.38f, 0.1f * side, 0));
-            h2.addChild("aw_horn3", ModelPartBuilder.create().uv(48, 0).cuboid(-0.5f, -0.5f, 0, 1, 1, 8),
-                    ModelTransform.of(0, 0, 9, -0.42f, 0.05f * side, 0));
-            // 이마 뿔
-            head.addChild("aw_brow_" + s, ModelPartBuilder.create().uv(48, 0).cuboid(-1f, -1f, 0, 2, 2, 7),
-                    ModelTransform.of(6.5f * side, -7, -7, 1.05f, 0.22f * side, 0));
+            // 뒤로 휘며 솟는 큰 뿔 (뼈 색, 세 마디): 뿌리 → 위로 솟고 → 끝이 뒤로 휨
+            ModelPartData h = horn(head, "aw_horn_" + s, 5.5f * side, -7, 1, -1.5708f + 0.4f * side, -0.75f, 14, 4);
+            h = horn(h, "aw_horn2", 14, 0, 0, 0.05f * side, 0.4f, 11, 3);
+            horn(h, "aw_horn3", 11, 0, 0, 0.05f * side, 0.45f, 8, 2);
+            // 이마 뿔 (짧고 곧게)
+            horn(head, "aw_brow_" + s, 6.5f * side, -7, -6, -1.5708f + 0.25f * side, -1.0f, 8, 2);
             // 볼 가시 (세 개, 뒤로 갈수록 짧게)
             for (int k = 0; k < 3; k++)
-                head.addChild("aw_cheek_" + s + k, ModelPartBuilder.create().uv(0, 0).cuboid(-0.5f, -0.5f, 0, 1, 1, 6 - k),
-                        ModelTransform.of(8f * side, -3 + k * 3, -6 + k * 3, 0.15f, (0.95f + k * 0.12f) * side, 0));
+                horn(head, "aw_cheek_" + s + k, 8f * side, -3 + k * 3, -6 + k * 3, -1.5708f + (0.95f + k * 0.12f) * side, -0.15f, 6 - k, 1);
+            // 턱 가시
+            horn(head.getChild("jaw"), "aw_chin_" + s, 5f * side, 4, -3, -1.5708f + 0.35f * side, 0.55f, 7, 2);
         }
         // 코뿔
-        head.addChild("aw_nose", ModelPartBuilder.create().uv(48, 0).cuboid(-1f, -5f, -1f, 2, 5, 2), ModelTransform.of(0, -1, -19, -0.4f, 0, 0));
-        head.addChild("aw_nose2", ModelPartBuilder.create().uv(48, 0).cuboid(-0.5f, -3f, -0.5f, 1, 3, 1), ModelTransform.of(0, -1, -14, -0.5f, 0, 0));
-        // 턱 가시
-        ModelPartData jaw = head.getChild("jaw");
-        for (int side : new int[]{1, -1})
-            jaw.addChild("aw_chin_" + (side > 0 ? "l" : "r"), ModelPartBuilder.create().uv(48, 0).cuboid(-0.75f, -0.75f, 0, 1.5f, 1.5f, 7),
-                    ModelTransform.of(5f * side, 4, -3, -0.55f, 0.35f * side, 0));
+        horn(head, "aw_nose", 0, -1, -19, -1.5708f, -1.15f, 6, 2);
+        horn(head, "aw_nose2", 0, -1, -14, -1.5708f, -1.25f, 4, 1);
         // 목 (꼬리도 같은 마디를 씀): 등가시 끝을 더 길게 + 옆가시
         ModelPartData neck = root.getChild("neck");
         neck.addChild("aw_spine", ModelPartBuilder.create().uv(48, 0).cuboid(-0.5f, -4f, -1.5f, 1, 4, 3), ModelTransform.of(0, -9, 0.5f, -0.3f, 0, 0));
@@ -75,6 +67,16 @@ public final class DragonLook {
             ModelPartData tip = wing.getChild(s + "_wing_tip");
             tip.addChild("aw_tipbone", ModelPartBuilder.create().uv(112, 136).cuboid(side > 0 ? 0 : -10f, -1f, -1f, 10, 2, 2), ModelTransform.of(56f * side, 0, 0, 0, 0.12f * side, 0));
         }
+    }
+
+    /**
+     * 뼈 색 뿔 한 마디. 날개 뼈 텍스처 (u112 v136, 가로로 긴 띠) 를 쓰려고 상자를 X 방향으로 길게 만들고,
+     * 안쪽 마디에서 Z 축으로 기울인 (tilt, 음수 = 위로) 뒤 바깥 마디에서 Y 축으로 돌림 (yaw, -π/2 = 뒤쪽).
+     * 다음 마디는 돌려준 부분의 (len, 0, 0) 에 붙임.
+     */
+    static ModelPartData horn(ModelPartData parent, String name, float x, float y, float z, float yaw, float tilt, float len, float thick) {
+        ModelPartData turn = parent.addChild(name, ModelPartBuilder.create(), ModelTransform.of(x, y, z, 0, yaw, 0));
+        return turn.addChild("bone", ModelPartBuilder.create().uv(112, 136).cuboid(0, -thick / 2, -thick / 2, len, thick, thick), ModelTransform.of(0, 0, 0, 0, 0, tilt));
     }
 
     // ------------------------------------------------------------------ 파티클

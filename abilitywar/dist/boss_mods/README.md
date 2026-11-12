@@ -1,18 +1,21 @@
-# 보스 모드: Bosses of Mass Destruction (BOMD) + Marium's Soulslike Weaponry + The Graveyard + Archon + AdventureZ (+ VoidZ) + Dungeon Now Loading + Withering Heights + Ender Dragon Fight Remastered
+# 보스 모드: Bosses of Mass Destruction (BOMD) + Marium's Soulslike Weaponry + The Graveyard + Archon + AdventureZ (+ VoidZ) + Dungeon Now Loading + Withering Heights
 
-Fabric 1.20.1 용 보스 모드 8개 (+ 애드온) 입니다.
+Fabric 1.20.1 용 보스 모드 7개 (+ 애드온) 입니다.
+
+> 2.8.0 부터: 엔더 드래곤 모드는 **True Ending** 으로 바뀌었고 (Ender Dragon Fight Remastered 는 뺌 — 같이 쓰면 안 됨), 드래곤 · 생명체 보스 모드 (Saint's Dragons · Mobs of Mythology · Myths of The Sea · Aquamirae · Mutant Monsters), 셰이더 (Sodium + Iris + Complementary Reimagined), 인벤토리 꾸미기 모드가 더 들어갔습니다.
+> 새로 들어간 모드는 이 폴더에 jar 로 넣지 않고 **Modrinth 공식 주소에서 받게** 했습니다: `../abilitywar-rpg-2.8.0.mrpack` (Modrinth 앱) 또는 `../download_mods.ps1` (Windows) 을 쓰세요.
+> 예전에 넣은 `edf-remastered-4.3.jar` 는 mods 폴더에서 **지우세요**.
 - **Bosses of Mass Destruction**: Fabric 보스 모드 중 가장 많이 쓰이는 모드 (Modrinth 다운로드 800만 이상). L_Ender's Cataclysm 처럼 보스마다 전용 경기장 구조물이 있습니다. (Cataclysm 은 Forge 전용이라 대신 골랐습니다.)
 - **Marium's Soulslike Weaponry**: 소울라이크 보스 8 + 보스가 떨어뜨리는 전설 무기 40개 이상 (Modrinth 다운로드 400만 이상).
 - **The Graveyard**: 묘지 · 지하 묘실 · 유령의 집 · 언데드에게 먹힌 마을 · 리치의 감옥 같은 구조물 + 언데드 몹 + 보스 리치 (Modrinth 다운로드 500만 이상).
 - 🆕 **AdventureZ** (+ **VoidZ**): 새 몬스터 30여 종 + 보스 — 블랙스톤 골렘 (네더의 최종 보스급), 디 아이 (엔드), 공허의 그림자 (VoidZ 의 공허 차원), 그리고 피글린 비스트 · 영혼 수확자 · 시든 강령술사 같은 중간 보스 (다운로드 740만 이상).
 - 🆕 **Dungeon Now Loading**: 크고 어려운 던전 + 끝의 보스 — 혼돈의 스포너, 쌍둥이 보스 페어키퍼 보로스 · 우로스 (다운로드 190만 이상).
 - 🆕 **Withering Heights**: 위더를 진짜 보스로 — 폭발 · 혼돈 기술 여러 개, 체력 늘림, 보스 음악.
-- 🆕 **Ender Dragon Fight Remastered**: 엔더 드래곤 강화 — 공격 여러 개 추가, 체력 500, 반피에 2 페이즈, 보스 음악 (다운로드 300만 이상).
 - **Archon** (Archon Renewed): 원소 마법 · 마나 · 강령술 · 원소 무기 + 소환 제단으로 부르는 원소 보스 5 (원작 Archon 다운로드 130만 이상, Renewed 는 원작의 버그를 고친 후속판).
 
 ## 넣는 법
 
-이 폴더의 **jar 17개를 전부** `mods` 폴더에 넣으세요 (능력대전쟁 jar · Fabric API 와 같이). **서버와 모든 플레이어 둘 다** 넣어야 합니다.
+이 폴더의 **jar 16개를 전부** `mods` 폴더에 넣으세요 (능력대전쟁 jar · Fabric API 와 같이). **서버와 모든 플레이어 둘 다** 넣어야 합니다.
 **Fabric Loader 0.19.5 이상**, **Fabric API 0.92.2 이상** 이 필요합니다 (Soulslike Weaponry 때문). 런처에서 Fabric Loader 를 새로 설치하면 됩니다.
 
 | 파일 | 무엇 | 라이선스 | 출처 (소스) |
@@ -32,13 +35,12 @@ Fabric 1.20.1 용 보스 모드 8개 (+ 애드온) 입니다.
 | `voidz-1.0.11.jar` | VoidZ 1.0.11 (AdventureZ 애드온: 공허 차원 + 공허의 그림자) | GPL-3.0 | [Modrinth](https://modrinth.com/mod/voidz) · [GitHub (소스)](https://github.com/Globox1997/VoidZ) |
 | `dungeon-now-loading-fabric-1.20.1-2.2.jar` | Dungeon Now Loading 2.2 (모드 본체, 파일 이름만 띄어쓰기 없이 바꿈) | CC0-1.0 (Modrinth 표기 MIT) | [Modrinth](https://modrinth.com/mod/dungeon-now-loading) · [GitHub](https://github.com/hexnowloading/DungeonNowLoading) |
 | `withering-heights-alpha-1.jar` | Withering Heights alpha-1 (위더 강화, 데이터팩 모드) | MIT (licenses/ 폴더) | [Modrinth](https://modrinth.com/datapack/withering-heights) |
-| `edf-remastered-4.3.jar` | Ender Dragon Fight Remastered 4.3 (엔더 드래곤 강화 + 보스 음악) | GPL-3.0 (licenses/ 폴더) | [Modrinth](https://modrinth.com/datapack/edf-remastered) · [GitHub (소스)](https://github.com/MrGenie151/Ender-Dragon-Fight-Remastered) |
 | `villagertradingplus-fabric-mc1.20.1-1.1.1.jar` | VillagersTradingPlus (주민 거래 라이브러리, The Graveyard 가 필요로 함) | GPL-3.0 | [Modrinth](https://modrinth.com/mod/villagerstradingplus) · [GitHub (소스)](https://github.com/finallion/VillagersTradingPlus) |
 
 모두 Modrinth 에 올라온 원래 파일 그대로입니다 (고치지 않음, sha512 를 Modrinth 와 맞춰 봄). 라이선스 파일은 각 jar 안에 들어 있고, jar 안에 없는 AttributeFix · Ranged Weapon API 는 `licenses/` 폴더에 넣어 두었습니다. 새 버전은 위 링크에서 받을 수 있습니다.
-GPL 모드 (The Graveyard · VillagersTradingPlus · Archon · AdventureZ · VoidZ · Ender Dragon Fight Remastered) 의 소스는 위 GitHub 링크에 있습니다.
+GPL 모드 (The Graveyard · VillagersTradingPlus · Archon · AdventureZ · VoidZ) 의 소스는 위 GitHub 링크에 있습니다.
 ⚠️ Spell Power 는 **0.12.0** 을 쓰세요: 최신 1.6.x 는 Archon 이 쓰는 부분이 바뀌어서 Archon 이 켜지다 멈출 수 있습니다 (jar 를 열어 맞춰 봄).
-일부만 쓰려면: BOMD = BOMD · GeckoLib · Cloth Config · Cardinal Components · Fabric Language Kotlin / Soulslike = Soulslike · GeckoLib · AttributeFix · Ranged Weapon API / Graveyard = Graveyard · GeckoLib · VillagersTradingPlus / Archon = Archon · Spell Power / AdventureZ = AdventureZ · Cloth Config (+ VoidZ) / Dungeon Now Loading · Withering Heights · Ender Dragon Fight Remastered = 그 jar 하나.
+일부만 쓰려면: BOMD = BOMD · GeckoLib · Cloth Config · Cardinal Components · Fabric Language Kotlin / Soulslike = Soulslike · GeckoLib · AttributeFix · Ranged Weapon API / Graveyard = Graveyard · GeckoLib · VillagersTradingPlus / Archon = Archon · Spell Power / AdventureZ = AdventureZ · Cloth Config (+ VoidZ) / Dungeon Now Loading · Withering Heights = 그 jar 하나.
 
 ## BOMD 보스 4
 
@@ -104,7 +106,7 @@ GPL 모드 (The Graveyard · VillagersTradingPlus · Archon · AdventureZ · Voi
 
 ## 🆕 더 세진 바닐라 보스
 - **Withering Heights**: 위더가 폭발 · 혼돈 기술을 쓰고 더 단단해집니다. 설정: `/function wither_rework:config`
-- **Ender Dragon Fight Remastered**: 엔더 드래곤 체력 500 + 새 공격 + 반피에 2 페이즈 + 보스 음악.
+- **True Ending** (2.8.0 부터, 모드팩 · 다운로드 스크립트로 받음): 엔더 드래곤 체력 300 + 급강하 충격파 · 연속 화염구 · 거대 레이저 · 마지막 공중전 페이즈 + 입자 연출 + 보스 음악.
 - 둘 다 능력대전쟁의 HP 표시 · "보스 처치" · 보스 전리품 (보스의 영혼 3 개) 이 그대로 적용됩니다.
 
 ## 따로 받아서 넣는 모드: Ultris: Boss Expansion

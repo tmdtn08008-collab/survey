@@ -95,7 +95,7 @@ public final class BossSpawner {
         AbilityWar.LOG.info("[wild bosses] {} entries", ENTRIES.size());
     }
 
-    static final int CONFIG_VERSION = 5;
+    static final int CONFIG_VERSION = 6;
 
     /**
      * 기본 목록: 이 모드 보스 4 + Bosses of Mass Destruction (설치돼 있으면 나옴)
@@ -105,7 +105,8 @@ public final class BossSpawner {
         JsonObject root = new JsonObject();
         root.addProperty("_version", CONFIG_VERSION);
         root.addProperty("_help", "biome: any / cold / hot / mountain / forest / swamp / ocean. weight 0 = off. 다른 모드 보스 id 를 넣으면 그 모드가 있을 때만 나옴. "
-                + "bosses_of_mass_destruction = Bosses of Mass Destruction (dist/boss_mods 에 같이 들어 있음), soulsweapons = Marium's Soulslike Weaponry (dist/boss_mods 에 같이 들어 있음), graveyard = The Graveyard (dist/boss_mods 에 같이 들어 있음), archon = Archon Renewed (dist/boss_mods 에 같이 들어 있음, archon:null 은 가장 센 보스라 기본 꺼짐), adventurez = AdventureZ (+ VoidZ), dungeonnowloading = Dungeon Now Loading (던전 보스라 기본 꺼짐).");
+                + "bosses_of_mass_destruction = Bosses of Mass Destruction (dist/boss_mods 에 같이 들어 있음), soulsweapons = Marium's Soulslike Weaponry (dist/boss_mods 에 같이 들어 있음), graveyard = The Graveyard (dist/boss_mods 에 같이 들어 있음), archon = Archon Renewed (dist/boss_mods 에 같이 들어 있음, archon:null 은 가장 센 보스라 기본 꺼짐), adventurez = AdventureZ (+ VoidZ), dungeonnowloading = Dungeon Now Loading (던전 보스라 기본 꺼짐), "
+                + "mutantmonsters = Mutant Monsters, aquamirae = Aquamirae (선장 코넬리아는 난파선 보스라 기본 꺼짐), myths_of_the_sea = Myths of The Sea (바다에서 저절로 나옴, 기본 꺼짐).");
         JsonArray a = new JsonArray();
         String[][] def = {
                 {"abilitywar:fallen_king", "10", "any"}, {"abilitywar:ember_colossus", "10", "hot"}, {"abilitywar:frost_witch", "10", "cold"},
@@ -119,6 +120,9 @@ public final class BossSpawner {
                 {"archon:tar", "4", "any"}, {"archon:ayla", "4", "mountain"}, {"archon:leven", "4", "ocean"}, {"archon:inigo", "4", "hot"}, {"archon:null", "0", "any"},
                 {"adventurez:blackstone_golem", "3", "hot"}, {"adventurez:the_eye", "0", "any"}, {"adventurez:void_shadow", "0", "any"},
                 {"dungeonnowloading:chaos_spawner", "0", "any"}, {"dungeonnowloading:fairkeeper_boros", "0", "any"}, {"dungeonnowloading:fairkeeper_ouros", "0", "any"},
+                {"mutantmonsters:mutant_zombie", "3", "any"}, {"mutantmonsters:mutant_skeleton", "3", "any"}, {"mutantmonsters:mutant_enderman", "2", "any"},
+                {"mutantmonsters:mutant_creeper", "2", "any"}, {"aquamirae:captain_cornelia", "0", "cold"}, {"myths_of_the_sea:leviathan", "0", "ocean"},
+                {"myths_of_the_sea:kraken", "0", "ocean"},
                 {"cataclysm:ignis", "0", "hot"}, {"cataclysm:netherite_monstrosity", "0", "hot"}, {"cataclysm:ender_guardian", "0", "any"},
                 {"cataclysm:the_harbinger", "0", "any"}, {"cataclysm:the_leviathan", "0", "ocean"}, {"cataclysm:ancient_remnant", "0", "hot"},
                 {"cataclysm:maledictus", "0", "cold"}, {"cataclysm:scylla", "0", "ocean"}};

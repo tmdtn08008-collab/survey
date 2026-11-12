@@ -194,8 +194,14 @@ public class VoidSingularityEntity extends Entity {
             Combat.unstun(e);
             float rest = c.owed - c.dealt;
             if (rest > 0.01f) c.hit(w, owner, rest);
-            Vec3d out = Combat.horizontal(e.getPos().subtract(center)).multiply(0.9).add(0, 0.6, 0);
-            Combat.setVelocity(e, out);
+            if (c.boss) {
+                // 보스: 튕겨 내지 않음 (떨어지는 피해까지 더해져 10% 를 넘지 않게)
+                Combat.setVelocity(e, Vec3d.ZERO);
+                e.fallDistance = -16;
+            } else {
+                Vec3d out = Combat.horizontal(e.getPos().subtract(center)).multiply(0.9).add(0, 0.6, 0);
+                Combat.setVelocity(e, out);
+            }
             Combat.concuss(e, 60, 30, owner);
             if (e instanceof ServerPlayerEntity) AWNet.anim(e, "common.launched");
         }

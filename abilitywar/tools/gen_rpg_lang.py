@@ -562,6 +562,87 @@ for k, ko, en in [
     ('trade.abilitywar.mark.confirmed', '✔✔ 확정', '✔✔ Confirmed')]:
     t(k, ko, en)
 
+# ---------------------------------------------------------------- 2.8: 심연의 탑 · 각성 · 마지막 드래곤 · 인벤토리 카드
+for k, ko, en in [
+    ('entity.abilitywar.tower_keeper', '탑지기', 'Tower Keeper'),
+    ('item.abilitywar.tower_keeper_spawn_egg', '탑지기 생성 알', 'Tower Keeper Spawn Egg'),
+    ('item.abilitywar.abyss_crystal', '심연의 결정', 'Abyss Crystal'),
+    ('item.abilitywar.abyss_crystal.desc', '심연의 탑에서 얻는 결정. 대장장이에게서 +15 장비를 각성시킬 때 씀.', 'Found in the Abyss Tower. Used to awaken +15 gear at a blacksmith.'),
+    ('item.abilitywar.dragon_heart', '용의 심장', 'Dragon Heart'),
+    ('item.abilitywar.dragon_heart.desc', '엔더 드래곤의 아직 뛰는 심장. ★3 부터 각성에 씀.', "The still-beating heart of the Ender Dragon. Needed for awakening from ★3."),
+    # 각성
+    ('gear.abilitywar.ui.awaken', '각성 ★%s / %s', 'Awakened ★%s / %s'),
+    ('smith.abilitywar.btn.awaken', '각성하기', 'Awaken'),
+    ('smith.abilitywar.awaken_next', '각성', 'Awaken'),
+    ('smith.abilitywar.awaken_maxed', '각성 완료! (★5)', 'Fully awakened! (★5)'),
+    ('smith.abilitywar.awaken_fail', '실패해도 그대로 (재료만 사라짐)', 'Failure keeps the stars (materials are used)'),
+    ('smith.abilitywar.result.awakened', '★%s 각성!', 'Awakened ★%s!'),
+    ('smith.abilitywar.err.awaken_level', '+15 장비만 각성할 수 있습니다.', 'Only +15 gear can be awakened.'),
+    ('smith.abilitywar.err.awaken_max', '이미 ★5 까지 각성했습니다.', 'Already awakened to ★5.'),
+    ('smith.abilitywar.broadcast_awaken', '%s 님이 %s 각성에 성공했습니다!', '%s awakened %s!'),
+    # 심연의 탑
+    ('tower.abilitywar.title', '심연의 탑', 'Abyss Tower'),
+    ('tower.abilitywar.say', '끝없이 이어지는 심연의 탑이다. 오를수록 몬스터가 강해지고, 5층마다 보스가 기다린다. 얼마나 높이 갈 수 있겠나?',
+     'An endless tower into the abyss. Monsters grow stronger with every floor, and a boss waits every 5 floors. How high can you go?'),
+    ('tower.abilitywar.best', '내 최고 기록: %s층', 'My best: floor %s'),
+    ('tower.abilitywar.req', '레벨 %s 이상 (지금 %s)', 'Level %s+ (now %s)'),
+    ('tower.abilitywar.party', '파티원 %s명이 같이 들어갑니다 (32칸 안, 레벨 40 이상)', '%s party members enter together (within 32 blocks, level 40+)'),
+    ('tower.abilitywar.solo', '혼자 들어갑니다 (파티면 32칸 안 파티원이 같이 들어감)', 'Entering alone (party members within 32 blocks join you)'),
+    ('tower.abilitywar.rule1', '층을 깰 때마다 G · 경험치 · 강화석, 보스 층은 심연의 결정 (각성 재료). 10층마다 첫 돌파 보너스.',
+     'Each floor gives G, XP and enhance stones; boss floors give Abyss Crystals (awakening). Bonus for every first 10-floor clear.'),
+    ('tower.abilitywar.rule2', '깬 10층 단위 다음 층 (11 · 21 · 31 …) 부터 다시 시작할 수 있습니다.', 'You can restart from the floor after any 10 you cleared (11, 21, 31 …).'),
+    ('tower.abilitywar.rule3', '탑에서 쓰러져도 아이템은 떨어지지 않습니다. 나가기: /aw tower leave', 'Dying in the tower keeps your items. Leave with /aw tower leave'),
+    ('tower.abilitywar.btn.start', '%s층부터', 'From floor %s'),
+    ('tower.abilitywar.enter', '심연의 탑 %s층으로 들어갑니다… (나가기: /aw tower leave)', 'Entering the Abyss Tower at floor %s… (leave: /aw tower leave)'),
+    ('tower.abilitywar.floor', '%s층', 'Floor %s'),
+    ('tower.abilitywar.floor_unit', '층', ''),
+    ('tower.abilitywar.floor.sub', '몬스터 %s 마리', '%s monsters'),
+    ('tower.abilitywar.floor.boss', '⚠ 보스 층', '⚠ Boss floor'),
+    ('tower.abilitywar.bar.prep', '심연의 탑 %s층 — %s초 뒤 시작', 'Abyss Tower floor %s — starts in %ss'),
+    ('tower.abilitywar.bar.fight', '심연의 탑 %s층 — 남은 적 %s / %s', 'Abyss Tower floor %s — %s / %s enemies left'),
+    ('tower.abilitywar.bar.boss', '심연의 탑 %s층 (보스) — 남은 적 %s / %s', 'Abyss Tower floor %s (boss) — %s / %s left'),
+    ('tower.abilitywar.bar.break', '다음 층 (%s층) 까지 %s초 · 나가기: /aw tower leave', 'Next floor (%s) in %ss · leave: /aw tower leave'),
+    ('tower.abilitywar.cleared', '%s층 돌파!', 'Floor %s cleared!'),
+    ('tower.abilitywar.cleared.sub', '+%s G · 심연의 결정 %s', '+%s G · Abyss Crystal ×%s'),
+    ('tower.abilitywar.cleared.sub_g', '+%s G', '+%s G'),
+    ('smith.abilitywar.result.awaken_fail', '각성 실패…', 'Awakening failed…'),
+    ('tower.abilitywar.milestone', '★ %s층 첫 돌파 보너스! (G · 심연의 결정 · 보호 주문서 · 보스의 영혼)', '★ First clear of floor %s! (G, Abyss Crystals, Protection Scroll, Boss Soul)'),
+    ('tower.abilitywar.broadcast', '%s 님이 심연의 탑 %s층을 처음 돌파했습니다!', '%s cleared Abyss Tower floor %s for the first time!'),
+    ('tower.abilitywar.left', '%s 님이 탑에서 나갔습니다.', '%s left the tower.'),
+    ('tower.abilitywar.fell', '%s 님이 쓰러졌습니다.', '%s has fallen.'),
+    ('tower.abilitywar.wiped', '모두 쓰러졌습니다… (%s층)', 'Everyone fell… (floor %s)'),
+    ('tower.abilitywar.timeout', '시간이 다 되었습니다… (%s층)', 'Out of time… (floor %s)'),
+    ('tower.abilitywar.summary', '이번 도전: %s층까지 · 최고 기록 %s층', 'This run: up to floor %s · best: floor %s'),
+    ('tower.abilitywar.top', '🗼 심연의 탑 순위 (접속 중)', '🗼 Abyss Tower ranking (online)'),
+    ('tower.abilitywar.err.level', '심연의 탑은 레벨 %s 부터 들어갈 수 있습니다.', 'The Abyss Tower needs level %s.'),
+    ('tower.abilitywar.err.level_member', '레벨이 모자라 이번에는 같이 못 들어갑니다 (레벨 %s).', 'Your level is too low to join this run (level %s).'),
+    ('tower.abilitywar.err.already', '이미 탑 안에 있습니다.', 'You are already in the tower.'),
+    ('tower.abilitywar.err.full', '지금은 탑이 가득 찼습니다. 잠시 뒤에 다시 오세요.', 'The tower is full right now. Try again later.'),
+    ('tower.abilitywar.err.closed', '심연의 탑이 열리지 않았습니다.', 'The Abyss Tower is not available.'),
+    ('sign.abilitywar.tower', '심연의 탑', 'Abyss Tower'),
+    # 마지막 드래곤
+    ('boss.abilitywar.ender_dragon.sub', '— 종언의 용 —', '— The Dragon of the End —'),
+    ('boss.abilitywar.ender_dragon.appeared', '⚠ 종언의 용, 엔더 드래곤이 깨어났다!', '⚠ The Ender Dragon, Dragon of the End, awakens!'),
+    ('boss.abilitywar.ender_dragon.rage1', '엔더 드래곤이 분노해 포효한다!', 'The Ender Dragon roars in fury!'),
+    ('boss.abilitywar.ender_dragon.rage2', '엔더 드래곤이 마지막 힘을 끌어올린다!', 'The Ender Dragon summons its last strength!'),
+    # 인벤토리 카드
+    ('inv.abilitywar.no_class', '직업 없음', 'No class'),
+    ('inv.abilitywar.level', 'Lv %s', 'Lv %s'),
+    ('inv.abilitywar.hp', '체력', 'Health'),
+    ('inv.abilitywar.armor', '방어력', 'Armor'),
+    ('inv.abilitywar.attack', '공격력', 'Attack'),
+    ('inv.abilitywar.guild', '길드 %s', 'Guild %s'),
+    ('inv.abilitywar.tower', '탑 %s층', 'Tower %s'),
+    ('inv.abilitywar.tower_none', '탑 기록 없음', 'Tower —'),
+    ('inv.abilitywar.s.ability', '능력 피해', 'Ability Dmg'),
+    ('inv.abilitywar.s.crit', '치명타', 'Crit'),
+    ('inv.abilitywar.s.cooldown', '쿨타임 감소', 'Cooldown'),
+    ('inv.abilitywar.s.lifesteal', '흡혈', 'Lifesteal'),
+    ('inv.abilitywar.s.reduction', '피해 감소', 'Dmg Taken'),
+]:
+    t(k, ko, en)
+
+
 def apply(fname, idx):
     p = os.path.join(LANG, fname)
     d = json.load(open(p, encoding='utf-8'))

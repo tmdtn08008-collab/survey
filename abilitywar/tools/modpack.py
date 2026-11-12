@@ -95,7 +95,7 @@ def resolve():
         f = ([x for x in v["files"] if x["primary"]] or v["files"])[0]
         folder = "shaderpacks" if group == "shader" else "mods"
         out.append(dict(name=name, author=author, env=env, group=group, version=v["version_number"],
-                        path=folder + "/" + f["filename"], url=f["url"], sha1=f["hashes"]["sha1"],
+                        path=folder + "/" + f["filename"].replace(" ", "-"), url=f["url"], sha1=f["hashes"]["sha1"],
                         sha512=f["hashes"]["sha512"], size=f["size"]))
     return out
 
@@ -218,11 +218,23 @@ def main():
         raise SystemExit(f"{jar} 가 없음 (./gradlew build 후 dist 로 복사)")
     mods = resolve()
     if "--check" in sys.argv:
+        import time
+        bad = 0
         for m in mods:
-            req = urllib.request.Request(m["url"], headers=UA, method="HEAD")
-            r = urllib.request.urlopen(req)
-            size = int(r.headers.get("Content-Length", -1))
-            print("ok" if size == m["size"] else "SIZE?", m["path"], size)
+            size = -1
+            for attempt in range(4):
+                try:
+                    r = urllib.request.urlopen(urllib.request.Request(m["url"], headers=UA, method="HEAD"), timeout=30)
+                    size = int(r.headers.get("Content-Length", -1))
+                    break
+                except Exception as e:
+                    print("  retry", attempt + 1, m["url"], e)
+                    time.sleep(2 ** (attempt + 1))
+            ok = size == m["size"]
+            bad += not ok
+            print("ok" if ok else "BAD", m["path"], size)
+        if bad:
+            raise SystemExit(f"{bad} 개 주소가 이상함")
     print(build_mrpack(mods, ver, jar))
     print(build_ps1(mods, ver, jar))
     print(len(mods), "files,", round(sum(m["size"] for m in mods) / 1e6, 1), "MB")

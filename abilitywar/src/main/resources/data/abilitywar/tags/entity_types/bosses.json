@@ -136,6 +136,34 @@
     {
       "id": "dungeonnowloading:fairkeeper_ouros",
       "required": false
+    },
+    {
+      "id": "aquamirae:captain_cornelia",
+      "required": false
+    },
+    {
+      "id": "myths_of_the_sea:leviathan",
+      "required": false
+    },
+    {
+      "id": "myths_of_the_sea:kraken",
+      "required": false
+    },
+    {
+      "id": "mutantmonsters:mutant_zombie",
+      "required": false
+    },
+    {
+      "id": "mutantmonsters:mutant_skeleton",
+      "required": false
+    },
+    {
+      "id": "mutantmonsters:mutant_creeper",
+      "required": false
+    },
+    {
+      "id": "mutantmonsters:mutant_enderman",
+      "required": false
     }
   ]
 }

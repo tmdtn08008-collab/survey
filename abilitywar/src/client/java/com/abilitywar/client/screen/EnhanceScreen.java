@@ -433,6 +433,10 @@ public class EnhanceScreen extends Screen {
                 msg = Text.translatable("smith.abilitywar.result.awakened", resultLevel);
                 col = GearEnhance.AWAKEN_COLOR;
             }
+            case 5 -> {
+                msg = Text.translatable("smith.abilitywar.result.awaken_fail");
+                col = 0x9A88B8;
+            }
             default -> {
                 msg = Text.translatable("smith.abilitywar.result.fail");
                 col = 0xB8B8B8;

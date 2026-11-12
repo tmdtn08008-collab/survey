@@ -453,6 +453,17 @@ public final class CapitalPlan {
             b.set(sx, by + 5, z0 + 2, s(Blocks.YELLOW_WOOL));
         }
         sign(b, mx, by + 4, hz0 - 1, Direction.NORTH, "sign.abilitywar.guild");
+        // 심연의 탑 문 (게시판 반대편, 회관 벽에 붙임) + 탑지기
+        int gz = hz0 - 1;
+        b.fill(mx + 6, by + 1, gz, mx + 6, by + 4, gz, s(Blocks.CRYING_OBSIDIAN));
+        b.fill(mx + 9, by + 1, gz, mx + 9, by + 4, gz, s(Blocks.CRYING_OBSIDIAN));
+        b.fill(mx + 7, by + 4, gz, mx + 8, by + 4, gz, s(Blocks.OBSIDIAN));
+        b.fill(mx + 7, by + 1, gz, mx + 8, by + 3, gz, s(Blocks.PURPLE_STAINED_GLASS));
+        b.set(mx + 6, by + 5, gz, s(Blocks.AMETHYST_CLUSTER));
+        b.set(mx + 9, by + 5, gz, s(Blocks.AMETHYST_CLUSTER));
+        b.set(mx + 7, by + 5, gz, s(Blocks.END_ROD));
+        b.set(mx + 8, by + 5, gz, s(Blocks.END_ROD));
+        b.spawns.add(new Blueprint.Spawn(new BlockPos(mx + 7, by + 1, gz - 1), w -> named(AWEntities.TOWER_KEEPER.create(w), 180)));
         // 정면 큰 깃발 (파랑 · 금 · 칼 문양 대신 노랑 줄)
         for (int fx : new int[]{mx - 5, mx + 5}) {
             b.fill(fx, by + 4, hz0 - 1, fx, by + 10, hz0 - 1, s(Blocks.BLUE_WOOL));

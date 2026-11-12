@@ -25,13 +25,13 @@ import net.minecraft.world.World;
  *   <li>RPG 장비 · 능력을 쓰는 플레이어 기준으로 더 단단함: 받는 피해 ×0.6, 같이 싸우는 사람이 늘면 더 줄어듦 (1명 더마다 ÷1.35).</li>
  *   <li>드래곤이 주는 피해 ×1.6.</li>
  *   <li>체력 50% · 20% 에서 분노의 포효: 가까운 플레이어에게 어둠 · 느려짐 + 화면 흔들림.</li>
- *   <li>쓰러뜨리면 가까이 있던 모두: 25,000 G · 경험치 20,000 · 용의 심장 · 심연의 결정 · 보스의 영혼 · 강화석 (RpgManager · Shops).</li>
+ *   <li>쓰러뜨리면 가까이 있던 모두: 25,000 G · 경험치 6,000 · 용의 심장 · 심연의 결정 · 보스의 영혼 · 강화석 (RpgManager · Shops).</li>
  * </ul>
  * True Ending 이 만드는 가짜 드래곤 (거울 드래곤) 은 보스로 치지 않음.
  */
 public final class FinalDragon {
     public static final long GOLD = 25_000;
-    public static final int XP = 20_000;
+    public static final int XP = 6_000;
     public static final float TAKEN = 0.6f, DEALT = 1.6f;
     static final String INTRO = "aw_dragon_intro", RAGE1 = "aw_dragon_rage1", RAGE2 = "aw_dragon_rage2";
 

@@ -350,7 +350,8 @@ public final class AbilityManager {
         if (com.abilitywar.gear.GearEffects.lastCrit && kind != AWNet.DMG_ULT) kind = AWNet.DMG_CRIT;
         com.abilitywar.gear.GearEffects.lastCrit = false;
         AWNet.damageNumber(victim, lost, kind, attacker);
-        if (attacker instanceof ServerPlayerEntity gp && gp != victim) com.abilitywar.gear.GearEffects.afterHit(gp, victim, source, lost);
+        // 고정 피해 (보스에게 주는 공허 궁극기) 는 무기 효과 · 흡혈이 터지지 않음 → 딱 최대 체력의 10%
+        if (attacker instanceof ServerPlayerEntity gp && gp != victim && !Combat.isFixedDamage()) com.abilitywar.gear.GearEffects.afterHit(gp, victim, source, lost);
         com.abilitywar.gear.GearEffects.thorns(victim, source, lost);
         boolean ult = source.isIn(AWDamage.TAG_ULTIMATE);
         if (attacker instanceof ServerPlayerEntity ap && ap != victim && !ult) {

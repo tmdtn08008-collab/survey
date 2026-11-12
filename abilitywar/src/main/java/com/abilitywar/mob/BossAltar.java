@@ -61,10 +61,10 @@ public final class BossAltar {
      * Archon: 타르 · 레벤 · 이니고 · 아일라. AdventureZ: 블랙스톤 골렘.
      */
     static final java.util.Map<String, java.util.List<String>> ALT = java.util.Map.of(
-            "abilitywar:fallen_king", java.util.List.of("bosses_of_mass_destruction:lich", "soulsweapons:accursed_lord_boss", "soulsweapons:returning_knight", "archon:tar"),
-            "abilitywar:frost_witch", java.util.List.of("bosses_of_mass_destruction:lich", "soulsweapons:draugr_boss", "archon:leven"),
-            "abilitywar:ember_colossus", java.util.List.of("bosses_of_mass_destruction:gauntlet", "soulsweapons:chaos_monarch", "soulsweapons:day_stalker", "archon:inigo", "adventurez:blackstone_golem"),
-            "abilitywar:ancient_wyvern", java.util.List.of("bosses_of_mass_destruction:obsidilith", "soulsweapons:moonknight", "archon:ayla"));
+            "abilitywar:fallen_king", java.util.List.of("bosses_of_mass_destruction:lich", "soulsweapons:accursed_lord_boss", "soulsweapons:returning_knight", "archon:tar", "mutantmonsters:mutant_zombie"),
+            "abilitywar:frost_witch", java.util.List.of("bosses_of_mass_destruction:lich", "soulsweapons:draugr_boss", "archon:leven", "mutantmonsters:mutant_skeleton"),
+            "abilitywar:ember_colossus", java.util.List.of("bosses_of_mass_destruction:gauntlet", "soulsweapons:chaos_monarch", "soulsweapons:day_stalker", "archon:inigo", "adventurez:blackstone_golem", "mutantmonsters:mutant_creeper"),
+            "abilitywar:ancient_wyvern", java.util.List.of("bosses_of_mass_destruction:obsidilith", "soulsweapons:moonknight", "archon:ayla", "mutantmonsters:mutant_enderman"));
     /** 제단이 부른 다른 모드 보스 → 제단 자리 (죽으면 제단 대기 시간). */
     static final java.util.Map<UUID, net.minecraft.util.math.GlobalPos> ALT_HOMES = new java.util.concurrent.ConcurrentHashMap<>();
 

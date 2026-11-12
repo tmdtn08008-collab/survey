@@ -382,7 +382,86 @@ def loot_items():
                              ".....ooooo......",
                              "................",
                              "................"], {'o': (24, 8, 40, 255), 'P': (150, 70, 220, 255), 'p': (190, 120, 250, 255), 'W': (230, 200, 255, 255), 'w': (255, 255, 255, 255)})
+    # 심연의 결정: 보랏빛 뾰족한 결정 덩어리 (가운데가 밝게 빛남)
+    out['abyss_crystal'] = grid(["................",
+                                 ".......o........",
+                                 "......oLo.......",
+                                 "......oLPo...o..",
+                                 ".....oLPPo..oLo.",
+                                 "..o..oLWPo.oLPo.",
+                                 ".oLo.oLWPPooLPo.",
+                                 ".oLPooLWWPoLPPo.",
+                                 ".oLPPoLWWPPLPPo.",
+                                 "..oLPPLWWPPPPo..",
+                                 "..oLPPPWPPPPdo..",
+                                 "...oPPPPPPPddo..",
+                                 "...oddPPPPdddo..",
+                                 "....ooddddddo...",
+                                 "......oooooo....",
+                                 "................"], {'o': (20, 6, 34, 255), 'P': (120, 50, 200, 255), 'L': (196, 140, 255, 255),
+                                                      'W': (250, 230, 255, 255), 'd': (70, 24, 120, 255)})
+    # 용의 심장: 검붉은 심장 + 보랏빛 핏줄, 가운데가 달아오름
+    out['dragon_heart'] = grid(["................",
+                                "....oo....oo....",
+                                "...oRRo..oRRo...",
+                                "..oRrrRooRrrRo..",
+                                "..oRrVrRRrrVRo..",
+                                ".oRrrVrrrrrVrRo.",
+                                ".oRrVrrYYrrrVRo.",
+                                ".oRrVrYWWYrrVRo.",
+                                ".oRrrVrYYrrVrRo.",
+                                "..oRrrVrrrVrRo..",
+                                "..oRRrrVrVrRRo..",
+                                "...oRRrrVrRRo...",
+                                "....oRRrrRRo....",
+                                ".....oRRRRo.....",
+                                "......oooo......",
+                                "................"], {'o': (24, 4, 10, 255), 'R': (110, 16, 40, 255), 'r': (170, 30, 60, 255),
+                                                     'V': (190, 90, 255, 255), 'Y': (255, 150, 90, 255), 'W': (255, 236, 200, 255)})
     return out
+
+
+def tower_keeper(rect, box, px):
+    """탑지기: 두건 쓴 늙은 마법사, 보랏빛 로브 + 별무늬, 빛나는 보라 눈, 은빛 수염."""
+    SKIN = (196, 170, 150)
+    HOOD, HOOD_D, HOOD_L = (40, 22, 70), (24, 12, 44), (90, 50, 150)
+    BEARD = (210, 210, 220)
+    GOLD = (226, 184, 86)
+    box(0, 0, 8, 8, 8, HOOD, HOOD, SKIN)
+    rect(8, 8, 8, 8, SKIN)
+    rect(8, 8, 8, 2, HOOD)
+    rect(8, 10, 1, 6, HOOD)
+    rect(15, 10, 1, 6, HOOD)
+    px[10, 11] = px[13, 11] = (200, 120, 255, 255)  # 빛나는 눈
+    px[9, 11] = px[14, 11] = (60, 30, 90, 255)
+    rect(9, 13, 6, 3, BEARD, 4)
+    rect(11, 13, 2, 1, (120, 80, 70), 0)
+    for (u, w) in [(0, 8), (16, 8), (24, 8)]:
+        rect(u, 8, w, 8, HOOD)
+    # 두건 겉 (모자 층)
+    box(32, 0, 8, 8, 8, HOOD_D, HOOD_D, HOOD_D)
+    rect(40, 8, 8, 2, HOOD_L, 3)
+    for x in range(41, 47):
+        px[x, 8] = (0, 0, 0, 0)
+    rect(40, 10, 8, 6, (0, 0, 0, 0), 0)
+    rect(40, 10, 1, 6, HOOD_D, 2)
+    rect(47, 10, 1, 6, HOOD_D, 2)
+    # 몸: 보랏빛 로브 + 금테 + 별
+    box(16, 16, 8, 12, 4, HOOD, HOOD, HOOD_D, HOOD, HOOD_D)
+    rect(23, 20, 2, 12, GOLD, 4)
+    rect(20, 26, 8, 1, GOLD, 3)
+    for (x, y) in [(21, 22), (26, 23), (22, 29), (26, 30)]:
+        px[x, y] = (230, 210, 255, 255)
+    # 팔 (넓은 소매)
+    box(40, 16, 4, 12, 4, HOOD, HOOD, SKIN)
+    box(32, 48, 4, 12, 4, HOOD, HOOD, SKIN)
+    for (u, v) in [(40, 30), (44, 30), (48, 30), (52, 30), (32, 62), (36, 62), (40, 62), (44, 62)]:
+        rect(u, v - 2, 4, 2, SKIN)
+    for (u, v) in [(40, 26), (44, 26), (48, 26), (52, 26), (32, 58), (36, 58), (40, 58), (44, 58)]:
+        rect(u, v, 4, 1, GOLD, 3)
+    # 다리 (긴 로브)
+    box(0, 16, 4, 12, 4, HOOD_D, HOOD_D, (30, 20, 30))
+    box(16, 48, 4, 12, 4, HOOD_D, HOOD_D, (30, 20, 30))
 
 
 def coin():
@@ -426,11 +505,12 @@ def main():
         im.save(os.path.join(ITEM, name + '.png'))
         with open(os.path.join(MODEL, name + '.json'), 'w') as f:
             json.dump({"parent": "minecraft:item/generated", "textures": {"layer0": "abilitywar:item/" + name}}, f)
-    for egg in ('apothecary_spawn_egg', 'blacksmith_spawn_egg'):
+    for egg in ('apothecary_spawn_egg', 'blacksmith_spawn_egg', 'tower_keeper_spawn_egg'):
         with open(os.path.join(MODEL, egg + '.json'), 'w') as f:
             json.dump({"parent": "minecraft:item/template_spawn_egg"}, f)
     skin('apothecary', 31, apothecary)
     skin('blacksmith', 37, blacksmith)
+    skin('tower_keeper', 41, tower_keeper)
     # 미리보기 (scratch 용): 아이템 8배
     sheet = Image.new('RGBA', (16 * 8 * len(items), 16 * 8), (40, 40, 48, 255))
     for i, im in enumerate(items.values()):
@@ -438,7 +518,7 @@ def main():
     out = os.environ.get('PREVIEW')
     if out:
         sheet.save(out)
-    print('ok', len(items), 'items, 2 skins')
+    print('ok', len(items), 'items, 3 skins')
 
 
 if __name__ == '__main__':

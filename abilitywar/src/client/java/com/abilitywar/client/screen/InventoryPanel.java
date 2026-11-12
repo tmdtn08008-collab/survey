@@ -87,11 +87,11 @@ public final class InventoryPanel {
         y = stat(ctx, tr, x, x1, y, "❤", Text.translatable("inv.abilitywar.hp"), Math.round(p.getHealth()) + " / " + Math.round(p.getMaxHealth()), 0xFF6A6A);
         y = stat(ctx, tr, x, x1, y, "⛨", Text.translatable("inv.abilitywar.armor"), fmt(p.getArmor()), 0x9AD0FF);
         y = stat(ctx, tr, x, x1, y, "⚔", Text.translatable("inv.abilitywar.attack"), fmt(attr(p, EntityAttributes.GENERIC_ATTACK_DAMAGE)), 0xFFB070);
-        y = stat(ctx, tr, x, x1, y, "✷", Text.translatable("attribute.name.abilitywar.ability_damage"), "+" + pct(attr(p, GearAttributes.ABILITY_DAMAGE)), 0xC07CFF);
-        y = stat(ctx, tr, x, x1, y, "✦", Text.translatable("attribute.name.abilitywar.crit_chance"), pct(attr(p, GearAttributes.CRIT_CHANCE)), 0xFFE070);
-        y = stat(ctx, tr, x, x1, y, "⌛", Text.translatable("attribute.name.abilitywar.cooldown_reduction"), pct(attr(p, GearAttributes.COOLDOWN)), 0x8FD3FF);
-        y = stat(ctx, tr, x, x1, y, "♥", Text.translatable("attribute.name.abilitywar.lifesteal"), pct(attr(p, GearAttributes.LIFESTEAL)), 0xFF8AA8);
-        y = stat(ctx, tr, x, x1, y, "◈", Text.translatable("attribute.name.abilitywar.damage_reduction"), pct(attr(p, GearAttributes.DAMAGE_REDUCTION)), 0xB8F0B8);
+        y = stat(ctx, tr, x, x1, y, "✷", Text.translatable("inv.abilitywar.s.ability"), "+" + pct(attr(p, GearAttributes.ABILITY_DAMAGE)), 0xC07CFF);
+        y = stat(ctx, tr, x, x1, y, "✦", Text.translatable("inv.abilitywar.s.crit"), pct(attr(p, GearAttributes.CRIT_CHANCE)), 0xFFE070);
+        y = stat(ctx, tr, x, x1, y, "⌛", Text.translatable("inv.abilitywar.s.cooldown"), pct(attr(p, GearAttributes.COOLDOWN)), 0x8FD3FF);
+        y = stat(ctx, tr, x, x1, y, "♥", Text.translatable("inv.abilitywar.s.lifesteal"), pct(attr(p, GearAttributes.LIFESTEAL)), 0xFF8AA8);
+        y = stat(ctx, tr, x, x1, y, "◈", Text.translatable("inv.abilitywar.s.reduction"), pct(attr(p, GearAttributes.DAMAGE_REDUCTION)), 0xB8F0B8);
         HudDraw.rect(ctx, x, y + 1, x1 - 7, y + 2, 0x403A2C12);
         y += 5;
         // 입은 장비: 등급 색 칸 + 강화 · 각성
@@ -122,8 +122,7 @@ public final class InventoryPanel {
         y += 11;
         String rank = RpgClient.guildRank >= 0 && RpgClient.guildRank < com.abilitywar.rpg.Guild.RANKS.length ? com.abilitywar.rpg.Guild.RANKS[RpgClient.guildRank] : "-";
         ctx.drawTextWithShadow(tr, Text.translatable("inv.abilitywar.guild", rank), x, y, 0x8FB8FF);
-        String tw = RpgClient.towerBest > 0 ? String.valueOf(RpgClient.towerBest) : "-";
-        Text tt = Text.translatable("inv.abilitywar.tower", tw);
+        Text tt = RpgClient.towerBest > 0 ? Text.translatable("inv.abilitywar.tower", RpgClient.towerBest) : Text.translatable("inv.abilitywar.tower_none");
         ctx.drawTextWithShadow(tr, tt, x1 - 7 - tr.getWidth(tt), y, 0xC07CFF);
         ctx.getMatrices().pop();
     }
