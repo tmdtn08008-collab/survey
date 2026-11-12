@@ -3730,15 +3730,68 @@ C['common.dash_right'] = dash_clip(
     {'R': ([3.5, -12.5, 8], [30, 14, 40]), 'L': ([-9.5, -13, 6], [34, 12, -70])},
     [0, -1.2, -5])
 
-# 궁극기 각성 (모든 궁극기 앞의 2초 연출): 몸을 웅크려 힘을 모음 → 떨림 → 팔을 활짝 펼치며 하늘을 봄
-C['common.ult_awaken'] = clip(40, blend_in=2, blend_out=4, bones=seq([
-    (0, {'body': [0, 0, 0], 'head': [0, 0, 0], 'right_arm': [0, 0, 0], 'left_arm': [0, 0, 0], 'right_leg': [0, 0, 0], 'left_leg': [0, 0, 0], 'root': {'pos': [0, 0, 0], 'rot': [0, 0, 0]}}),
-    (6, {'body': [20, 0, 0], 'head': [12, 0, 0], 'right_arm': [-42, 24, 34], 'left_arm': [-42, -24, -34], 'right_leg': [-14, 0, 7], 'left_leg': [-8, 0, -7], 'root': {'pos': [0, -1.6, 0], 'rot': [6, 0, 0]}}, 'outCubic'),
-    (16, {'body': [23, 0, 0], 'head': [14, 0, 0], 'right_arm': [-48, 28, 38], 'left_arm': [-48, -28, -38], 'right_leg': [-16, 0, 7], 'left_leg': [-10, 0, -7], 'root': {'pos': [0, -1.8, 0], 'rot': [7, 0, 0]}}, 'inOutSine'),
-    (22, {'body': [21, 1, 0], 'head': [12, -2, 0], 'right_arm': [-46, 26, 40], 'left_arm': [-50, -26, -36], 'right_leg': [-16, 0, 7], 'left_leg': [-10, 0, -7], 'root': {'pos': [0, -1.7, 0], 'rot': [7, 0, 0]}}, 'inOutSine'),
-    (28, {'body': [24, -1, 0], 'head': [15, 2, 0], 'right_arm': [-52, 30, 36], 'left_arm': [-46, -30, -40], 'right_leg': [-18, 0, 8], 'left_leg': [-12, 0, -8], 'root': {'pos': [0, -2.0, 0], 'rot': [8, 0, 0]}}, 'inOutSine'),
-    (32, {'body': [-16, 0, 0], 'head': [-30, 0, 0], 'right_arm': [-24, 0, 112], 'left_arm': [-24, 0, -112], 'right_leg': [0, 0, 14], 'left_leg': [0, 0, -14], 'root': {'pos': [0, 0.6, 0], 'rot': [-6, 0, 0]}}, 'outExpo'),
-    (40, {'body': [-10, 0, 0], 'head': [-20, 0, 0], 'right_arm': [-30, 0, 100], 'left_arm': [-30, 0, -100], 'right_leg': [0, 0, 12], 'left_leg': [0, 0, -12], 'root': {'pos': [0, 0.3, 0], 'rot': [-4, 0, 0]}}, 'inOutSine'),
-]))
+# 궁극기 각성 (모든 궁극기 앞의 2초 연출): 직업마다 다른 자세 — 힘을 모으는 자세 (6~28, 떨림) → 터지는 자세 (32~40)
+import copy as _copy
+
+
+def _full(**kw):
+    base = {'body': [0, 0, 0], 'head': [0, 0, 0], 'right_arm': [0, 0, 0], 'left_arm': [0, 0, 0], 'right_leg': [0, 0, 0], 'left_leg': [0, 0, 0],
+            'root': {'pos': [0, 0, 0], 'rot': [0, 0, 0]}}
+    for k, v in kw.items():
+        if k == 'root':
+            r = {'pos': [0, 0, 0], 'rot': [0, 0, 0]}
+            r.update(v)
+            base['root'] = r
+        else:
+            base[k] = v
+    return base
+
+
+def _jit(p, s):
+    q = _copy.deepcopy(p)
+    for i, b in enumerate(['body', 'head', 'right_arm', 'left_arm']):
+        q[b] = [q[b][0] + s * (1 if i % 2 else -1), q[b][1] + s * 0.6, q[b][2] + s * (0.5 if i > 1 else 0)]
+    return q
+
+
+def awaken(a, b):
+    return clip(40, blend_in=2, blend_out=4, bones=seq([
+        (0, _full()), (6, a, 'outCubic'), (16, _jit(a, 1.5), 'inOutSine'), (22, _jit(a, -1.5), 'inOutSine'),
+        (28, _jit(a, 2.5), 'inOutSine'), (32, b, 'outExpo'), (40, _jit(b, 1), 'inOutSine')]))
+
+
+_KNEEL_LEGS = dict(right_leg=[-80, 6, 6], left_leg=[-6, -6, -4])
+AWAKEN = {
+    # 공허: 앞으로 뻗은 손바닥 (왼손이 손목을 잡음) → 두 팔을 활짝 벌려 틈을 엶
+    'void': (_full(body=[14, 0, 0], head=[6, 0, 0], right_arm=[-85, 10, 5], left_arm=[-75, -40, -10], right_leg=[-12, 0, 6], left_leg=[-6, 0, -6], root={'pos': [0, -1.2, 0]}),
+             _full(body=[-12, 0, 0], head=[-20, 0, 0], right_arm=[-10, 0, 100], left_arm=[-10, 0, -100], right_leg=[0, 0, 12], left_leg=[0, 0, -12], root={'pos': [0, 0.5, 0]})),
+    # 용기사: 짐승처럼 낮게 웅크린 발톱 → 일어서며 두 팔을 들어 포효
+    'dragon': (_full(body=[34, 0, 0], head=[-20, 0, 0], right_arm=[-40, 20, 30], left_arm=[-40, -20, -30], right_leg=[-20, 0, 10], left_leg=[-10, 0, -10], root={'pos': [0, -2.4, 0], 'rot': [10, 0, 0]}),
+               _full(body=[-24, 0, 0], head=[-48, 0, 0], right_arm=[-150, 0, 50], left_arm=[-150, 0, -50], right_leg=[-10, 0, 12], left_leg=[6, 0, -12], root={'pos': [0, 0.4, 0], 'rot': [-8, 0, 0]})),
+    # 마검사: 검을 하늘로 → 두 손으로 비스듬히 겨눔
+    'blade': (_full(body=[-6, 0, 0], head=[-24, 0, 0], right_arm=[-172, 0, 8], left_arm=[-40, 30, -10], right_leg=[0, 0, 6], left_leg=[0, 0, -6]),
+              _full(body=[18, -25, 0], head=[6, 20, 0], right_arm=[-100, -30, 10], left_arm=[-95, 40, -10], right_leg=[-30, 0, 8], left_leg=[20, 0, -8], root={'pos': [0, -1.5, 0], 'rot': [0, -20, 0]})),
+    # 혈귀: 팔을 늘어뜨리고 구부정 → 팔을 뒤로 젖히고 하늘 (핏빛 달) 을 보며 떠오름
+    'blood': (_full(body=[32, 0, 0], head=[30, 0, 0], right_arm=[10, 0, 14], left_arm=[10, 0, -14], right_leg=[-8, 0, 4], left_leg=[-4, 0, -4], root={'pos': [0, -1.0, 0]}),
+              _full(body=[-26, 0, 0], head=[-50, 0, 0], right_arm=[30, 0, 70], left_arm=[30, 0, -70], right_leg=[14, 0, 6], left_leg=[20, 0, -6], root={'pos': [0, 1.6, 0], 'rot': [-10, 0, 0]})),
+    # 성가사: 두 손바닥을 위로 펼침 → 두 팔을 V 자로 들어 올림
+    'cantor': (_full(body=[-4, 0, 0], head=[-10, 0, 0], right_arm=[-50, -20, 40], left_arm=[-50, 20, -40], root={'pos': [0, 0.2, 0]}),
+               _full(body=[-14, 0, 0], head=[-36, 0, 0], right_arm=[-165, 0, 30], left_arm=[-165, 0, -30], right_leg=[0, 0, 4], left_leg=[0, 0, -4], root={'pos': [0, 1.0, 0]})),
+    # 흑마법사: 가슴 앞에서 두 손을 모아 주문 → 한 손은 앞으로 내지르고 한 손은 높이
+    'warlock': (_full(body=[18, 0, 0], head=[20, 0, 0], right_arm=[-70, 40, 10], left_arm=[-70, -40, -10], right_leg=[-10, 0, 6], left_leg=[-6, 0, -6], root={'pos': [0, -0.8, 0]}),
+                _full(body=[10, 15, 0], head=[-6, -10, 0], right_arm=[-95, 0, 0], left_arm=[-170, 0, -20], right_leg=[-24, 0, 6], left_leg=[18, 0, -6], root={'pos': [0, -0.6, 0]})),
+    # 천사: 무릎 꿇고 기도 → 일어나 두 팔을 하늘로, 떠오름
+    'angel': (_full(body=[10, 0, 0], head=[24, 0, 0], right_arm=[-66, 44, 20], left_arm=[-66, -44, -20], root={'pos': [0, -4.2, 0.4]}, **_KNEEL_LEGS),
+              _full(body=[-14, 0, 0], head=[-34, 0, 0], right_arm=[-160, 10, 34], left_arm=[-160, -10, -34], right_leg=[12, 2, 3], left_leg=[20, -2, -2], root={'pos': [0, 1.2, 0], 'rot': [-4, 0, 0]})),
+    # 수호기사: 방패 (왼팔) 를 앞세운 넓은 자세 → 가슴을 펴고 포효
+    'guardian': (_full(body=[16, 0, 0], head=[4, 0, 0], right_arm=[-40, 20, 20], left_arm=[-95, 0, -10], right_leg=[-18, 0, 14], left_leg=[14, 0, -14], root={'pos': [0, -1.6, 0]}),
+                 _full(body=[-18, 0, 0], head=[-30, 0, 0], right_arm=[20, 0, 40], left_arm=[20, 0, -40], right_leg=[-10, 0, 18], left_leg=[10, 0, -18], root={'pos': [0, -1.0, 0]})),
+    # 성기사: 성검을 땅에 꽂고 무릎 꿇음 → 일어나며 성검을 하늘로
+    'paladin': (_full(body=[26, 0, 0], head=[14, 0, 0], right_arm=[-58, 22, 10], left_arm=[-58, -22, -10], root={'pos': [0, -4.2, 0.4]}, **_KNEEL_LEGS),
+                _full(body=[-10, 0, 0], head=[-30, 0, 0], right_arm=[-175, 0, 6], left_arm=[-160, 10, -10], right_leg=[0, 0, 6], left_leg=[0, 0, -6], root={'pos': [0, 0.3, 0]})),
+}
+for _k, (_a, _b) in AWAKEN.items():
+    C[_k + '.ult_awaken'] = awaken(_a, _b)
+C['common.ult_awaken'] = awaken(*AWAKEN['void'])
 
 write('common', C)

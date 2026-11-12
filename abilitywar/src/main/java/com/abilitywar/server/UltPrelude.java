@@ -28,7 +28,9 @@ import java.util.Set;
  *   <li>시간 정지: 주변 (연출 반경) 플레이어 · 몹이 멈추고, 화면이 능력 색 흑백으로.</li>
  *   <li>카메라: 얼굴 클로즈업 → 낮은 각도로 돌며 올려다봄 → 확 빠지며 위로 (CameraController "&lt;능력&gt;_pre").</li>
  *   <li>화면: 집중선 · 궁극기 이름 컷인 띠 · 마지막에 번쩍 (CinematicOverlay).</li>
- *   <li>몸: 웅크려 힘을 모으다 팔을 활짝 펼침 (common.ult_awaken), 발밑 마법진 · 모여드는 빛 · 번개 · 충격파 (Effects.UltAwaken).</li>
+ *   <li>몸: 직업마다 다른 각성 자세 ("&lt;능력&gt;.ult_awaken": 공허 = 손바닥 → 두 팔로 틈을 엶, 용기사 = 웅크린 발톱 → 포효, 마검사 = 검을 하늘로 → 겨눔,
+ *       혈귀 = 늘어진 팔 → 젖히며 떠오름, 성가사 = 손바닥 → V 자, 흑마법사 = 주문 → 내지름, 천사 · 성기사 = 무릎 꿇음 → 하늘로, 수호기사 = 방패 → 포효).</li>
+ *   <li>효과: 발밑 마법진 · 모여드는 빛 · 번개 · 충격파 + 직업마다 다른 입자 (불티 · 핏빛 안개 · 깃털빛 · 영혼 …) (Effects.UltAwaken).</li>
  * </ul>
  * 끝나면 원래 궁극기를 씀 (게이지는 그때 씀). 게임 규칙 abilitywarUltPrelude 로 끌 수 있음.
  */
@@ -71,7 +73,7 @@ public final class UltPrelude {
             Combat.stun((LivingEntity) e, LENGTH + 2, p);
             Combat.setVelocity(e, Vec3d.ZERO);
         }
-        AWNet.anim(p, "common.ult_awaken");
+        AWNet.anim(p, a.key + ".ult_awaken");
         NbtCompound n = new NbtCompound();
         n.putInt("c", p.getId());
         n.putInt("d", LENGTH);

@@ -41,6 +41,22 @@
 | 블랙홀 확장 단계: 위아래로 뻗는 공허 기둥 · 번개 많아짐 | 임계 단계: 커지고 떨리며 하얗게 달아오름 → 붕괴 |
 | ![](screenshots/189_void_hole_expand.jpg) | ![](screenshots/190_void_hole_critical.jpg) |
 
+🆕 2.8.2 — **직업마다 다른 각성 자세 (힘을 모음 → 터짐)** + 직업마다 다른 입자. 왼쪽부터 공허 · 용기사 · 마검사 / 혈귀 · 성가사 · 흑마법사 / 천사 · 수호기사 · 성기사:
+
+![](screenshots/191_ult_awaken_poses.jpg)
+
+| 직업 | 힘을 모으는 자세 (0.3~1.4초, 떨림) | 터지는 자세 (1.6초~) | 입자 |
+|---|---|---|---|
+| 공허 | 앞으로 뻗은 손바닥 (왼손이 손목을 잡음) | 두 팔을 활짝 벌려 틈을 엶 | 빨려드는 검은 연기 |
+| 용기사 | 짐승처럼 낮게 웅크린 발톱 | 일어서며 두 팔을 들어 포효 | 솟구치는 불꽃 · 불티 |
+| 마검사 | 검을 하늘로 | 두 손으로 비스듬히 겨눔 | 보랏빛 검기 잔상 |
+| 혈귀 | 팔을 늘어뜨리고 구부정 | 팔을 젖히고 하늘을 보며 떠오름 | 핏빛 안개 · 핏방울 |
+| 성가사 | 두 손바닥을 위로 | 두 팔을 V 자로 들어 올림 | 금빛 깃털빛 · 반짝임 |
+| 흑마법사 | 가슴 앞에서 두 손을 모아 주문 | 한 손은 내지르고 한 손은 높이 | 땅에서 올라와 모이는 초록 영혼 |
+| 천사 | 무릎 꿇고 기도 | 일어나 두 팔을 하늘로, 떠오름 | 금빛 깃털빛 · 반짝임 |
+| 수호기사 | 방패를 앞세운 넓은 자세 | 가슴을 펴고 포효 | 금빛 방패 고리 |
+| 성기사 | 성검을 꽂고 무릎 꿇음 | 일어나며 성검을 하늘로 | 금빛 깃털빛 · 반짝임 |
+
 ### 🆕 2.8 — 심연의 탑 · 각성 · 종언의 용 · 캐릭터 카드
 
 | 탑지기 (수도 모험가 길드 앞, 보랏빛 문): 최고 기록 · 시작 층 고르기 | 심연의 탑 1층: 원형 투기장, 위에 "남은 적" 막대 |
@@ -316,7 +332,7 @@
 ## 설치
 
 1. Fabric Loader(1.20.1)를 설치합니다.
-💡 **모드팩 파일 (가장 쉬움)**: [`dist/abilitywar-rpg-2.8.1.mrpack`](dist/abilitywar-rpg-2.8.1.mrpack) 를 **Modrinth 앱** (또는 Prism Launcher · ATLauncher 등) 에서 *파일에서 가져오기* 로 열면 마인크래프트 1.20.1 + Fabric Loader 0.19.5 + 능력대전쟁 + 보스 · 드래곤 · 생명체 모드 (Ultris · True Ending 포함) + 셰이더 (Sodium · Iris · Complementary Reimagined, **켜진 상태로 시작**) + 인벤토리 꾸미기 모드 + Fabric API 가 한 번에 설치됩니다. 모드 파일은 Modrinth 공식 주소에서 받아집니다.
+💡 **모드팩 파일 (가장 쉬움)**: [`dist/abilitywar-rpg-2.8.2.mrpack`](dist/abilitywar-rpg-2.8.2.mrpack) 를 **Modrinth 앱** (또는 Prism Launcher · ATLauncher 등) 에서 *파일에서 가져오기* 로 열면 마인크래프트 1.20.1 + Fabric Loader 0.19.5 + 능력대전쟁 + 보스 · 드래곤 · 생명체 모드 (Ultris · True Ending 포함) + 셰이더 2 개 (Sodium · Iris + **Complementary Reimagined** (예쁨, 켜진 상태로 시작) · **MakeUp - Ultra Fast** (저사양)) + 인벤토리 꾸미기 모드 + Fabric API 가 한 번에 설치됩니다. 모드 파일은 Modrinth 공식 주소에서 받아집니다.
    - 2.7.0 팩에서 바꾸면: 예전 **Ender Dragon Fight Remastered** 는 True Ending 과 같이 쓰면 안 돼서 뺐습니다 (직접 넣었다면 `edf-remastered-4.3.jar` 를 지우세요).
    - 셰이더가 무거우면 게임 안에서 **O** (셰이더 팩 화면) → OFF. Iris 의 R (다시 불러오기) · K (켜기/끄기) 키는 능력 키와 겹쳐서 처음 실행할 때 꺼 둡니다 (Saint's Dragons 의 겹치는 키도 V · C · Z … 로 옮김, `config/abilitywar_keys.txt`).
 
@@ -325,7 +341,7 @@
 irm https://raw.githubusercontent.com/tmdtn08008-collab/survey/claude/blissful-carson-s8snwp/abilitywar/dist/download_mods.ps1 | iex
 ```
 
-2. `mods` 폴더에 **Fabric API** 와 **`dist/abilitywar-2.8.1.jar`** 를 넣습니다.
+2. `mods` 폴더에 **Fabric API** 와 **`dist/abilitywar-2.8.2.jar`** 를 넣습니다.
    보스 모드도 쓰려면 위의 모드팩이나 다운로드 스크립트를 쓰세요 (`dist/boss_mods/` 에는 2.7 까지의 보스 모드 jar 16개가 그대로 있고, 설명은 `dist/boss_mods/README.md`).
 3. 게임 실행 → 월드 접속 → 처음 들어오면 **1차 직업 선택 화면**이 뜹니다 (전사·마법사·탱커·힐러).
    관리자는 `/aw set <직업>` 으로 아무 직업이나 바로 지정할 수 있습니다: `warrior` `mage` `tank` `healer` / `void` `dragon` `blade` `blood` `cantor` `warlock` `angel` `guardian`
@@ -646,7 +662,7 @@ RPG 의 버퍼 역할. 찬가로 **자신과 같은 팀**(`/team`)을 강화하�
 
 ### 🆕 같이 쓰는 보스 · 드래곤 · 생명체 모드
 
-**가장 쉬운 방법: 모드팩 `dist/abilitywar-rpg-2.8.1.mrpack`** (위의 설치 참고). 직접 넣으려면 `dist/boss_mods/` 의 jar 16개 + 다운로드 스크립트로 2.8 에 새로 들어간 모드를 받으세요 (**Fabric Loader 0.19.5 이상** 필요). 무엇이 어느 모드용인지는 `dist/boss_mods/README.md`.
+**가장 쉬운 방법: 모드팩 `dist/abilitywar-rpg-2.8.2.mrpack`** (위의 설치 참고). 직접 넣으려면 `dist/boss_mods/` 의 jar 16개 + 다운로드 스크립트로 2.8 에 새로 들어간 모드를 받으세요 (**Fabric Loader 0.19.5 이상** 필요). 무엇이 어느 모드용인지는 `dist/boss_mods/README.md`.
 
 **Bosses of Mass Destruction** (LGPL, 보스마다 전용 경기장 구조물)
 
@@ -938,7 +954,7 @@ Ultris 는 라이선스가 "다른 곳에 다시 올리기 금지" 라서 이 �
 
 ## 🆕 🎨 셰이더 · 🎒 인벤토리
 
-- 모드팩에 **Sodium + Iris + Indium** 과 셰이더 팩 **Complementary Shaders - Reimagined** 가 들어 있고 처음부터 켜져 있습니다 (O 키로 고르거나 끄기). 이 모드의 화면 · 효과는 바닐라 그리기 방식이라 Iris 와 같이 쓸 수 있게 했습니다 (Sodium · Iris 의 mixin 과 겹치는 곳이 없음을 jar 를 열어 확인).
+- 모드팩에 **Sodium + Iris + Indium** 과 셰이더 팩 2 개가 들어 있습니다: **Complementary Shaders - Reimagined** (처음부터 켜짐, 예쁜 쪽) · **MakeUp - Ultra Fast** (저사양 · 노트북용). 게임 안에서 **O 키** → 셰이더 팩 화면에서 고르거나 끄기. 이 모드의 화면 · 효과는 바닐라 그리기 방식이라 Iris 와 같이 쓸 수 있게 했습니다 (Sodium · Iris 의 mixin 과 겹치는 곳이 없음을 jar 를 열어 확인).
 - **인벤토리 (E)**: 옆에 **캐릭터 카드** (직업 · 레벨 · 경험치, 체력 · 방어 · 공격 · 능력 피해 · 치명타 · 쿨타임 감소 · 흡혈 · 피해 감소, 입은 장비 등급 · 강화 · 각성, G · 길드 등급 · 탑 기록) + 금테. 레시피 책을 열면 왼쪽으로 옮겨 갑니다.
 - 모드팩의 **Inventory Particles** (아이템마다 반짝이 · 불꽃), **Smooth Gui** (화면이 부드럽게 열림), **Mouse Tweaks** (드래그로 옮기기 · 휠).
 
@@ -1053,7 +1069,7 @@ RPG 를 위한 무기와 방어구입니다. 등급은 8개이고, 등급마다 
 ## 개발자용
 
 ```
-./gradlew build          # build/libs/abilitywar-2.8.1.jar
+./gradlew build          # build/libs/abilitywar-2.8.2.jar
 python3 tools/modpack.py --check   # dist/abilitywar-rpg-<버전>.mrpack + dist/download_mods.ps1 (모드 목록은 이 파일 안)
 ./gradlew runClient      # 개발 클라이언트
 python3 tools/gen_textures.py     # 이펙트/아이콘 텍스처 다시 생성

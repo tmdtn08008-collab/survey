@@ -798,10 +798,12 @@ public final class Effects {
      */
     public static final class UltAwaken extends Fx {
         final int caster, dur, col, light;
+        final String key;
         final Vec3d groundPos;
 
         UltAwaken(ClientWorld w, NbtCompound n) {
             super(n.getInt("d") + 14);
+            key = n.getString("k");
             caster = n.getInt("c");
             dur = n.getInt("d");
             col = n.getInt("col");
@@ -840,6 +842,7 @@ public final class Effects {
                     spawn(Kind.GLOW, groundPos.add(Math.cos(a) * rr, 0.1, Math.sin(a) * rr), new Vec3d(0, rf(0.12f, 0.3f), 0), rf(12, 20), rf(0.08f, 0.16f)).color(light, 0.9f);
                 }
             }
+            if (age < dur) classParticles(w, o);
             if (age == dur - 1) {
                 // 터짐: 사방으로 불꽃 + 연기 고리
                 sparks(o, 70, 1.4f, light, 0.16f);
@@ -850,6 +853,49 @@ public final class Effects {
                 }
             }
             return super.tick(w);
+        }
+
+        /** 직업마다 다른 입자. */
+        void classParticles(ClientWorld w, Vec3d o) {
+            double ang = R.nextDouble() * Math.PI * 2, rr = rf(0.6f, 2.2f);
+            Vec3d around = o.add(Math.cos(ang) * rr, rf(-1.0f, 0.8f), Math.sin(ang) * rr);
+            switch (key) {
+                case "dragon" -> { // 솟구치는 불티 + 불꽃
+                    for (int i = 0; i < 3; i++) spawn(Kind.FLAME, groundPos.add(rf(-2.5f, 2.5f), 0.2, rf(-2.5f, 2.5f)), new Vec3d(0, rf(0.1f, 0.25f), 0), rf(14, 22), rf(0.25f, 0.45f)).color(0xFFA040, 1f);
+                    spawn(Kind.SPARK, around, new Vec3d(0, rf(0.05f, 0.15f), 0), 16, 0.08f).color(0xFFD080, 1f);
+                }
+                case "blood" -> { // 몸을 감도는 핏빛 안개 + 핏방울
+                    Particles.P p = spawn(Kind.SMOKE_ADD, around, new Vec3d(-Math.sin(ang) * 0.12, 0.02, Math.cos(ang) * 0.12), 24, 0.6f);
+                    p.color(0xB0101E, 0.55f);
+                    spawn(Kind.GLOW, o.add(rf(-0.5f, 0.5f), rf(0.5f, 1.2f), rf(-0.5f, 0.5f)), new Vec3d(0, -0.12, 0), 14, 0.07f).color(0xFF2030, 1f);
+                }
+                case "cantor", "angel", "paladin" -> { // 내려앉는 금빛 깃털빛 + 반짝임
+                    spawn(Kind.WISP_ADD, o.add(rf(-2.5f, 2.5f), rf(2.0f, 3.5f), rf(-2.5f, 2.5f)), new Vec3d(rf(-0.02f, 0.02f), -0.05, rf(-0.02f, 0.02f)), 40, rf(0.12f, 0.2f)).color(0xFFF0C0, 0.9f);
+                    spawn(Kind.SPARK, around, Vec3d.ZERO, 12, 0.06f).color(0xFFE080, 1f);
+                }
+                case "warlock" -> { // 땅에서 올라와 몸으로 모이는 초록 영혼
+                    Particles.P p = spawn(Kind.WISP_ADD, groundPos.add(rf(-3.5f, 3.5f), 0.2, rf(-3.5f, 3.5f)), new Vec3d(0, 0.06, 0), 34, rf(0.18f, 0.3f));
+                    p.color(0x48E8A0, 0.8f);
+                    p.attract = o;
+                    p.attractStrength = 0.02f;
+                }
+                case "guardian" -> { // 금빛 방패 고리 조각
+                    spawn(Kind.RING, o, Vec3d.ZERO, 10, rf(0.8f, 1.6f)).color(0xF0C860, 0.5f);
+                    spawn(Kind.SPARK, around, new Vec3d(0, 0.08, 0), 14, 0.07f).color(0xFFE6A0, 1f);
+                }
+                case "blade" -> { // 보랏빛 검기 잔상
+                    Vec3d d = randDir().multiply(0.4);
+                    Particles.P p = spawn(Kind.STREAK, around, d, 8, 0.12f);
+                    p.color(0xC870FF, 1f);
+                    p.drag = 1f;
+                }
+                default -> { // 공허: 빨려드는 검은 연기
+                    Particles.P p = spawn(Kind.SMOKE_DARK, around.add(Math.cos(ang) * 2, 0, Math.sin(ang) * 2), Vec3d.ZERO, 26, 0.7f);
+                    p.color(0x06000C, 0.6f);
+                    p.attract = o;
+                    p.attractStrength = 0.03f;
+                }
+            }
         }
 
         @Override

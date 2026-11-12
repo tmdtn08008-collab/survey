@@ -22,7 +22,7 @@ Remove-Item -Force -ErrorAction SilentlyContinue (Join-Path $dest 'edf-remastere
 Get-ChildItem -Path $dest -Filter 'abilitywar-*.jar' -ErrorAction SilentlyContinue | Remove-Item -Force
 
 $files = @(
-    @('abilitywar-2.8.1.jar', 'https://raw.githubusercontent.com/tmdtn08008-collab/survey/claude/blissful-carson-s8snwp/abilitywar/dist/abilitywar-2.8.1.jar', 'both'),
+    @('abilitywar-2.8.2.jar', 'https://raw.githubusercontent.com/tmdtn08008-collab/survey/claude/blissful-carson-s8snwp/abilitywar/dist/abilitywar-2.8.2.jar', 'both'),
     @('fabric-api-0.92.12+1.20.1.jar', 'https://cdn.modrinth.com/data/P7dR8mSH/versions/rvI2dfzR/fabric-api-0.92.12%2B1.20.1.jar', 'both'),
     @('BOMD-1.7.5-1.20.1.jar', 'https://cdn.modrinth.com/data/du3UfiLL/versions/yoCCX4Cc/BOMD-1.7.5-1.20.1.jar', 'both'),
     @('soulslike-weaponry-1.4.10-1.20.1-fabric.jar', 'https://cdn.modrinth.com/data/oX6SohLj/versions/LY1MhWN0/soulslike-weaponry-1.4.10-1.20.1-fabric.jar', 'both'),
@@ -58,6 +58,7 @@ $files = @(
     @('iris-1.7.6+mc1.20.1.jar', 'https://cdn.modrinth.com/data/YL57xq9U/versions/s5eFLITc/iris-1.7.6%2Bmc1.20.1.jar', 'client'),
     @('indium-1.0.36+mc1.20.1.jar', 'https://cdn.modrinth.com/data/Orvt0mRa/versions/nQHYSjxO/indium-1.0.36%2Bmc1.20.1.jar', 'client'),
     @('ComplementaryReimagined_r5.9.3.zip', 'https://cdn.modrinth.com/data/HVnmMxH1/versions/Bqen1mJX/ComplementaryReimagined_r5.9.3.zip', 'shader'),
+    @('MakeUp-UltraFast-9.6.zip', 'https://cdn.modrinth.com/data/izsIPI7a/versions/t4YRxQug/MakeUp-UltraFast-9.6.zip', 'shader'),
     @('InventoryParticles-3.2.0+1.20.1+fabric.jar', 'https://cdn.modrinth.com/data/XYnKrsxH/versions/JDwRa5Wi/InventoryParticles-3.2.0%2B1.20.1%2Bfabric.jar', 'client'),
     @('MossyLib-1.6.0+1.20.1+fabric.jar', 'https://cdn.modrinth.com/data/ffLDUGbm/versions/wl1N1Ts7/MossyLib-1.6.0%2B1.20.1%2Bfabric.jar', 'client'),
     @('smoothgui-fabric-2.1.0+mc1.20.1.jar', 'https://cdn.modrinth.com/data/j6yrZogB/versions/XM7uHMcu/smoothgui-fabric-2.1.0%2Bmc1.20.1.jar', 'client'),

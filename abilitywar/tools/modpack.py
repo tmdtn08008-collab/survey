@@ -63,6 +63,8 @@ MODS = [
     ("Iris Shaders", "IrisShaders", "YL57xq9U", "s5eFLITc", "client", "graphics"),
     ("Indium", "comp500", "Orvt0mRa", "nQHYSjxO", "client", "graphics"),
     ("Complementary Shaders - Reimagined", "EminGT", "HVnmMxH1", "Bqen1mJX", "client", "shader"),
+    # 저사양 셰이더 (O 키 → 셰이더 팩 화면에서 고름)
+    ("MakeUp - Ultra Fast", "XavierFST", "izsIPI7a", "t4YRxQug", "client", "shader"),
     # --- 인벤토리 꾸미기 (클라이언트만)
     ("Inventory Particles", "MossyLeaf", "XYnKrsxH", "JDwRa5Wi", "client", "inventory"),
     ("MossyLib", "MossyLeaf", "ffLDUGbm", "wl1N1Ts7", "client", "inventory"),
