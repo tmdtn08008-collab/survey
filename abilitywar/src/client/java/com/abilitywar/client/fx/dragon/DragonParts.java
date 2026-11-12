@@ -384,10 +384,10 @@ public final class DragonParts {
         float cs = (float) Math.cos(rot) * s, sn = (float) Math.sin(rot) * s;
         VertexConsumer v = vcp.getBuffer(AWRenderLayers.additive(SHIELD));
         float a = amount * (0.75f + 0.25f * (float) Math.sin(now * 0.8));
-        v.vertex(m, -cs - sn, y - sn + cs, z).color(1f, 0.5f, 0.15f, a).texture(0, 1).next();
-        v.vertex(m, cs - sn, y + sn + cs, z).color(1f, 0.5f, 0.15f, a).texture(1, 1).next();
-        v.vertex(m, cs + sn, y + sn - cs, z).color(1f, 0.5f, 0.15f, a).texture(1, 0).next();
-        v.vertex(m, -cs + sn, y - sn - cs, z).color(1f, 0.5f, 0.15f, a).texture(0, 0).next();
+        v.vertex(m, -cs - sn, y - sn + cs, z).texture(0, 1).color(1f, 0.5f, 0.15f, a).next();
+        v.vertex(m, cs - sn, y + sn + cs, z).texture(1, 1).color(1f, 0.5f, 0.15f, a).next();
+        v.vertex(m, cs + sn, y + sn - cs, z).texture(1, 0).color(1f, 0.5f, 0.15f, a).next();
+        v.vertex(m, -cs + sn, y - sn - cs, z).texture(0, 0).color(1f, 0.5f, 0.15f, a).next();
     }
 
     // ------------------------------------------------------------------ 1인칭

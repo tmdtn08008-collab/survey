@@ -1,5 +1,6 @@
 package com.abilitywar.client.fx;
 
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderPhase;
 import net.minecraft.client.render.VertexFormat;
@@ -15,10 +16,16 @@ public abstract class AWRenderLayers extends RenderLayer {
         super(name, vertexFormat, drawMode, expectedBufferSize, hasCrumbling, translucent, startAction, endAction);
     }
 
+    /**
+     * 위치 → 텍스처 → 색 순서 (position_tex_color). 셰이더 모드 (Iris) 는 position_color_tex 프로그램을 이 순서의 프로그램으로 바꿔 끼워서,
+     * 위치 → 색 → 텍스처 순서로 보내면 텍스처 좌표가 색으로 읽혀 빨강 · 초록 삼각형이 됨.
+     */
+    private static final RenderPhase.ShaderProgram POSITION_TEXTURE_COLOR_PROGRAM = new RenderPhase.ShaderProgram(GameRenderer::getPositionTexColorProgram);
+
     private static final Function<Identifier, RenderLayer> ADDITIVE = Util.memoize(tex -> RenderLayer.of("abilitywar_additive",
-            VertexFormats.POSITION_COLOR_TEXTURE, VertexFormat.DrawMode.QUADS, 4096, false, true,
+            VertexFormats.POSITION_TEXTURE_COLOR, VertexFormat.DrawMode.QUADS, 4096, false, true,
             RenderLayer.MultiPhaseParameters.builder()
-                    .program(RenderPhase.POSITION_COLOR_TEXTURE_PROGRAM)
+                    .program(POSITION_TEXTURE_COLOR_PROGRAM)
                     .texture(new RenderPhase.Texture(tex, false, false))
                     .transparency(RenderPhase.LIGHTNING_TRANSPARENCY)
                     .cull(RenderPhase.DISABLE_CULLING)
@@ -27,9 +34,9 @@ public abstract class AWRenderLayers extends RenderLayer {
                     .build(false)));
 
     private static final Function<Identifier, RenderLayer> ADDITIVE_NODEPTH = Util.memoize(tex -> RenderLayer.of("abilitywar_additive_nodepth",
-            VertexFormats.POSITION_COLOR_TEXTURE, VertexFormat.DrawMode.QUADS, 4096, false, true,
+            VertexFormats.POSITION_TEXTURE_COLOR, VertexFormat.DrawMode.QUADS, 4096, false, true,
             RenderLayer.MultiPhaseParameters.builder()
-                    .program(RenderPhase.POSITION_COLOR_TEXTURE_PROGRAM)
+                    .program(POSITION_TEXTURE_COLOR_PROGRAM)
                     .texture(new RenderPhase.Texture(tex, false, false))
                     .transparency(RenderPhase.LIGHTNING_TRANSPARENCY)
                     .cull(RenderPhase.DISABLE_CULLING)
@@ -38,9 +45,9 @@ public abstract class AWRenderLayers extends RenderLayer {
                     .build(false)));
 
     private static final Function<Identifier, RenderLayer> TRANSLUCENT = Util.memoize(tex -> RenderLayer.of("abilitywar_translucent",
-            VertexFormats.POSITION_COLOR_TEXTURE, VertexFormat.DrawMode.QUADS, 4096, false, true,
+            VertexFormats.POSITION_TEXTURE_COLOR, VertexFormat.DrawMode.QUADS, 4096, false, true,
             RenderLayer.MultiPhaseParameters.builder()
-                    .program(RenderPhase.POSITION_COLOR_TEXTURE_PROGRAM)
+                    .program(POSITION_TEXTURE_COLOR_PROGRAM)
                     .texture(new RenderPhase.Texture(tex, false, false))
                     .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
                     .cull(RenderPhase.DISABLE_CULLING)

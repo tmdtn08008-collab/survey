@@ -551,7 +551,7 @@ public final class ElderDragon {
     }
 
     static void sv(VertexConsumer vc, Matrix4f m, Vec3d p, float r, float g, float b, float a, float u, float v) {
-        vc.vertex(m, (float) p.x, (float) p.y, (float) p.z).color(r, g, b, a).texture(u, v).next();
+        vc.vertex(m, (float) p.x, (float) p.y, (float) p.z).texture(u, v).color(r, g, b, a).next();
     }
 
     static void emitPoly(VertexConsumer vc, Matrix4f m, Matrix3f n, Poly poly, float r, float g, float b, float a, int light) {

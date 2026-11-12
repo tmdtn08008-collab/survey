@@ -108,7 +108,7 @@ public final class BladeParts {
     }
 
     static void sv(VertexConsumer vc, Matrix4f m, float x, float y, float z, float r, float g, float b, float a, float u, float v) {
-        vc.vertex(m, x, y, z).color(r, g, b, a).texture(u, v).next();
+        vc.vertex(m, x, y, z).texture(u, v).color(r, g, b, a).next();
     }
 
     // 검날 단면 (z, 날 폭)

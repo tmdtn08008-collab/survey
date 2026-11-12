@@ -22,7 +22,7 @@ Remove-Item -Force -ErrorAction SilentlyContinue (Join-Path $dest 'edf-remastere
 Get-ChildItem -Path $dest -Filter 'abilitywar-*.jar' -ErrorAction SilentlyContinue | Remove-Item -Force
 
 $files = @(
-    @('abilitywar-2.10.0.jar', 'https://raw.githubusercontent.com/tmdtn08008-collab/survey/claude/blissful-carson-s8snwp/abilitywar/dist/abilitywar-2.10.0.jar', 'both'),
+    @('abilitywar-2.10.1.jar', 'https://raw.githubusercontent.com/tmdtn08008-collab/survey/claude/blissful-carson-s8snwp/abilitywar/dist/abilitywar-2.10.1.jar', 'both'),
     @('fabric-api-0.92.12+1.20.1.jar', 'https://cdn.modrinth.com/data/P7dR8mSH/versions/rvI2dfzR/fabric-api-0.92.12%2B1.20.1.jar', 'both'),
     @('BOMD-1.7.5-1.20.1.jar', 'https://cdn.modrinth.com/data/du3UfiLL/versions/yoCCX4Cc/BOMD-1.7.5-1.20.1.jar', 'both'),
     @('soulslike-weaponry-1.4.10-1.20.1-fabric.jar', 'https://cdn.modrinth.com/data/oX6SohLj/versions/LY1MhWN0/soulslike-weaponry-1.4.10-1.20.1-fabric.jar', 'both'),

@@ -44,6 +44,7 @@ public class AbilityWarClient implements ClientModInitializer {
         EntityRendererRegistry.register(AWEntities.TOWER_KEEPER, com.abilitywar.client.render.JobMasterRenderer::towerKeeper);
         EntityRendererRegistry.register(AWEntities.DUNGEON_GUIDE, com.abilitywar.client.render.JobMasterRenderer::dungeonGuide);
         com.abilitywar.client.screen.InventoryPanel.init();
+        com.abilitywar.client.compat.CreativePagesFix.init();
         com.abilitywar.client.render.mob.MobRenderers.init();
         com.abilitywar.client.dev.TestDriver.init();
         ClientNet.init();

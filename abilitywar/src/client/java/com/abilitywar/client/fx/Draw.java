@@ -11,7 +11,7 @@ public final class Draw {
     private static final Vector3f A = new Vector3f(), B = new Vector3f(), C = new Vector3f(), D = new Vector3f();
 
     public static void v(VertexConsumer vc, Matrix4f m, float x, float y, float z, float r, float g, float b, float a, float u, float v) {
-        vc.vertex(m, x, y, z).color(r, g, b, a).texture(u, v).next();
+        vc.vertex(m, x, y, z).texture(u, v).color(r, g, b, a).next();
     }
 
     public static void vc(VertexConsumer vc, Matrix4f m, float x, float y, float z, float r, float g, float b, float a) {
