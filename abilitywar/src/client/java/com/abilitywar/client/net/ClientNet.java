@@ -36,6 +36,11 @@ public final class ClientNet {
                 } else com.abilitywar.client.screen.JobMasterScreen.open(npc);
             });
         });
+        ClientPlayNetworking.registerGlobalReceiver(com.abilitywar.rpg.DungeonGateBlock.S2C_OPEN_GATE, (client, handler, buf, sender) -> {
+            net.minecraft.util.math.BlockPos pos = buf.readBlockPos();
+            int theme = buf.readVarInt();
+            client.execute(() -> com.abilitywar.client.screen.DungeonScreen.openGate(pos, theme));
+        });
         ClientPlayNetworking.registerGlobalReceiver(com.abilitywar.rpg.Shops.S2C_ENHANCE, (client, handler, buf, sender) -> {
             int code = buf.readByte(), level = buf.readVarInt(), slot = buf.readVarInt();
             client.execute(() -> com.abilitywar.client.screen.EnhanceScreen.onResult(code, level, slot));

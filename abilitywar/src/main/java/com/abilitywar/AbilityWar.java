@@ -37,6 +37,7 @@ public class AbilityWar implements ModInitializer {
         com.abilitywar.item.RpgItems.init();
         com.abilitywar.social.Social.init();
         com.abilitywar.rpg.AbyssTower.init();
+        com.abilitywar.rpg.DungeonGateBlock.init();
         com.abilitywar.rpg.InstanceDungeon.init();
         com.abilitywar.mob.FinalDragon.init();
         Abilities.init();

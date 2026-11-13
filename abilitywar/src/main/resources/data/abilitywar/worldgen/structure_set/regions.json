@@ -1,0 +1,18 @@
+{
+  "structures": [
+    {
+      "structure": "abilitywar:region",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 34,
+    "separation": 16,
+    "salt": 20490,
+    "exclusion_zone": {
+      "other_set": "abilitywar:towns",
+      "chunk_count": 10
+    }
+  }
+}

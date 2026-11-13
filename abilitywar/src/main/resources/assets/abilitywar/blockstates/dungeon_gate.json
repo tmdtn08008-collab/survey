@@ -1,0 +1,6 @@
+{
+  "multipart": [
+    {"when": {"axis": "x"}, "apply": {"model": "abilitywar:block/dungeon_gate"}},
+    {"when": {"axis": "z"}, "apply": {"model": "abilitywar:block/dungeon_gate", "y": 90}}
+  ]
+}

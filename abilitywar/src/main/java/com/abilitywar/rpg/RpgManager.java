@@ -831,6 +831,21 @@ public final class RpgManager {
                         }
                         openNpc(player, npc);
                     }
+                    case 16 -> {
+                        // 16 던전 입구로 들어가기 ("테마:난이도:x:y:z") — 입구 가까이에서만
+                        String[] a = arg.split(":");
+                        InstanceDungeon.Theme th = InstanceDungeon.Theme.byKey(a[0]);
+                        InstanceDungeon.Diff df = InstanceDungeon.Diff.byKey(a.length > 1 ? a[1] : "normal");
+                        if (th == null || df == null || a.length < 5) return;
+                        net.minecraft.util.math.BlockPos at = new net.minecraft.util.math.BlockPos(parseInt(a[2]), parseInt(a[3]), parseInt(a[4]));
+                        if (player.getBlockPos().getSquaredDistance(at) > 10 * 10 || !DungeonGateBlock.near(player.getWorld(), at, th)) {
+                            player.sendMessage(Text.translatable("shop.abilitywar.err.far").formatted(Formatting.RED), true);
+                            return;
+                        }
+                        String err = InstanceDungeon.start(player, th, df);
+                        if (err != null)
+                            player.sendMessage(Text.translatable(err, InstanceDungeon.minLevel(th, df), Shops.fmt(InstanceDungeon.fee(th, df))).formatted(Formatting.RED), true);
+                    }
                     case 10, 11, 12, 13, 14, 15 -> {
                         // 상점 · 대장장이 · 탑지기 (가까이에서만): 10 사기 ("물건:개수"), 11 강화 ("칸:보호"), 12 승급 ("칸"), 13 각성 ("칸"), 14 탑 들어가기 ("시작 층")
                         Entity e = player.getWorld().getEntityById(npc);

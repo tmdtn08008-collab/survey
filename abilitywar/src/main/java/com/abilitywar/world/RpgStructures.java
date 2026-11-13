@@ -41,7 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class RpgStructures {
     // ================================================================ 종류
     public enum Kind {
-        CAPITAL(118, 70), CAPITAL_LANDS(320, 40), TOWN(40, 34), FALLEN_FORTRESS(30, 30), EMBER_ALTAR(26, 30), FROST_TEMPLE(26, 34), WYVERN_ROOST(22, 30), GOBLIN_CAMP(14, 12), DRAGON_NEST(30, 40);
+        CAPITAL(118, 70), CAPITAL_LANDS(320, 40), TOWN(40, 34), FALLEN_FORTRESS(30, 30), EMBER_ALTAR(26, 30), FROST_TEMPLE(26, 34), WYVERN_ROOST(22, 30), GOBLIN_CAMP(14, 12), DRAGON_NEST(30, 40), REGION(108, 40), WILD_GATE(10, 14);
 
         /** 반지름 (가로·세로), 높이 (바닥 위). */
         public final int radius, height;
@@ -56,19 +56,30 @@ public final class RpgStructures {
         }
     }
 
-    static final Map<String, Blueprint> CACHE = new ConcurrentHashMap<>();
+    /** 만든 설계도 (최근에 쓴 것 160개까지; 지역은 만들기 비싸서 다 비우지 않고 오래된 것부터 버림). */
+    static final Map<String, Blueprint> CACHE = java.util.Collections.synchronizedMap(new java.util.LinkedHashMap<>(256, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, Blueprint> e) {
+            return size() > 160;
+        }
+    });
 
     static Blueprint blueprint(Kind kind, int x, int y, int z, long seed, Blueprint.Heights heights) {
-        String key = kind + ":" + x + ":" + y + ":" + z + ":" + seed;
+        return blueprint(kind, x, y, z, seed, heights, 0);
+    }
+
+    static Blueprint blueprint(Kind kind, int x, int y, int z, long seed, Blueprint.Heights heights, int variant) {
+        String key = kind + ":" + x + ":" + y + ":" + z + ":" + seed + ":" + variant;
         Blueprint b = CACHE.get(key);
         if (b != null) return b;
-        if (CACHE.size() > 48) CACHE.clear();
         java.util.Random r = new java.util.Random(seed ^ ((long) x * 341873128712L + (long) z * 132897987541L));
         Blueprint nb = new Blueprint();
         switch (kind) {
             case CAPITAL -> CapitalPlan.build(nb, x, y, z, r);
             case CAPITAL_LANDS -> LandsPlan.build(nb, x, y, z, new java.util.Random(seed * 31 + 7 ^ x), heights);
             case TOWN -> TownPlan.build(nb, x, y, z, r);
+            case REGION -> RegionPlan.build(Regions.Theme.of(variant), nb, x, y, z, r, heights);
+            case WILD_GATE -> GatePlan.build(com.abilitywar.rpg.InstanceDungeon.Theme.values()[Math.floorMod(variant, com.abilitywar.rpg.InstanceDungeon.Theme.values().length)], nb, x, y, z, r);
             default -> DungeonPlans.build(kind, nb, x, y, z, r);
         }
         nb.finish();
@@ -108,8 +119,14 @@ public final class RpgStructures {
         final long seed;
         /** 이 조각이 맡은 칸 (왕령은 여러 조각이 칸을 나눠 맡음). null = 전부. */
         final BlockBox cell;
+        /** 지역 테마 · 던전 입구 테마 번호 (그 밖에는 0). */
+        final int variant;
 
         RpgPiece(Kind kind, int x, int y, int z, long seed, BlockBox box, BlockBox cell) {
+            this(kind, x, y, z, seed, box, cell, 0);
+        }
+
+        RpgPiece(Kind kind, int x, int y, int z, long seed, BlockBox box, BlockBox cell, int variant) {
             super(PIECE, 0, box);
             this.kind = kind;
             this.x = x;
@@ -117,6 +134,19 @@ public final class RpgStructures {
             this.z = z;
             this.seed = seed;
             this.cell = cell;
+            this.variant = variant;
+        }
+
+        public Kind kind() {
+            return kind;
+        }
+
+        public int variant() {
+            return variant;
+        }
+
+        public BlockPos center() {
+            return new BlockPos(x, y, z);
         }
 
         RpgPiece(StructureContext ctx, NbtCompound nbt) {
@@ -128,6 +158,7 @@ public final class RpgStructures {
             this.seed = nbt.getLong("Seed");
             int[] c = nbt.getIntArray("Cell");
             this.cell = c.length == 4 ? new BlockBox(c[0], -2048, c[1], c[2], 2048, c[3]) : null;
+            this.variant = nbt.getInt("Var");
         }
 
         @Override
@@ -138,6 +169,7 @@ public final class RpgStructures {
             nbt.putInt("Z", z);
             nbt.putLong("Seed", seed);
             if (cell != null) nbt.putIntArray("Cell", new int[]{cell.getMinX(), cell.getMinZ(), cell.getMaxX(), cell.getMaxZ()});
+            if (variant != 0) nbt.putInt("Var", variant);
         }
 
         @Override
@@ -149,7 +181,7 @@ public final class RpgStructures {
                 if (x0 > x1 || z0 > z1) return;
                 clip = new BlockBox(x0, chunkBox.getMinY(), z0, x1, chunkBox.getMaxY(), z1);
             }
-            blueprint(kind, x, y, z, seed, heights(gen, world, world.toServerWorld().getChunkManager().getNoiseConfig())).place(world, clip, random);
+            blueprint(kind, x, y, z, seed, heights(gen, world, world.toServerWorld().getChunkManager().getNoiseConfig()), variant).place(world, clip, random);
         }
     }
 
@@ -201,11 +233,28 @@ public final class RpgStructures {
                     collector.addPiece(new RpgPiece(kind, ccx, baseY, ccz, seed, new BlockBox(x0, Math.max(bb.getMinY(), baseY - 64), z0, x1, Math.max(bb.getMaxY(), baseY + 2), z1), cell));
                 }));
             }
+            var sampler = ctx.noiseConfig().getMultiNoiseSampler();
+            if (kind == Kind.REGION) {
+                // 테마 지역: 고리 자리 (수도 둘레 6곳) 또는 흩어진 자리. 테마는 조각에 저장.
+                Regions.Theme th = Regions.themeAt(seed, ctx.biomeSource(), sampler, ctx.chunkPos().x, ctx.chunkPos().z);
+                if (th == null) return Optional.empty();
+                int[] hs = new int[9];
+                int i = 0;
+                for (int dx = -1; dx <= 1; dx++)
+                    for (int dz = -1; dz <= 1; dz++) hs[i++] = gen.getHeightOnGround(cx + dx * 10, cz + dz * 10, Heightmap.Type.WORLD_SURFACE_WG, ctx.world(), ctx.noiseConfig()) - 1;
+                Arrays.sort(hs);
+                int baseY = Math.max(gen.getSeaLevel() + 1, hs[4]);
+                int E = Regions.R + 16;
+                BlockBox box = new BlockBox(cx - E, ctx.world().getBottomY(), cz - E, cx + E, ctx.world().getTopY() - 1, cz + E);
+                return Optional.of(new StructurePosition(new BlockPos(cx, baseY, cz), collector -> collector.addPiece(new RpgPiece(kind, cx, baseY, cz, seed, box, null, th.ordinal()))));
+            }
             boolean capital = kind == Kind.CAPITAL;
             // 수도와 왕령 (반지름 23청크) 에는 다른 구조물을 짓지 않음
             if (!capital) {
-                ChunkPos cap = CapitalPlacement.locate(seed, ctx.biomeSource(), ctx.noiseConfig().getMultiNoiseSampler());
+                ChunkPos cap = CapitalPlacement.locate(seed, ctx.biomeSource(), sampler);
                 if (Math.max(Math.abs(cap.x - ctx.chunkPos().x), Math.abs(cap.z - ctx.chunkPos().z)) < 23) return Optional.empty();
+                // 테마 지역 안에도 안 지음
+                if (Regions.blocked(seed, ctx.biomeSource(), sampler, ctx.chunkPos().x, ctx.chunkPos().z, kind.radius)) return Optional.empty();
             }
             int[] hs = new int[9];
             int i = 0;
@@ -222,12 +271,20 @@ public final class RpgStructures {
             }
             if (kind == Kind.WYVERN_ROOST || kind == Kind.DRAGON_NEST) y = hs[6];
             final int baseY = y;
+            // 던전 입구: 평평한 곳만, 테마는 생물군계로
+            int variant = 0;
+            if (kind == Kind.WILD_GATE) {
+                if (hs[8] - hs[0] > 10) return Optional.empty();
+                var bio = ctx.biomeSource().getBiome(BiomeCoords.fromBlock(cx), BiomeCoords.fromBlock(baseY), BiomeCoords.fromBlock(cz), sampler);
+                variant = GatePlan.themeFor(bio, Regions.mix(seed, ctx.chunkPos().x, ctx.chunkPos().z)).ordinal();
+            }
+            final int var = variant;
             BlockBox box = new BlockBox(cx - r - 2, baseY + 1, cz - r - 2, cx + r + 2, baseY + kind.height, cz + r + 2);
             return Optional.of(new StructurePosition(new BlockPos(cx, baseY, cz), collector -> {
                 // 실제 범위 = 설계도 범위 (지붕·땅 고르기 포함)
-                BlockBox bb = blueprint(kind, cx, baseY, cz, seed, hts).bounds();
+                BlockBox bb = blueprint(kind, cx, baseY, cz, seed, hts, var).bounds();
                 BlockBox pieceBox = new BlockBox(bb.getMinX(), baseY + 1, bb.getMinZ(), bb.getMaxX(), Math.max(bb.getMaxY(), baseY + 2), bb.getMaxZ());
-                collector.addPiece(new RpgPiece(kind, cx, baseY, cz, seed, pieceBox.getBlockCountX() > 0 ? pieceBox : box, null));
+                collector.addPiece(new RpgPiece(kind, cx, baseY, cz, seed, pieceBox.getBlockCountX() > 0 ? pieceBox : box, null, var));
             }));
         }
 
@@ -326,6 +383,7 @@ public final class RpgStructures {
 
     public static void init() {
         RpgWorld.init();
+        Regions.init();
         AbilityWar.LOG.info("[rpg] structures: {} {} {} {}", Registries.STRUCTURE_TYPE.getId(TYPE), Registries.STRUCTURE_PIECE.getId(PIECE), Registries.STRUCTURE_PLACEMENT.getId(PLACEMENT), Registries.STRUCTURE_PLACEMENT.getId(LANDS_PLACEMENT));
     }
 
@@ -344,11 +402,25 @@ public final class RpgStructures {
 
     public static boolean suppressFeature(net.minecraft.world.chunk.Chunk chunk, net.minecraft.world.gen.feature.PlacedFeature f, ChunkGenerator gen) {
         boolean rpg = false;
-        for (Structure st : chunk.getStructureReferences().keySet())
-            if (st instanceof RpgStructure rs && rs.kind != Kind.CAPITAL_LANDS) {
-                rpg = true;
-                break;
+        ChunkPos me = chunk.getPos();
+        for (var e : chunk.getStructureReferences().entrySet()) {
+            if (!(e.getKey() instanceof RpgStructure rs) || rs.kind == Kind.CAPITAL_LANDS || rs.kind == Kind.WILD_GATE) continue;
+            if (rs.kind == Kind.REGION) {
+                // 테마 지역: 가운데에서 (R - 20) 안의 청크만 원래 나무 · 풀을 막음 (가장자리는 원래 숲과 섞임)
+                double lim = (Regions.R - 20) / 16.0;
+                for (long st : e.getValue()) {
+                    int sx = ChunkPos.getPackedX(st), sz = ChunkPos.getPackedZ(st);
+                    if ((sx - me.x) * (sx - me.x) + (sz - me.z) * (sz - me.z) <= lim * lim) {
+                        rpg = true;
+                        break;
+                    }
+                }
+                if (rpg) break;
+                continue;
             }
+            rpg = true;
+            break;
+        }
         if (!rpg) return false;
         return VEGETATION.computeIfAbsent(gen.getBiomeSource(), src -> {
             java.util.Set<net.minecraft.world.gen.feature.PlacedFeature> set = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());

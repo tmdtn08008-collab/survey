@@ -32,6 +32,7 @@ public final class RpgWorld {
             REGION.clear();
         });
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK.register(RpgWorld::tickRegions);
+        RegionLife.init();
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_LOAD.register((e, w) -> {
             if (!(e instanceof net.minecraft.entity.passive.VillagerEntity v)) return;
             for (String t : v.getCommandTags()) {
@@ -70,6 +71,26 @@ public final class RpgWorld {
         return best;
     }
 
+    /** 테마 지역 안이면 (가운데 · 테마), 아니면 null. 가장자리 4칸까지. */
+    public record RegionHit(BlockPos center, Regions.Theme theme) {
+    }
+
+    @org.jetbrains.annotations.Nullable
+    public static RegionHit regionAt(ServerWorld w, BlockPos pos) {
+        if (w.getRegistryKey() != World.OVERWORLD) return null;
+        var acc = w.getStructureAccessor();
+        for (var st : acc.getStructureReferences(pos).keySet()) {
+            if (!(st instanceof RpgStructures.RpgStructure rs) || rs.kind != RpgStructures.Kind.REGION) continue;
+            var start = acc.getStructureAt(pos, st);
+            if (start == null || !start.hasChildren() || !(start.getChildren().get(0) instanceof RpgStructures.RpgPiece piece)) continue;
+            BlockPos c = piece.center();
+            double dx = pos.getX() - c.getX(), dz = pos.getZ() - c.getZ();
+            if (dx * dx + dz * dz > (Regions.R + 4) * (Regions.R + 4)) continue;
+            return new RegionHit(c, Regions.Theme.of(piece.variant()));
+        }
+        return null;
+    }
+
     /** 순찰대 (약탈자 순찰대 · The Graveyard 의 언데드 무리) 가 생기면 안 되는 곳: 수도 · 마을. */
     public static boolean noPatrols(ServerWorld w, BlockPos pos) {
         return inSafeZone(w, pos) || (w.getRegistryKey() == World.OVERWORLD && kindAt(w, pos) == RpgStructures.Kind.TOWN);
@@ -90,6 +111,16 @@ public final class RpgWorld {
             String key = "";
             net.minecraft.text.Text title = null, sub = null;
             var start = w.getRegistryKey() == World.OVERWORLD ? structureAt(w, p.getBlockPos()) : null;
+            if (start != null && ((RpgStructures.RpgStructure) start.getStructure()).kind == RpgStructures.Kind.REGION) {
+                // 테마 지역: 원 안일 때만, 이름은 테마로
+                RegionHit hit = regionAt(w, p.getBlockPos());
+                start = null;
+                if (hit != null) {
+                    key = "region:" + hit.theme().key + "@" + hit.center().asLong();
+                    title = net.minecraft.text.Text.translatable("region.abilitywar.region." + hit.theme().key);
+                    sub = net.minecraft.text.Text.translatable("region.abilitywar.region." + hit.theme().key + ".sub");
+                }
+            }
             if (start != null) {
                 var kind = ((RpgStructures.RpgStructure) start.getStructure()).kind;
                 String k = kind.name().toLowerCase();

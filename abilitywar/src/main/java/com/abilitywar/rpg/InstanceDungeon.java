@@ -110,7 +110,18 @@ public final class InstanceDungeon {
                 new String[]{"abilitywar:wraith", "minecraft:blaze", "minecraft:wither_skeleton", "abilitywar:cultist", "abilitywar:ancient_golem"},
                 new String[]{"abilitywar:ancient_wyvern"}, new String[]{"abilitywar:dragon_king"},
                 new Palette(Blocks.BLACKSTONE, Blocks.POLISHED_BLACKSTONE_BRICKS, Blocks.NETHER_BRICKS, Blocks.GILDED_BLACKSTONE, Blocks.BLACKSTONE,
-                        Blocks.OCHRE_FROGLIGHT, Blocks.POLISHED_BASALT, Blocks.IRON_BARS, new Block[]{Blocks.GOLD_BLOCK, Blocks.BONE_BLOCK, Blocks.OBSIDIAN}));
+                        Blocks.OCHRE_FROGLIGHT, Blocks.POLISHED_BASALT, Blocks.IRON_BARS, new Block[]{Blocks.GOLD_BLOCK, Blocks.BONE_BLOCK, Blocks.OBSIDIAN})),
+        // 2.11: 슬라임 숲 · 거미 숲의 던전 (순서 = 던전 입구 블록의 번호라 뒤에 붙임)
+        SLIME("slime_hollow", 18, 4_000, 600, 0x7CE05A,
+                new String[]{"minecraft:slime", "minecraft:slime", "minecraft:slime", "abilitywar:goblin", "minecraft:witch"},
+                new String[]{"minecraft:slime"}, new String[]{"minecraft:slime"},
+                new Palette(Blocks.MOSSY_COBBLESTONE, Blocks.MUD_BRICKS, Blocks.MOSS_BLOCK, Blocks.MUD, Blocks.PACKED_MUD, Blocks.VERDANT_FROGLIGHT,
+                        Blocks.MANGROVE_LOG, Blocks.MANGROVE_FENCE, new Block[]{Blocks.SLIME_BLOCK, Blocks.MOSS_BLOCK, Blocks.CLAY, Blocks.BROWN_MUSHROOM_BLOCK})),
+        SPIDER("spider_nest", 32, 8_000, 1_500, 0xC8C8D8,
+                new String[]{"minecraft:spider", "minecraft:cave_spider", "minecraft:spider", "minecraft:skeleton", "abilitywar:thief"},
+                new String[]{"minecraft:spider"}, new String[]{"abilitywar:spider_queen"},
+                new Palette(Blocks.COBBLED_DEEPSLATE, Blocks.TUFF, Blocks.COARSE_DIRT, Blocks.GRAVEL, Blocks.DEEPSLATE, Blocks.OCHRE_FROGLIGHT,
+                        Blocks.STRIPPED_DARK_OAK_LOG, Blocks.IRON_BARS, new Block[]{Blocks.BONE_BLOCK, Blocks.COBWEB, Blocks.WHITE_WOOL, Blocks.MUSHROOM_STEM}));
 
         public final String key;
         public final int level, gold, fee, color;
@@ -154,6 +165,8 @@ public final class InstanceDungeon {
                 case CULT -> new Item[]{RpgItems.CULT_SIGIL, RpgItems.WRAITH_ESSENCE, RpgItems.KNIGHT_CREST, RpgItems.CROWN_SHARD};
                 case GOLEM -> new Item[]{RpgItems.GOLEM_CORE, RpgItems.FAIRY_DUST, RpgItems.EMBER_CORE};
                 case DRAGON -> new Item[]{RpgItems.DRAKE_SCALE, RpgItems.WYVERN_SCALE, RpgItems.DRAGON_KING_SCALE};
+                case SLIME -> new Item[]{net.minecraft.item.Items.SLIME_BALL, RpgItems.FAIRY_DUST, RpgItems.GOBLIN_EAR, RpgItems.DIRE_FANG};
+                case SPIDER -> new Item[]{net.minecraft.item.Items.SPIDER_EYE, RpgItems.BANDIT_SEAL, RpgItems.WRAITH_ESSENCE, RpgItems.DIRE_FANG};
             };
         }
 
@@ -165,8 +178,22 @@ public final class InstanceDungeon {
                 case CULT -> new GearGrade[]{GearGrade.LEGENDARY, GearGrade.MYTHIC, GearGrade.SECRET};
                 case GOLEM -> new GearGrade[]{GearGrade.MYTHIC, GearGrade.SECRET, GearGrade.SECRET};
                 case DRAGON -> new GearGrade[]{GearGrade.SECRET, GearGrade.SECRET, r.nextInt(100) < 30 ? GearGrade.UNKNOWN : GearGrade.SECRET};
+                case SLIME -> new GearGrade[]{GearGrade.RARE, GearGrade.HERO, GearGrade.LEGENDARY};
+                case SPIDER -> new GearGrade[]{GearGrade.HERO, GearGrade.LEGENDARY, GearGrade.MYTHIC};
             };
             return g[d.ordinal()];
+        }
+
+        /** 난이도 단계 (몹 수 · 함정 피해): 필요 레벨로 셈 (고블린 0 … 용 4). */
+        int tier() {
+            return Math.max(0, (level - 10) / 15);
+        }
+
+        /** 화면에 보일 순서 (필요 레벨 순). */
+        public static List<Theme> byLevel() {
+            List<Theme> l = new ArrayList<>(List.of(values()));
+            l.sort(java.util.Comparator.comparingInt(t -> t.level));
+            return l;
         }
 
         public static Theme byKey(String k) {
@@ -300,6 +327,17 @@ public final class InstanceDungeon {
             newP.experienceLevel = oldP.experienceLevel;
             newP.totalExperience = oldP.totalExperience;
             newP.experienceProgress = oldP.experienceProgress;
+        });
+        // 슬라임이 쪼개져 나온 작은 슬라임도 그 방의 적 (다 잡아야 방이 열림)
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents.ENTITY_LOAD.register((e, w) -> {
+            if (!isDungeon(w) || !(e instanceof net.minecraft.entity.mob.SlimeEntity) || e.getCommandTags().contains(MOB_TAG)) return;
+            for (Run r : RUNS)
+                for (Room rm : r.rooms)
+                    if (rm.active && rm.inside(e.getPos(), 1)) {
+                        e.addCommandTag(MOB_TAG);
+                        rm.mobs.add(e.getUuid());
+                        return;
+                    }
         });
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> server.execute(() -> {
             ServerPlayerEntity p = handler.player;
@@ -908,7 +946,7 @@ public final class InstanceDungeon {
                 for (int i = 0; i < 2 + r.diff.ordinal() + extra; i++) spawn(w, r, rm, pick(r.theme.mobs, rnd), 0);
             }
             default -> {
-                int n = 3 + r.theme.ordinal() / 2 + r.diff.ordinal() + extra * 2;
+                int n = 3 + r.theme.tier() / 2 + r.diff.ordinal() + extra * 2;
                 for (int i = 0; i < n; i++) spawn(w, r, rm, pick(r.theme.mobs, rnd), 0);
             }
         }
@@ -938,6 +976,8 @@ public final class InstanceDungeon {
             m.initialize(w, w.getLocalDifficulty(e.getBlockPos()), SpawnReason.EVENT, null, null);
             m.setPersistent();
         }
+        // 슬라임: 보스 = 슬라임 킹 (크기 8), 중간 보스 = 크기 4, 보통 1~3
+        if (e instanceof net.minecraft.entity.mob.SlimeEntity sl) sl.setSize(rank == 2 ? 8 : rank == 1 ? 4 : 1 + rnd.nextInt(3), true);
         e.addCommandTag(MOB_TAG);
         double party = 1 + 0.35 * Math.max(0, r.partySize - 1);
         double hp = r.diff.hp * party, dmg = r.diff.dmg;
@@ -979,7 +1019,7 @@ public final class InstanceDungeon {
             spots.add(new Vec3d(rm.c.getX() + 0.5 + (rnd.nextDouble() * 2 - 1) * (rm.half - 1.5), rm.c.getY() + 1, rm.c.getZ() + 0.5 + (rnd.nextDouble() * 2 - 1) * (rm.half - 1.5)));
         List<ServerPlayerEntity> in = ps.stream().filter(p -> rm.inside(p.getPos(), 0.5)).toList();
         if (!in.isEmpty()) spots.add(in.get(rnd.nextInt(in.size())).getPos());
-        float dmg = 4 + 3 * r.diff.ordinal() + r.theme.ordinal() * 2;
+        float dmg = 4 + 3 * r.diff.ordinal() + r.theme.tier() * 2;
         for (Vec3d s : spots) {
             NbtCompound n2 = new NbtCompound();
             n2.putFloat("r", 1.6f);

@@ -122,6 +122,24 @@ public final class AWCommands {
     private static final com.mojang.brigadier.suggestion.SuggestionProvider<ServerCommandSource> PLACES = (ctx, b) ->
             net.minecraft.command.CommandSource.suggestMatching(java.util.Arrays.stream(com.abilitywar.world.RpgStructures.Kind.values()).map(k -> k.name().toLowerCase()).toList(), b);
 
+    /** 수도 둘레의 테마 지역 6곳: 이름 · 좌표 · 거리 · 권장 레벨. */
+    static int regions(ServerCommandSource src) {
+        var ow = src.getServer().getOverworld();
+        var calc = ow.getChunkManager().getStructurePlacementCalculator();
+        var bsrc = ((com.abilitywar.mixin.StructurePlacementCalculatorAccessor) calc).abilitywar$getBiomeSource();
+        var ring = com.abilitywar.world.Regions.ring(calc.getStructureSeed(), bsrc, calc.getNoiseConfig().getMultiNoiseSampler());
+        net.minecraft.util.math.Vec3d at = src.getPosition();
+        src.sendFeedback(() -> Text.translatable("region.abilitywar.list_head").formatted(Formatting.GOLD), false);
+        for (var sp : ring) {
+            int x = sp.cx() * 16 + 8, z = sp.cz() * 16 + 8;
+            int dist = (int) Math.hypot(x - at.x, z - at.z);
+            var th = sp.theme();
+            src.sendFeedback(() -> Text.translatable("region.abilitywar.list_line", Text.translatable("region.abilitywar.region." + th.key).styled(s -> s.withColor(th.color)),
+                    th.minLv, th.maxLv, x, z, dist).formatted(Formatting.GRAY), false);
+        }
+        return ring.size();
+    }
+
     private static int dungeonStart(ServerCommandSource src, String theme, String diff) throws CommandSyntaxException {
         ServerPlayerEntity p = src.getPlayerOrThrow();
         var t = com.abilitywar.rpg.InstanceDungeon.Theme.byKey(theme);
@@ -370,6 +388,7 @@ public final class AWCommands {
                             ctx.getSource().sendFeedback(() -> st.getName(), false);
                             return 1;
                         })))
+                .then(literal("regions").executes(ctx -> regions(ctx.getSource())))
                 .then(literal("dungeon")
                         .then(literal("start").then(argument("theme", StringArgumentType.word())
                                 .suggests((c, sb) -> CommandSource.suggestMatching(java.util.Arrays.stream(com.abilitywar.rpg.InstanceDungeon.Theme.values()).map(t -> t.key), sb))

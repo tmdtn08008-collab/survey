@@ -69,6 +69,7 @@ public final class AWMobs {
     public static final EntityType<AncientGolemEntity> ANCIENT_GOLEM = reg("ancient_golem", AncientGolemEntity::new, 1.4f, 2.7f, false, 0x6A7A60, 0x3AE0A0);
     public static final EntityType<EnhancedGolemEntity> ENHANCED_GOLEM = reg("enhanced_golem", EnhancedGolemEntity::new, 1.7f, 3.3f, false, 0x1A1424, 0xFFB040);
     public static final EntityType<DrakeEntity> DRAKE = reg("drake", DrakeEntity::new, 2.1f, 1.4f, true, 0x2A6A3A, 0x9AF060);
+    public static final EntityType<SpiderQueenEntity> SPIDER_QUEEN = reg("spider_queen", SpiderQueenEntity::new, 2.2f, 1.4f, false, 0x2A1A2A, 0xC02030);
     public static final EntityType<DragonKingEntity> DRAGON_KING = reg("dragon_king", DragonKingEntity::new, 7.0f, 4.6f, true, 0x1A3A8A, 0xFFD060);
 
     public static void init() {
@@ -94,6 +95,7 @@ public final class AWMobs {
         FabricDefaultAttributeRegistry.register(ENHANCED_GOLEM, EnhancedGolemEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(DRAKE, DrakeEntity.createAttributes());
         FabricDefaultAttributeRegistry.register(DRAGON_KING, DragonKingEntity.createAttributes());
+        FabricDefaultAttributeRegistry.register(SPIDER_QUEEN, SpiderQueenEntity.createAttributes());
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(e -> EGGS.forEach(e::add));
 
         // 자연 스폰 (밤·어두운 곳, 몬스터 규칙)

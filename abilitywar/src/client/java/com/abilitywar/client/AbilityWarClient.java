@@ -45,6 +45,7 @@ public class AbilityWarClient implements ClientModInitializer {
         EntityRendererRegistry.register(AWEntities.DUNGEON_GUIDE, com.abilitywar.client.render.JobMasterRenderer::dungeonGuide);
         com.abilitywar.client.screen.InventoryPanel.init();
         com.abilitywar.client.compat.CreativePagesFix.init();
+        net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlock(com.abilitywar.rpg.DungeonGateBlock.BLOCK, net.minecraft.client.render.RenderLayer.getTranslucent());
         com.abilitywar.client.render.mob.MobRenderers.init();
         com.abilitywar.client.dev.TestDriver.init();
         ClientNet.init();

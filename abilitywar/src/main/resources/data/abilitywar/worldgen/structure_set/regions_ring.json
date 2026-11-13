@@ -1,0 +1,11 @@
+{
+  "structures": [
+    {
+      "structure": "abilitywar:region",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "abilitywar:region_ring"
+  }
+}

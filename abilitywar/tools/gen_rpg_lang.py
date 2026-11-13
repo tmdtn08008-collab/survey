@@ -790,6 +790,48 @@ for k, ko, en in [
     t(k, ko, en)
 
 
+# ================================================================ 2.11 테마 지역 · 야생 던전 입구
+t('entity.abilitywar.spider_queen', '거미 여왕', 'Spider Queen')
+t('item.abilitywar.spider_queen_spawn_egg', '거미 여왕 생성 알', 'Spider Queen Spawn Egg')
+t('block.abilitywar.dungeon_gate', '던전 입구', 'Dungeon Gate')
+REGIONS = [
+    ('fairy_glade', '요정의 숲', 'Fairy Glade', 1, 15, '요정 · 도깨비불 · 가운데: 치유의 샘', 'fairies, wisps · centre: healing spring', '요정 장난 주의', 'Mind the fairies'),
+    ('goblin_woods', '고블린 숲', 'Goblin Woods', 10, 25, '고블린 · 오크 · 다이어울프 · 던전: 고블린 굴', 'goblins, orcs, dire wolves · dungeon: Goblin Warren', '⚠ 고블린 출몰', '⚠ Goblins about'),
+    ('slime_woods', '슬라임 숲', 'Slime Woods', 15, 30, '슬라임 · 마녀 · 던전: 슬라임 동굴', 'slimes, witches · dungeon: Slime Hollow', '⚠ 미끄러운 땅', '⚠ Slippery ground'),
+    ('spider_woods', '거미 숲', 'Spider Woods', 28, 42, '거미 · 동굴 거미 · 거미 여왕 · 던전: 거미 둥지', 'spiders, cave spiders, Spider Queen · dungeon: Spider Nest', '⚠ 거미줄 조심', '⚠ Beware the webs'),
+    ('haunted_woods', '망령의 숲', 'Haunted Woods', 38, 55, '망령 · 해골 기사 · 광신도 · 던전: 광신도 묘실', 'wraiths, skeleton knights, cultists · dungeon: Cult Crypt', '⚠ 돌아오지 못한 자 많음', '⚠ Few return'),
+    ('crystal_woods', '수정 숲', 'Crystal Woods', 52, 70, '고대 골렘 · 도깨비불 · 강화 골렘 · 던전: 골렘 유적', 'ancient golems, wisps, Enhanced Golem · dungeon: Golem Ruins', '⚠ 골렘 지대', '⚠ Golem country'),
+]
+for key, ko, en, lo, hi, sub_ko, sub_en, warn_ko, warn_en in REGIONS:
+    t('region.abilitywar.region.' + key, ko, en)
+    t('region.abilitywar.region.' + key + '.sub', '레벨 %d~%d · %s' % (lo, hi, sub_ko), 'Level %d-%d · %s' % (lo, hi, sub_en))
+    t('region.abilitywar.sign.lv.' + key, '권장 레벨 %d~%d' % (lo, hi), 'Level %d-%d' % (lo, hi))
+    t('region.abilitywar.sign.warn.' + key, warn_ko, warn_en)
+for k, ko, en in [
+        ('region.abilitywar.sign.top', '— 이 앞은 —', '— Ahead lies —'),
+        ('region.abilitywar.spring.1', '요정의 샘', 'Fairy Spring'),
+        ('region.abilitywar.spring.2', '샘가에 서면', 'Rest by the water'),
+        ('region.abilitywar.spring.3', '상처가 아뭅니다', 'and your wounds heal'),
+        ('region.abilitywar.elite', '⚔ %s 이(가) %s 에 나타났습니다!', '⚔ %s has appeared in the %s!'),
+        ('region.abilitywar.slime_king', '슬라임 킹', 'Slime King'),
+        ('region.abilitywar.list_head', '— 왕국 둘레의 숲 (/aw regions) —', '— Woods around the kingdom (/aw regions) —'),
+        ('region.abilitywar.list_line', '%s · 레벨 %s~%s · X %s Z %s (%s 칸)', '%s · Level %s-%s · X %s Z %s (%s blocks)'),
+        ('dungeon.abilitywar.name.slime_hollow', '슬라임 동굴', 'Slime Hollow'),
+        ('dungeon.abilitywar.name.spider_nest', '거미 둥지', 'Spider Nest'),
+        ('dungeon.abilitywar.boss.slime_hollow.mid', '산성 슬라임', 'Acid Slime'),
+        ('dungeon.abilitywar.boss.slime_hollow.boss', '슬라임 킹 · 동굴의 군주', 'The Slime King of the Hollow'),
+        ('dungeon.abilitywar.boss.spider_nest.mid', '독니 수호자', 'Venomfang Warden'),
+        ('dungeon.abilitywar.boss.spider_nest.boss', '거미 여왕 아라크네', 'Arachne, the Spider Queen'),
+        ('gate.abilitywar.title', '던전 입구', 'Dungeon Gate'),
+        ('gate.abilitywar.say', '소용돌이 너머에서 차가운 바람이 불어온다. 들어갈 때마다 길이 바뀌는 던전이다. 난이도를 고르면 파티 (32칸 안) 와 함께 들어간다.',
+         'A cold wind blows from beyond the vortex. The paths inside change every time. Pick a difficulty to enter with your party (within 32 blocks).'),
+        ('gate.abilitywar.sign.top', '⚔ 던전 입구 ⚔', '⚔ Dungeon Gate ⚔'),
+        ('gate.abilitywar.sign.use', '문에 들어가세요', 'Step into the gate')]:
+    t(k, ko, en)
+for key, lv in [('goblin_warren', 10), ('slime_hollow', 18), ('pirate_grotto', 25), ('spider_nest', 32), ('cult_crypt', 40), ('golem_ruins', 55), ('dragon_abyss', 70)]:
+    t('gate.abilitywar.sign.lv.' + key, '레벨 %d 부터' % lv, 'Level %d+' % lv)
+
+
 def apply(fname, idx):
     p = os.path.join(LANG, fname)
     d = json.load(open(p, encoding='utf-8'))

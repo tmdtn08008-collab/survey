@@ -58,6 +58,7 @@ public final class WildRenderers {
         EntityRendererRegistry.register(AWMobs.FAIRY, FairyRenderer::new);
         EntityRendererRegistry.register(AWMobs.MERMAID, MermaidRenderer::new);
         EntityRendererRegistry.register(AWMobs.DIRE_WOLF, DireWolfRenderer::new);
+        EntityRendererRegistry.register(AWMobs.SPIDER_QUEEN, SpiderQueenRenderer::new);
         EntityRendererRegistry.register(AWMobs.ANCIENT_GOLEM, ctx -> new GolemRenderer<>(ctx, "ancient_golem", 1.0f));
         EntityRendererRegistry.register(AWMobs.ENHANCED_GOLEM, ctx -> new GolemRenderer<>(ctx, "enhanced_golem", 1.22f));
         EntityRendererRegistry.register(AWMobs.DRAKE, MobRenderers.Invisible::new);
